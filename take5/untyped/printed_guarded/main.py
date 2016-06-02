@@ -1,0 +1,37 @@
+from retic.runtime import *
+from retic.guarded import *
+from retic.typing import *
+from retic import Void, List, Int
+from benchmark_tools.Timer import Timer
+from player import Player
+from dealer import Dealer
+
+def generate_dealer(players, cards_per_game):
+    points = [0 for i in retic_cast(range, Dyn, Function(AnonymousParameters([Dyn]), Dyn), "\nmain.py:11:27: Expected function of type Function(['Dyn'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")(retic_cast(len, Dyn, Function(AnonymousParameters([Dyn]), Dyn), "\nmain.py:11:33: Expected function of type Function(['Dyn'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")(players))]
+    return retic_cast(retic_cast(Dealer(players, retic_cast(points, List(Int), Dyn, '\nmain.py:12:11: Expected argument of type Dyn but value %s was provided instead. (code ARG_ERROR)'), cards_per_game), Dyn, Object('Dealer', {'update_game': Function(NamedParameters([('player', Dyn), ('stack_index', Dyn), ('stacks', Dyn)]), Dyn), 'simulate_game': Function(NamedParameters([]), Dyn), 'create_deck': Function(DynParameters, Dyn), 'replace_card': Function(NamedParameters([('card', Dyn), ('index', Dyn), ('stacks', Dyn)]), Dyn), 'create_stacks': Function(NamedParameters([]), Dyn), 'output_scores': Function(NamedParameters([]), Dyn), }), "\nmain.py:12:11: Constructed object value %s does not match type Object(Dealer, {'update_game': Function(['player:Dyn', 'stack_index:Dyn', 'stacks:Dyn'], Dyn), 'simulate_game': Function([], Dyn), 'create_deck': Function(DynParameters, Dyn), 'replace_card': Function(['card:Dyn', 'index:Dyn', 'stacks:Dyn'], Dyn), 'create_stacks': Function([], Dyn), 'output_scores': Function([], Dyn)}),  expected for instances of Class(Dealer, {'update_game': Function(['self:Dyn', 'player:Dyn', 'stack_index:Dyn', 'stacks:Dyn'], Dyn), 'simulate_game': Function(['self:Dyn'], Dyn), 'create_deck': Function(DynParameters, Dyn), 'replace_card': Function(['self:Dyn', 'card:Dyn', 'index:Dyn', 'stacks:Dyn'], Dyn), '__init__': Function(['self:Dyn', 'players:Dyn', 'bull_points:Dyn', 'cards_per_game:Dyn'], Dyn), 'create_stacks': Function(['self:Dyn'], Dyn), 'output_scores': Function(['self:Dyn'], Dyn)}, ). Consider changing the type or setting it to Dyn. (code BAD_OBJECT_INJECTION)"), Object('Dealer', {'update_game': Function(NamedParameters([('player', Dyn), ('stack_index', Dyn), ('stacks', Dyn)]), Dyn), 'simulate_game': Function(NamedParameters([]), Dyn), 'create_deck': Function(DynParameters, Dyn), 'replace_card': Function(NamedParameters([('card', Dyn), ('index', Dyn), ('stacks', Dyn)]), Dyn), 'create_stacks': Function(NamedParameters([]), Dyn), 'output_scores': Function(NamedParameters([]), Dyn), }), Dyn, '\nmain.py:12:4: A return value of type Dyn was expected but a value %s was returned instead. (code RETURN_ERROR)')
+generate_dealer = retic_cast(generate_dealer, Dyn, Function(NamedParameters([('players', Dyn), ('cards_per_game', Dyn)]), Dyn), "\nmain.py:6:0: Function %s does not match specified type Function(['players:Dyn', 'cards_per_game:Dyn'], Dyn). Consider changing the type or setting it to Dyn. (code BAD_FUNCTION_INJECTION)")
+
+def generate_players(num_players):
+    players = []
+    for i in retic_cast(range, Dyn, Function(AnonymousParameters([Dyn]), Dyn), "\nmain.py:21:13: Expected function of type Function(['Dyn'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")(num_players):
+        players.append(retic_cast(retic_cast(Player(i, retic_cast([], List(Dyn), Dyn, '\nmain.py:22:23: Expected argument of type Dyn but value %s was provided instead. (code ARG_ERROR)')), Dyn, Object('Player', {'get_index_of_closest_stack': Function(NamedParameters([('cards', Dyn), ('card', Dyn)]), Dyn), 'discard': Function(NamedParameters([]), Dyn), 'choose_correct_stack': Function(NamedParameters([('stacks', Dyn)]), Dyn), }), "\nmain.py:22:23: Constructed object value %s does not match type Object(Player, {'get_index_of_closest_stack': Function(['cards:Dyn', 'card:Dyn'], Dyn), 'discard': Function([], Dyn), 'choose_correct_stack': Function(['stacks:Dyn'], Dyn)}),  expected for instances of Class(Player, {'__init__': Function(['self:Dyn', 'name:Dyn', 'cards:Dyn'], Dyn), 'get_index_of_closest_stack': Function(['self:Dyn', 'cards:Dyn', 'card:Dyn'], Dyn), 'discard': Function(['self:Dyn'], Dyn), 'choose_correct_stack': Function(['self:Dyn', 'stacks:Dyn'], Dyn)}, ). Consider changing the type or setting it to Dyn. (code BAD_OBJECT_INJECTION)"), Object('Player', {'get_index_of_closest_stack': Function(NamedParameters([('cards', Dyn), ('card', Dyn)]), Dyn), 'discard': Function(NamedParameters([]), Dyn), 'choose_correct_stack': Function(NamedParameters([('stacks', Dyn)]), Dyn), }), Dyn, '\nmain.py:22:8: Expected argument of type Dyn but value %s was provided instead. (code ARG_ERROR)'))
+    return retic_cast(players, List(Dyn), Dyn, '\nmain.py:23:4: A return value of type Dyn was expected but a value %s was returned instead. (code RETURN_ERROR)')
+generate_players = retic_cast(generate_players, Dyn, Function(NamedParameters([('num_players', Dyn)]), Dyn), "\nmain.py:14:0: Function %s does not match specified type Function(['num_players:Dyn'], Dyn). Consider changing the type or setting it to Dyn. (code BAD_FUNCTION_INJECTION)")
+
+def main():
+    num = 3
+    cards_per_player = 10
+    cards_per_game = 210
+    if (num < 2):
+        retic_cast(print, Dyn, Function(AnonymousParameters([String]), Dyn), "\nmain.py:30:8: Expected function of type Function(['String'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")('Too few players!')
+    if ((cards_per_game / cards_per_player) < num):
+        retic_cast(print, Dyn, Function(AnonymousParameters([String]), Dyn), "\nmain.py:32:8: Expected function of type Function(['String'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")('Too many players!')
+        retic_cast(exit, Dyn, Function(AnonymousParameters([]), Dyn), '\nmain.py:33:8: Expected function of type Function([], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)')()
+    players = generate_players(retic_cast(num, Int, Dyn, '\nmain.py:34:14: Expected argument of type Dyn but value %s was provided instead. (code ARG_ERROR)'))
+    dealer = generate_dealer(players, retic_cast(cards_per_game, Int, Dyn, '\nmain.py:35:13: Expected argument of type Dyn but value %s was provided instead. (code ARG_ERROR)'))
+    retic_cast(retic_cast(dealer, Dyn, Object('', {'simulate_game': Dyn, }), '\nmain.py:36:4: Accessing nonexistant object attribute simulate_game from value %s. (code WIDTH_DOWNCAST)').simulate_game, Dyn, Function(AnonymousParameters([]), Dyn), '\nmain.py:36:4: Expected function of type Function([], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)')()
+main = retic_cast(main, Dyn, Function(NamedParameters([]), Dyn), '\nmain.py:25:0: Function %s does not match specified type Function([], Dyn). Consider changing the type or setting it to Dyn. (code BAD_FUNCTION_INJECTION)')
+t = retic_cast(Timer, Dyn, Function(AnonymousParameters([]), Dyn), '\nmain.py:38:4: Expected function of type Function([], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)')()
+with t:
+    for i in retic_cast(range, Dyn, Function(AnonymousParameters([Int]), Dyn), "\nmain.py:40:13: Expected function of type Function(['Int'], Dyn) at call site but but value %s was provided instead. (code FUNC_ERROR)")(3):
+        main()
