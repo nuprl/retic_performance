@@ -1,13 +1,13 @@
 from retic import List, Float, Int
 
-import os, sys
+import os, sys, itertools
 this_package_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(this_package_path, '..'))
 
 #TODO: Cannot type variable in retic
 data = (list(map(float, [line.strip() for line in open(
     "utill-random-numbers.txt")])))
-rand_num = (element for element in data)
+rand_num = itertools.cycle(data)
 
 
 def accumulated_s(probabilities:List(Float))->List(Float):

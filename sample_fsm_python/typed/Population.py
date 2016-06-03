@@ -3,6 +3,7 @@ from retic import List, Void, Int, Float
 from Utilities import choose_randomly
 from Automata import Automaton
 from copy import copy
+import itertools
 
 import os, sys
 this_package_path = os.path.dirname(os.path.abspath(__file__))
@@ -11,7 +12,7 @@ sys.path.insert(0, os.path.join(this_package_path, '..'))
 #TODO: Cannot type variable in retic
 data = (list(map(int, [line.strip() for line in open(
     "population-random-numbers.txt")])))
-rand_num = (element for element in data)
+rand_num = itertools.cycle(data)
 
 class Population:
     """

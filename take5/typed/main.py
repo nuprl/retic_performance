@@ -38,8 +38,10 @@ def main()->Void:
 
     players = generate_players(num)
     dealer = generate_dealer(players, cards_per_game)
-    print("scores: %s" % dealer.simulate_game())
+    dealer.simulate_game()
+    #print("scores: %s" % dealer.simulate_game())
 t = Timer()
 with t:
+  for i in range(500):
     main()
 

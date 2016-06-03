@@ -49,4 +49,5 @@ def simulation_to_lines(data: List(Float))->List(Tuple(Int, Float)):
 
 t = Timer()
 with t:
+  for i in range(100):
     run()
