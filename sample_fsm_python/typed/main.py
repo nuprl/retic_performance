@@ -1,6 +1,4 @@
 import os, sys
-this_package_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(this_package_path, '..'))
 
 from benchmark_tools.Timer import Timer
 from Population import Population

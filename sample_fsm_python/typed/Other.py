@@ -2,16 +2,11 @@ from Population import Population
 from Automata import Automaton
 from random import randrange
 from retic import Int
-import itertools
 
-import os, sys
-this_package_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(this_package_path, '..'))
-
+import os, sys, itertools
+fname = os.path.join(os.path.dirname(__file__), "automata-random-numbers.txt")
 #TODO: Cannot type variable in retic
-data = (list(map(int, [line.strip() for line in open(
-    "automata-random-numbers.txt")])))
-rand_num = itertools.cycle(data)
+rand_num = itertools.cycle((int(line.strip()) for line in open(fname, "r")))
 
 
 def make_random_automaton(n: Int)->Automaton:
