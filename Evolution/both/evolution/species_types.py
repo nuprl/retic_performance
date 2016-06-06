@@ -4,7 +4,6 @@ from evolution.trait_cards import CarnivoreCard, FatTissueCard
 __author__ = 'Edwin Cowart, Kevin McDonough'
 
 
-
 def is_carnivore(value):
     """ Is the given value a Carnivore?
     :param value: The value being checked

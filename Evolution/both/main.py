@@ -1,8 +1,9 @@
 import sys
-from dealer.dealer import Dealer
 from evolution.player.player import Player
-from dealer.deck import Deck
 from benchmark_tools.Timer import Timer
+
+from dealer.dealer import Dealer
+from dealer.deck import Deck
 
 
 MIN_PLAYERS = 3
@@ -22,7 +23,6 @@ def main(argv):
         dealer = make_dealer(n)
         dealer.run_game()
         score = dealer.get_sorted_scores()
-       # print_score(score)
 
 def make_dealer(n):
     """

@@ -13,7 +13,7 @@ class CooperationCard(TraitCard):
         """
         description = "CooperationCard automatically feeds the species to its right one token of food every time it " \
                       "eats (taken from the common food supply at the watering hole)."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def on_feed(self, dealer, player_index, species_index):
         species_list = dealer.player_states[player_index].species_list

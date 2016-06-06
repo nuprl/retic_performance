@@ -12,7 +12,7 @@ class BurrowingCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card, "BurrowingCard deflects an attack when its species has a food"
+        super().__init__(num_tokens_as_food_card, "BurrowingCard deflects an attack when its species has a food"
                                                           " supply equal to its population size.")
 
     def blocks_attack(self,
@@ -32,3 +32,4 @@ class BurrowingCard(TraitCard):
 
     def __repr__(self):
         return "BurrowingCard({})".format(self.num_tokens_as_food_card)
+

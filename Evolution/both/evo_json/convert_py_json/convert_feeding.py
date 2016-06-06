@@ -11,10 +11,6 @@ from evo_json.convert_py_json.convert_species import convert_to_pj_species_plus
 
 __author__ = 'Edwin Cowart, Kevin McDonough'
 
-
-"""----------- PyJSON Feeding <-> Feeding -----------"""
-
-
 """
 PJ_Feeding = List[PyJSON] # of format [PJ_Player, PJ_Watering_Hole, List[PJ_Player]]
 """

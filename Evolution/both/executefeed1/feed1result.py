@@ -1,6 +1,5 @@
 from evolution.player.player_feeding_choice import PlayerForgoAttack
 
-
 class Feed1Result:
 
     def execute_feed1(self, can_feed_deque, dealer, index):
@@ -15,7 +14,6 @@ class Feed1Result:
         :return: None
         """
         raise NotImplementedError('Method not yet implemented')
-
 
 
     def verify_and_apply(self, feeding_choice, can_feed_deque, dealer, index):

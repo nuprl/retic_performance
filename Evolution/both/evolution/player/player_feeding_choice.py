@@ -5,7 +5,7 @@ from evolution.constants import HORN_POP_REDUCTION, ATTACK_POP_REDUCTION
 __author__ = 'Edwin Cowart, Kevin McDonough'
 
 
-class PlayerFeedingChoice(object, metaclass=ABCMeta):
+class PlayerFeedingChoice:
     """
     Represents the Feeding Choice being made by the Player
     """

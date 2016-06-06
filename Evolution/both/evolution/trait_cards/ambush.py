@@ -11,7 +11,7 @@ class AmbushCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return: None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card, "AmbushCard overcomes a Warning Call during an evolution.")
+        super().__init__(num_tokens_as_food_card, "AmbushCard overcomes a Warning Call during an evolution.")
 
     def get_name(self):
         return "Ambush"
@@ -21,3 +21,5 @@ class AmbushCard(TraitCard):
 
     def __repr__(self):
         return "AmbushCard({})".format(self.num_tokens_as_food_card)
+
+

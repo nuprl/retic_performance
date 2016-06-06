@@ -132,15 +132,6 @@ class Species:
         :return: The possible carnivore evolution choices for this species
         """
         choices = []
-        # def add_choice(species, species_i, player_state, player_i, player_states):
-        #     player_species = player_state.species_list
-        #     right_neighbor = player_species[species_i + 1] if species_i + 1 < len(player_species) else None
-        #     left_neighbor = player_species[species_i - 1] if species_i - 1 >= 0 else None
-        #     if species.is_attackable(self, right_neighbor, left_neighbor):
-        #         choices.append(PlayerAttackWithCarnivore(self_index, player_i, species_i))
-        #
-        # util.for_all_species(dealer.player_states, add_choice)
-
 
         for player_i, player_state in enumerate(dealer.player_states):
             player_species = player_state.species_list

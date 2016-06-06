@@ -12,7 +12,7 @@ class CarnivoreCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return: None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card, "CarnivoreCard must attack to eat during the evolution stage.")
+        super().__init__(num_tokens_as_food_card, "CarnivoreCard must attack to eat during the evolution stage.")
 
     def set_num_tokens_as_food_card(self, num_tokens_as_food_card):
         """ Set the Number of Food Tokens

@@ -20,8 +20,8 @@ class FatTissueCard(TraitCard):
                       "physical game, the additional food is stored on the actual card. It must be used to feed the " \
                       "species at the beginning of the next evolution round, before any food is taken from the " \
                       "watering hole."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
-        self.stored_food = stored_food  # type: Natural
+        super().__init__(num_tokens_as_food_card, description)
+        self.stored_food = stored_food
 
     def store_food(self, stored_food, owner_body_size):
         """

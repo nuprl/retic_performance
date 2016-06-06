@@ -14,7 +14,7 @@ class WarningCallCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return None
         """
-        evolution.trait_cards.cards.TraitCard.__init__(self, num_tokens_as_food_card,
+        super().__init__(num_tokens_as_food_card,
                                                        "Warning Call prevents an attack from a Carnivore on Rest "
                                                        "neighboring species unless the attacker has the AmbushCard "
                                                        "property.")

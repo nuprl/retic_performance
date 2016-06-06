@@ -3,7 +3,7 @@ from evolution.Species import Species
 from evolution.species_types import is_extant_carnivore
 
 
-class Situation(object):
+class Situation:
 
     def __init__(self, defender, attacker, defender_left_neighbor=None, defender_right_neighbor=None):
         """

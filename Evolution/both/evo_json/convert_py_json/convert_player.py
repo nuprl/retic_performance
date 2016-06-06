@@ -8,8 +8,6 @@ from evolution.player.player import Player
 from evolution.player.player_state import PlayerState
 __author__ = 'Edwin Cowart, Kevin McDonough'
 
-
-
 def is_pj_player(value):
     """ Is the given value a PJ_Player?
     :param value: The value being checked

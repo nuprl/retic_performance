@@ -14,7 +14,7 @@ class LongNeckCard(TraitCard):
         """
         description = "Long Neck automatically adds one food token for the entire species when the food cards are " \
                       "revealed."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def get_name(self):
         return "Long Neck"

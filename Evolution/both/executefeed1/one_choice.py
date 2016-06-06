@@ -1,6 +1,4 @@
-import logging
 from executefeed1.feed1result import Feed1Result
-logger = logging.getLogger("dealer")
 
 class OneChoice(Feed1Result):
 
@@ -13,7 +11,6 @@ class OneChoice(Feed1Result):
         self.feeding_choice = feeding_choice
 
     def execute_feed1(self, can_feed_deque, dealer, index):
-        logger.info("Feeding choice is %s" % self.feeding_choice)
         self.verify_and_apply(self.feeding_choice, can_feed_deque, dealer, index)
 
     def __eq__(self, other):

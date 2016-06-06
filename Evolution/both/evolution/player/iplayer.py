@@ -12,7 +12,7 @@ class IPlayer(PlayerState):
     """
     def __init__(self, player, id, species_list=None,
                  food_bag=PLAYER_STARTING_FOOD_TOKENS, hand=None):
-        super(IPlayer, self).__init__(id, species_list, food_bag, hand)
+        super().__init__(id, species_list, food_bag, hand)
         self.player = player
 
     def update_player(self, wh):

@@ -12,7 +12,7 @@ class SymbiosisCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return: None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card,
+        super().__init__(num_tokens_as_food_card,
                            "Symbiosis prevents an attack if this species has a neighbor to "
                            "the right whose body size is larger than this ones.")
 

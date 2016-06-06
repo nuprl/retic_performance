@@ -10,7 +10,7 @@ PlayedCard is one of:
 - FaceDownCard
 """
 
-class TraitCard(object):
+class TraitCard:
 
     def __init__(self, num_tokens_as_food_card=TRAIT_CARD_DEFAULT_FOOD_TOKENS, description=TRAIT_CARD_DEFAULT_DESC):
         """
@@ -21,9 +21,9 @@ class TraitCard(object):
         :type description: String
         :return: None
         """
-        self.num_tokens_as_food_card = TRAIT_CARD_MIN_FOOD_TOKENS  # type: int
+        self.num_tokens_as_food_card = TRAIT_CARD_MIN_FOOD_TOKENS
         self.set_num_tokens_as_food_card(num_tokens_as_food_card)
-        self.description = TRAIT_CARD_DEFAULT_DESC                 # type: str
+        self.description = TRAIT_CARD_DEFAULT_DESC
         self.set_description(description)
 
     @classmethod

@@ -13,7 +13,7 @@ class HornCard(TraitCard):
         :return: None
         """
         description = "Horns kills one animal of an attacking CarnivoreCard species before the attack is completed."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def get_name(self):
         return "Horns"

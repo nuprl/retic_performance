@@ -12,7 +12,7 @@ class HardShellCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return: None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card,
+        super().__init__(num_tokens_as_food_card,
                            "Hard Shell prevents an attack unless the attacker is "
                            "at least 4 units larger than this species in body size.")
 

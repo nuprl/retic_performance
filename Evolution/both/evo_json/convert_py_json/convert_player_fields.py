@@ -9,9 +9,6 @@ __author__ = 'Edwin Cowart, Kevin McDonough'
 """----------- PyJSON Player id filed <-> Natural -----------"""
 
 
-"""
-PJ_Id = List[PyJSON] # of format ["id", NaturalPlus]
-"""
 def is_pj_id(value):
     """
     IS the given value a PJ_Id?
@@ -88,11 +85,7 @@ def convert_to_pj_player_species(species_list):
 
     return [SPECIES_STR, convert_to_pj_los(species_list)]
 
-"""----------- PyJSON Player bag <-> Natural -----------"""
 
-"""
-PJ_Bag = List[PyJSON] # of format ["bag", Natural]
-"""
 def is_pj_bag(value):
     """ IS the given value a PJ_ID?
     :param value: The value being checked

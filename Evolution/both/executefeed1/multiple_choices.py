@@ -1,10 +1,7 @@
-from executefeed1.feed1result import Feed1Result
 from evolution.player.player_feeding_choice import PlayerForgoAttack
 from evolution.timeout import TimeoutError
 from evo_json.data_def import ConvertPyJSONError
-import logging
-
-logger = logging.getLogger("dealer")
+from executefeed1.feed1result import Feed1Result
 
 
 class MultipleChoices(Feed1Result):
@@ -19,7 +16,6 @@ class MultipleChoices(Feed1Result):
         player_state = dealer.player_states[index]
         try:
             feeding_choice = player_state.choose_feeding(dealer.wateringhole, dealer.player_states)
-            logger.info("Feeding choice is %s" % feeding_choice)
             self.verify_and_apply(feeding_choice, can_feed_deque, dealer, index)
 
         except (TimeoutError, ConvertPyJSONError):

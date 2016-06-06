@@ -14,12 +14,12 @@ from evolution.player.species_keys import SpeciesPickKey, SpeciesFeedType, \
     SpeciesOrderKey
 
 
-from typed.exchange_for_population import ExchangeForPopulation
-from typed.exchange_for_population import ExchangeForPopulation
-from typed.exchange_for_species import ExchangeForSpecies
+from exchange_for_population import ExchangeForPopulation
+from exchange_for_population import ExchangeForPopulation
+from exchange_for_species import ExchangeForSpecies
 
 
-class Player(object):
+class Player:
     def __init__(self):
         """
         :return: None
@@ -56,15 +56,7 @@ class Player(object):
             card_plays.append(
                 ExchangeForPopulation(self.get_hand_index(s_hand.pop(0)),
                                       len(self.player_state.species_list)))
-        # if s_hand:
-        #     card_plays.append(
-        #         ExchangeForBodySize(self.get_hand_index(s_hand.pop(0)),
-        #                             len(self.player_state.species_list)))
-        # if s_hand:
-        #     card_plays.append(
-        #         ReplaceCards(self.get_hand_index(s_hand.pop(0)),
-        #                             len(self.player_state.species_list),
-        #                             0))
+
         return food_card_index, card_plays
 
     def get_hand_index(self, card):

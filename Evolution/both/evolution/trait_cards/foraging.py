@@ -12,7 +12,7 @@ class ForagingCard(TraitCard):
         :return: None
         """
         description = "Foraging enables this species to eat two tokens of food for every evolution."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def on_feed(self, dealer, player_index, species_index):
         player_state = dealer.player_states[player_index]

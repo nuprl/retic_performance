@@ -13,7 +13,7 @@ class FertileCard(TraitCard):
         :return: None
         """
         description = "FertileCard automatically adds one animal to the population when the food cards are revealed."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def apply_before_feeding(self, dealer, player_index, species_index):
         player_state = dealer.player_states[player_index]

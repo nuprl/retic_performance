@@ -10,7 +10,7 @@ class HerdingCard(TraitCard):
         """
         :param num_tokens_as_food_card: The food tokens associated with this HerdingCard
         """
-        TraitCard.__init__(self, num_tokens_as_food_card,
+        super().__init__(num_tokens_as_food_card,
                            "Herding stops attacks from Carnivore species whose populations "
                            "are smaller or equal in size to this species population.")
 

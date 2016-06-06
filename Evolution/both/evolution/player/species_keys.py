@@ -17,7 +17,7 @@ class SpeciesFeedType(enum.Enum):
 
 
 @total_ordering
-class SpeciesPickKey(object):
+class SpeciesPickKey:
     def __init__(self, species, owning_player_index, players):
         """
         :param species: The species to be compared
@@ -124,7 +124,7 @@ class SpeciesOrderKey():
 
 
 @total_ordering
-class FatOrderKey(object):
+class FatOrderKey:
     def __init__(self, species: Species):
         self.species = species
 

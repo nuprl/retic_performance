@@ -14,7 +14,7 @@ class PackHuntingCard(TraitCard):
         """
         description = "Pack Hunting adds this species population size to its body size for " \
                       "attacks on other species."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def mod_owner_body_size(self,
                             owner,

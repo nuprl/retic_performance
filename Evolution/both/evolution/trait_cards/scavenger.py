@@ -12,7 +12,7 @@ class ScavengerCard(TraitCard):
         :return None
         """
         description = "Scavenger automatically eats one food token every time a Carnivore eats another species."
-        TraitCard.__init__(self, num_tokens_as_food_card, description)
+        super().__init__(num_tokens_as_food_card, description)
 
     def get_name(self):
         return "Scavenger"

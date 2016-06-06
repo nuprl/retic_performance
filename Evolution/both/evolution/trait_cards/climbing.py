@@ -12,7 +12,7 @@ class ClimbingCard(TraitCard):
         :type num_tokens_as_food_card: int
         :return None
         """
-        TraitCard.__init__(self, num_tokens_as_food_card,
+        super().__init__(num_tokens_as_food_card,
                            "ClimbingCard prevents an attack unless the Carnivore"
                            " also has the ClimbingCard attribute.")
 

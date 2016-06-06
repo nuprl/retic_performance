@@ -1,7 +1,5 @@
 import enum
 
-__author__ = 'Edwin Cowart, Kevin McDonough'
-
 
 class SituationFlag(enum.Enum):
     """
@@ -21,6 +19,7 @@ class SituationFlag(enum.Enum):
         :return: True if flag is a belligerent, False otherwise
         :rtype: bool
         """
+        print(flag is SituationFlag.ATTACKER or flag is SituationFlag.DEFENDER)
         return flag is SituationFlag.ATTACKER or flag is SituationFlag.DEFENDER
 
     @staticmethod
@@ -32,6 +31,7 @@ class SituationFlag(enum.Enum):
         :return: True if flag is an defender, False otherwise
         :rtype: bool
         """
+        print(flag is SituationFlag.DEFENDER)
         return flag is SituationFlag.DEFENDER
 
     @staticmethod
@@ -43,6 +43,7 @@ class SituationFlag(enum.Enum):
         :return: True if flag is an attacker, False otherwise
         :rtype: bool
         """
+        print(flag is SituationFlag.ATTACKER)
         return flag is SituationFlag.ATTACKER
 
     @staticmethod
@@ -54,6 +55,7 @@ class SituationFlag(enum.Enum):
         :return: True if flag is a defender neighbor, False otherwise
         :rtype: bool
         """
+        print(flag is SituationFlag.DEFENDER_L_NEIGHBOR or flag is SituationFlag.DEFENDER_R_NEIGHBOR)
         return flag is SituationFlag.DEFENDER_L_NEIGHBOR or flag is SituationFlag.DEFENDER_R_NEIGHBOR
 
     @staticmethod
@@ -65,6 +67,7 @@ class SituationFlag(enum.Enum):
         :return: True if flag is a left defender neighbor, False otherwise
         :rtype bool
         """
+        print(flag is SituationFlag.DEFENDER_L_NEIGHBOR)
         return flag is SituationFlag.DEFENDER_L_NEIGHBOR
 
     @staticmethod
@@ -76,4 +79,5 @@ class SituationFlag(enum.Enum):
         :return: True if flag is a right defender neighbor, False otherwise
         :rtype bool
         """
+        print(flag is SituationFlag.DEFENDER_R_NEIGHBOR)
         return flag is SituationFlag.DEFENDER_R_NEIGHBOR

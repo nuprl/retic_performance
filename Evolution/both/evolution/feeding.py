@@ -7,7 +7,7 @@ from evolution.player.player_feeding_choice import *
 __author__ = 'Edwin Cowart, Kevin McDonough'
 
 
-class Feeding(object):
+class Feeding:
     """
     Represents a Feeding where a Player must choose one of its Species to feed
     """
