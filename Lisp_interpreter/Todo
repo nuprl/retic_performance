@@ -1,0 +1,34 @@
+issues:
+(/ 2.0 2)
+hitting enter multiple times exits the program!!
+
+check parser errors
+- and or are no longer reserved
+
+
+TODO:
+1- Fix space errors
+2- Print proper error messages
+3- eval_internal in Func. app should catch error when
+first parse expression does not produce a function
+4- go over all the tests again and fix all errors and get if to work
+
+Sunday:
+- Recursion works
+- Types, syntax & rules
+
+
+
+
+
+
+fix operations
+wrap values: issue with zero divisiton
+
+
+
+
+typing reader:
+65k configs
+
+interpreter,parser too small

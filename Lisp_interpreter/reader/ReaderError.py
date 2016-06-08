@@ -1,0 +1,2 @@
+class ReaderError(BaseException):
+    pass
