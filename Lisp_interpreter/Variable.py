@@ -1,5 +1,3 @@
-import DirPaths
-
 from BSLExpr import BSLExpr
 from BSLError import BSLError
 from Global_Scope import foo
