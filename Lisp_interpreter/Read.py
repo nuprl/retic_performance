@@ -1,4 +1,3 @@
-import DirPaths
 from sys import stdin, stdout
 from Parser import parse
 from ParserError import ParserError

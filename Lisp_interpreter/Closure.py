@@ -1,6 +1,4 @@
-import DirPaths
 import copy
-
 from BSLError import BSLError
 
 class Closure:

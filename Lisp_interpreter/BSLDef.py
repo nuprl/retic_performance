@@ -1,4 +1,3 @@
-import DirPaths
 from BSLError import BSLError
 from Closure import Closure
 from abc import abstractmethod

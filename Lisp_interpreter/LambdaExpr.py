@@ -1,4 +1,3 @@
-import DirPaths
 from BSLExpr import BSLExpr
 from Closure import Closure
 

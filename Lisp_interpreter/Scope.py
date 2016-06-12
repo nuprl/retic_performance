@@ -1,5 +1,3 @@
-import copy
-import DirPaths
 import operator
 from functools import reduce
 from BSLError import BSLError
@@ -7,7 +5,6 @@ from ComparisonDef import ComparisonDef
 from Num import Num
 from Boolean import Boolean
 from BSLExpr import BSLExpr
-from copy import copy
 
 class Scope:
     """

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-import DirPaths
 from BSLError import BSLError
 
 class BSLExpr:

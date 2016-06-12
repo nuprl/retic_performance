@@ -1,5 +1,3 @@
-import DirPaths
-
 class Binding:
     """
     To represent a binding between a name and a BSLExpr
