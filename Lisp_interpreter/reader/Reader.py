@@ -1,5 +1,7 @@
+import DirPaths
 from ReaderError import ReaderError
 from retic import Void, String, List, Dyn, Bool, Tuple
+
 
 class Reader:
     """
@@ -25,7 +27,8 @@ class Reader:
     - [S-expression]
     """
 
-    def __init__(self:Reader, ip)->Void:
+
+    def __init__(self, ip:String)->Void:
         """
         :param ip: [chars]
         :return: None
@@ -34,7 +37,7 @@ class Reader:
 
 
     #TODO ????
-    def reader(self:Reader)->Dyn:
+    def reader(self)->Dyn:
         """
         Read S-expression from Standard input
         :return: S-expression
@@ -46,9 +49,11 @@ class Reader:
             raise ReaderError('Unexpected %s' % (')'))
 
         else:
-            return self.read_ex1(next)[0]
+            r = self.read_ex1(next)
+            print(r)
+            return r[0]
 
-    def read_ex1(self:Reader, char:String)->Tuple(List(String),String):
+    def read_ex1(self, char:String)->Tuple(Dyn,Dyn):
         """
         Produce the next Sexpression and the character that follows it
         :param char: String
@@ -69,14 +74,14 @@ class Reader:
         else:
             return self.read_token([next])
 
-    def read_exx(self:Reader)->Tuple(List(String),String):
+    def read_exx(self)->Tuple(Dyn, Dyn):
         """
         Produce a list of S-expressions and the character that follows it
         :return: [[S-expressions] Char]
         """
         return self.read_ex_acc(self.read_first_proper_char())
 
-    def read_ex_acc(self:Reader, next:String)->Tuple(List(String), String):
+    def read_ex_acc(self, next:String)->Tuple(Dyn, Dyn):
         """
         Accumulates the char that precedes exx on stdin
         ex:
@@ -101,7 +106,7 @@ class Reader:
             s_expr_list.insert(0,first_s_expr)
             return (s_expr_list, next_char_again)
 
-    def read_token(self:Reader, starts_with:List(String))->List(Dyn):
+    def read_token(self, starts_with:List(String))->Tuple(Dyn,Dyn):
         """
         Produce the next token and the character that ended it
         :param starts_with: [char]
@@ -115,9 +120,9 @@ class Reader:
         except ValueError:
             pass
 
-        return [pre_token_first, pre_token_second]
+        return (pre_token_first, pre_token_second)
 
-    def read_token_acc(self:Reader, prefix:List(String))->List(Dyn):
+    def read_token_acc(self, prefix:List(String))->Tuple(Dyn, Dyn):
         """
         Produce rest of current token from ip
         :param prefix: [char]
@@ -136,9 +141,9 @@ class Reader:
                 break
             else:
                 result = result + next
-        return [result, final_next]
+        return (result, final_next)
 
-    def read_first_proper_char(self:Reader)->Dyn:
+    def read_first_proper_char(self)->Dyn:
         """
         Produces the first character that is not a white space
         :return: String
@@ -151,21 +156,21 @@ class Reader:
             if not char.isspace():
                 return char
 
-    def read_char(self:Reader)->String:
+    def read_char(self)->String:
         """
         Reads the next character
         :return: String
         """
         return self.ip.pop(0)
 
-    def is_not_eof(self:Reader)->Bool:
+    def is_not_eof(self)->Bool:
         """
         Is ip not eof?
         :return: True if not eof and False otherwise
         """
         return bool(self.ip)
 
-    def split(self:Reader, line:String)->List(String):
+    def split(self, line:String)->List(String):
         """
         Transforms line to list of characters
         :param line: String
