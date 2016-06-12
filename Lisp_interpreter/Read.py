@@ -4,20 +4,8 @@ from ParserError import ParserError
 from Global_Scope import foo
 from Reader import Reader
 from retic import Void, Bool, List, String, Dyn
-# from reader.p_expr import P_Expr
+from p_expr import P_Expr
 
-
-#If this class is in a different file, there'd be a bug.
-class P_Expr:
-    """
-    Represents a union type p-expr
-    """
-    def __init__(self, expr):
-        """
-        :param p_expr: List of string or None
-        :return: None
-        """
-        self.expr = expr
 
 class No_Expr(P_Expr):
     def __init__(self, expr:Void):
