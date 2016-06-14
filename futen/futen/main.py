@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# from __future__ import print_function
 
-from __future__ import print_function
 import sys
-from io import StringIO
+import io
 import argparse
 import os
 
@@ -11,23 +9,26 @@ import paramiko
 from jinja2 import environment
 from jinja2 import loaders
 
+from retic import String, Void, List
+from paramiko.config import SSHConfig
+
 class TemplateInventoryRenderer(object):
 
-    def __init__(self, template_dir):
+    def __init__(self:TemplateInventoryRenderer, template_dir:String)->Void:
         print ("Template_dir: ", type (template_dir))
         loader = loaders.FileSystemLoader(template_dir)
         self.environ = environment.Environment(loader=loader)
 
-    def render(self, template_name, args):
+    def render(self:TemplateInventoryRenderer, template_name:String, args)->String:
         print("Template_name: ", type(template_name))
         template = self.environ.get_template(template_name)
         return template.render(**args)
 
 
-def parse(lines):
+def parse(lines:List)->SSHConfig:
     print("Lines: ", type(lines))
     config = ''.join(lines)
-    fd = StringIO(config)
+    fd = io.StringIO(config)
     parser = paramiko.SSHConfig()
     parser.parse(fd)
     return parser

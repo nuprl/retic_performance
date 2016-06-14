@@ -1,5 +1,7 @@
 from retic import Void, List, Int, Bool, Dyn
 from evolution.player.player_state import PlayerState
+from benchmark_tools.Counter import counted
+
 
 class CardPlay:
     """
@@ -9,6 +11,7 @@ class CardPlay:
     - ExchangeCard
     """
 
+    @counted
     def __init__(self:CardPlay, played_card_index:Int)->Void:
         """
         :param played_card_index: the card that was played
@@ -17,6 +20,7 @@ class CardPlay:
         """
         self.played_card_index = played_card_index
 
+    @counted
     def apply(self:CardPlay, player_state:PlayerState)->Void:
         """
         Applies this card play to the given PlayerState
@@ -26,6 +30,7 @@ class CardPlay:
         """
         raise NotImplementedError("Method not yet implemented.")
 
+    @counted
     def get_card_indices(self:CardPlay)->List(Int):
         """
         Get the indices of the TraitCards used by this CardPlay
@@ -35,6 +40,7 @@ class CardPlay:
         return [self.played_card_index]
 
     #TODO: Fix types for this method
+    @counted
     def verify_self(self:CardPlay, player_state:PlayerState, food_card_index:Int, card_plays_before_this:List(CardPlay))->Bool:
         """
         Verifies that this card play is valid
@@ -55,6 +61,7 @@ class CardPlay:
 
         return no_dups and no_overlap and in_range
 
+    @counted
     def update_trait_counts(self:CardPlay, species_trait_count:List(Int))->List(Int):
         """
         Append the species trait count to the given list
@@ -66,6 +73,7 @@ class CardPlay:
         """
         raise NotImplementedError("Method not yet implemented")
 
+    @counted
     def num_species_created(self:CardPlay)->Int:
         """
         returns the number of species created

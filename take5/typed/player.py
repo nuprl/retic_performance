@@ -1,9 +1,11 @@
 from retic import List,Tuple,Void,String,Int
+from benchmark_tools.Counter import counted
 
 class Player:
     """
     To represent a player in the game
     """
+    @counted
     def __init__(self:Player, name:Int, cards:List(Tuple(Int,Int)))->Void:
         """
         :param name: Int
@@ -14,6 +16,7 @@ class Player:
         self.name = name
         self.cards = cards
 
+    @counted
     def discard(self:Player)->Int:
         """
         Return index of card to be discarded
@@ -23,6 +26,7 @@ class Player:
         discarded_index = face_values.index(max(face_values))
         return discarded_index
 
+    @counted
     def choose_correct_stack(self:Player, stacks:List(List(Tuple(Int,Int))))->Int:
         """
         Returns the index of the correct stack
@@ -45,6 +49,8 @@ class Player:
         else:
             return self.get_index_of_closest_stack(top_cards, discarded)
 
+
+    @counted
     def get_index_of_closest_stack(self:Player, cards:List(Tuple(Int,Int)), card:Tuple(Int,Int))->Int:
         """
         gets index of stack closest to card in value

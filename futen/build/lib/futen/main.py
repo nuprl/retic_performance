@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+
 import sys
-from io import StringIO
+import cStringIO
 import argparse
 import os
 
 import paramiko
 from jinja2 import environment
 from jinja2 import loaders
+
 
 class TemplateInventoryRenderer(object):
 
@@ -27,7 +29,7 @@ class TemplateInventoryRenderer(object):
 def parse(lines):
     print("Lines: ", type(lines))
     config = ''.join(lines)
-    fd = StringIO(config)
+    fd = cStringIO.StringIO(config)
     parser = paramiko.SSHConfig()
     parser.parse(fd)
     return parser

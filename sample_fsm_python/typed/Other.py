@@ -4,11 +4,13 @@ from random import randrange
 from retic import Int
 
 import os, sys, itertools
+from benchmark_tools.Counter import counted
 fname = os.path.join(os.path.dirname(__file__), "automata-random-numbers.txt")
 #TODO: Cannot type variable in retic
 rand_num = itertools.cycle((int(line.strip()) for line in open(fname, "r")))
 
 
+@counted
 def make_random_automaton(n: Int)->Automaton:
     """
     builds an n states x k inputs automation
@@ -21,7 +23,7 @@ def make_random_automaton(n: Int)->Automaton:
     return Automaton(seed, 0.0, table, seed)
 
 
-
+@counted
 def build_random_population(n: Int)->Population:
     """
     for even n, build a population of size n
