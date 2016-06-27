@@ -2,7 +2,7 @@ from retic import Void,List,Int
 from benchmark_tools.Timer import Timer
 from player import Player
 from dealer import Dealer
-from benchmark_tools.Counter import counted
+from benchmark_tools.Counter import counted, get_num_calls
 from inspect import getmembers, isfunction
 
 
@@ -50,8 +50,5 @@ with t:
   for i in range(500):
     main()
 
+print(get_num_calls())
 
-# func = [o for o in getmembers(main) if isfunction(o[1])]
-# print(len(func))
-# for f in func:
-#     print(f.calls)
