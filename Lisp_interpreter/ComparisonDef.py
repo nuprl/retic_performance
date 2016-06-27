@@ -1,5 +1,3 @@
-import DirPaths
-import operator
 from BSLError import BSLError
 from Num import Num
 from Boolean import Boolean

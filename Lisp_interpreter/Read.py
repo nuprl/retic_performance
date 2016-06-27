@@ -1,34 +1,12 @@
-import DirPaths
 from sys import stdout
-from retic import Void, Bool, String
+from sys import stdin, stdout
 from Parser import parse
 from ParserError import ParserError
 from Global_Scope import foo
 from Reader import Reader
-from types import P_Expr, Line
+from Types import P_Expr, Line
+from retic import Void, Bool, List, String, Dyn
 
-#
-# class P_Expr:
-#     """
-#     Represents a union type p-expr
-#     """
-#     def __init__(self, expr):
-#         """
-#         :param p_expr: List of string or None
-#         :return: None
-#         """
-#         self.expr = expr
-#
-#
-# class Line:
-#     """
-#     To represent the read line or False if no line was read
-#     """
-#     def __init__(self, line):
-#         """
-#         :param line: [String, ...] or False
-#         """
-#         self.line = line
 
 def read_eval_print_loop()->Void:
     """

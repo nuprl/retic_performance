@@ -1,6 +1,4 @@
 import copy
-import DirPaths
-
 from BSLDef import BSLDef
 from BSLError import BSLError
 from Structure import Structure

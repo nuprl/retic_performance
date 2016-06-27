@@ -1,4 +1,3 @@
-import DirPaths
 from BSLDef import BSLDef
 from Structure import Structure
 from BSLError import BSLError

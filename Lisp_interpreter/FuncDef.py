@@ -1,6 +1,3 @@
-import copy
-import sys
-import DirPaths
 from LambdaExpr import LambdaExpr
 from BSLError import BSLError
 from Binding import Binding

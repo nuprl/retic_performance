@@ -1,5 +1,3 @@
-import DirPaths
-
 from Num import Num
 from And import And
 from If import If

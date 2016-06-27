@@ -1,7 +1,3 @@
-import DirPaths
-import sys
-sys.path.insert(0, '/Users/zeinamigeed/Lisp_interpreter/interpreter/BSL_Expr')
-
 from Num import Num
 from Boolean import Boolean
 from And import And
