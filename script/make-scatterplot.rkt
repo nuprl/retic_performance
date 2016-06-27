@@ -60,7 +60,8 @@
     (parameterize ([point-x-jitter 0.3]
                    [point-sym 'dot])
       (plot-file
-        ((plot-proc) type+avg*)
+        ((plot-proc) type+avg*
+                     #:y-min 0)
         out
         #:width 1200
         #:x-label "Num. Types"
