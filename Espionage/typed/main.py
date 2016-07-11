@@ -74,7 +74,7 @@ def kruskal(nodes:List(Int), edges:List(Tuple(Int, Int, Int)), edges_to_check:Li
 
 
 t = Timer()
-fname = os.path.join(os.path.dirname(__file__), "us-input.txt")
+fname = os.path.join(os.path.dirname(__file__), "../both/us-input.txt")
 with open(fname, "r") as f:
     in_lines = f.readlines()
 with t:
