@@ -1,7 +1,8 @@
 from retic import fields, Dict, Int, Void, Tuple
 
-@fields({'self': UnionFind, my_dict: Dict(Int, Tuple(Int, Int))})
+@fields({'my_dict': Dict(Int, Tuple(Int, Int))})
 class UnionFind:
+    my_dict = {}
     def __init__(self:UnionFind, my_dict:Dict(Int, Tuple(Int, Int)))->Void:
         self.my_dict = my_dict
 
