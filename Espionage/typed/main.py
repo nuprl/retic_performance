@@ -2,7 +2,7 @@ import os
 from operator import itemgetter
 from retic import Void, List, Tuple, Int, String, Dict
 from benchmark_tools.Timer import Timer
-from benchmark_tools.Counter import counted
+from benchmark_tools.Counter import counted, get_num_calls
 from union_find import UnionFind
 
 @counted
@@ -87,5 +87,5 @@ with open(fname, "r") as f:
 with t:
     main(in_lines)
 
-print(get_num_calls())
+# print(get_num_calls())
 
