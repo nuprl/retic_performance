@@ -4,13 +4,13 @@ iri2uri
 Converts an IRI to a URI.
 
 """
-__author__ = "Joe Gregorio (joe@bitworking.org)"
-__copyright__ = "Copyright 2006, Joe Gregorio"
-__contributors__ = []
-__version__ = "1.0.0"
-__license__ = "MIT"
-__history__ = """
-"""
+# __author__ = "Joe Gregorio (joe@bitworking.org)"
+# __copyright__ = "Copyright 2006, Joe Gregorio"
+# __contributors__ = []
+# __version__ = "1.0.0"
+# __license__ = "MIT"
+# __history__ = """
+# """
 
 import urllib.parse
 from retic import List, Tuple, Int, String
