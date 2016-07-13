@@ -12,21 +12,22 @@ from jinja2 import loaders
 from retic import String, Void, List
 from paramiko.config import SSHConfig
 
+@fields({environ: environment.Environment})
 class TemplateInventoryRenderer(object):
 
     def __init__(self:TemplateInventoryRenderer, template_dir:String)->Void:
-        print ("Template_dir: ", type (template_dir))
+        # print ("Template_dir: ", type (template_dir))
         loader = loaders.FileSystemLoader(template_dir)
         self.environ = environment.Environment(loader=loader)
 
-    def render(self:TemplateInventoryRenderer, template_name:String, args)->String:
-        print("Template_name: ", type(template_name))
+    def render(self:TemplateInventoryRenderer, template_name:String, args:TODO)->String:
+        # print("Template_name: ", type(template_name))
         template = self.environ.get_template(template_name)
         return template.render(**args)
 
 
-def parse(lines:List)->SSHConfig:
-    print("Lines: ", type(lines))
+def parse(lines:List(String))->SSHConfig:
+    # print("Lines: ", type(lines))
     config = ''.join(lines)
     fd = io.StringIO(config)
     parser = paramiko.SSHConfig()
@@ -34,13 +35,13 @@ def parse(lines:List)->SSHConfig:
     return parser
 
 
-def get_entries(parser):
-    print("Parser: ", type(parser))
+def get_entries(parser:TODO)->List(TODO_E):
+    # print("Parser: ", type(parser))
     return parser._config
 
 
-def get_netloc(entry, parser):
-    print("Entry: ", type(entry))
+def get_netloc(entry:TODO_E, parser:TODO)->Tuple(TODO_K,TODO_V):
+    # print("Entry: ", type(entry))
     hostname = entry.get('host')[0]
     if hostname == '*':
         return
@@ -48,7 +49,7 @@ def get_netloc(entry, parser):
     return (hostname, port)
 
 
-def get_netlocs(lines):
+def get_netlocs(lines:List(String))->Dict(TODO_K,TODO_V):
     parser = parse(lines)
     entries = get_entries(parser)
     netlocs = {}
@@ -61,11 +62,12 @@ def get_netlocs(lines):
     return netlocs
 
 
-def execute(lines, args):
-    print("Args: ", type(args))
+def execute(lines:List(String), args:TODO)->String:
+    # print("Args: ", type(args))
     netlocs = get_netlocs(lines)
 
     if args.template_file:
+        print("GOT TEMPLATE FILE") #bg: this is important
         dirpath, filename = os.path.split(args.template_file)
         renderer = TemplateInventoryRenderer(dirpath)
         template_context = dict([
@@ -78,39 +80,39 @@ def execute(lines, args):
         ['%s:%s' % (hostname, port) for hostname, port in netlocs.items()]
     )
 
-
-def _validate(args):
-    pass
-
-
-def _parse_args():
-    description = 'Ansible inventory file generating script'
-    ' from OpenSSH configuration file'
-    arg_parser = argparse.ArgumentParser(description=description)
-
-    option_t_help = 'Use template file'
-    arg_parser.add_argument(
-        '-t', '--template-file',
-        type=str,
-        required=False,
-        help=option_t_help,
-    )
-
-    args = arg_parser.parse_args()
-    _validate(args)
-
-    return args
-
-
-def main():
-    try:
-        lines = sys.stdin.readlines()
-        args = _parse_args()
-        result = execute(lines, args)
-        print(result)
-    except BaseException as e:
-        print('Error: %s' % e, file=sys.stderr)
-
-
-if __name__ == '__main__':
-    main()
+###bg: unused
+# def _validate(args):
+#     pass
+# 
+# 
+# def _parse_args():
+#     description = 'Ansible inventory file generating script'
+#     ' from OpenSSH configuration file'
+#     arg_parser = argparse.ArgumentParser(description=description)
+# 
+#     option_t_help = 'Use template file'
+#     arg_parser.add_argument(
+#         '-t', '--template-file',
+#         type=str,
+#         required=False,
+#         help=option_t_help,
+#     )
+# 
+#     args = arg_parser.parse_args()
+#     _validate(args)
+# 
+#     return args
+# 
+# 
+# def main():
+#     try:
+#         lines = sys.stdin.readlines()
+#         args = _parse_args()
+#         result = execute(lines, args)
+#         print(result)
+#     except BaseException as e:
+#         print('Error: %s' % e, file=sys.stderr)
+# 
+# 
+# if __name__ == '__main__':
+#     main()
