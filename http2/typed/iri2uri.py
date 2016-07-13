@@ -57,7 +57,7 @@ class Iri2Uri:
   def encode(self:Iri2Uri, c:String)->String:
       retval = c
       i = ord(c)
-      for low, high in escape_range:
+      for low, high in self.escape_range:
           if i < low:
               break
           if i >= low and i <= high:
@@ -65,6 +65,7 @@ class Iri2Uri:
               break
       return retval
 
+  #bg: really, url:(bytes | string)
   def iri2uri(self:Iri2Uri, uri:String)->String:
       """Convert an IRI to a URI. Note that IRIs must be
       passed in a unicode strings. That is, do not utf-8 encode
@@ -76,5 +77,7 @@ class Iri2Uri:
           #  1. encode as utf-8
           #  2. then %-encode each octet of that utf-8
           uri = urllib.parse.urlunsplit((scheme, authority, path, query, fragment))
-          uri = "".join([encode(c) for c in uri])
-      return uri
+          uri = "".join([self.encode(c) for c in uri])
+          return uri
+      else:
+          raise ValueError(uri)
