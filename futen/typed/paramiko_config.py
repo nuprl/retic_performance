@@ -31,8 +31,11 @@ from retic import List,Void,String,Bool
 
 SSH_PORT = 22
 
+### type host = Tuple(List(String), Dict(String,String))
+# will see if this works, it's a way to avoid heterogenous maps
 
-#@fields({SETTINGS_REGEX: _sre.SRE_Pattern, _config:List(String)})
+
+@fields({SETTINGS_REGEX: String, _config:List(Tuple(List(String),Dict(String,String)))})
 class SSHConfig (object):
     """
     Representation of config information as stored in the format used by
@@ -44,8 +47,8 @@ class SSHConfig (object):
     .. versionadded:: 1.6
     """
 
-    SETTINGS_REGEX = re.compile(r'(\w+)(?:\s*=\s*|\s+)(.+)')
-    config = []
+    SETTINGS_REGEX = r'(\w+)(?:\s*=\s*|\s+)(.+)' #bg: originally a regex, but cannot type those
+    _config = []
 
     def __init__(self):
         """
@@ -59,7 +62,7 @@ class SSHConfig (object):
 
         :param file_obj: a file-like object to read the config file from
         """
-        host = {"host": ['*'], "config": {}}
+        host = (['*'], {})
         for line in file_obj:
             # Strip any leading or trailing whitespace from the line.
             # See https://github.com/paramiko/paramiko/issues/499 for more info.
@@ -75,15 +78,12 @@ class SSHConfig (object):
             
             if key == 'host':
                 self._config.append(host)
-                host = {
-                    'host': self._get_hosts(value),
-                    'config': {}
-                }
+                host = (self._get_hosts(value), {}) #bg
             elif key == 'proxycommand' and value.lower() == 'none':
                 # Store 'none' as None; prior to 3.x, it will get stripped out
                 # at the end (for compatibility with issue #415). After 3.x, it
                 # will simply not get stripped, leaving a nice explicit marker.
-                host['config'][key] = None
+                host[1][key] = None
             else:
                 if value.startswith('"') and value.endswith('"'):
                     value = value[1:-1]
@@ -92,15 +92,15 @@ class SSHConfig (object):
                 # cases, since they are allowed to be specified multiple times
                 # and they should be tried in order of specification.
                 if key in ['identityfile', 'localforward', 'remoteforward']:
-                    if key in host['config']:
-                        host['config'][key].append(value)
+                    if key in host[1]:
+                        host[1][key].append(value)
                     else:
-                        host['config'][key] = [value]
-                elif key not in host['config']:
-                    host['config'][key] = value
+                        host[1][key] = [value]
+                elif key not in host[1]:
+                    host[1][key] = value
         self._config.append(host)
 
-    def lookup(self:SSHConfig, hostname:String)->Dict(String,Dyn):
+    def lookup(self:SSHConfig, hostname:String)->Dict(String,String):
         """
         Return a dict of config options for a given hostname.
 
@@ -120,16 +120,14 @@ class SSHConfig (object):
 
         :param str hostname: the hostname to lookup
         """
-        print("lookup %s" % hostname)
-        print("allowed %s" % self._config)
         matches = [
             config for config in self._config
-            if self._allowed(config['host'], hostname)
+            if self._allowed(config[0], hostname)
         ]
 
         ret = {}
         for match in matches:
-            for key, value in match['config'].items():
+            for key, value in match[1].items():
                 if key not in ret:
                     # Create a copy of the original value,
                     # else it will reference the original list
@@ -223,7 +221,7 @@ class SSHConfig (object):
                         }
 
         for k in config:
-            if config[k] is None:
+            if k in config:
                 continue
             if k in replacements:
                 for find, replace in replacements[k]:

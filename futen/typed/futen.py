@@ -10,6 +10,9 @@ from retic import String, Void, List
 from paramiko_config import SSHConfig
 
 
+NO_PORT = "-1" #bg
+
+#bg simplified rendering
 #@fields({environ: environment.Environment})
 #class TemplateInventoryRenderer(object):
 #
@@ -25,57 +28,44 @@ from paramiko_config import SSHConfig
 
 
 def parse(lines:List(String))->SSHConfig:
-    print("Lines: ", type(lines))
     #config = ''.join(lines)
     #fd = io.StringIO(config)
     parser = SSHConfig()
     parser.parse(lines)
     return parser
 
-def get_netloc(entry:Dict(String,Dyn), parser:SSHConfig)->Tuple(String,String):
-    print("Entry: ", type(entry))
-    hostname = entry.get('host')[0]
-    if hostname == '*':
-        return ("*", "")
+def get_netloc(entry:Tuple(List(String),Dict(String,String)), parser:SSHConfig)->Tuple(String,String):
+    hostname = "".join(entry[0]) #bg
+    if hostname == "*":
+        return ("*", NO_PORT)
     port = parser.lookup(hostname).get('port')
-    print(hostname)
-    print(port)
     return (hostname, port)
 
 
 def get_netlocs(lines:List(String))->Dict(String,String):
     parser = parse(lines)
     entries = parser._config
-    print(entries)
     netlocs = {}
     for entry in entries:
         netloc = get_netloc(entry, parser)
         if not netloc:
             continue
         hostname, port = netloc
-        print("port = %s" % port)
-        if port:
+        if port != NO_PORT:
             netlocs[hostname] = port
     return netlocs
 
 
-def execute(lines:List(String), args:List(String))->String:
-    print("Args: ", type(args))
+def execute(lines:List(String), template_file:String)->String:
     netlocs = get_netlocs(lines)
 
-    if args.template_file:
-        print("GOT TEMPLATE FILE") #bg: this is important
-        #dirpath, filename = os.path.split(args.template_file)
-        #renderer = TemplateInventoryRenderer(dirpath)
-        #template_context = dict([
-        #    (hostname, '%s:%s' % (hostname, port))
-        #    for hostname, port in netlocs.items()
-        #])
-        #return renderer.render(filename, template_context)
-
-    return '\n'.join(
-        ['%s:%s' % (hostname, port) for hostname, port in netlocs.items()]
-    )
+    #bg simplified
+    dirpath, filename = os.path.split(template_file)
+    template_context = [
+        (hostname, '%s:%s' % (hostname, port))
+        for hostname, port in netlocs.items()
+    ]
+    return str(sorted(template_context, key=lambda x: x[0]))
 
 ###bg: unused
 # def _validate(args):

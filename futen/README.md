@@ -1,36 +1,3 @@
-futen
-=====
-
-Egg Info
----
-
-Metadata-Version: 1.1
-Name: futen
-Version: 0.0.1
-Summary: Conversion script to Ansible inventory file from OpenSSH configuration
-Home-page: https://github.com/momijiame/futen
-Author: momijiame
-Author-email: amedama.ginmokusei@gmail.com
-License: UNKNOWN
-Description: UNKNOWN
-Platform: UNKNOWN
-Classifier: Programming Language :: Python :: 2
-Classifier: Programming Language :: Python :: 2.6
-Classifier: Programming Language :: Python :: 2.7
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.3
-Classifier: Development Status :: 3 - Alpha
-Classifier: License :: OSI Approved :: Apache Software License
-Classifier: Intended Audience :: Developers
-Classifier: Natural Language :: Japanese
-Classifier: Operating System :: POSIX
-
-
-Requirements (bg: maybe can remove?)
----
-
-argparse
-paramiko
-jinja2
-
-nose
+bg:
+- removed unit test class, removed `nose` dependency
+- removed jinja2 renderer, just comparing strings now
