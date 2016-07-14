@@ -1,21 +1,4 @@
-# Copyright (C) 2006-2007  Robey Pointer <robeypointer@gmail.com>
-# Copyright (C) 2012  Olle Lundberg <geek@nerd.sh>
-#
 # This file is part of paramiko.
-#
-# Paramiko is free software; you can redistribute it and/or modify it under the
-# terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation; either version 2.1 of the License, or (at your option)
-# any later version.
-#
-# Paramiko is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with Paramiko; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 
 """
 Configuration file (aka ``ssh_config``) support.
@@ -30,10 +13,6 @@ import socket
 from retic import List,Void,String,Bool
 
 SSH_PORT = 22
-
-### type host = Tuple(List(String), Dict(String,String))
-# will see if this works, it's a way to avoid heterogenous maps
-
 
 @fields({SETTINGS_REGEX: String, _config:List(Tuple(List(String),Dict(String,String)))})
 class SSHConfig (object):
@@ -141,17 +120,6 @@ class SSHConfig (object):
         if 'proxycommand' in ret and ret['proxycommand'] is None:
             del ret['proxycommand']
         return ret
-
-    #bg: unused
-    #def get_hostnames(self):
-    #    """
-    #    Return the set of literal hostnames defined in the SSH config (both
-    #    explicit hostnames and wildcard entries).
-    #    """
-    #    hosts = set()
-    #    for entry in self._config:
-    #        hosts.update(entry['host'])
-    #    return hosts
 
     def _allowed(self:SSHConfig, hosts:List(String), hostname:String)->Bool:
         match = False
