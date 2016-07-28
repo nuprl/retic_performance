@@ -3,8 +3,7 @@ from benchmark_tools.Counter import counted
 
 @fields({'my_dict': Dict(Int, Tuple(Int, Int))})
 class UnionFind:
-    my_dict = {}
-
+    #this doesn't need to be here
     @counted
     def __init__(self:UnionFind, my_dict:Dict(Int, Tuple(Int, Int)))->Void:
         self.my_dict = my_dict
