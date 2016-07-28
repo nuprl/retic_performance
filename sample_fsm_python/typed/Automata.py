@@ -1,6 +1,10 @@
 from retic import List, Dyn, Void, String, Int, Float
 from benchmark_tools.Counter import counted
+from retic import fields
 
+
+@fields({'current':Int, 'payoff':Float, 'table':List(List(Int)),
+         'initial':Int})
 class Automaton:
 
     #TODO: Variables cannot be typed in retic

@@ -6,10 +6,13 @@ from copy import copy
 from benchmark_tools.Counter import counted
 
 import os, sys, itertools
+from retic import fields
 fname = os.path.join(os.path.dirname(__file__), "population-random-numbers.txt")
 #TODO: Cannot type variable in retic
 rand_num = itertools.cycle((int(line.strip()) for line in open(fname, "r")))
 
+
+@fields({'a':List(Automaton)})
 class Population:
     """
     Populations of Automata
