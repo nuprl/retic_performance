@@ -15,7 +15,7 @@ class Dealer:
     To represent the Dealer for the whole game
     """
 
-    def __init__(self, players:List(Player), bull_points:List(Int), cards_per_game:Int)->Void:
+    def __init__(self:Dealer, players:List(Player), bull_points:List(Int), cards_per_game:Int)->Void:
         """
         :param deck: [Card ...]
         :param players: [Player ...]
