@@ -50,5 +50,4 @@ with t:
   for i in range(500):
     main()
 
-print(get_num_calls())
 

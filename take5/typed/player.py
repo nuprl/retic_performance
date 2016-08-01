@@ -1,6 +1,8 @@
 from retic import List,Tuple,Void,String,Int
 from benchmark_tools.Counter import counted
 
+
+@fields({"name": Int, "cards": List(Tuple(Int,Int))})
 class Player:
     """
     To represent a player in the game

@@ -1,6 +1,6 @@
 from random import randrange, shuffle, random, seed
 from copy import deepcopy
-from retic import List, Void, Tuple, Bool, Int, Float
+from retic import List, Void, Tuple, Bool, Int, Float, fields
 from player import Player
 from benchmark_tools.Counter import counted
 
@@ -9,13 +9,13 @@ max_val = 7
 turns = 10
 stack_size = 5
 
+@fields({"players": List(Player), "bull_points": List(Int), "cards_per_game": Int})
 class Dealer:
     """
     To represent the Dealer for the whole game
     """
 
-    @counted
-    def __init__(self:Dealer, players:List(Player), bull_points:List(Int), cards_per_game:Int)->Void:
+    def __init__(self, players:List(Player), bull_points:List(Int), cards_per_game:Int)->Void:
         """
         :param deck: [Card ...]
         :param players: [Player ...]
@@ -37,7 +37,7 @@ class Dealer:
             #hand cards
             for i, player in enumerate(self.players):
                 hand = []
-                for i in range(0, i + 1 * 10):
+                for i in range(i + 1 * 10):
                     hand.append(self.deck[i])
                 player.cards = hand
 
