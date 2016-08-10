@@ -20,6 +20,7 @@ import random
 import re
 import shutil
 import subprocess
+import time
 
 ## -----------------------------------------------------------------------------
 ## constants
@@ -176,6 +177,7 @@ if __name__ == "__main__":
       if lock_worklist(wl):
         my_worklist = wl
     if my_worklist is None:
+      time.sleep(1)
       continue
     ## -- read a few lines from the worklist
     my_configs = file_pop(my_worklist, CHUNK)
