@@ -16,6 +16,7 @@
 ## import
 
 import glob
+import os
 import random
 import re
 import shutil
@@ -189,7 +190,7 @@ if __name__ == "__main__":
       shutil.copytree("%s/%s" % (bm, BOTH)
                      ,my_dir)
     ## -- save my claimed configs to file, so `brun` can clean later
-    with open("%s/%s" % (my_dir, NODE_INPUT)), "w") as f:
+    with open("%s/%s" % (my_dir, NODE_INPUT), "w") as f:
       for cfg in my_configs:
         print(cfg, file=f)
     ## -- step through configs & run each
