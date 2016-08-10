@@ -28,7 +28,7 @@ TEST    = "Test"
 NODE_AI = "%s/karst/bnode.py" % RP
 QSTAT   = "qstat -u %s" % USER
 QSUB    = "qsub -k o -l nodes=1:ppn=16,walltime=24:00:00 %s" % NODE_AI
-# TODO where will this qsub put the output files? we should check those for errors
+# warning: output goes in YOUR current directory. Please check those for errors!
 
 KARST_INPUT = "karst_input.txt"
 # List of configurations that need to be run. Each benchmark has one of these.
