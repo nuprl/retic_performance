@@ -100,7 +100,7 @@ def any_nodes_in_progress():
     @return Boolean
   """
   # Don't bother catching `CalledProcessError`, just die
-  output = str(subprocess.check_output(QSTAT, shell=True, stderr=subprocess.STDOUT), encoding="utf-8").split("\n")
+  output = [x for x in str(subprocess.check_output(QSTAT, shell=True, stderr=subprocess.STDOUT), encoding="utf-8").split("\n") if x]
   if bool(output):
     elap_times = parse_elapsed_times(output)
     jobs_left  = len(output)
