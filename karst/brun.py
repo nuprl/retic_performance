@@ -82,7 +82,7 @@ def parse_elapsed_times(qstat_output):
              Hour = Min = Sec = Natural number
   """
   elaps = []
-  for ln in str(qstat_output, encoding="utf-8").split("\n"):
+  for ln in qstat_output:
     m = re.search(r'([0-9]{2}):([0-9]{2}):([0-9]{2})$', ln)
     if m:
       elaps.append([int(m.group(i)) for i in range(1, 4)])
@@ -100,11 +100,11 @@ def any_nodes_in_progress():
     @return Boolean
   """
   # Don't bother catching `CalledProcessError`, just die
-  output = subprocess.check_output(QSTAT, shell=True, stderr=subprocess.STDOUT)
+  output = str(subprocess.check_output(QSTAT, shell=True, stderr=subprocess.STDOUT), encoding="utf-8").split("\n")
   if bool(output):
     elap_times = parse_elapsed_times(output)
-    jobs_left  = len(elap_times)
-    hours_left = 24 - math.floor(max((t[0] for t in elap_times)))
+    jobs_left  = len(output)
+    hours_left = 24 - math.floor(max((t[0] for t in elap_times))) if bool(elap_times) else "??"
     print("Cannot start `./brun`, %s jobs still running (%s hours left). Use '%s' to check job status." % (jobs_left, hours_left, QSTAT))
     return True
   else:
