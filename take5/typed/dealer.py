@@ -2,7 +2,6 @@ from random import randrange, shuffle, random, seed
 from copy import deepcopy
 from retic import List, Void, Tuple, Bool, Int, Float, fields
 from player import Player
-from benchmark_tools.Counter import counted
 
 min_val = 2
 max_val = 7
@@ -26,7 +25,6 @@ class Dealer:
         self.bull_points = bull_points
         self.cards_per_game = cards_per_game
 
-    @counted
     def simulate_game(self:Dealer)->List(Tuple(Int, Int)):
         """
         Similulates a game and returns the players' scores
@@ -55,7 +53,6 @@ class Dealer:
 
 
     #Problem: if you change return type to Tuple(int), it will pass guarded check and not pass transient.
-    @counted
     def create_deck(self:Dealer, deck_size, bull_points:Float = .5, order:Float = .5)->List(Tuple(Int, Int)):
         """
         :param deck_size: Int, number of cards in deck
@@ -74,7 +71,6 @@ class Dealer:
         return cards
 
 
-    @counted
     def create_stacks(self:Dealer)->(List(List(Tuple(Int, Int)))):
         """
         create 4 new stacks each having 1 card from the deck
@@ -87,7 +83,6 @@ class Dealer:
             stacks.append([self.deck.pop()])
         return stacks
 
-    @counted
     def output_scores(self:Dealer)->List(Tuple(Int, Int)):
         """
         Outputs the names of the winning and losing players
@@ -101,7 +96,6 @@ class Dealer:
             res.append((player_name, player_points))
         return res
 
-    @counted
     def update_game(self:Dealer, player:Player, stack_index:Int, stacks:List(List(Tuple(Int, Int))))->\
             Tuple(Int, List(List(Tuple(Int, Int)))):
         """
@@ -132,7 +126,6 @@ class Dealer:
                 return 0, new_stacks
 
 
-    @counted
     def replace_card(self:Dealer, card:Tuple(Int, Int), index:Int, stacks:List(List(Tuple(Int, Int))))->List(List(Tuple(Int, Int))):
         """
         Replaces stack with card and returns new stack
