@@ -1,11 +1,9 @@
 import os
 from operator import itemgetter
 from retic import Void, List, Tuple, Int, String, Dict
-from benchmark_tools.Timer import Timer
-from benchmark_tools.Counter import counted, get_num_calls
+from Timer import Timer
 from union_find import UnionFind
 
-@counted
 def main(all_lines:List(String))->Void:
     l1 = all_lines[0].split(" ")
     edge_count = int(l1[1])
@@ -17,7 +15,6 @@ def main(all_lines:List(String))->Void:
     output_result(res_tuple, edges_to_check)
     return
 
-@counted
 def output_result(res:List(Tuple(Int, Int)), edges:List(Tuple(Int, Int)))->List(String):
     results = []
     for e in edges: 
@@ -29,7 +26,6 @@ def output_result(res:List(Tuple(Int, Int)), edges:List(Tuple(Int, Int)))->List(
             results.append("no")
     return results
 
-@counted
 def convert_to_set(res:List(Tuple(Int, Int, Int)))->List(Tuple(Int, Int)):
     res_tuple=[]
     for r in res:
@@ -37,7 +33,6 @@ def convert_to_set(res:List(Tuple(Int, Int, Int)))->List(Tuple(Int, Int)):
         res_tuple.append((e1, e2))
     return res_tuple
 
-@counted
 def create_nodes(edges:List(Tuple(Int, Int, Int)))->List(Int):
     all_nodes = set()
     for edge in edges:
@@ -49,17 +44,14 @@ def create_nodes(edges:List(Tuple(Int, Int, Int)))->List(Int):
             all_nodes.add(e2)
     return list(all_nodes)
 
-@counted
 def make_tuple(line:String)->Tuple(Int, Int, Int):
     split = line.split(" ")
     return (int(split[0]), int(split[1]), int(split[2]))
 
-@counted
 def make_set(line:String)->Tuple(Int, Int):
     split = line.split(" ")
     return (int(split[0]), int(split[1]))
 
-@counted
 def kruskal(nodes:List(Int), edges:List(Tuple(Int, Int, Int)), edges_to_check:List(Tuple(Int, Int)))\
         ->List(Tuple(Int, Int, Int)):
     sets = UnionFind({})
