@@ -56,7 +56,7 @@ Details
 
 - `brun.py` Control script for the karst benchmarks.
    Running this script schedules new nodes.
-- `bnode.py` Protocol for cluster nodes.
+- `bnode.sh` Protocol for cluster nodes.
   Basically, loop forever running new configs.
 - `setup_karst.py` Configures all benchmark directories for `brun.py`.
   After running the setup you are ready to `brun.py`.
