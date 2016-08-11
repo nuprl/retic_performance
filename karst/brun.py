@@ -14,6 +14,7 @@ import math
 import os
 import random
 import re
+import shutil
 import subprocess
 import sys
 
@@ -24,11 +25,15 @@ USER    = "zmahmoud"
 RP      = "/N/u/zmahmoud/Karst/retic_performance"
 
 TEST    = "Test"
+TYPED   = "typed"
 
-NODE_AI = "%s/karst/bnode.py" % RP
+MUTEX   = "lock"
+
+NODE_AI = "%s/karst/bnode.sh" % RP
 QSTAT   = "qstat -u %s" % USER
-QSUB    = "qsub -k o -l nodes=1:ppn=16,walltime=24:00:00 %s" % NODE_AI
-# warning: output goes in YOUR current directory. Please check those for errors!
+NTIME   = "24:00:00"
+QSUB    = "qsub -k o -l nodes=1:ppn=16,walltime=%s %s" % (NTIME, NODE_AI)
+# warning: qsub logfiles go in YOUR current directory. Check those for errors!
 
 KARST_INPUT = "karst_input.txt"
 # List of configurations that need to be run. Each benchmark has one of these.
@@ -36,7 +41,7 @@ KARST_INPUT = "karst_input.txt"
 KARST_OUTPUT = "karst_output.txt"
 # This script collects results for each benchmark in a `KARST_OUTPUT` file
 
-NUM_NODES  = 99
+NUM_NODES  = 6 #99
 # Max number of nodes to schedule at once (limit is like 700)
 
 NODE_INPUT = "node_input.txt"
@@ -47,12 +52,15 @@ NODE_OUTPUT = "node_output.txt"
 ## typedef
 
 # ConfigId
-config_id_rx = r'([0-9]+-)+'
 def is_config_id(string):
-  return bool(re.match(config_id_rx, string))
+  return bool(re.match(r'([0-9]+-)+' , string))
 
 ## -----------------------------------------------------------------------------
 ## util
+
+def all_worklists(bm):
+  return [fn for fn in glob.iglob("%s/%s*" % (bm, KARST_INPUT))
+          if not fn.endswith(MUTEX)]
 
 def is_finished(output):
   """
@@ -68,7 +76,7 @@ def parse_config_id(output):
      in a string of output.
     @returns ConfigId
   """
-  cfg = output.split(" ", 1)
+  cfg = output.split(" ", 1)[0]
   if is_config_id(cfg):
     return cfg
   else:
@@ -103,8 +111,12 @@ def any_nodes_in_progress():
   output = [x for x in str(subprocess.check_output(QSTAT, shell=True, stderr=subprocess.STDOUT), encoding="utf-8").split("\n") if x]
   if bool(output):
     elap_times = parse_elapsed_times(output)
-    jobs_left  = len(output)
-    hours_left = 24 - math.floor(max((t[0] for t in elap_times))) if bool(elap_times) else "??"
+    if bool(elap_times):
+      jobs_left  = len(elap_times)
+      hours_left = 24 - math.floor(max((t[0] for t in elap_times)))
+    else:
+      jobs_left  = "??"
+      hours_left = "??"
     print("Cannot start `./brun`, %s jobs still running (%s hours left). Use '%s' to check job status." % (jobs_left, hours_left, QSTAT))
     return True
   else:
@@ -120,9 +132,10 @@ def cleanup_nodes():
   """
   for bm_dir in glob.iglob(RP + "/*/"): # trailing / means 'directories only'
     karst_output = bm_dir + KARST_OUTPUT
-    karst_inputs = glob.glob("%s/%s*" % (bm_dir, KARST_INPUT)) # may be []
+    karst_inputs = all_worklists(bm_dir)
     if not os.path.exists(karst_output):
-      warning("Missing output file '%s', skipping benchmark." % karst_output)
+      if os.path.exists("%s/%s" % (bm_dir, TYPED)):
+        warning("Missing output file '%s', skipping benchmark." % karst_output)
       continue
     for node_dir in glob.iglob("%s/%s/*/" % (bm_dir, TEST)):
       # -- read the node's results file,
@@ -132,13 +145,14 @@ def cleanup_nodes():
       if not os.path.exists(node_output):
         warning("Missing node output file '%s' skipping node." % node_output)
         continue
-      if not os.path.exists(node_intput):
+      if not os.path.exists(node_input):
         warning("Missing node input file '%s' skipping node." % node_input)
         continue
       totally_finished_cfgs = set([])
       with open(node_output, "r") as in_lines:
         with open(karst_output, "a") as out_lines:
-          for output in in_lines:
+          for raw in in_lines:
+            output = raw.strip()
             if is_finished(output):
               # -- save result to global output file, save config.#
               print(output, file=out_lines)
@@ -150,9 +164,9 @@ def cleanup_nodes():
         with open(karst_input, "a") as out_lines:
           for cfg in in_lines:
             if cfg not in totally_finished_cfgs:
-              print(cfg, file=out_lines)
+              print(cfg.strip(), file=out_lines)
       # -- delete the node's directory, to save space
-      os.rmdir(node_dir)
+      shutil.rmtree(node_dir)
   return
 
 def all_benchmarks_finished():
@@ -160,12 +174,13 @@ def all_benchmarks_finished():
     Return True if there are no configurations left to run for any benchmark.
     @return Boolean
   """
-  for karst_input in glob.iglob("%s/*/%s*" % (RP, KARST_INPUT)):
-    # http://stackoverflow.com/a/15924160/5237018
-    if os.path.getsize(karst_input) > 0:
-      return False
-    else:
-      os.remove(karst_input)
+  for bm in glob.iglob("%s/*/" % RP):
+    for karst_input in all_worklists(bm):
+      # http://stackoverflow.com/a/15924160/5237018
+      if os.path.getsize(karst_input) > 0:
+        return False
+      else:
+        os.remove(karst_input)
   return True
 
 def run():

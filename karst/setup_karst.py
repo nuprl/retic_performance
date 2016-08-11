@@ -40,7 +40,8 @@ BOTH      = "both"
 TEST      = "Test"
 TYPED     = "typed"
 
-KARST_INPUT = "karst_input.txt"
+KARST_OUTPUT = "karst_output.txt"
+KARST_INPUT  = "karst_input.txt"
 
 LINES_PER_KARST_FILE = 100000
 # Keep it small enough to 'quickly' read/write files of this length
@@ -684,6 +685,11 @@ def ensure_dir(d):
     os.mkdir(d)
   return
 
+def ensure_file(f):
+  if not os.path.exists(f):
+    open(f, "a").close()
+  return
+
 def is_benchmark(d):
   return os.path.isdir(d) and os.path.exists("%s/%s" % (d, TYPED))
 
@@ -720,6 +726,7 @@ def run(dirs):
     ensure_dir(both_dir)
     shutil.copyfile(TIMER, "%s/Timer.py" % both_dir)
     ensure_dir("%s/%s" % (d, TEST))
+    ensure_file("%s/%s" % (d, KARST_OUTPUT))
     all_config_files = [glob.iglob("%s/*" % d) for d in glob.glob("%s/%s/*/" % (d, BENCHMARK))]
     output_index = 1
     output_file  = open("%s/%s%s" % (d, KARST_INPUT, output_index), "w")
