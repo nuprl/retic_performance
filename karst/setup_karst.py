@@ -718,11 +718,9 @@ def file_name(path):
 
 def test_typed_config(typed_dir, both_dir, test_dir):
   staging_dir = "%s/STAGING" % test_dir
-  os.mkdir(staging_dir)
+  shutil.copytree(both_dir, staging_dir)
   for py in glob.iglob("%s/*.py" % typed_dir):
     shutil.copy(py, staging_dir)
-  for both in glob.iglob("%s/*" % both_dir):
-    shutil.copy(both, staging_dir)
   ok = False
   cmd = "%s %s/%s" % (RETIC, staging_dir, MAIN)
   try:
@@ -751,7 +749,6 @@ def run(dirs):
     ensure_dir(test_dir)
     # -- check that typed config actually runs
     if not test_typed_config("%s/%s" % (d, TYPED), both_dir, test_dir):
-      shutil.rmtree(both_dir)
       shutil.rmtree(test_dir)
       return
     gen_all(d)
@@ -766,7 +763,7 @@ def run(dirs):
       if lines_left == 0:
         output_file.close()
         output_index += 1
-        output_file  = open("%s/%s/%s" % (d, KARST_INPUT, output_index), "w")
+        output_file  = open("%s/%s%s" % (d, KARST_INPUT, output_index), "w")
         lines_left   = LINES_PER_KARST_FILE
 
 ## -----------------------------------------------------------------------------
