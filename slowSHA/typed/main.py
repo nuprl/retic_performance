@@ -73,7 +73,7 @@ def sha512(message : Bytes) -> SHA512:
 
 ## -----------------------------------------------------------------------------
 
-from benchmark_tools.Timer import Timer
+from Timer import Timer
 from sha1 import SHA1
 from sha512 import SHA512
 import os

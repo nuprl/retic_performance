@@ -3,7 +3,6 @@ from retic import List, Void, Int, Float
 from Utilities import choose_randomly
 from Automata import Automaton
 from copy import copy
-from benchmark_tools.Counter import counted
 
 import os, sys, itertools
 from retic import fields
@@ -18,18 +17,15 @@ class Population:
     Populations of Automata
     """
 
-    @counted
     def __init__(self: Population, a: List(Automaton)) -> Void:
         self.a = a
 
-    @counted
     def payoffs(self: Population)->List(Float):
         result = []
         for element in self.a:
             result = result + [element.payoff]
         return result
 
-    @counted
     def match_up(self: Population, r: Int) -> Population:
         """
         matches up neighboring pairs of
@@ -46,7 +42,6 @@ class Population:
             self.a[i+1] = a[1]
         return self
 
-    @counted
     def regenerate(self:Population, rate: Int)->Population:
         """
         Replaces r elements of p with r 'children' of randomly chosen
@@ -63,7 +58,6 @@ class Population:
         self.shuffle()
         return self
 
-    @counted
     def shuffle(self:Population)->Void:
         b = copy(self.a)
         for i in range(len(self.a)):

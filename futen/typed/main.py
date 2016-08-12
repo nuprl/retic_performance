@@ -1,7 +1,7 @@
 from os import path
 from collections import namedtuple
 from futen import get_netlocs, execute
-from benchmark_tools.Timer import Timer
+from Timer import Timer
 from retic import Int
 
 #bg: all test files should be in current directory when tests run

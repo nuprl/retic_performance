@@ -1,6 +1,6 @@
 from retic import Void
 from iri2uri import Iri2Uri
-from benchmark_tools.Timer import Timer
+from Timer import Timer
 import os
 
 

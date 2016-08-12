@@ -1,6 +1,6 @@
 import sys
 from evolution.player.player import Player
-from benchmark_tools.Timer import Timer
+from Timer import Timer
 
 from dealer.dealer import Dealer
 from dealer.deck import Deck

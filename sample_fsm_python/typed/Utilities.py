@@ -1,11 +1,9 @@
 from retic import List, Float, Int
 import os, sys, itertools
-from benchmark_tools.Counter import counted
 fname = os.path.join(os.path.dirname(__file__), "util-random-numbers.txt")
 #TODO: Cannot type variable in retic
 rand_num = itertools.cycle((float(line.strip()) for line in open(fname, "r")))
 
-@counted
 def accumulated_s(probabilities:List(Float))->List(Float):
     total = sum(probabilities)
     payoffs = probabilities
@@ -16,7 +14,6 @@ def accumulated_s(probabilities:List(Float))->List(Float):
         result = result + [next/total]
     return result
 
-@counted
 def choose_randomly(probabilities:List(Float), speed:Int)->List(Int):
 
     s = accumulated_s(probabilities)
@@ -30,7 +27,6 @@ def choose_randomly(probabilities:List(Float), speed:Int)->List(Int):
                 break
     return res  ### and here
 
-@counted
 def relative_average(l: List(Float), w: Float) -> Float:
     return sum(l) / w / len(l)
 

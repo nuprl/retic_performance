@@ -2,14 +2,12 @@ from cardplay import CardPlay
 from evolution.species import Species
 from retic import Int, Bool, List, Void, Dyn, String
 from evolution.player.player_state import PlayerState
-from benchmark_tools.Counter import counted
 
 class ExchangeForSpecies(CardPlay):
     """
     Represents exchanging cards for more species
     """
 
-    @counted
     def __init__(self:ExchangeForSpecies, played_card_index:Int, loi:List(Int))->Void:
         """
         :param played_card_index: index of the card
@@ -25,29 +23,24 @@ class ExchangeForSpecies(CardPlay):
         super().__init__(played_card_index)
         self.loi = loi
 
-    @counted
     def apply(self:ExchangeForSpecies, player_state:PlayerState)->Void:
         traits = [player_state.hand[i] for i in self.loi]
         new_species = Species(played_cards=traits)
         player_state.species_list.append(new_species)
 
-    @counted
     def get_card_indices(self:ExchangeForSpecies)->List(Int):
         indices = super(ExchangeForSpecies, self).get_card_indices() + self.loi
         return indices
 
-    @counted
     def verify_self(self:ExchangeForSpecies, player_state:PlayerState, food_card_index:Int, card_plays_before_this:List(CardPlay))->Bool:
         verify_rest = super(ExchangeForSpecies, self).verify_self(player_state, food_card_index, card_plays_before_this)
         verify_loi = player_state.validate_trait_cards_indicies(self.loi)
 
         return verify_loi and verify_rest
 
-    @counted
     def num_species_created(self:ExchangeForSpecies)->Int:
         return 1
 
-    @counted
     def update_trait_counts(self:ExchangeForSpecies, species_trait_count:List(Int))->List(Int):
         species_trait_count.append(len(self.loi))
         return species_trait_count

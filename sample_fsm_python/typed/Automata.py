@@ -1,5 +1,4 @@
 from retic import List, Dyn, Void, String, Int, Float
-from benchmark_tools.Counter import counted
 from retic import fields
 
 
@@ -12,7 +11,6 @@ class Automaton:
                     [(4, 0), (1, 1)]]
 
 
-    @counted
     def __init__(self: Automaton, current: Int,
                  payoff: Float,
                  table: List(List(Int)),
@@ -22,7 +20,6 @@ class Automaton:
         self.table = table
         self.initial = initial
 
-    @counted
     def interact(self: Automaton, other: Automaton, r: Int) -> List(Automaton):
         """
         the sum of pay-offs for the two respective automata over all rounds
@@ -51,7 +48,6 @@ class Automaton:
         other.payoff = y2
         return [self, other]
 
-    @counted
     def clone(self: Automaton)->Automaton:
         """
         reset payoff and current state to initial strategy
@@ -59,7 +55,6 @@ class Automaton:
         """
         return Automaton(self.initial, 0, self.table, self.initial)
 
-    @counted
     def reset(self: Automaton)->Automaton:
         """
         reset the historic payoff
