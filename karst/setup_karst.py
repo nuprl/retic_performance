@@ -22,6 +22,7 @@ import glob
 import itertools
 import os
 import shutil
+import subprocess
 import sys
 
 ## -----------------------------------------------------------------------------
@@ -749,7 +750,7 @@ def run(dirs):
     shutil.copyfile(TIMER, "%s/Timer.py" % both_dir)
     ensure_dir(test_dir)
     # -- check that typed config actually runs
-    if not test_typed_config(both_dir, test_dir):
+    if not test_typed_config("%s/%s" % (d, TYPED), both_dir, test_dir):
       shutil.rmtree(both_dir)
       shutil.rmtree(test_dir)
       return
