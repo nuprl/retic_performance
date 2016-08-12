@@ -30,6 +30,7 @@ import sys
 USER      = "zmahmoud"
 BASEPATH  = "/N/u/%s/Karst" % USER
 PYTHON    = "%s/Python-3.4.3/python" % BASEPATH
+RETIC     = "%s/reticulated/retic.py" % BASEPATH
 RP        = "%s/retic_performance" % BASEPATH
 TOOLS     = "%s/benchmark_tools/benchmark_tools" % BASEPATH
 READER    = "%s/Reader.py" % TOOLS
@@ -37,6 +38,7 @@ TIMER     = "%s/Timer.py"  % TOOLS
 
 BENCHMARK = "Benchmark"
 BOTH      = "both"
+MAIN      = "main.py"
 TEST      = "Test"
 TYPED     = "typed"
 
@@ -713,6 +715,26 @@ def is_clean_benchmark(d):
 def file_name(path):
   return os.path.splitext(os.path.basename(path))[0]
 
+def test_typed_config(typed_dir, both_dir, test_dir):
+  staging_dir = "%s/STAGING" % test_dir
+  os.mkdir(staging_dir)
+  for py in glob.iglob("%s/*.py" % typed_dir):
+    shutil.copy(py, staging_dir)
+  for both in glob.iglob("%s/*" % both_dir):
+    shutil.copy(both, staging_dir)
+  ok = False
+  cmd = "%s %s/%s" % (RETIC, staging_dir, MAIN)
+  try:
+    out_time = float(str(subprocess.check_output(cmd, shell=True), encoding="utf-8"))
+    ok = True
+  except subprocess.CalledProcessError as cpe:
+    print("Error running retic: %s" % cpe.message)
+  except ValueError:
+    print("Error running retic: output of %s was not (just) a float" % cmd)
+  finally:
+    shutil.rmtree(staging_dir)
+    return ok
+
 def run(dirs):
   for d in dirs:
     if not is_benchmark(d):
@@ -721,11 +743,17 @@ def run(dirs):
       continue
     print("Setting up '%s'" % d)
     # -- ok, really setup the benchmark
-    gen_all(d)
     both_dir = "%s/%s" % (d, BOTH)
+    test_dir = "%s/%s" % (d, TEST)
     ensure_dir(both_dir)
     shutil.copyfile(TIMER, "%s/Timer.py" % both_dir)
-    ensure_dir("%s/%s" % (d, TEST))
+    ensure_dir(test_dir)
+    # -- check that typed config actually runs
+    if not test_typed_config(both_dir, test_dir):
+      shutil.rmtree(both_dir)
+      shutil.rmtree(test_dir)
+      return
+    gen_all(d)
     ensure_file("%s/%s" % (d, KARST_OUTPUT))
     all_config_files = [glob.iglob("%s/*" % d) for d in glob.glob("%s/%s/*/" % (d, BENCHMARK))]
     output_index = 1
