@@ -55,13 +55,19 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
   MY_BENCHMARK=""
   NUM_BENCHMARKS_LEFT=0
   for BM in ${RP}/*/; do
-    if [ -e ${BM}/${KARST_INPUT}*[0-9] ]; then
+    for DONT_CARE in ${BM}/${KARST_INPUT}*[0-9]; do
       NUM_BENCHMARKS_LEFT=$(( NUM_BENCHMARKS_LEFT + 1 ))
-    fi
+      break
+    done
   done
   BENCHMARK_ID=$(( ( RANDOM % NUM_BENCHMARKS_LEFT ) + 1 ))
   for BM in ${RP}/*/; do
-    if [ -e ${BM}/${KARST_INPUT}*[0-9] ]; then
+    HAVE_ANY=""
+    for DONT_CARE in ${BM}/${KARST_INPUT}*[0-9]; do
+      HAVE_ANY="yes"
+      break
+    done
+    if [ $HAVE_ANY ]; then
       BENCHMARK_ID=$(( BENCHMARK_ID - 1 ))
       if [ ${BENCHMARK_ID} -eq 0 ]; then
         MY_BENCHMARK=${BM}
