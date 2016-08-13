@@ -41,7 +41,7 @@ KARST_INPUT = "karst_input.txt"
 KARST_OUTPUT = "karst_output.txt"
 # This script collects results for each benchmark in a `KARST_OUTPUT` file
 
-NUM_NODES  = 6 #99
+NUM_NODES  = 20 #99
 # Max number of nodes to schedule at once (limit is like 700)
 
 NODE_INPUT = "node_input.txt"
@@ -53,7 +53,7 @@ NODE_OUTPUT = "node_output.txt"
 
 # ConfigId
 def is_config_id(string):
-  return bool(re.match(r'([0-9]+-)+' , string))
+  return bool(re.match(r'([0-9]+)(-[0-9]+)*' , string))
 
 ## -----------------------------------------------------------------------------
 ## util
@@ -131,6 +131,7 @@ def cleanup_nodes():
     @return Void
   """
   for bm_dir in glob.iglob(RP + "/*/"): # trailing / means 'directories only'
+    print("Cleaning up '%s'..." % bm_dir)
     karst_output = bm_dir + KARST_OUTPUT
     karst_inputs = all_worklists(bm_dir)
     if not os.path.exists(karst_output):
@@ -138,6 +139,7 @@ def cleanup_nodes():
         warning("Missing output file '%s', skipping benchmark." % karst_output)
       continue
     for node_dir in glob.iglob("%s/%s/*/" % (bm_dir, TEST)):
+      print("Cleaning up '%s'..." % node_dir)
       # -- read the node's results file,
       #    collect a list of truly finished configs
       node_output = node_dir + NODE_OUTPUT
@@ -157,14 +159,18 @@ def cleanup_nodes():
               # -- save result to global output file, save config.#
               print(output, file=out_lines)
               totally_finished_cfgs.add(parse_config_id(output))
+      print("... parsed %s finished configs" % len(totally_finished_cfgs))
       # -- read the node's list of claimed configs,
       #    write the unfinished ones back to the local `KARST_INPUT` file
+      unfinished = 0
       with open(node_input, "r") as in_lines:
         karst_input = random.choice(karst_inputs) if bool(karst_inputs) else "%s/%s0" % (bm_dir, KARST_INPUT)
         with open(karst_input, "a") as out_lines:
           for cfg in in_lines:
             if cfg not in totally_finished_cfgs:
+              unfinished += 1
               print(cfg.strip(), file=out_lines)
+      print("... put %s unfinished configs back on the worklist" % unfinished)
       # -- delete the node's directory, to save space
       shutil.rmtree(node_dir)
   return
