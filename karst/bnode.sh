@@ -52,57 +52,38 @@ NODE_QSTAT="qstat ${PBS_JOBID}"
 
 while [ 1 ]; do # (remaining_time() > 1): #hours
   # -- pick random benchmark with work left to do
-  MY_BENCHMARK=""
-  NUM_BENCHMARKS_LEFT=0
+  ALL_BENCHMARKS=()
   for BM in ${RP}/*/; do
-    for DONT_CARE in ${BM}/${KARST_INPUT}*[0-9]; do
-      NUM_BENCHMARKS_LEFT=$(( NUM_BENCHMARKS_LEFT + 1 ))
-      break
-    done
-  done
-  BENCHMARK_ID=$(( ( RANDOM % NUM_BENCHMARKS_LEFT ) + 1 ))
-  for BM in ${RP}/*/; do
-    HAVE_ANY=""
-    for DONT_CARE in ${BM}/${KARST_INPUT}*[0-9]; do
-      HAVE_ANY="yes"
-      break
-    done
-    if [ $HAVE_ANY ]; then
-      BENCHMARK_ID=$(( BENCHMARK_ID - 1 ))
-      if [ ${BENCHMARK_ID} -eq 0 ]; then
-        MY_BENCHMARK=${BM}
-        break
-      fi
+    # Valid benchmarks have at least one output folder
+    #   http://stackoverflow.com/a/4264351/5237018
+    if [ $( find ${BM} -maxdepth 1 -name "${KARST_INPUT}*[0-9]" -print -quit ) ]; then
+      ALL_BENCHMARKS+=(${BM})
     fi
   done
-  if [ ! -d ${MY_BENCHMARK} ]; then
+  NUM_BENCHMARKS=${#ALL_BENCHMARKS[@]}
+  if [ ${NUM_BENCHMARKS} -eq 0 ]; then
     # Couldn't find anything to do
     printf "All jobs finished, ${PBS_JOBID} says goodbye\n"
     break
   fi
+  MY_BENCHMARK=${ALL_BENCHMARKS[${RANDOM} % ${NUM_BENCHMARKS} ]}
   # -- pick random non-empty worklist for the benchmark
-  MY_WORKLIST=""
-  NUM_WORKLISTS_LEFT=0
+  ALL_WORKLISTS=()
   for WL in ${MY_BENCHMARK}/${KARST_INPUT}*[0-9]; do
     if [ -s ${WL} ]; then
-      NUM_WORKLISTS_LEFT=$(( NUM_WORKLISTS_LEFT + 1 ))
+      ALL_WORKLISTS+=(${WL})
+    else
+      # empty worklist
+      print "Empty worklist ${WL}\n"
+      #rm ${WL}
     fi
   done
-  WORKLIST_ID=$(( ( RANDOM % NUM_WORKLISTS_LEFT) + 1 ))
-  for WL in ${MY_BENCHMARK}/${KARST_INPUT}*[0-9]; do
-    if [ -s ${WL} ]; then
-      WORKLIST_ID=$(( WORKLIST_ID - 1 ))
-      if [ ${WORKLIST_ID} -eq 0 ]; then
-        MY_WORKLIST=${WL}
-        break
-      fi
-    fi
-  done
-  if [ ! ${MY_WORKLIST} ]; then
-    # Delete the empty worklist files
-    rm ${MY_BENCHMARK}/${KARST_INPUT}*
+  NUM_WORKLISTS_LEFT=${#ALL_WORKLISTS[@]}
+  if [ ${NUM_WORKLISTS_LEFT} -eq 0 ]; then
+    printf "No worklists in directory ${BM}, retrying\n"
     continue
   fi
+  MY_WORKLIST=${ALL_WORKLISTS[${RANDOM} % ${NUM_WORKLISTS_LEFT} ]}
   # -- setup working directory, if not already there
   MY_DIR=${MY_BENCHMARK}/${TEST}/${PBS_JOBID}
   MY_CONFIGS=${MY_DIR}/${NODE_INPUT}
