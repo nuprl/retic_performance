@@ -166,10 +166,11 @@ def cleanup_nodes():
       with open(node_input, "r") as in_lines:
         karst_input = random.choice(karst_inputs) if bool(karst_inputs) else "%s/%s0" % (bm_dir, KARST_INPUT)
         with open(karst_input, "a") as out_lines:
-          for cfg in in_lines:
+          for raw in in_lines:
+            cfg = raw.strip()
             if cfg not in totally_finished_cfgs:
               unfinished += 1
-              print(cfg.strip(), file=out_lines)
+              print(cfg, file=out_lines)
       print("... put %s unfinished configs back on the worklist" % unfinished)
       # -- delete the node's directory, to save space
       shutil.rmtree(node_dir)
