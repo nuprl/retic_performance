@@ -13,8 +13,8 @@
 ## constants
 
 USER="zmahmoud"
-RP="/N/u/${USER}/Karst/retic_performance"
-RETIC="/N/u/${USER}/Karst/reticulated/retic.py"
+USER_HOME="/N/u/${USER}/Karst"
+RP="${USER_HOME}/retic_performance"
 
 BOTH="both"
 BENCHMARK="Benchmark"
@@ -46,6 +46,27 @@ NODE_OUTPUT="node_output.txt"
 # Use PBS_JOBID as unique id for nodes
 NODE_QSTAT="qstat ${PBS_JOBID}"
 # To check my status
+
+## -----------------------------------------------------------------------------
+## setup RETIC and PYTHON
+
+TAR_SUFFIX="tar.gz"
+PYTHON_VERSION="Python-3.4.3"
+RETICULATED="reticulated"
+RETIC_TAR="${USER_HOME}/${RETICULATED}.${TAR_SUFFIX}"
+PYTHON_TAR="${USER_HOME}/${PYTHON_VERSION}.${TAR_SUFFIX}"
+
+MY_TMP="/tmp/${PBS_JOBID}"
+
+mkdir ${MY_TMP}
+tar -xzf ${PYTHON_TAR} -C ${MY_TMP}
+tar -xzf ${RETIC_TAR} -C ${MY_TMP}
+
+PYTHON_EXEC="${MY_TMP}/${PYTHON_VERSION}/python"
+RETIC="${MY_TMP}/${RETICULATED}/retic.py"
+
+# change shebang line to use ${PYTHON_EXEC}
+sed -i${BAK} "s,#!.*,#!${PYTHON_EXEC}," ${RETIC}
 
 ## -----------------------------------------------------------------------------
 ## main
