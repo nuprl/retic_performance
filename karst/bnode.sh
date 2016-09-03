@@ -95,8 +95,8 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
       ALL_WORKLISTS+=(${WL})
     else
       # empty worklist
-      print "Empty worklist ${WL}\n"
-      #rm ${WL}
+      printf "Empty worklist ${WL}\n"
+      rm ${WL}
     fi
   done
   NUM_WORKLISTS_LEFT=${#ALL_WORKLISTS[@]}
