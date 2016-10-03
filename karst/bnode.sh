@@ -105,14 +105,6 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
     continue
   fi
   MY_WORKLIST=${ALL_WORKLISTS[${RANDOM} % ${NUM_WORKLISTS_LEFT} ]}
-  # -- setup working directory, if not already there
-  MY_DIR=${MY_BENCHMARK}/${TEST}/${PBS_JOBID}
-  MY_CONFIGS=${MY_DIR}/${NODE_INPUT}
-  MY_OUTPUT=${MY_DIR}/${NODE_OUTPUT}
-  if [ ! -d ${MY_DIR} ]; then
-    mkdir ${MY_DIR}
-    cp -r ${MY_BENCHMARK}/${BOTH}/* ${MY_DIR}
-  fi
   # -- try locking the worklist
   #TODO MY_LOCKFILE=${MY_WORKLIST}${MUTEX}
   MY_LOCKFILE=${MY_BENCHMARK}/${MUTEX}
@@ -129,6 +121,15 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
   # -- got lock, read a few lines from the list
   head -n ${CHUNK} ${MY_WORKLIST} > ${MY_CONFIGS}
   sed -i${BAK} "1,${CHUNK}d" ${MY_WORKLIST}
+  # -- setup working directory, if not already there
+  MY_DIR=${MY_BENCHMARK}/${TEST}/${PBS_JOBID}
+  MY_CONFIGS=${MY_DIR}/${NODE_INPUT}
+  MY_OUTPUT=${MY_DIR}/${NODE_OUTPUT}
+  if [ ! -d ${MY_DIR} ]; then
+    mkdir ${MY_DIR}
+    cp -r ${MY_BENCHMARK}/${BOTH}/* ${MY_DIR}
+  fi
+  # -- unlock
   rm ${MY_LOCKFILE} ${MY_WORKLIST}${BAK}
   # -- ok time to run
   while read CONFIG; do

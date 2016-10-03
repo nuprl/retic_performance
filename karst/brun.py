@@ -41,7 +41,7 @@ KARST_INPUT = "karst_input.txt"
 KARST_OUTPUT = "karst_output.txt"
 # This script collects results for each benchmark in a `KARST_OUTPUT` file
 
-NUM_NODES  = 99
+NUM_NODES  = 8
 # Max number of nodes to schedule at once (limit is like 700)
 
 NODE_INPUT = "node_input.txt"
