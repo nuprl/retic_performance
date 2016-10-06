@@ -1,6 +1,7 @@
-from cardplay import CardPlay
+from typed.cardplay import CardPlay
 from retic import Int, Bool, List, Void, Dyn, String
 from evolution.player.player_state import PlayerState
+
 
 class ExchangeForPopulation(CardPlay):
     """

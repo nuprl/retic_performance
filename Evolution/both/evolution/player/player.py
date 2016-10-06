@@ -1,8 +1,3 @@
-import os, sys
-this_package_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(this_package_path, '../../..'))
-
-
 from collections import namedtuple
 from evolution.data_defs import is_list_of, is_natural
 from evolution.player.player_state import PlayerState
@@ -13,10 +8,12 @@ from evolution.player.player_feeding_choice import PlayerFeedVegetarian
 from evolution.player.species_keys import SpeciesPickKey, SpeciesFeedType, \
     SpeciesOrderKey
 
+import os, sys
+this_package_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(this_package_path, '../../../'))
 
-from exchange_for_population import ExchangeForPopulation
-from exchange_for_population import ExchangeForPopulation
-from exchange_for_species import ExchangeForSpecies
+from typed.exchange_for_population import ExchangeForPopulation
+from typed.exchange_for_species import ExchangeForSpecies
 
 
 class Player:
@@ -155,3 +152,5 @@ class Player:
 
     def __eq__(self, other):
         return isinstance(other, Player)
+
+
