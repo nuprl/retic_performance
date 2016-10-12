@@ -8,12 +8,8 @@ from evolution.player.player_feeding_choice import PlayerFeedVegetarian
 from evolution.player.species_keys import SpeciesPickKey, SpeciesFeedType, \
     SpeciesOrderKey
 
-import os, sys
-this_package_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(this_package_path, '../../../'))
-
-from typed.exchange_for_population import ExchangeForPopulation
-from typed.exchange_for_species import ExchangeForSpecies
+from exchange_for_population import ExchangeForPopulation
+from exchange_for_species import ExchangeForSpecies
 
 
 class Player:

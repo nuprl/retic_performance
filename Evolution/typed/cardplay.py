@@ -1,10 +1,4 @@
 from retic import Void, List, Int, Bool, Dyn
-
-import os, sys
-this_package_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(this_package_path, '../both'))
-
-
 from evolution.player.player_state import PlayerState
 
 
