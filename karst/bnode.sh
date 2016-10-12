@@ -30,7 +30,7 @@ MUTEX=".lock"
 ITERS=40
 # Number of iterations to run for each configuration
 
-CHUNK=10
+CHUNK=500
 # Number of configurations to grab at once
 
 KARST_INPUT="karst_input.txt"
