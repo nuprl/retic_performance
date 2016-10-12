@@ -144,11 +144,17 @@ def cleanup_nodes():
       #    collect a list of truly finished configs
       node_output = node_dir + NODE_OUTPUT
       node_input  = node_dir + NODE_INPUT
-      if not os.path.exists(node_output):
-        warning("Missing node output file '%s' skipping node." % node_output)
+      has_output = os.path.exists(node_output)
+      has_input = os.path.exists(node_input)
+      if (not has_output) and (not has_input):
+        print("Node '%s' has no output and no input. Deleting the folder." % node_dir)
+        shutil.rmtree(node_dir)
         continue
-      if not os.path.exists(node_input):
-        warning("Missing node input file '%s' skipping node." % node_input)
+      if not has_output:
+        warning("Missing node output file '%s', but node has input. Skipping node." % node_output)
+        continue
+      if not has_input:
+        warning("Missing node input file '%s', but node has output. Skipping node." % node_input)
         continue
       totally_finished_cfgs = set([])
       with open(node_output, "r") as in_lines:
