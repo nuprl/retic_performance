@@ -1,3 +1,16 @@
+"""
+  usage: ValidateResults.py <file.txt> ...
+
+  For each cluster output file <file.txt> given on the command line:
+  - Searches for duplicate and repeated configs.
+  - Creates a new file "<file.txt>.fix" with duplicates removed, if the
+    duplicated rows have overlapping 95% confidence intervals.
+
+  Be sure to double-check the ".fix" file against the original after this
+  script finishes.
+"""
+
+
 import code
 import itertools
 import glob
