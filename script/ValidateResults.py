@@ -25,6 +25,7 @@ GIT_ROOT = os.path.dirname(THIS_FILE_DIRECTORY)
 BENCHMARK = "Benchmark"
 DUP = "duplicate"
 MIS = "missing"
+DNE = "does_not_exist"
 
 def directory_of_benchmark_name(name):
   return os.path.join(GIT_ROOT, name)
@@ -64,33 +65,56 @@ def close_enough(valss):
         return False
   return True
 
-def fix_duplicates(data_file, dup):
+def valid_output(s):
+  try:
+    vals = eval(s)
+    return isinstance(vals, list)
+  except:
+    return False
+
+def fix_duplicates(data_file, dup, dne):
   data_for_dups = {}
   line_for_dups = {}
   for d in dup:
-    data_for_dups[d] = []
-  with open("%s.fix" % data_file, 'w') as g:
+    if d not in dne:
+      data_for_dups[d] = []
+  fix_file = "%s.fix" % data_file
+  with open(fix_file, 'w') as g:
     with open(data_file, 'r') as f:
+      lineno = -1
       for line in f:
+        lineno += 1
         xs = line.strip().split("    ")
         config = xs[0]
+        if config in dne:
+          continue
         if config in dup:
-          vals = eval(xs[-1])
-          if not isinstance(vals, list):
-            print("yo no %s %s" % (xs[-1], vals))
+          if not valid_output(xs[-1]):
+            print("Malformed output list on line %s: %s" % (lineno, xs[-1]))
             raise ValueError()
-          data_for_dups[config].append(vals)
+          data_for_dups[config].append(eval(xs[-1]))
           line_for_dups[config] = xs[0:-1]
-        else:
+        elif valid_output(xs[-1]):
           print(line.strip(), file=g)
+        else:
+          print("Invalid %s" % config)
     for cfg,valss in data_for_dups.items():
       if close_enough(valss):
-        print("    ".join((str(y) for y in line_for_dups[cfg] + valss[0])), file=g)
+        print("    ".join((str(y) for y in line_for_dups[cfg] + [valss[0]])), file=g)
       else:
         print("Trouble with %s:\n    %s" % (cfg, valss))
+  print("Saved de-duplicated outputs to '%s'" % fix_file)
+  return
+
+def print_configs(out_file, cfgs, descr):
+  with open(out_file, 'w') as g:
+    for cfg in cfgs:
+      print(cfg, file=g)
+  print("Saved %s configs to '%s'" % (descr, out_file))
 
 def validate_file(data_file, benchmark_files):
   seen = set([])
+  dne = set([])
   need = all_configs_of_filenames(benchmark_files)
   dup = set([])
   with open(data_file, "r") as f:
@@ -100,9 +124,13 @@ def validate_file(data_file, benchmark_files):
         dup.add(config)
       else:
         seen.add(config)
-        need.remove(config)
+        if config in need:
+          need.remove(config)
+        else:
+          dne.add(config)
   return {DUP : dup
-         ,MIS : need}
+         ,MIS : need
+         ,DNE : dne}
 
 def main(argv):
   for data_file in argv:
@@ -122,16 +150,21 @@ def main(argv):
     print("Results now:")
     print("- missing %s configs" % len(results[MIS]))
     print("- %s duplicate configs" % len(results[DUP]))
+    print("- %s invalid configs" % len(results[DNE]))
     if 0 < len(results[DUP]):
-      fix_duplicates(data_file, results[DUP])
+      fix_duplicates(data_file, results[DUP], results[DNE])
+    if 0 < len(results[MIS]):
+      print_configs("%s.mis" % data_file, results[MIS], "missing")
+    if 0 < len(results[DNE]):
+      print_configs("%s.dne" % data_file, results[DNE], "non-existant")
     #print("Opening a REPL in current scope (results bound to local variable 'results') ...")
     #code.interact(local=locals())
 
 def check_args(argv):
-  if not bool(argv):
+  if len(argv) < 2:
     # empty list of arguments
     return False
-  for arg in argv:
+  for arg in argv[1:]:
     if not os.path.exists(arg):
       # invalid path
       return False
@@ -139,7 +172,7 @@ def check_args(argv):
 
 if __name__ == "__main__":
   if (check_args(sys.argv)):
-    main(sys.argv)
+    main(sys.argv[1:])
   else:
     print("usage: python ValidateResults.py <filename.txt> ...")
 
