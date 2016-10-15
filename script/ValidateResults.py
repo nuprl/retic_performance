@@ -91,15 +91,17 @@ def fix_duplicates(data_file, dup, dne):
         if config in dup:
           if not valid_output(xs[-1]):
             print("Malformed output list on line %s: %s" % (lineno, xs[-1]))
-            raise ValueError()
-          data_for_dups[config].append(eval(xs[-1]))
-          line_for_dups[config] = xs[0:-1]
+          else:
+            data_for_dups[config].append(eval(xs[-1]))
+            line_for_dups[config] = xs[0:-1]
         elif valid_output(xs[-1]):
           print(line.strip(), file=g)
         else:
           print("Invalid %s" % config)
     for cfg,valss in data_for_dups.items():
-      if close_enough(valss):
+      if not bool(valss):
+        print("No data for %s" % cfg)
+      elif close_enough(valss):
         print("    ".join((str(y) for y in line_for_dups[cfg] + [valss[0]])), file=g)
       else:
         print("Trouble with %s:\n    %s" % (cfg, valss))
