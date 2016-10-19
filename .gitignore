@@ -15,3 +15,5 @@ Benchmark
 Test
 
 karst_*
+
+__pycache__/
