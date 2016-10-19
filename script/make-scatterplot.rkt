@@ -28,8 +28,9 @@
 ;; Convert a string like '[0.14698418600000007, 0.14525612899999985, 0.1445905839999999]'
 ;;  to a list of numbers
 (define (parse-sec seconds-str)
-  (map string->number
-    (string-split (substring seconds-str 1 (- (string-length seconds-str) 1)) ", ")))
+  (for/list ([str (string-split (substring seconds-str 1 (- (string-length seconds-str) 1)) ", ")]
+             #:when (not (string=? "" str)))
+    (string->number str)))
 
 ;; Round a number
 (define (rnd n)
@@ -48,7 +49,7 @@
         (with-input-from-file fname
           (lambda ()
             (for ([ln (in-lines)])
-              (match-define (list cfg num-types-str sec-str) (string-split ln "   "))
+              (match-define (list cfg num-types-str sec-str) (string-split ln "    "))
               (define num-types (string->number num-types-str))
               (define sec (mean (parse-sec sec-str)))
               (define old* (hash-ref acc num-types '()))
