@@ -1,13 +1,7 @@
 from benchmark_tools.Runner import count_types
+from script.ProcessText import *
 
-
-def get_lengths():
-    directories = sorted(glob.glob('%s/*' % benchmark))
-    all_files = [glob.glob('%s/*' % d) for d in directories]
-    lengths = [len(files) for files in all_files]
-    return lengths
-
-def add_types(file_name):
+def add_types(file_name, dir_path):
     """
     Add types to data files
     :param file_name: path
@@ -15,13 +9,17 @@ def add_types(file_name):
     """
     list_of_list_lines = parse_file(file_name)
     for line_list in list_of_list_lines:
+        file_names = get_file_names(dir_path)
+        max_configs = get_max_configs_all_files(file_names)
         config = line_list[0]
         nums = config.split("-")
-        num_types = count_types(nums, 0)
+        print(nums)
+        num_types = count_types(nums, max_configs)
+        line_list[1] = num_types
 
     new_file = open("%s_2" % file_name, "w")
     for l in list_of_list_lines:
-        new_file.write(' '.join(l) + "\n")
+        new_file.write(' '.join((str (l))) + "\n")
 
 def parse_file(file_name):
     """
@@ -39,5 +37,5 @@ def parse_file(file_name):
     return res
 
 
-add_types('Espionage.txt')
+add_types('Espionage.txt', '/../../Espionage')
 
