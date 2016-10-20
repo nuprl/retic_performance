@@ -15,12 +15,11 @@ def add_types(file_name, dir_path):
         nums_str = config.split("-")
         nums = [int(n) for n in nums_str]
         num_types = count_types(nums, max_configs)
-        print(num_types)
-        line_list[1] = num_types
+        line_list[1] = str(num_types)
 
     new_file = open("%s_2" % file_name, "w")
     for l in list_of_list_lines:
-        new_file.write(' '.join((str (l))) + "\n")
+        new_file.write(' '.join(l) + "\n")
 
 def parse_file(file_name):
     """
