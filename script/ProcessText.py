@@ -34,7 +34,7 @@ def read_from_file(txt_file, dir_path):
 
             file_names = get_file_names(dir_path)
 
-            function_names = ",".join([",".join(get_function_names_for_file(file)) for file in file_names])
+            function_names = ",".join([",".join(get_fun_and_cls_names(file)) for file in file_names])
             header = "time, %s" % function_names
             print(header, file=output)
 
@@ -88,7 +88,7 @@ def convert_all_num(int_list, files):
     return res
 
 
-def get_function_names_for_file(file):
+def get_fun_and_cls_names(file):
     """
     Gets all function names in this file
     :param file: a file
@@ -105,6 +105,7 @@ def get_function_names_for_file(file):
             if isinstance(exp, ast.FunctionDef):
                 names.append("%s.%s" % (file_name, exp.name))
             elif isinstance(exp, ast.ClassDef):
+                names.append("%s.$s" % exp.name)
                 unvisited.extend([x for x in exp.body])
 
         return names
@@ -125,7 +126,7 @@ def get_num_of_configs(python_file):
     :param python_file: python file path
     :return: int
     """
-    return len(get_function_names_for_file(python_file))
+    return len(get_fun_and_cls_names(python_file))
 
 def get_max_configs_all_files(files):
     """

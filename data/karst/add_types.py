@@ -1,5 +1,5 @@
-from benchmark_tools.Runner import count_types
 from script.ProcessText import *
+from math import log2
 
 def add_types(file_name, dir_path):
     """
@@ -14,12 +14,13 @@ def add_types(file_name, dir_path):
         config = line_list[0]
         nums_str = config.split("-")
         nums = [int(n) for n in nums_str]
+        print(nums)
         num_types = count_types(nums, max_configs)
         line_list[1] = str(num_types)
 
-    new_file = open("%s_2" % file_name, "w")
+    new_file = open("%s_2" % file_name, "a")
     for l in list_of_list_lines:
-        new_file.write(' '.join(l) + "\n")
+        new_file.write('  '.join(l) + "\n")
 
 def parse_file(file_name):
     """
@@ -36,6 +37,25 @@ def parse_file(file_name):
 
     return res
 
+
+def count_types(nums, lengths):
+    """
+    Number of typed functions across all the files
+    :param nums: List of string
+    :param lengths: lengths[i] is upper bound for nums[i]
+    :return: Int, representing number of annotated functions in the file
+    """
+    total = 0
+    for num, length in zip(nums, lengths):
+        b = bin(int(num))[2:]
+        l = int(log2(length))
+        c = ("0" * (l - len(b))) + b
+        total += sum([1 for bit in c if bit == '0'])
+
+    return total
+
+def get_name(fname):
+    return fname.rsplit("/", 1)[-1].rsplit(".", 1)[0]
 
 add_types('Espionage.txt', '/Users/zeinamigeed/Documents/fall2016/software_dev/retic_performance/Espionage')
 
