@@ -118,10 +118,7 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
     printf "Node ${PBS_JOBID} failed to lock ${MY_WORKLIST}, wc failed\n"
     continue
   fi
-  # -- got lock, read a few lines from the list
-  head -n ${CHUNK} ${MY_WORKLIST} > ${MY_CONFIGS}
-  sed -i${BAK} "1,${CHUNK}d" ${MY_WORKLIST}
-  # -- setup working directory, if not already there
+  # -- got lock, setup working directory, if not already there
   MY_DIR=${MY_BENCHMARK}/${TEST}/${PBS_JOBID}
   MY_CONFIGS=${MY_DIR}/${NODE_INPUT}
   MY_OUTPUT=${MY_DIR}/${NODE_OUTPUT}
@@ -129,6 +126,9 @@ while [ 1 ]; do # (remaining_time() > 1): #hours
     mkdir ${MY_DIR}
     cp -r ${MY_BENCHMARK}/${BOTH}/* ${MY_DIR}
   fi
+  # -- read a few lines from the list
+  head -n ${CHUNK} ${MY_WORKLIST} > ${MY_CONFIGS}
+  sed -i${BAK} "1,${CHUNK}d" ${MY_WORKLIST}
   # -- unlock
   rm ${MY_LOCKFILE} ${MY_WORKLIST}${BAK}
   # -- ok time to run
