@@ -194,8 +194,8 @@ def main(argv):
       print("Missing '%s/' directory for '%s', setup the benchmark and try again" % (BENCHMARK, benchmark_name))
       continue
     print("Validating output file '%s' against directory '%s'" % (data_file, benchmark_dir))
-    benchmark_files = [(os.path.basename(d), len(glob.glob(os.path.join(d, "*"))))
-                       for d in glob.iglob(os.path.join(benchmark_bm_dir, "*")) ]
+    benchmark_files = sorted([(os.path.basename(d), len(glob.glob(os.path.join(d, "*"))))
+                       for d in glob.iglob(os.path.join(benchmark_bm_dir, "*")) ])
     print("Benchmark '%s' has %s files:" % (benchmark_name, len(benchmark_files)))
     for fc in benchmark_files:
       print("- %s.py : %s configs" % (fc[0], fc[1]))
