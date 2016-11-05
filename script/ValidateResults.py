@@ -8,6 +8,7 @@
 
   Be sure to double-check the ".fix" file against the original after this
   script finishes.
+
 """
 
 
@@ -27,11 +28,18 @@ DUP = "duplicate"
 MIS = "missing"
 DNE = "does_not_exist"
 
+SEP = "    " # sorry world
+
 def directory_of_benchmark_name(name):
   return os.path.join(GIT_ROOT, name)
 
 def parse_benchmark_name(filename):
-  return filename.split(".", 1)[0]
+  before_dot = filename.split(".", 1)[0]
+  maybe_dir = directory_of_benchmark_name(before_dot)
+  if os.path.exists(maybe_dir):
+    return [before_dot, maybe_dir]
+  else:
+    raise ValueError("Failed to infer benchmark name from filename '%s'." % filename)
 
 def all_configs_of_filenames(benchmark_files):
   """
@@ -84,7 +92,7 @@ def fix_duplicates(data_file, dup, dne):
       lineno = -1
       for line in f:
         lineno += 1
-        xs = line.strip().split("    ")
+        xs = line.strip().split(SEP)
         config = xs[0]
         if config in dne:
           continue
@@ -108,13 +116,33 @@ def fix_duplicates(data_file, dup, dne):
   print("Saved de-duplicated outputs to '%s'" % fix_file)
   return
 
+def data_file_map(fn, data_file, suffix="mapped"):
+  out_file = "%s.%s" % (data_file, suffix)
+  with open(out_file, 'w') as g:
+    with open(data_file, 'r') as f:
+      for line in f:
+        xs = line.strip().split(SEP)
+        ys = fn(*xs)
+        print(SEP.join(ys), file=g)
+  return out_file
+
+def fix_types(data_file, config_types_map):
+  print("%s configs have incorrect type counts" % len(config_types_map))
+  def check_and_fix_types(cfg, old_types, times):
+    new_types = str(config_types_map.get(cfg, old_types))
+    return [cfg, new_types, times]
+  ty_file = data_file_map(check_and_fix_types, data_file, suffix="typed")
+  print("Saved re-typed outputs to '%s'" % ty_file)
+  return
+
 def print_configs(out_file, cfgs, descr):
   with open(out_file, 'w') as g:
     for cfg in cfgs:
       print(cfg, file=g)
   print("Saved %s configs to '%s'" % (descr, out_file))
 
-def validate_file(data_file, benchmark_files):
+# TODO abstract me
+def validate_file_duplicates(data_file, benchmark_files):
   seen = set([])
   dne = set([])
   need = all_configs_of_filenames(benchmark_files)
@@ -134,10 +162,33 @@ def validate_file(data_file, benchmark_files):
          ,MIS : need
          ,DNE : dne}
 
+def count_types(nums, lengths):
+    total = 0
+    for num, length in zip(nums, lengths):
+        b = bin(int(num))[2:]
+        l = int(math.log2(length))
+        c = ("0" * (l - len(b))) + b
+        total += sum([1 for bit in c if bit == '0'])
+    return total
+
+# TODO abstract me
+def validate_file_types(data_file, file_numconfigs_assoc):
+  config_types_map = {}
+  # 2016-11-05: assumes files & config ids use the same order
+  numconfigs = [xs[1] for xs in file_numconfigs_assoc]
+  with open(data_file, 'r') as f:
+    for line in f:
+      xs = line.strip().split(SEP)
+      config = xs[0]
+      actual_types = int(xs[1])
+      expect_types = count_types(config.split("-"), numconfigs)
+      if actual_types != expect_types:
+        config_types_map[config] = expect_types
+  return config_types_map
+
 def main(argv):
   for data_file in argv:
-    benchmark_name = parse_benchmark_name(os.path.basename(data_file))
-    benchmark_dir = directory_of_benchmark_name(benchmark_name)
+    [benchmark_name, benchmark_dir] = parse_benchmark_name(os.path.basename(data_file))
     benchmark_bm_dir = os.path.join(benchmark_dir, BENCHMARK)
     if not os.path.exists(benchmark_bm_dir):
       print("Missing '%s/' directory for '%s', setup the benchmark and try again" % (BENCHMARK, benchmark_name))
@@ -148,17 +199,29 @@ def main(argv):
     print("Benchmark '%s' has %s files:" % (benchmark_name, len(benchmark_files)))
     for fc in benchmark_files:
       print("- %s.py : %s configs" % (fc[0], fc[1]))
-    results = validate_file(data_file, benchmark_files)
+    results = validate_file_duplicates(data_file, benchmark_files)
     print("Results now:")
-    print("- missing %s configs" % len(results[MIS]))
+    print("- %s missing configs" % len(results[MIS]))
     print("- %s duplicate configs" % len(results[DUP]))
     print("- %s invalid configs" % len(results[DNE]))
+    perfect = True
     if 0 < len(results[DUP]):
+      perfect = False
       fix_duplicates(data_file, results[DUP], results[DNE])
     if 0 < len(results[MIS]):
+      perfect = False
       print_configs("%s.mis" % data_file, results[MIS], "missing")
     if 0 < len(results[DNE]):
+      perfect = False
       print_configs("%s.dne" % data_file, results[DNE], "non-existant")
+    if not perfect:
+      return
+    print("All '%s' configurations present in file '%s', checking type counts..." % (benchmark_name, data_file))
+    config_types_map = validate_file_types(data_file, benchmark_files)
+    if 0 < len(config_types_map):
+      fix_types(data_file, config_types_map)
+    else:
+      print("Type counts in '%s' are OK." % data_file)
     #print("Opening a REPL in current scope (results bound to local variable 'results') ...")
     #code.interact(local=locals())
 
