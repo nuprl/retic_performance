@@ -17,6 +17,7 @@ import itertools
 import glob
 import sys
 import os
+import re
 import statistics
 import math
 
@@ -122,9 +123,29 @@ def data_file_map(fn, data_file, suffix="mapped"):
     with open(data_file, 'r') as f:
       for line in f:
         xs = line.strip().split(SEP)
+        check_map_fn_args(xs)
         ys = fn(*xs)
         print(SEP.join(ys), file=g)
   return out_file
+
+def check_map_fn_args(xs):
+  """
+    Expecting a list of 3 values, the result of splitting a line like:
+        0-0-0    4    [1.23, 4.56]
+    i.e.
+        ID    NUM-TYPES    TIMES
+  """
+  if not (len(xs) == 3):
+    raise ValueError("expected 3 values in list %s" % xs)
+  if not re.match(r'([0-9]+-)+', xs[0]):
+    raise ValueError("expected configuration, got %s in list %s" % (xs[0], xs))
+  try:
+    int(xs[1])
+  except:
+    raise ValueError("expected natural number, got %s in list %s" % (xs[1], xs))
+  if not (xs[2].startswith("[") and xs[2].endswith("]")):
+    raise ValueError("expected list-like string, got %s in list %s" % (xs[2], xs))
+  return True
 
 def fix_types(data_file, config_types_map):
   print("%s configs have incorrect type counts" % len(config_types_map))
@@ -202,7 +223,7 @@ def main(argv):
     results = validate_file_duplicates(data_file, benchmark_files)
     print("Results now:")
     print("- %s missing configs" % len(results[MIS]))
-    print("- %s duplicate configs" % len(results[DUP]))
+    print("- %s duplicate configs (%s)" % (len(results[DUP]), results[DUP] if len(results[DUP]) < 6 else results[DUP][0:5]))
     print("- %s invalid configs" % len(results[DNE]))
     perfect = True
     if 0 < len(results[DUP]):
