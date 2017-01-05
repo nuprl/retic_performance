@@ -223,7 +223,7 @@ def main(argv):
     results = validate_file_duplicates(data_file, benchmark_files)
     print("Results now:")
     print("- %s missing configs" % len(results[MIS]))
-    print("- %s duplicate configs (%s)" % (len(results[DUP]), results[DUP] if len(results[DUP]) < 6 else results[DUP][0:5]))
+    print("- %s duplicate configs (%s)" % (len(results[DUP]), results[DUP] if len(results[DUP]) < 6 else str(results[DUP])[:28] + " ..."))
     print("- %s invalid configs" % len(results[DNE]))
     perfect = True
     if 0 < len(results[DUP]):
