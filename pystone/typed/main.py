@@ -1,6 +1,5 @@
-#from retic.dummy import *
-
-#! /usr/bin/env python3
+from Timer import Timer
+#bg: added import for Timer (all my changes are labeled with 'bg:' comments)
 
 """
 "PYSTONE" Benchmark Program
@@ -67,9 +66,10 @@ FALSE = 0
 
 def main(loops=LOOPS):
     benchtime, stones = pystones(loops)
-    print("Pystone(%s) time for %d passes = %g" % \
-          (__version__, loops, benchtime))
-    print("This machine benchmarks at %g pystones/second" % stones)
+    #bg: commented out print statements
+    #print("Pystone(%s) time for %d passes = %g" % \
+    #      (__version__, loops, benchtime))
+    #print("This machine benchmarks at %g pystones/second" % stones)
 
 
 def pystones(loops=LOOPS):
@@ -261,18 +261,22 @@ def Func3(EnumParIn:int)->int:
     return FALSE
 
 if __name__ == '__main__':
-    import sys
-    def error(msg):
-        print(msg, end=' ', file=sys.stderr)
-        print("usage: %s [number_of_loops]" % sys.argv[0], file=sys.stderr)
-        sys.exit(100)
-    nargs = len(sys.argv) - 1
-    if nargs > 1:
-        error("%d arguments are too many;" % nargs)
-    elif nargs == 1:
-        try: loops = int(sys.argv[1])
-        except ValueError:
-            error("Invalid argument %r;" % sys.argv[1])
-    else:
-        loops = LOOPS
-    main(loops)
+    #bg: commented out unused code
+    #import sys
+    #def error(msg):
+    #    print(msg, end=' ', file=sys.stderr)
+    #    print("usage: %s [number_of_loops]" % sys.argv[0], file=sys.stderr)
+    #    sys.exit(100)
+    #nargs = len(sys.argv) - 1
+    #if nargs > 1:
+    #    error("%d arguments are too many;" % nargs)
+    #elif nargs == 1:
+    #    try: loops = int(sys.argv[1])
+    #    except ValueError:
+    #        error("Invalid argument %r;" % sys.argv[1])
+    #else:
+    #    loops = LOOPS
+    #bg: added timer
+    t = Timer()
+    with t:
+        main(LOOPS) #bg: changed `loops` to `LOOPS`
