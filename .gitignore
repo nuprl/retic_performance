@@ -1,4 +1,5 @@
 *.aux
+*.cut
 *.log
 *.out
 *.pdf
@@ -18,3 +19,5 @@ karst_*
 
 __pycache__/
 *.pyc
+
+compiled/
