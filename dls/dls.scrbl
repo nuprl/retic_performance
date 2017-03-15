@@ -62,9 +62,6 @@
 @include-section{conclusion.scrbl}
 
 @acks{
-  Hidden for double-blind review.
-}
-@;{
   Matthias for all things.
   Mike for Reticulated, bugfixes.
   Sam for access to IU cluster.
