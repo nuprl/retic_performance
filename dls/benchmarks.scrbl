@@ -2,7 +2,7 @@
 @require[
   "common.rkt"
 ]
-@section[#:tag "sec:benchmarks"]{Benchmarks}
+@title[#:tag "sec:benchmarks"]{Benchmarks}
 
 @; @figure["fig:static-benchmark" "Static Benchmark Characteristics"
 @;   @tabular[
@@ -17,10 +17,10 @@
 @;     @list[@elem{Espionage}  @elem{ 2}    @elem{999}                @elem{999}]
 @;     @list[@elem{Slow SHA}   @elem{ 4}    @elem{999}                @elem{999}]]]
 @; ]
-@; 
-@; % remove BSL
-@; % mention size of the reader, parser etc. - how much computation time does each part take to run
-@; % for take5, talk about making the program loop to inc. time > 1 sec
+
+  @; remove BSL
+  @; mention size of the reader, parser etc. - how much computation time does each part take to run
+  @; for take5, talk about making the program loop to inc. time > 1 sec
 
 
 @;@Figure-ref{fig:static-benchmark} talks about the size of our benchmarks.

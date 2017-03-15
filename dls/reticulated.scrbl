@@ -2,7 +2,7 @@
 @require[
   "common.rkt"
 ]
-@section[#:tag "sec:reticulated"]{Reticulated}
+@title[#:tag "sec:reticulated"]{Reticulated}
 
 @; Is it a whole program analysis i.e if module a is prereq. of module b, does b get compiled again even if b has
 @; already been type-checked?

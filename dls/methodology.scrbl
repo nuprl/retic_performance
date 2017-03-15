@@ -2,7 +2,7 @@
 @require[
   "common.rkt"
 ]
-@section[#:tag "sec:methodology"]{Methodology}
+@title[#:tag "sec:methodology"]{Methodology}
 
 @itemlist[
 @item{

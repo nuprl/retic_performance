@@ -3,7 +3,6 @@
 (provide
   (all-from-out
     "bib.rkt"
-    scriblib/footnote
     ;scriblib/figure
     scribble/eval
     scriblib/autobib
@@ -13,7 +12,6 @@
 (require
   "bib.rkt"
   racket/class
-  scriblib/footnote
   scriblib/figure
   scribble/core
   scribble/eval
@@ -122,3 +120,14 @@
 (define (parag . x)
   (apply elem #:style "paragraph" x))
 
+(define (python . x)
+  (apply exact (append (list "\n\\begin{python}\n") x (list "\n\\end{python}\n"))))
+
+(define (pythoninline . x)
+  (apply exact (append (list "\\pythoninline{") x (list "}"))))
+
+(define (pythonexternal a b)
+  (apply exact (format "\\pythonexternal{~a}{~a}" a b)))
+
+(define (note . x)
+  (apply exact (append (list "\\footnote{") x (list "}"))))

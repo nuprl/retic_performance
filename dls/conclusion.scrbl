@@ -2,6 +2,6 @@
 @require[
   "common.rkt"
 ]
-@section[#:tag "sec:conclusion"]{Conclusion}
+@title[#:tag "sec:conclusion"]{Conclusion}
 
 Performance
