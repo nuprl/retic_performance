@@ -1,5 +1,4 @@
-#lang scribble/acmart @anonymous @; @review
-@; @9pt ???
+#lang scribble/acmart @anonymous @sigplan @10pt
 @require[
   "common.rkt"
 ]
