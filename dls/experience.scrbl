@@ -7,6 +7,8 @@
   @; add code samples
   @; cite masked types (myers 2012?)
 
+In this section, we point out to our experience using reticulating python during porting python programs and suggest some improvements (union types are now part of retic.2.0)
+
 @section{import * }
 
 Consider the following python program:

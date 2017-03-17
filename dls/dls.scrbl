@@ -4,7 +4,7 @@
 ]
 
 
-@title{Performance Evaluation of Reticulated Python}
+@title{??? Evaluation of Reticulated Python}
 @author{Ben Greenman}
 @email|{types@ccs.neu.edu}|
 @affiliation{
@@ -54,8 +54,9 @@
 
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
-@include-section{benchmarks.scrbl}
 @include-section{methodology.scrbl}
+@include-section{benchmarks.scrbl}
+@include-section{evaluation_critera.scrbl}
 @include-section{threats.scrbl}
 @include-section{experience.scrbl}
 @include-section{conclusion.scrbl}

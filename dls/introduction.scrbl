@@ -5,4 +5,4 @@
 
 @title[#:tag "sec:introduction"]{Introduction}
 
-These bears are everything.
+This paper presents a comprehensive performance of Reticulated Python. 

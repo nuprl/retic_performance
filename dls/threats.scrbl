@@ -5,6 +5,10 @@
 
 @title[#:tag "sec:threats"]{Threats to Validity}
 
+In this section we show the limitations of:
+1- our evaluation criterea
+2- the benchmarking process
+
 @section{Definition of Efficiency}
 
 We say ``efficient'' is ``low overhead compared to Python''.
