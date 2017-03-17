@@ -6,6 +6,8 @@
 
   @; add code samples
   @; cite masked types (myers 2012?)
+  @; optional arguments not checked (error in POPL'17 benchmark)
+  @; objects with object-fields not checked (see Go, try to make minimal example)
 
 In this section, we point out to our experience using reticulating python during porting python programs and suggest some improvements (union types are now part of retic.2.0)
 
