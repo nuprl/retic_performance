@@ -99,7 +99,7 @@ degree of the Spline."""
         return (self.knots[self.degree - 1],
                 self.knots[len(self.knots) - self.degree])
 
-    def __call__(self:Spline, u:float):
+    def __call__(self:Spline, u:float)->GVector:
         """Calculates a point of the B-Spline using de Boors Algorithm"""
         dom = self.GetDomain()
         if u < dom[0] or u > dom[1]:
