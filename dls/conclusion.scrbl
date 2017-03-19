@@ -4,4 +4,5 @@
 ]
 @title[#:tag "sec:conclusion"]{Conclusion}
 
-In this section we mention our results on the performance of reticulated python based on the evaluation critera.
+We conclude that fully typed configurations exhibit the most slowdown in comparison to all other configurations of the same benchmark. Therefore there is a correlation between the performance overhead and the number of type annotations in a given configuration.
+

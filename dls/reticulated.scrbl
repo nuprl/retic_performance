@@ -4,7 +4,7 @@
 ]
 @title[#:tag "sec:reticulated"]{Reticulated}
 
-This section introduces reticulated python and graual typing
+This section introduces reticulated python and gradual typing
 
 @; Is it a whole program analysis i.e if module a is prereq. of module b, does b get compiled again even if b has
 @; already been type-checked?

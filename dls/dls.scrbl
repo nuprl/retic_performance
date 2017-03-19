@@ -56,7 +56,6 @@
 @include-section{reticulated.scrbl}
 @include-section{methodology.scrbl}
 @include-section{benchmarks.scrbl}
-@include-section{evaluation_critera.scrbl}
 @include-section{threats.scrbl}
 @include-section{experience.scrbl}
 @include-section{conclusion.scrbl}

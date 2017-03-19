@@ -9,7 +9,7 @@
   @; optional arguments not checked (error in POPL'17 benchmark)
   @; objects with object-fields not checked (see Go, try to make minimal example)
 
-In this section, we point out to our experience using reticulating python during porting python programs and suggest some improvements (union types are now part of retic.2.0)
+In this section, we point out to our experience using reticulated python during porting python programs and suggest some improvements.
 
 @section{import * }
 

@@ -5,9 +5,9 @@
 
 @title[#:tag "sec:threats"]{Threats to Validity}
 
-In this section we show the limitations of:
-1- our evaluation criterea
-2- the benchmarking process
+Our method of evaluating the performance of reticulated python exhibits a number of limitations. In particular, we do not evaluate all possible configurations ranging from fully typed to fully untyped. Furthermore, there is a possibility for measurement error due to factors such as running on multiple threads.
+
+
 
 @section{Definition of Efficiency}
 

@@ -26,7 +26,7 @@
 @;@Figure-ref{fig:static-benchmark} talks about the size of our benchmarks.
 
 
-In this section, we give an introduction to 8 benchmarks, some of which represent "real life" code? and some of which was written for the purposes of this paper.
+In this section we give a brief description of each of the benchmarks used in our performance evaluation, as well as denote the portion of the benchmark that was annotated. For benchmarks with a small number of functions, we annotate the entire benchmark, but for larger benchmarks we only annotate a portion of them.
 
 @parag{Sample FSM}
 This program simulates the tension between individuals focused on their own
