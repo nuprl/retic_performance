@@ -4,7 +4,7 @@
 ]
 @title[#:tag "sec:methodology"]{Methodology}
 
-In this section we introduce the method used to evaluate the performance. Since we do not want to run all possible program configurations, we only type functions as a whole, yielding 2^n configurations per benchmark, for n = the number of functions in a benchmark. Using this methods means we assume this is an approximation to how the programmer introduces type annotations to a program. 
+For each benchmark, we aimed to choose a set of configurations that represent the overall performance of Reticulated Python, and had size less than x. In our method, we type functions as a whole, yielding 2^n configurations per benchmark, where n is the number of functions in a benchmark. 
 
 @itemlist[
 @item{

@@ -26,7 +26,7 @@
 @;@Figure-ref{fig:static-benchmark} talks about the size of our benchmarks.
 
 
-In this section we give a brief description of each of the benchmarks used in our performance evaluation, as well as denote the portion of the benchmark that was annotated. For benchmarks with a small number of functions, we annotate the entire benchmark, but for larger benchmarks we only annotate a portion of them.
+In this section we give a brief description of the benchmarks used in our performance evaluation and denote the portion of the benchmark that was annotated with types. If the total number of functions is less than or equal to x for a given benchmark, we annotate all functions. Otherwise, we choose at most x functions to annotate. 
 
 @parag{Sample FSM}
 This program simulates the tension between individuals focused on their own

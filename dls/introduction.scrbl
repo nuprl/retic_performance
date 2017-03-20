@@ -5,5 +5,6 @@
 
 @title[#:tag "sec:introduction"]{Introduction}
 
-This paper presents a comprehensive performance evaluation of reticulated python. We port 8 python benchmarks to reticulated python and run a number of configurations ranging from fully untyped to fully typed configurations. We then show the correlation between type annotations and performance overhead for each of our benchmarks.   
+This paper presents a comprehensive performance evaluation of Reticulated Python, a micro-gradual typing system. We conclude that the performance overhead of Reticulated Python is not acceptable compared to python.
+
 

@@ -4,5 +4,4 @@
 ]
 @title[#:tag "sec:conclusion"]{Conclusion}
 
-We conclude that fully typed configurations exhibit the most slowdown in comparison to all other configurations of the same benchmark. Therefore there is a correlation between the performance overhead and the number of type annotations in a given configuration.
-
+We conclude that out of 8 benchmarks, x benchmarks are acceptable, where acceptable means N-deliverable and N/M-usable.
