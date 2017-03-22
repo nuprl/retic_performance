@@ -1,46 +1,40 @@
 #lang scribble/acmart @anonymous @sigplan @10pt
-@require[
-  "common.rkt"
-]
 
+@require{common.rkt}
 
-@title{??? Evaluation of Reticulated Python}
-@author[
-#:email "types@ccs.neu.edu"
-#:affiliation 
-@affiliation[
-@;  #:department "College of Computer and Information Science"
-  #:institution "Northeastern University"
-  #:city "Boston"
-  #:state "Massachusetts"
-]]{Ben Greenman}
+@title{Recoiling from Reticulated Python}
 
-@;orcid{0000-0001-7078-9287}
+@(define (nuprl)
+  @affiliation[
+    #:institution  @list{Northeastern University Programming Research Lab @nl[] (NU PRL)}
+    #:city        "Boston"
+    #:state       "Massachusetts"])
 
 @author[
-#:email "abdelmigeed.z@husky.neu.edu"
-#:affiliation @affiliation[
-@;  #:department "College of Computer and Information Science"
-  #:institution "Northeastern University"
-  #:city "Boston"
-  #:state "Massachusetts"
-]
-]{Zeina Migeed}
+  #:email "types@ccs.neu.edu"
+  #:orcid "0000-0001-7078-9287"
+  #:affiliation (nuprl)]{
+Ben Greenman}
+
+@author[
+  #:email "abdelmigeed.z@husky.neu.edu"
+  #:affiliation (nuprl)]{
+Zeina Migeed}
 
 @copyrightyear{2017}
 
 @; -----------------------------------------------------------------------------
-@abstract{
-  Gradual typing promises to combine the benefits of dynamic and static typing
-  disciplines in a single language, giving developers freedom to use type
-  information only where it proves useful for catching bugs, documenting
-  interfaces, or enabling optimizations.  Reticulated Python is one such
-  @emph{gradually typed} language; it gives Python programmers the ability to
-  incrementally add sound, optional type annotations to critical parts of their
-  programs.  Reticulated preserves type soundness by adding dynamic type tests
-  to a program.  These tests can arbitrarily degrade the performance of
-  programs, but their effect on partially-typed variations of realistic
-  programs is unknown.
+@;maketitle[]
+
+@abstract{Gradual typing promises to combine the benefits of dynamic and static typing
+  disciplines in a single language, giving developers freedom to use type information
+  only where it proves useful for catching bugs, documenting interfaces, or enabling
+  optimizations.  Reticulated Python is one such @emph{gradually typed} language; it
+  gives Python programmers the ability to incrementally add sound, optional type
+  annotations to critical parts of their programs.  Reticulated preserves type
+  soundness by adding dynamic type tests to a program.  These tests can arbitrarily
+  degrade the performance of programs, but their effect on partially-typed variations
+  of realistic programs is unknown.
 
   This paper studies the overhead of gradual typing in Reticulated Python.  We
   examine @|NUM-BENCHMARKS| programs taken from a variety of areas including
@@ -51,11 +45,10 @@
   We additionally sample random configurations in which any subset of class
   fields, function parameters, or function return types may be typed.  Finally
   we attempt to explain which functions or types are responsible for the
-  greatest overhead and generalize common patterns.
-}
+  greatest overhead and generalize common patterns.}
+
 @terms{CS}
 @keywords{CS}
-@;maketitle[]
 
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
