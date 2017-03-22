@@ -2,9 +2,13 @@
 
 (provide
   tab-split
-  path-string->string)
+  path-string->string
+  rnd
+  pct)
 
 (require
+  (only-in racket/format
+    ~r)
   (only-in racket/string
     string-split))
 
@@ -17,3 +21,9 @@
 
 (define (tab-split str)
   (string-split str TAB))
+
+(define (rnd n)
+  (~r n #:precision 2))
+
+(define (pct part total)
+  (* 100 (/ part total)))

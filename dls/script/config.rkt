@@ -36,7 +36,8 @@
   (build-path bm-dir TYPED))
 
 (define (is-benchmark-folder? p)
-  (and (directory-exists? p)
+  (and (path-string? p)
+       (directory-exists? p)
        (directory-exists? (build-path p TYPED))))
 
 ;; =============================================================================

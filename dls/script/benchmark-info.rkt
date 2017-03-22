@@ -122,8 +122,10 @@
   (cond
    [(simple-name? bm-name)
     (->benchmark-info (build-path (retic-performance-benchmarks-dir HOME) (~a bm-name)))]
+   [(is-benchmark-folder? bm-name)
+    (path->benchmark-info bm-name)]
    [else
-    (path->benchmark-info bm-name)]))
+    (raise-argument-error '->benchmark-info "path to benchmark folder" bm-name)]))
 
 (define (path->benchmark-info src)
   (define simple-name (path->simple-name src))
@@ -161,6 +163,12 @@
       (check > (benchmark->sloc bm) small-loc
         (format "expected benchmark '~a' to contain at least ~a LOC" n small-loc))
       ))
+
+  (test-case "->benchmark-info:fail"
+    (check-exn exn:fail:contract?
+      (λ () (->benchmark-info 42)))
+    (check-exn exn:fail:contract?
+      (λ () (->benchmark-info '|hello world|))))
 
   (test-case "path->simple-name"
     (check-equal?

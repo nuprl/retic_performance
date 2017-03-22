@@ -192,14 +192,19 @@
 (define (quick-performance-info bm-name)
   (define bm (->benchmark-info bm-name))
   (define pf (benchmark->performance-info bm))
+  (define nc (performance-info-num-configs pf))
   (printf "~a~n" bm-name)
-  (printf "- num configs  : ~a~n" (performance-info-num-configs pf))
+  (printf "- num configs  : ~a~n" nc)
   (printf "- Python  time : ~a~n" "???")
   (printf "- untyped time : ~a~n" (performance-info-untyped-runtime pf))
-  (printf "-   typed time : ~a~n" (performance-info-typed-runtime pf))
+  (printf "- typed time   : ~a~n" (performance-info-typed-runtime pf))
   (printf "- min overhead : ~a~n" (min-overhead pf))
   (printf "- max overhead : ~a~n" (max-overhead pf))
   (printf "- avg overhead : ~a~n" (mean-overhead pf))
+  (let ([d2 ((deliverable 2) pf)])
+    (printf "- 2 deliv.     : ~a (~a%)~n" d2 (rnd (pct d2 nc))))
+  (let ([d5 ((deliverable 5) pf)])
+    (printf "- 5 deliv.     : ~a (~a%)~n" d5 (rnd (pct d5 nc))))
   (void))
 
 ;; =============================================================================
@@ -304,7 +309,20 @@
 
 )
 
-(module+ main
+;; -----------------------------------------------------------------------------
 
-)
+(module+ main
+  (require racket/cmdline)
+  (command-line
+   #:program "perf-info"
+   #:args benchmark-name*
+   (cond
+    [(null? benchmark-name*)
+     (printf "usage: rp:perf-info <benchmark-name> ...~n")]
+    [(null? (cdr benchmark-name*))
+     (quick-performance-info (car benchmark-name*))]
+    [else
+     (for ([n (in-list benchmark-name*)])
+       (with-handlers ([exn:fail:contract? (λ (e) (printf "WARNING: failure processing '~a'~n" n))])
+         (quick-performance-info n)))])))
 
