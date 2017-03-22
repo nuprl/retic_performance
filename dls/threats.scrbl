@@ -1,8 +1,4 @@
-#lang scribble/acmart
-@require[
-  "common.rkt"
-]
-
+#lang gm-dls-2017
 @title[#:tag "sec:threats"]{Threats to Validity}
 
 Our method of evaluating the performance of reticulated python exhibits a number of limitations. In particular, we do not evaluate all possible configurations ranging from fully typed to fully untyped. Furthermore, measurement error may have occurred due to factors such as running on multiple threads.

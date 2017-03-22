@@ -1,7 +1,4 @@
-#lang scribble/acmart
-@require[
-  "common.rkt"
-]
+#lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Reticulated}
 
 

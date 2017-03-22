@@ -1,8 +1,4 @@
-#lang scribble/acmart
-@require[scriblib/figure]
-@require[
-  "common.rkt"
-]
+#lang gm-dls-2017
 @title[#:tag "sec:benchmarks"]{Benchmarks}
 
  @figure["fig:static-benchmark" "Static Benchmark Characteristics"

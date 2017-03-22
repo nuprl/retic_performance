@@ -1,8 +1,4 @@
-#lang scribble/acmart
-@require[
-  "common.rkt"
-]
-
+#lang gm-dls-2017
 @title[#:tag "sec:introduction"]{Introduction}
 
 Sound gradual typing allows us to safely combine typed and untyped code, but to accomplish soundness, gradual typing adds extra checks during runtime. There are currently a few implementations of sound gradual typing, but none of them seem to be efficient. Studies by  Takikawa et al on Typed Racket , a macro-gradual type system show a significant overhead of Typed Racket compared to Racket. The method used in this study explores the partial conversions from typed to untyped code by measuring the performance of 2^n configurations where n is the number of modules in a given benchmark. It also employs the linear sampling approach by generating a linear number of samples of random typed/untyped ratios over modules. It then uses a lattice oriented approach to interpret the results. 
@@ -16,8 +12,4 @@ In this paper, we conduct a proper evaluation on a micro-gradual type system by 
 Instead of testing every possible configuration over modules, we test every possible configuration over functions. In other words, we consider 2^n configurations obtained by choosing to annotate or to not annotate every function in the program and test their performance against python. Secondly, We select n random configurations but instead of annotating over modules, we annotate over atomic expressions. We then interpret the results according to the lattice-oriented approach from  Takikawa et al.
 
 In summary, we make two main contributions: We test Siek's hypothesis by adapting the  Takikawa et al. method to measure the performance of a micro-gradual type system and we validate the linear sampling method by Takikawa et al.
-
-
-
-
 
