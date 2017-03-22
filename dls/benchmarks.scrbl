@@ -1,4 +1,5 @@
 #lang scribble/acmart
+@require[scriblib/figure]
 @require[
   "common.rkt"
 ]

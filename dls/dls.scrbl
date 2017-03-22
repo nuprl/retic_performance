@@ -5,22 +5,27 @@
 
 
 @title{??? Evaluation of Reticulated Python}
-@author{Ben Greenman}
-@email|{types@ccs.neu.edu}|
-@affiliation{
-  @department{College of Computer and Information Science}
-  @institution{Northeastern University}
-  @city{Boston}
-  @state{Massachusetts}}
-@orcid{0000-0001-7078-9287}
+@author[
+#:email "types@ccs.neu.edu"
+#:affiliation 
+@affiliation[
+@;  #:department "College of Computer and Information Science"
+  #:institution "Northeastern University"
+  #:city "Boston"
+  #:state "Massachusetts"
+]]{Ben Greenman}
 
-@author{Zeina Migeed}
-@email|{abdelmigeed.z@husky.neu.edu}|
-@affiliation{
-  @department{College of Computer and Information Science}
-  @institution{Northeastern University}
-  @city{Boston}
-  @state{Massachusetts}}
+@;orcid{0000-0001-7078-9287}
+
+@author[
+#:email "abdelmigeed.z@husky.neu.edu"
+#:affiliation @affiliation[
+@;  #:department "College of Computer and Information Science"
+  #:institution "Northeastern University"
+  #:city "Boston"
+  #:state "Massachusetts"
+]
+]{Zeina Migeed}
 
 @copyrightyear{2017}
 
@@ -50,7 +55,7 @@
 }
 @terms{CS}
 @keywords{CS}
-@maketitle[]
+@;maketitle[]
 
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
