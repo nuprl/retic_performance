@@ -131,3 +131,6 @@
 
 (define (note . x)
   (apply exact (append (list "\\footnote{") x (list "}"))))
+
+(define (nl)
+  (apply exact (list "\\newline{}")))
