@@ -23,6 +23,10 @@
 
   all-benchmarks
   ->benchmark-info
+
+
+  make-benchmark-info
+  ;; Low-level function
 )
 
 (require

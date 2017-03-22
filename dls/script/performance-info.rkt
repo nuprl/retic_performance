@@ -37,10 +37,10 @@
 (define (make-performance-info name #:src k
                                     #:num-configurations num-configs
                                     #:configurations/module* configs/module*
+                                    #:python-runtime python
                                     #:untyped-retic-runtime base-retic
                                     #:typed-retic-runtime typed-retic)
-  ;; TODO python runtime
-  (performance-info name k num-configs configs/module* #f base-retic typed-retic))
+  (performance-info name k num-configs configs/module* python base-retic typed-retic))
 
 (define (benchmark->performance-info bm)
   (define k (benchmark->karst-data bm))
@@ -50,10 +50,12 @@
       "cannot find Karst data for benchmark '~a'" name))
   (define-values [num-configs configs/module* base-retic typed-retic]
     (scan-karst-file k))
+  (define python 1) ;; TODO !!!!
   (make-performance-info name
     #:src k
     #:num-configurations num-configs
     #:configurations/module* configs/module*
+    #:python-runtime python
     #:untyped-retic-runtime base-retic
     #:typed-retic-runtime typed-retic))
 
@@ -73,10 +75,11 @@
       (values cm
               (λ (cfg/mod*)
                 (set-box! cm
-                  (if (unbox cm)
-                    (for/list ([v-old (in-list (unbox cm))]
-                               [v-new (in-list cfg/mod*)])
-                      (max v-old v-new))
+                  (if (and (unbox cm)
+                           (for/and ([v-old (in-list (unbox cm))]
+                                     [v-new (in-list cfg/mod*)])
+                             (>= v-old v-new)))
+                    (unbox cm)
                     cfg/mod*))))))
   (define-values [base-retic typed-retic update-base-retic update-typed-retic]
     (let ([ur (box #f)]
@@ -120,19 +123,25 @@
 ;; parse-config-string : String -> (Listof Natural)
 ;; Parse a string like `0-0-3` into a list of numbers `'(0 0 3)`
 (define/contract (parse-config-string cfg-str)
-  (-> string? (listof exact-nonnegative-integer?))
+  (-> string? (non-empty-listof exact-nonnegative-integer?))
   (map string->number (string-split cfg-str "-")))
 
 (define/contract (parse-times-string times-str)
-  (-> string? (listof (and/c flonum? (>=/c 0))))
+  (-> string? (non-empty-listof (and/c real? (>=/c 0))))
   (let ([sp (open-input-string (string-replace times-str "," ""))])
     (begin0 (read sp) (close-input-port sp))))
 
 (define (num-configurations pf)
   (performance-info-num-configs pf))
 
-(define (overhead pf v)
-  (/ v (performance-info-untyped-runtime pf)))
+(define overhead
+  (case-lambda
+   [(pf v)
+    ((overhead pf) v)]
+   [(pf)
+    ;; TODO use python runtime
+    (let ([baseline (performance-info-untyped-runtime pf)])
+      (λ (v) (/ v baseline)))]))
 
 (define (min-overhead pf)
   (overhead pf (fold/mean (performance-info-src pf) min)))
@@ -140,17 +149,16 @@
 (define (max-overhead pf)
   (overhead pf (fold/mean (performance-info-src pf) max)))
 
-(define (average-overhead pf)
-  ;; TODO how is the average less than the min?
+(define (mean-overhead pf)
   (define 1/N (/ 1 (num-configurations pf)))
   (define (avg acc v)
     (+ acc (* 1/N v)))
-  ;(overhead pf
-  (fold/mean (performance-info-src pf) avg #:init (λ (v) (* 1/N v))))
+  (overhead pf (fold/mean (performance-info-src pf) avg #:init (λ (v) (* 1/N v)))))
 
+;; fold/mean : (All (A) Path-String (-> A Real A) #:init (U #f (-> Real A)) -> A)
 (define fold/mean
   (let ([line->mean (λ (ln)
-                      (let ([times-str (caddr (parse-line (read-line)))])
+                      (let ([times-str (caddr (parse-line ln))])
                         (mean (parse-times-string times-str))))])
     (λ (filename f #:init [init-f #f])
       (with-input-from-file filename
@@ -161,20 +169,25 @@
             (f acc (line->mean ln))))))))
 
 (define ((deliverable D) pf)
-  (TODO))
+  (define overhead/pf (overhead pf))
+  (define (D-deliverable? t)
+    (<= (overhead/pf t) D))
+  (count-configurations pf D-deliverable?))
 
-(define ((usable D U) pf)
-  (TODO))
+(define (count-configurations pf good?)
+  (define (add-good? count t)
+    (if (good? t) (+ count 1) count))
+  (fold/mean (performance-info-src pf)
+             add-good?
+             #:init (λ (t) (add-good? 0 t))))
 
 (define (typed/python-ratio pf)
-  (TODO))
+  (/ (performance-info-typed-runtime pf)
+     (performance-info-python-runtime pf)))
 
 (define (typed/retic-ratio pf)
   (/ (performance-info-typed-runtime pf)
      (performance-info-untyped-runtime pf)))
-
-(define (python-runtime pf)
-  (TODO))
 
 (define (quick-performance-info bm-name)
   (define bm (->benchmark-info bm-name))
@@ -186,22 +199,109 @@
   (printf "-   typed time : ~a~n" (performance-info-typed-runtime pf))
   (printf "- min overhead : ~a~n" (min-overhead pf))
   (printf "- max overhead : ~a~n" (max-overhead pf))
-  (printf "- avg overhead : ~a~n" (average-overhead pf))
+  (printf "- avg overhead : ~a~n" (mean-overhead pf))
   (void))
 
 ;; =============================================================================
 
 (module+ test
-  (require rackunit)
+  (require rackunit racket/runtime-path)
 
-  (test-case "performance-info"
-    #;(let* ([bm (->benchmark-info 'Espionage)]
-           [pf (benchmark->performance-info bm)]
-          )
+  (define-runtime-path karst-example "./test/karst-example.tab")
+
+  (test-case "benchmark->performance-info:example-data"
+    (define-values [num-configs configs/module* base-retic typed-retic]
+      (scan-karst-file karst-example))
+    (check-equal? num-configs 4)
+    (check-equal? configs/module* '(1 1))
+    (check-equal? base-retic 10)
+    (check-equal? typed-retic 20)
+
+    (let ([pf (make-performance-info 'example
+                #:src karst-example
+                #:num-configurations num-configs
+                #:configurations/module* configs/module*
+                #:python-runtime base-retic ;; TODO
+                #:untyped-retic-runtime base-retic
+                #:typed-retic-runtime typed-retic)])
+      (check-equal? (num-configurations pf) 4)
+      (check-equal? (min-overhead pf) 1/2)
+      (check-equal? (max-overhead pf) 10)
+      (check-equal? (mean-overhead pf) 27/8)
+      (check-equal? (typed/retic-ratio pf) 2)
+      (check-equal? ((deliverable 2) pf) 3)
+      (check-equal? ((deliverable 10) pf) 4)
+      (void)))
+
+  ;; general correctness/sanity for a real program
+  (let* ([bm (->benchmark-info 'Espionage)]
+         [pf (benchmark->performance-info bm)])
+    (test-case "performance-info:spot-check"
       (check-true (performance-info? pf))
+      (let* ([lo (min-overhead pf)]
+             [hi (max-overhead pf)]
+             [avg (mean-overhead pf)]
+             [nc (num-configurations pf)]
+             [d2 ((deliverable 2) pf)]
+             [d3 ((deliverable 3) pf)]
+             [dhi ((deliverable hi) pf)])
+        (check <= lo hi)
+        (check <= lo avg)
+        (check <= avg hi)
+        (check <= d2 nc)
+        (check <= d2 d3)
+        (check-equal? dhi nc)
+        (void)))
+
+    (test-case "quick-stats:spot-check"
+      (define quick-stats-str
+        (let ([sp (open-output-string)])
+          (parameterize ([current-output-port sp])
+            (quick-performance-info 'Espionage))
+          (begin0 (get-output-string sp) (close-output-port sp))))
+      (define m (regexp-match #rx"avg overhead : ([.0-9]+)\n" quick-stats-str))
+      (check-true (pair? m))
+      (check-equal? (string->number (cadr m)) (mean-overhead pf))
       (void))
-    (quick-performance-info 'Espionage)
   )
+
+  (test-case "typed-configuration?"
+    (check-true (typed-configuration? '(0 0 0)))
+    (check-true (typed-configuration? '()))
+    (check-false (typed-configuration? '(1 0)))
+    (check-false (typed-configuration? '(9 8 7 7 9))))
+
+  (test-case "parse-line"
+    (check-equal?
+      (parse-line "0-0	4	[1, 2, 2, 3]")
+      (list "0-0" "4" "[1, 2, 2, 3]"))
+    (check-exn exn:fail:contract?
+      (λ () (parse-line ""))))
+
+  (test-case "parse-config-string"
+    (check-equal?
+      (parse-config-string "0-0")
+      '(0 0))
+    (check-equal?
+      (parse-config-string "1-22-333")
+      '(1 22 333))
+    (check-exn exn:fail:contract?
+      (λ () (parse-config-string "1-2-four")))
+    (check-exn exn:fail:contract?
+      (λ () (parse-config-string ""))))
+
+  (test-case "parse-times-string"
+    (check-equal?
+      (parse-times-string "[1, 2, 3]")
+      '(1 2 3))
+    (check-equal?
+      (parse-times-string "[1.23, 4.554]")
+      '(1.23 4.554))
+    (check-exn exn:fail:contract?
+      (λ () (parse-times-string "[]")))
+    (check-exn exn:fail:contract?
+      (λ () (parse-times-string "[1, -2]"))))
+
 )
 
 (module+ main
