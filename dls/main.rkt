@@ -13,7 +13,6 @@
 ;;   - you can build paper without python3, sloccount installed
 ;;   - but it will stop you if your cache is out of sync
 
-;; TODO ;; (require racket/contract)
 (provide
   (all-from-out
     "bib.rkt"
@@ -25,27 +24,102 @@
     scribble/manual)
 
   (rename-out
-    [acmart:#%module-begin #%module-begin])
+   [acmart:#%module-begin #%module-begin]
+
+   [render-benchmark-name bm]
+   ;; Usage: `@bm[benchmark-info]`
+   ;; Given a benchmark-info struct, render the name of the benchmark
+   ;;  in a standard way.
+  )
 
   ALL-BENCHMARKS
+  ;; (listof benchmark-info?)]
+  ;; Registry of all known benchmarks.
+  ;; To change, edit `script/benchmark-info.rkt`.
+
   NUM-BENCHMARKS
+  ;; natural?
+  ;; Same as `(length ALL-BENCHMARKS)`
 
   $
-  citet
-  etal
-  exact
-  id
-  note
-  parag
-  python
-  pythonexternal
-  pythoninline
-  sc
-  sf
-  ~cite
+  ;; Usage: `@${some math}`
+  ;;  where `some math` is LaTeX-formatted math.
+  ;; Wraps its arguments in dollar signs `$ ....$` and sends the result to LaTeX
 
-  (rename-out
-   [render-benchmark-name bm])
+  ~cite
+  ;; Usage: `@~cite[bib-name]`
+  ;;  where `bib-name` is an identifier from `bib.rkt`
+  ;; Renders a short-style citation to `bib-name`.
+  ;; Example:
+  ;;   @elem{We love@~cite[matthias]}
+  ;; May render to:
+  ;;   "We love [409]."
+  ;; Where 409 is the number assigned to the bib entry that `matthias` refers to
+
+  citet
+  ;; Usage: `@citet[bib-name]`
+  ;;  where `bib-name` is an identifier from `bib.rkt`
+  ;; Renders a long-style citation to `bib-name`
+  ;; Example:
+  ;;  @elem{See work by @citet[matthias]}
+  ;; May render to:
+  ;;  "See work by Felleisen 1901"
+  ;; If `matthias` refers to a 1901 article by Felleisen.
+
+  etal
+  ;; Usage: `@|etal|`
+  ;; Renders "et al." with proper spacing between the words.
+  ;; Use `citet` instead.
+
+  exact
+  ;; Usage: `@exact|{some text}|`
+  ;;    or `@exact{some text}`
+  ;;  where `some text` is text that should go directly to LaTeX
+  ;; Using `|{ ... }|` instead of `{ ... }` ignores any `@` signs
+  ;;  or unmatched `}` in the `...`.
+
+  id
+  ;; Usage: `@id[foo]`
+  ;;  where `foo` is a Racket identifier.
+  ;; Renders the display-mode form of the value of `foo`
+
+  note
+  ;; Usage: `@note{some text}`
+  ;; Renders a footnote containing `some text`.
+  ;; The footnote marker will appear where `@note` appears in the source,
+  ;;  and the footnote text will appear at the bottom of the current page.
+  ;;
+  ;; Remember! Footnotes always go after any punctuation.
+  ;; (See "Introduction to Notes" here: https://owl.english.purdue.edu/owl/owlprint/717/ )
+
+  parag
+  ;; Usage: `@parag{word}`
+  ;;  where `word` is a single word or short phrase.
+  ;; Renders a label for an upcoming paragraph.
+
+  python
+  ;; Usage: `@python{ code }`
+  ;;  where `code` is one-or-more-lines of Python code
+  ;; Renders a codeblock containing Python code.
+
+  pythonexternal
+  ;; Usage: `@pythonexternal{path-string}`
+  ;;  where `path-string` refers to a file containing Python code
+  ;; Renders the contents of `path-string` in a Python code block
+
+  pythoninline
+  ;; Usage: `@pythoninline{code}`
+  ;;  where `code` is less than 1 line of Python code
+  ;; Renders some Python code in the current line of text.
+  ;; Useful for formatting identifiers
+
+  sc
+  ;; Usage `@sc{some text}`
+  ;; Renders `text` in small caps style
+
+  sf
+  ;; Usage `@sf{some text}`
+  ;; Renders `some text` in serif style
 )
 
 (require
@@ -132,7 +206,7 @@
   #:style small-number-style)
 
 (define etal
-  "et al.")
+  (exact "et~al."))
 
 (define (sf x)
   (elem #:style "sfstyle" x))

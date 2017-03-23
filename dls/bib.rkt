@@ -1,7 +1,9 @@
 #lang racket/base
 
-;; This module defines a gradual typing bibliography in
-;; autobib format, suitable for use in papers written in Scribble
+;; Bibliography for DLS 2017 submission
+;;
+;; To add a new entry, define a new `make-bib` at the bottom of this file.
+;; Look to the previous definitions for examples.
 
 (require racket/format scriblib/autobib)
 

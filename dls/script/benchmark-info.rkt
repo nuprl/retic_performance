@@ -8,31 +8,56 @@
 ;; - num classes
 ;; - num methods
 
-
+(require racket/contract)
 (provide
-  benchmark-info?
+  (contract-out
+    [benchmark-info?
+     (-> any/c boolean?)]
+    ;; Predicate for the `benchmark-info` struct
 
-  (rename-out
-   [benchmark-info-name benchmark->name]
-   [benchmark-info-module* benchmark->module*]
-   [benchmark-info-src benchmark->src])
+    [rename benchmark-info-name benchmark->name
+     (-> benchmark-info? symbol?)]
+    ;; Return the name of a benchmark
 
-  benchmark->num-modules
-  benchmark->sloc
-  benchmark->karst-data
+    [rename benchmark-info-module* benchmark->module*
+     (-> benchmark-info? (listof string?))]
+    ;; Return the names of all modules in the benchmark
 
-  all-benchmarks
-  ->benchmark-info
+    [rename benchmark-info-src benchmark->src
+     (-> benchmark-info? path-string?)]
+    ;; Return a path to this benchmark's directory
 
+    [benchmark->num-modules
+     (-> benchmark-info? natural?)]
+    ;; Return the number of modules in the given benchmark
+
+    [benchmark->sloc
+     (-> benchmark-info? natural?)]
+    ;; Estimate the source-lines-of-code (SLOC) in the benchmark's modules
+
+    [benchmark->karst-data
+     (-> benchmark-info? (or/c #f path-string?))]
+    ;; Return a path to the benchmark's data from the Karst cluster, if any
+
+    [all-benchmarks
+     (-> (listof benchmark-info?))]
+    ;; Return a list of all known benchmarks
+
+    [->benchmark-info
+     (-> (or/c symbol? string? path-string?) benchmark-info?)]
+    ;; Return the benchmark that the given data refers to
+  )
 
   make-benchmark-info
-  ;; Low-level function
+  ;; Low-level constructor. Provided for testing.
 )
 
 (require
   "config.rkt"
   "python.rkt"
   "util.rkt"
+  (only-in racket/math
+    natural?)
   (only-in racket/path
     file-name-from-path)
   (only-in racket/string
@@ -122,7 +147,7 @@
   (cond
    [(simple-name? bm-name)
     (->benchmark-info (build-path (retic-performance-benchmarks-dir HOME) (~a bm-name)))]
-   [(is-benchmark-folder? bm-name)
+   [(is-benchmark-directory? bm-name)
     (path->benchmark-info bm-name)]
    [else
     (raise-argument-error '->benchmark-info "path to benchmark folder" bm-name)]))
@@ -184,17 +209,3 @@
     (check-false (simple-name? "hello/world")))
 
 )
-;    971604
-;    896934
-;     29966
-;     29995
-;     15149
-;     15232
-;   7182811
-;       434
-;      3891
-;     55604
-;      7357
-;  29902524
-;      7572
-;  15176759

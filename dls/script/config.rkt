@@ -2,13 +2,33 @@
 
 ;; Parameters, configuration functions
 
+(require racket/contract)
 (provide
-  retic-performance-home-dir
-  retic-performance-benchmarks-dir
-  retic-performance-karst-dir
-  benchmark-dir->typed-dir
+  (contract-out
+    [retic-performance-home-dir
+     (-> path-string?)]
+    ;; Return a path to the root of your `retic_performance` repo.
+    ;; MUST BE CALLED from inside the repo.
 
-  is-benchmark-folder?)
+    [retic-performance-benchmarks-dir
+     (-> path-string? path-string?)]
+    ;; Build a path to your benchmarks directory
+    ;;  given a path to your repo directory
+
+    [retic-performance-karst-dir
+     (-> path-string? path-string?)]
+    ;; Build a path to your Karst data directory
+    ;;  given a path to your repo directory
+
+    [benchmark-dir->typed-dir
+     (-> path-string? path-string?)]
+    ;; Build a path to a benchmark's typed code directory
+    ;;  given a path to the benchmark's root directory
+
+    [is-benchmark-directory?
+     (-> any/c boolean?)]
+    ;; Return `#true` if the given value is a benchmark's root directory
+))
 
 (require
   "system.rkt")
@@ -35,7 +55,7 @@
 (define (benchmark-dir->typed-dir bm-dir)
   (build-path bm-dir TYPED))
 
-(define (is-benchmark-folder? p)
+(define (is-benchmark-directory? p)
   (and (path-string? p)
        (directory-exists? p)
        (directory-exists? (build-path p TYPED))))
@@ -50,8 +70,8 @@
   (test-case "home-dir"
     (check-pred directory-exists? home))
 
-  (test-case "is-benchmark-folder?"
+  (test-case "is-benchmark-directory?"
     (define futen (build-path (retic-performance-benchmarks-dir home) "futen"))
-    (check-true (is-benchmark-folder? futen))
-    (check-false (is-benchmark-folder? home))))
+    (check-true (is-benchmark-directory? futen))
+    (check-false (is-benchmark-directory? home))))
 

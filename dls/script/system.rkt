@@ -1,10 +1,17 @@
 #lang racket/base
 
+;; API for making system calls
+
+(require racket/contract)
 (provide
-  shell
-  ;; (-> String (Listof String) String)
-  ;; TODO document
-)
+  (contract-out
+   [shell
+    (-> string? (listof string?) string?)]
+   ;; `(shell cmd arg*)` finds the executable that `cmd` denotes,
+   ;;  then invokes the executable with arguments `arg*`.
+   ;; Raises an exception if the executable exists uncleanly,
+   ;;  otherwise returns a string containing all output produced by the exe.
+))
 
 (require
   "util.rkt"

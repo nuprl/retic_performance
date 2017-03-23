@@ -4,17 +4,16 @@
 ;;  for querying static characteristics
 
 (require racket/contract)
-
 (provide
   (contract-out
    [python-sloc
-    (-> python-path? exact-nonnegative-integer?)])
+    (-> python-path? exact-nonnegative-integer?)]
    ;; Count source lines of code in a python module
 
-  python-path?
-  ;; (-> any/c Boolean)
-  ;; Return #t if the given path string ends in a `.py` suffix, and #f otherwise
-)
+   [python-path?
+    (-> any/c boolean?)]
+   ;; Return `#t` if the given path string ends in a `.py` suffix, and `#f` otherwise
+))
 
 (require
   "system.rkt"

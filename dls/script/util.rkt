@@ -1,11 +1,32 @@
 #lang racket/base
 
+;; Utility functions.
+;; Maybe these should be somewhere more public.
+
+(require racket/contract)
 (provide
-  tab-split
-  path-string->string
-  rnd
-  pct
-  file-remove-extension)
+  (contract-out
+    [tab-split
+     (-> string? (listof string?))]
+    ;; Split a list of string by its tab characters
+
+    [path-string->string
+     (-> path-string? string?)]
+    ;; Convert a string or a path to a string
+
+    [rnd
+     (-> real? string?)]
+    ;; Render a number as a string, round to 2 decimal places.
+
+    [pct
+     (-> real? real? real?)]
+    ;; `(pct 1 4)` returns 25
+
+    [file-remove-extension
+     (-> path-string? path-string?)]
+    ;; Removes a Racket-added extension from a filename.
+    ;; `(file-remove-extension "foo_tab.gz")` returns "foo.tab"
+))
 
 (require
   (only-in racket/format

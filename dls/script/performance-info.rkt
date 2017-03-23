@@ -1,19 +1,89 @@
 #lang racket/base
 
+;; Encapsulates info about a benchmark's performance
+
+;; Command-line usage:
+;;     raco rp-perf <benchmark-name> ...
+;; Prints summary stats for each `<benchmark-name>`
+
 ;; TODO
 ;; - make sure "alphabetical in Racket" matches configuration order
+;; - maybe don't need this, maybe should be part of `benchmark-info`
 
 (require racket/contract)
 (provide
   (contract-out
+   [performance-info?
+    (-> any/c boolean?)]
+   ;; Predicate for instances of the `preformance-info` struct
+
    [benchmark->performance-info
     (-> benchmark-info? performance-info?)]
+   ;; Construct a `performance-info` struct from a `benchmark-info` struct
+
+   [python-runtime
+    (-> performance-info? real?)]
+   ;; Return the runtime of the benchmark's untyped configuration under Python
+
+   [untyped-runtime
+    (-> performance-info? real?)]
+   ;; Return the runtime of the benchmark's untyped configuration under Reticulated
+
+   [typed-runtime
+    (-> performance-info? real?)]
+   ;; Return the runtime of the benchmark's fully-typed configuration under Reticulated
+
+   [num-configurations
+    (-> performance-info? natural?)]
+   ;; Count the number of configurations in a benchmark
+
+   [overhead
+    (case->
+     (-> performance-info? real? real?)
+     (-> performance-info? (-> real? real?)))]
+   ;; `(overhead p v)` returns the overhead of the running time `v` relative
+   ;;  to the Python configuration of `p`
+
+   [min-overhead
+    (-> performance-info? real?)]
+   ;; Returns the lowest observed overhead of any configuration in `p`
+
+   [max-overhead
+    (-> performance-info? real?)]
+   ;; Returns the maximum observed overhead of any configuration in `p`
+
+   [mean-overhead
+    (-> performance-info? real?)]
+   ;; Returns the average overhead across all configurations in `p`
+
+   [deliverable
+    (-> real? (-> performance-info? natural?))]
+   ;; `((deliverable D) p)` returns the number of configurations in `p`
+   ;; that have overhead at most `D` relative to the Python configuration of `p`
+
+   [typed/python-ratio
+    (-> performance-info? real?)]
+   ;; Returns the overhead of the fully-typed configuration in `p`
+   ;;  relative to the Python configuration
+
+   [typed/retic-ratio
+    (-> performance-info? real?)]
+   ;; Returns the overhead of the fully-typed configuration in `p`
+   ;;  relative to the untyped configuration
+
+   [untyped/python-ratio
+    (-> performance-info? real?)]
+   ;; Returns the overhead of the untyped configuration in `p`
+   ;;  relative to the Python configuration
+
   )
 )
 
 (require
   "benchmark-info.rkt"
   "util.rkt"
+  (only-in racket/math
+    natural?)
   (only-in file/gunzip
     gunzip)
   (only-in math/statistics
@@ -142,6 +212,15 @@
   (let ([sp (open-input-string (string-replace times-str "," ""))])
     (begin0 (read sp) (close-input-port sp))))
 
+(define (untyped-runtime pf)
+  (performance-info-untyped-runtime pf))
+
+(define (typed-runtime pf)
+  (performance-info-typed-runtime pf))
+
+(define (python-runtime pf)
+  (performance-info-python-runtime pf))
+
 (define (num-configurations pf)
   (performance-info-num-configs pf))
 
@@ -204,6 +283,10 @@
 (define (typed/retic-ratio pf)
   (/ (performance-info-typed-runtime pf)
      (performance-info-untyped-runtime pf)))
+
+(define (untyped/python-ratio pf)
+  (/ (performance-info-untyped-runtime pf)
+     (performance-info-python-runtime pf)))
 
 (define (quick-performance-info bm-name)
   (define bm (->benchmark-info bm-name))
