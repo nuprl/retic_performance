@@ -51,25 +51,25 @@
   slowSHA
 ))
 (define POPL-2017-BENCHMARK-NAMES '(
-;  call_method
-;  call_method_slots
-;  call_simple
+  call_method
+  call_method_slots
+  call_simple
 ;  chaos
 ;  fannkuch
-;  float
-;  go
-;  meteor
-;  nbody
+  float
+  go
+  meteor
+  nbody
 ;  nqueens
 ;  pidigits
 ;  pystone
-;  spectralnorm
+  spectralnorm
 ))
 (define DLS-2017-BENCHMARK-NAMES '(
-;  Espionage
+  Espionage
 ;  Evolution
 ;  sample_fsm_python
-;  take5
+  take5
 ))
 
 (struct benchmark-info (
@@ -108,7 +108,7 @@
 (define (benchmark->karst-data bm)
   (define name (symbol->string (benchmark-info-name bm)))
   (define karst-path
-    (path-add-extension (build-path (retic-performance-karst-dir HOME) name) ".tab"))
+    (path-add-extension (build-path (retic-performance-karst-dir HOME) name) "_tab.gz"))
   (and (file-exists? karst-path)
        karst-path))
 
@@ -184,3 +184,17 @@
     (check-false (simple-name? "hello/world")))
 
 )
+;    971604
+;    896934
+;     29966
+;     29995
+;     15149
+;     15232
+;   7182811
+;       434
+;      3891
+;     55604
+;      7357
+;  29902524
+;      7572
+;  15176759

@@ -14,6 +14,8 @@
 (require
   "benchmark-info.rkt"
   "util.rkt"
+  (only-in file/gunzip
+    gunzip)
   (only-in math/statistics
     mean)
   (only-in racket/string
@@ -42,8 +44,17 @@
                                     #:typed-retic-runtime typed-retic)
   (performance-info name k num-configs configs/module* python base-retic typed-retic))
 
+(define (gunzip/cd ps)
+  (define-values [base name _dir?] (split-path ps))
+  (parameterize ([current-directory base])
+    (gunzip name))
+  (build-path base (file-remove-extension name)))
+
 (define (benchmark->performance-info bm)
-  (define k (benchmark->karst-data bm))
+  (define k
+    (let* ([tab.gz (benchmark->karst-data bm)]
+           [tab (gunzip/cd tab.gz)])
+      tab))
   (define name (benchmark->name bm))
   (unless k
     (raise-user-error 'benchmark->performance-info
@@ -157,16 +168,21 @@
 
 ;; fold/mean : (All (A) Path-String (-> A Real A) #:init (U #f (-> Real A)) -> A)
 (define fold/mean
-  (let ([line->mean (λ (ln)
-                      (let ([times-str (caddr (parse-line ln))])
-                        (mean (parse-times-string times-str))))])
+  (let ([line->mean (λ (ln line-number)
+                      (with-handlers ([exn:fail:read?
+                                       (lambda (e)
+                                         (printf "PARSE ERROR on line ~a~n" line-number)
+                                         (raise e))])
+                        (let ([times-str (caddr (parse-line ln))])
+                          (mean (parse-times-string times-str)))))])
     (λ (filename f #:init [init-f #f])
       (with-input-from-file filename
         (λ ()
-          (define init (line->mean (read-line)))
+          (define init (line->mean (read-line) 1))
           (for/fold ([acc (if init-f (init-f init) init)])
-                    ([ln (in-lines)])
-            (f acc (line->mean ln))))))))
+                    ([ln (in-lines)]
+                     [i (in-naturals 2)])
+            (f acc (line->mean ln i))))))))
 
 (define ((deliverable D) pf)
   (define overhead/pf (overhead pf))
@@ -212,18 +228,19 @@
 (module+ test
   (require rackunit racket/runtime-path)
 
-  (define-runtime-path karst-example "./test/karst-example.tab")
+  (define-runtime-path karst-example "./test/karst-example_tab.gz")
 
   (test-case "benchmark->performance-info:example-data"
+    (define karst-example-gunzip (gunzip/cd karst-example))
     (define-values [num-configs configs/module* base-retic typed-retic]
-      (scan-karst-file karst-example))
+      (scan-karst-file karst-example-gunzip))
     (check-equal? num-configs 4)
     (check-equal? configs/module* '(1 1))
     (check-equal? base-retic 10)
     (check-equal? typed-retic 20)
 
     (let ([pf (make-performance-info 'example
-                #:src karst-example
+                #:src karst-example-gunzip
                 #:num-configurations num-configs
                 #:configurations/module* configs/module*
                 #:python-runtime base-retic ;; TODO
