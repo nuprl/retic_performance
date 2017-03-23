@@ -22,6 +22,7 @@
     scribble/example
     scriblib/autobib
     scribble/manual)
+  generate-bibliography
 
   (rename-out
    [acmart:#%module-begin #%module-begin]
@@ -201,12 +202,8 @@
                e))
        (super-new)))))
 
-(define-cite ~cite citet
-  generate-bibliography
+(define-cite ~cite citet generate-bibliography
   #:style small-number-style)
-
-(define etal
-  (exact "et~al."))
 
 (define (sf x)
   (elem #:style "sfstyle" x))
@@ -218,6 +215,9 @@
 (define (exact . items)
   (make-element (make-style "relax" '(exact-chars))
                 items))
+
+(define etal
+  (exact "et~al."))
 
 (define (id x)
   (~a x))

@@ -61,3 +61,4 @@
   Spenser Bauman for advice about cluster.
 }
 
+@generate-bibliography[]
