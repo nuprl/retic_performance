@@ -470,10 +470,10 @@
 	      "Asumu Takikawa"
 	      "Daniel Feltey"
 	      "Ben Greenman"
-	      "Max New" 
+	      "Max S. New"
 	      "Jan Vitek"
 	      "Matthias Felleisen")
-   #:title "Is gradual typing dead?"
+   #:title "Is sound gradual typing dead?"
    #:location (proceedings-location popl #:pages '(456 468))
    #:date 2016))
 
@@ -482,12 +482,12 @@
    #:author (authors
 	      "Ben Greenman"
 	      "Asumu Takikawa"
-	      "Max New" 
+	      "Max S. New"
 	      "Daniel Feltey"
-	      "Robby Findler"
+	      "Robert Bruce Findler"
 	      "Jan Vitek"
 	      "Matthias Felleisen")
-   #:title "Performance Evaluation For Gradual Typing"
+   #:title "How to evaluate the performance of gradual type systems"
    #:location "submitted for publication"
    #:date 2017))
 
