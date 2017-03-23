@@ -1,9 +1,9 @@
 """
-  usage: ValidateResults.py <file.txt> ...
+  usage: ValidateResults.py <file.tab> ...
 
-  For each cluster output file <file.txt> given on the command line:
+  For each cluster output file <file.tab> given on the command line:
   - Searches for duplicate and repeated configs.
-  - Creates a new file "<file.txt>.fix" with duplicates removed, if the
+  - Creates a new file "<file.tab>.fix" with duplicates removed, if the
     duplicated rows have overlapping 95% confidence intervals.
 
   Be sure to double-check the ".fix" file against the original after this
@@ -29,10 +29,10 @@ DUP = "duplicate"
 MIS = "missing"
 DNE = "does_not_exist"
 
-SEP = "    " # sorry world
+SEP = "\t"
 
 def directory_of_benchmark_name(name):
-  return os.path.join(GIT_ROOT, name)
+  return os.path.join(GIT_ROOT, "benchmarks", name)
 
 def parse_benchmark_name(filename):
   before_dot = filename.split(".", 1)[0]
@@ -137,7 +137,7 @@ def check_map_fn_args(xs):
   """
   if not (len(xs) == 3):
     raise ValueError("expected 3 values in list %s" % xs)
-  if not re.match(r'([0-9]+-)+', xs[0]):
+  if not re.match(r'([0-9]+)(-[0-9]+)*', xs[0]):
     raise ValueError("expected configuration, got %s in list %s" % (xs[0], xs))
   try:
     int(xs[1])
@@ -260,7 +260,7 @@ if __name__ == "__main__":
   if (check_args(sys.argv)):
     main(sys.argv[1:])
   else:
-    print("usage: python ValidateResults.py <filename.txt> ...")
+    print("usage: python ValidateResults.py <filename.tab> ...")
 
 
 

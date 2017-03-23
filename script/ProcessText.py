@@ -10,6 +10,8 @@ import ast
 import glob
 import sys
 
+SEP = "\t"
+
 def get_file_names(dir_path):
     """
     :param dir_path: Path of directory containing file names
@@ -39,7 +41,7 @@ def read_from_file(txt_file, dir_path):
             print(header, file=output)
 
             for line in lines:
-                [nums_str, num_types_str, times_str] = line.split("   ")
+                [nums_str, num_types_str, times_str] = line.split(SEP)
                 num_list = get_nums(nums_str)
                 times_list = get_times(times_str)
                 res = convert_all_num(num_list, file_names)
