@@ -21,3 +21,6 @@ __pycache__/
 *.pyc
 
 compiled/
+
+# Do not commit raw data files! Only commit gzipped files.
+*.tab
