@@ -50,17 +50,17 @@ fraction of mixed-typed configurations is @math{3x}-deliverable; note that
 would accept such a slow down.
 
 This paper contributes three insights. First, it explains an adaptation of
-Takikawa et al.'s method (see section @secref{sec:method}) for Reticulated
+Takikawa et al.'s method (see @section-ref{sec:method}) for Reticulated
 Python's gradual typing system@~cite[vksb-dls-2014], which is relatively
 faithful to Siek and Taha's original proposal. Second, it reports on the
-results of applying the adapted method to Reticulated (see section
-@secref{sec:measurements}). While the performance of Reticulated seems to
+results of applying the adapted method to Reticulated (see
+@section-ref{sec:measurements}).  While the performance of Reticulated seems to
 be significantly better than Typed Racket's, we conjecture that this
 due to (1) a significant gap in Reticulated's soundness, (2)
 Reticulated's lack of expressiveness, and (3) low-quality error messages
-(see section @secref{sec:vs-tr}).  Third, the paper confirms Greenman et
+(see @section-ref{sec:vs-tr}).  Third, the paper confirms Greenman et
 al.'s insight that linear sampling is a sufficiently good approximation of
-the exponential set of measurements for the adapted method (see section
-@secref{sec:linear}). The next couple of sections present the background
+the exponential set of measurements for the adapted method (see
+@section-ref{sec:linear}). The next couple of sections present the background
 for this paper.
 

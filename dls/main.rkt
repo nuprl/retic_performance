@@ -31,6 +31,7 @@
    ;; Usage: `@bm[benchmark-info]`
    ;; Given a benchmark-info struct, render the name of the benchmark
    ;;  in a standard way.
+
   )
 
   ALL-BENCHMARKS
@@ -121,6 +122,12 @@
   sf
   ;; Usage `@sf{some text}`
   ;; Renders `some text` in serif style
+
+  section-ref
+  ;; Usage: `@section-ref{section-name}`
+  ;;  where `section-name` appears in a `@section[#:tag section-name]{...}` form
+  ;; Renders as "section N", where `N` is the number assigned to the section
+  ;;  labeled with `section-name`.
 )
 
 (require
@@ -150,11 +157,6 @@
   (for-syntax racket/base syntax/parse))
 
 ;; =============================================================================
-
-(define (exact . items)
-  (make-element (make-style "relax" '(exact-chars))
-                items))
-
 
 (define ALL-BENCHMARKS
   (all-benchmarks))
@@ -217,7 +219,6 @@
   (exact "\\textsc{\\small " x "}"
     (if sup (format "$^~a$" sup) "")))
 
-#;
 (define (exact . items)
   (make-element (make-style "relax" '(exact-chars))
                 items))
@@ -229,8 +230,7 @@
   (~a x))
 
 (define ($ . items)
-  (make-element (make-style "relax" '(exact-chars))
-                (list "$" items "$")))
+  (apply exact (list "$" items "$")))
 
 (define (parag . x)
   (apply elem #:style "paragraph" x))
@@ -243,3 +243,7 @@
 
 (define (pythonexternal a b)
   (apply exact (format "\\pythonexternal{~a}{~a}" a b)))
+
+(define (section-ref section-name)
+  (elem (exact "section~")
+        (secref section-name)))
