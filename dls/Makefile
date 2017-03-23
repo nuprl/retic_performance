@@ -1,14 +1,14 @@
 PAPER=dls
 PKG=gm-dls-2017
 
-all: pdf
+all: pkg setup pdf
 
-pdf: pkg setup texstyle.tex
+pdf: compile texstyle.tex
 	scribble ++extra figures \
            ++style texstyle.tex \
            --pdf $(PAPER).scrbl
 
-tex: pkg setup texstyle.tex
+tex: compile texstyle.tex
 	scribble ++style texstyle.tex --latex $(PAPER).scrbl
 
 pkg:
@@ -16,6 +16,8 @@ pkg:
 
 setup:
 	raco setup ${PKG}
+
+compile:
 	raco make ${PAPER}.scrbl
 
 clean:

@@ -20,28 +20,9 @@ If you want a new import, edit `main.rkt` to provide it.
 
 #### How to build the paper
 
-```
-  $ make
-```
-
-Installs necessary Racket packages, builds `dls.pdf`.
-
-
-Running `make` has the same effect as running:
-
-```
-  $ make pdf
-```
-
-which has almost the same effect as running:
-
-```
-  $ make tex
-  $ pdflatex dls.tex
-```
-
-except that the first command (`make tex`) builds the file `dls.tex`.
-Also, `pdflatex` gives MUCH better error messages than `make` or `make pdf`.
+- _For the first time_ : `make`
+- _After the first time, for a faster build_: `make pdf`
+- _Just the LaTeX_ : `make tex`
 
 
 #### Dependencies
