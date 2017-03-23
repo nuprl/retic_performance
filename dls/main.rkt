@@ -34,7 +34,7 @@
   )
 
   ALL-BENCHMARKS
-  ;; (listof benchmark-info?)]
+  ;; (listof benchmark-info?)
   ;; Registry of all known benchmarks.
   ;; To change, edit `script/benchmark-info.rkt`.
 
@@ -72,7 +72,7 @@
   ;; Renders "et al." with proper spacing between the words.
   ;; Use `citet` instead.
 
-  exact
+;;  exact
   ;; Usage: `@exact|{some text}|`
   ;;    or `@exact{some text}`
   ;;  where `some text` is text that should go directly to LaTeX
@@ -151,6 +151,11 @@
 
 ;; =============================================================================
 
+(define (exact . items)
+  (make-element (make-style "relax" '(exact-chars))
+                items))
+
+
 (define ALL-BENCHMARKS
   (all-benchmarks))
 
@@ -212,6 +217,7 @@
   (exact "\\textsc{\\small " x "}"
     (if sup (format "$^~a$" sup) "")))
 
+#;
 (define (exact . items)
   (make-element (make-style "relax" '(exact-chars))
                 items))

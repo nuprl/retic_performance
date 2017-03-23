@@ -460,9 +460,36 @@
                      "Earl Dean" "Robert Bruce Findler"
                      "Matthew Flatt" "Sam Tobin-Hochstadt"
                      "Matthias Felleisen")
-   #:title "Towards Practical Gradual Typing"
+   #:title "Towards practical gradual typing"
    #:location (proceedings-location ecoop #:pages '(4 27))
    #:date 2015))
+
+(define takikawa-popl-2016
+  (make-bib
+   #:author (authors
+	      "Asumu Takikawa"
+	      "Daniel Feltey"
+	      "Ben Greenman"
+	      "Max New" 
+	      "Jan Vitek"
+	      "Matthias Felleisen")
+   #:title "Is gradual typing dead?"
+   #:location (proceedings-location popl #:pages '(456 468))
+   #:date 2016))
+
+(define greenman-jfp-2017
+  (make-bib
+   #:author (authors
+	      "Ben Greenman"
+	      "Asumu Takikawa"
+	      "Max New" 
+	      "Daniel Feltey"
+	      "Robby Findler"
+	      "Jan Vitek"
+	      "Matthias Felleisen")
+   #:title "Performance Evaluation For Gradual Typing"
+   #:location "submitted for publication"
+   #:date 2017))
 
 (define rnv-ecoop-2015
   (make-bib

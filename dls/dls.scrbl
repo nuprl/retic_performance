@@ -1,6 +1,7 @@
 #lang gm-dls-2017 @anonymous @sigplan @10pt
 
-@title{Performance Evaluation of Reticulated Python}
+@;title{Performance Evaluation of Reticulated Python}
+@title{Is Gradual Typing Alive?}
 
 @(define NEU
    @affiliation[
@@ -50,7 +51,10 @@
 @include-section{reticulated.scrbl}
 @include-section{methodology.scrbl}
 @include-section{benchmarks.scrbl}
+@include-section{measuring.scrbl}
 @include-section{threats.scrbl}
+@include-section{vs-tr.scrbl}
+@include-section{linear.scrbl}
 @include-section{experience.scrbl}
 @include-section{conclusion.scrbl}
 

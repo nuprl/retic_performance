@@ -2,7 +2,8 @@
 @title[#:tag "sec:reticulated"]{Reticulated}
 
 
-Python is a widely used programing language. Reticulated Python is the only sound gradual typing implementation for Python.
+Python is a widely used programing language. Reticulated Python is the only
+gradual typing implementation for Python that aims to be sound. 
 
 
 @; Is it a whole program analysis i.e if module a is prereq. of module b, does b get compiled again even if b has
@@ -33,7 +34,6 @@ Python is a widely used programing language. Reticulated Python is the only soun
   Talk about blame
 }
 ]
-
 
 
 

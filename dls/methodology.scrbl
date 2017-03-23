@@ -1,5 +1,5 @@
 #lang gm-dls-2017
-@title[#:tag "sec:methodology"]{Methodology}
+@title[#:tag "sec:method"]{Adapting Takikawa et al.'s Method}
 
 For each benchmark, we aimed to choose a set of configurations that represent the overall performance of Reticulated Python, and had size less than x. In our method, we type functions as a whole, yielding 2^n configurations per benchmark, where n is the number of functions in a benchmark. 
 

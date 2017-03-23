@@ -1,15 +1,66 @@
 #lang gm-dls-2017
+
+@require{bib.rkt}
+
 @title[#:tag "sec:introduction"]{Introduction}
 
-Sound gradual typing allows us to safely combine typed and untyped code, but to accomplish soundness, gradual typing adds extra checks during runtime. There are currently a few implementations of sound gradual typing, but none of them seem to be efficient. Studies by  Takikawa et al on Typed Racket , a macro-gradual type system show a significant overhead of Typed Racket compared to Racket. The method used in this study explores the partial conversions from typed to untyped code by measuring the performance of 2^n configurations where n is the number of modules in a given benchmark. It also employs the linear sampling approach by generating a linear number of samples of random typed/untyped ratios over modules. It then uses a lattice oriented approach to interpret the results. 
+Siek and Taha's 2006 paper@~cite[st-sfp-2006] introduces the notion of
+gradual typing, a sound variant of Common Lisp's optional typing. Using
+gradual typing, ``programmers should be able to add or remove type
+annotations without any unexpected impacts on their program.'' One
+unexpected impact would be the application of a function on integers to a
+string; similarly, when typed code hands an array of floats to untyped
+code, the programmer expects that the untyped code does not assign a
+boolean to one of the array's slots.  By contrast, a programmer might
+expect the addition of types to speed up the program execution because the
+compiler can exploit the type information.
 
-Another study by Vitousek et al. on Reticulated Python, a micro-gradual type system studies the performance of fully annotated Reticulated Python programs versus Python programs and shows that Reticulated Python is 20x slower than Python. However, this study does not measure any of the configurations which represent the partial conversions from typed to untyped code. The reason why we want to measure these configurations is that they span the different ways the developer can use this system. A developer may want to only add types to certain parts of the code for debugging reasons, or may introduce types to a program in an incremental manner. Up till now, no studies conduct a proper evaluation of Reticulated Python. Furthermore, no studies conduct a proper evaluation on any micro-gradual type system. 
+Gradual typing implements the sound combination of typed and untyped code
+with the insertion of run-time checks. At a high level, a gradual typing
+system uses the type annotations to determine whether and where a, say,
+typed function may flow into the function position of an application and
+adds a type there to ensure the argument value matches the expected
+type. If not, the run-time check raises an exception. Clearly, the
+insertion of such run-time checks imposes a cost, and the question arises
+how significant this cost is.
 
-According to Siek et. al, "Programmers should be able to add or remove type annotations without any unexpected impacts on their program". However, so far, this hypothesis cannot be verified and one reasons for that is the absence of proper evaluations on micro-gradual type systems.
+In 2016, @citet[takikawa-popl-2016] present the first proper method for
+evaluating the performance of gradual typing systems. Their method is to
+measure @emph{all} partial conversions from typed to untyped code. That is,
+if there are @math{n} code components, Takikawa et al. propose to measure
+@math{2^n} configurations. Doing so mimics the process through which
+programmers may gradually equip all possible sites for type declarations
+with annotations. In order to evaluate these measurements, they propose a
+simple metric, @emph{the deliverable count up to @math{X}}, meaning the
+number of configurations whose performance slow-down is below
+@math{X}. Follow-up work by @citet[greenman-jfp-2017] confirms that a
+@emph{linear} amount of random sampling approximates the comprehensive but
+exponential measurements well in the case of Typed Racket.
 
-In this paper, we conduct a proper evaluation on a micro-gradual type system by adapting the  Takikawa et al. method for macro-gradual type systems to mico-gradual type systems in the following way:
+Simultaneously to Siek and Taha's original work, Tobin-Hochstadt and
+Felleisen's vision paper@~cite[thf-dls-2006] launches the development of
+Typed Racket, based on almost the same idea as gradual typing. Instead of
+allowing programmers to annotate arbitrary functions and classes, their
+proposal insists on annotating entire Racket modules with types. In 2016,
+with Typed Racket under development for 10 years, Takikawa et al.'s
+performance evaluation of Typed Racket indicates that the module-based form
+of gradual typing has disastrous performance characteristics. Only a small
+fraction of mixed-typed configurations is @math{3x}-deliverable; note that
+@math{3x} is a rather generous measure considering that few developers
+would accept such a slow down.
 
-Instead of testing every possible configuration over modules, we test every possible configuration over functions. In other words, we consider 2^n configurations obtained by choosing to annotate or to not annotate every function in the program and test their performance against python. Secondly, We select n random configurations but instead of annotating over modules, we annotate over atomic expressions. We then interpret the results according to the lattice-oriented approach from  Takikawa et al.
-
-In summary, we make two main contributions: We test Siek's hypothesis by adapting the  Takikawa et al. method to measure the performance of a micro-gradual type system and we validate the linear sampling method by Takikawa et al.
+This paper contributes three insights. First, it explains an adaptation of
+Takikawa et al.'s method (see section @secref{sec:method}) for Reticulated
+Python's gradual typing system@~cite[vksb-dls-2014], which is relatively
+faithful to Siek and Taha's original proposal. Second, it reports on the
+results of applying the adapted method to Reticulated (see section
+@secref{sec:measurements}). While the performance of Reticulated seems to
+be significantly better than Typed Racket's, we conjecture that this
+due to (1) a significant gap in Reticulated's soundness, (2)
+Reticulated's lack of expressiveness, and (3) low-quality error messages
+(see section @secref{sec:vs-tr}).  Third, the paper confirms Greenman et
+al.'s insight that linear sampling is a sufficiently good approximation of
+the exponential set of measurements for the adapted method (see section
+@secref{sec:linear}). The next couple of sections present the background
+for this paper.
 
