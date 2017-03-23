@@ -656,13 +656,17 @@ def print_usage():
   print("usage: python remove_types.py <BENCHMARK-FOLDER>") 
   return
 
+def run_all(ds):
+  for d in ds:
+    run(d)
+
 ## -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
   # By default, run on all benchmark directories.
   # If directories are given, 
-  if len(sys.argv) == 2:
-    run(sys.argv[1])
+  if len(sys.argv) > 1:
+    run_all(sys.argv[1:])
   else:
     print_usage()
 
