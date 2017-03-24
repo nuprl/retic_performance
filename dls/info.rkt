@@ -14,4 +14,5 @@
 (define pkg-authors '(ben zeina))
 (define raco-commands '(
   ("rp-perf" (submod gm-dls-2017/script/performance-info main) "Print performance statistics" #f)
+  ("rp-sample" (submod gm-dls-2017/script/sample main) "Generate samples for a benchmark" #f)
 ))
