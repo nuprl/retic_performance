@@ -14,6 +14,10 @@
      (-> path-string? string?)]
     ;; Convert a string or a path to a string
 
+    [ensure-directory
+     (-> path-string? void?)]
+    ;; If given directory exists, do nothing. Else create it.
+
     [rnd
      (-> real? string?)]
     ;; Render a number as a string, round to 2 decimal places.
@@ -21,6 +25,9 @@
     [pct
      (-> real? real? real?)]
     ;; `(pct 1 4)` returns 25
+
+    [log2
+     (-> exact-nonnegative-integer? exact-nonnegative-integer?)]
 
     [file-remove-extension
      (-> path-string? path-string?)]
@@ -47,6 +54,12 @@
 (define (rnd n)
   (~r n #:precision 2))
 
+(define (ensure-directory d)
+  (unless (path-string? d)
+    (raise-argument-error 'ensure-directory "path-string?" d))
+  (unless (directory-exists? d)
+    (make-directory d)))
+
 (define (pct part total)
   (* 100 (/ part total)))
 
@@ -61,6 +74,14 @@
   (define no-ext (path->string (path-replace-extension str #"")))
   (define i (string-last-index-of no-ext #\_))
   (string-append (substring no-ext 0 i) "." (substring no-ext (+ i 1))))
+
+(define (log2 n)
+  (if (= n 1)
+    0
+    (let loop ([k 1])
+      (if (= n (expt 2 k))
+        k
+        (loop (+ k 1))))))
 
 ;; =============================================================================
 
@@ -93,4 +114,10 @@
   (test-case "file-remove-extension"
     (check-equal? (file-remove-extension "foo_tab.gz") "foo.tab")
     (check-equal? (file-remove-extension "a_b.c") "a.b"))
+
+  (test-case "log2"
+    (check-equal? (log2 1) 0)
+    (check-equal? (log2 2) 1)
+    (check-equal? (log2 8) 3)
+    (check-equal? (log2 4096) 12))
 )

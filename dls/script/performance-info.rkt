@@ -77,6 +77,8 @@
    ;;  relative to the Python configuration
 
   )
+  performance-info-src
+  line->configuration-string
 )
 
 (require
@@ -196,6 +198,10 @@
 
 (define (typed-configuration? cfg/mod*)
   (andmap zero? cfg/mod*))
+
+(define (line->configuration-string str)
+  (let ([str* (parse-line str)])
+    (car str*)))
 
 (define/contract (parse-line str)
   (-> string? (list/c string? string? string?))
