@@ -2,10 +2,12 @@
 (define collection "gm-dls-2017")
 (define deps '(
   "base"
+  "at-exp-lib"
   "scribble-lib"
   "with-cache"
 ))
 (define build-deps '(
+  "math-lib"
   "rackunit-lib"
   "rackunit-abbrevs"
 ))
