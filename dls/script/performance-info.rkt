@@ -9,6 +9,7 @@
 ;; TODO
 ;; - make sure "alphabetical in Racket" matches configuration order
 ;; - maybe don't need this, maybe should be part of `benchmark-info`
+;; - get max configuration from bm info, isntead of inferring from file?
 
 (require racket/contract)
 (provide
@@ -77,6 +78,7 @@
    ;;  relative to the Python configuration
 
   )
+  string->configuration
   performance-info-src
   line->configuration-string
 )
@@ -125,7 +127,7 @@
 (define (benchmark->performance-info bm)
   (define k
     (let* ([tab.gz (benchmark->karst-data bm)]
-           [tab (gunzip/cd tab.gz)])
+           [tab (and tab.gz (gunzip/cd tab.gz))])
       tab))
   (define name (benchmark->name bm))
   (unless k
@@ -142,6 +144,18 @@
     #:untyped-retic-runtime base-retic
     #:typed-retic-runtime typed-retic))
 
+(define (make-configuration-counter)
+  (let ([cm (box #f)])
+    (values cm
+            (λ (cfg/mod*)
+              (set-box! cm
+                (if (and (unbox cm)
+                         (for/and ([v-old (in-list (unbox cm))]
+                                   [v-new (in-list cfg/mod*)])
+                           (>= v-old v-new)))
+                  (unbox cm)
+                  cfg/mod*))))))
+
 ;; scan-karst-file : Path-String -> (Values Natural (Listof Natural) Natural Natural)
 ;; Take a "first glance" pass over a data file
 ;; Return
@@ -154,16 +168,7 @@
               (λ ()
                 (set-box! num-configs (+ 1 (unbox num-configs)))))))
   (define-values [configs/module* update-configs/module*]
-    (let ([cm (box #f)])
-      (values cm
-              (λ (cfg/mod*)
-                (set-box! cm
-                  (if (and (unbox cm)
-                           (for/and ([v-old (in-list (unbox cm))]
-                                     [v-new (in-list cfg/mod*)])
-                             (>= v-old v-new)))
-                    (unbox cm)
-                    cfg/mod*))))))
+    (make-configuration-counter))
   (define-values [base-retic typed-retic update-base-retic update-typed-retic]
     (let ([ur (box #f)]
           [tr (box #f)])
@@ -183,7 +188,7 @@
           (let ([ln-info (parse-line ln)])
             (values (car ln-info) (caddr ln-info))))
         (num-configs++)
-        (define cfg/mod* (parse-config-string cfg-str))
+        (define cfg/mod* (string->configuration cfg-str))
         (define prev-cfg* (unbox configs/module*))
         (update-configs/module* cfg/mod*)
         (when (typed-configuration? cfg/mod*)
@@ -196,6 +201,17 @@
           (unbox base-retic)
           (unbox typed-retic)))
 
+(define (karst-file->max-configuration k)
+  (define-values [configs/module* update-configs/module*]
+    (make-configuration-counter))
+  (with-input-from-file k
+    (λ ()
+      (for ([ln (in-lines)])
+        (update-configs/module*
+          (string->configuration (line->configuration-string ln)))
+        (void))))
+  (unbox configs/module*))
+
 (define (typed-configuration? cfg/mod*)
   (andmap zero? cfg/mod*))
 
@@ -207,10 +223,10 @@
   (-> string? (list/c string? string? string?))
   (tab-split str))
 
-;; parse-config-string : String -> (Listof Natural)
+;; string->configuration : String -> (Listof Natural)
 ;; Parse a string like `0-0-3` into a list of numbers `'(0 0 3)`
-(define/contract (parse-config-string cfg-str)
-  (-> string? (non-empty-listof exact-nonnegative-integer?))
+(define/contract (string->configuration cfg-str)
+  (-> string? configuration?)
   (map string->number (string-split cfg-str "-")))
 
 (define/contract (parse-times-string times-str)
@@ -389,17 +405,17 @@
     (check-exn exn:fail:contract?
       (λ () (parse-line ""))))
 
-  (test-case "parse-config-string"
+  (test-case "string->configuration"
     (check-equal?
-      (parse-config-string "0-0")
+      (string->configuration "0-0")
       '(0 0))
     (check-equal?
-      (parse-config-string "1-22-333")
+      (string->configuration "1-22-333")
       '(1 22 333))
     (check-exn exn:fail:contract?
-      (λ () (parse-config-string "1-2-four")))
+      (λ () (string->configuration "1-2-four")))
     (check-exn exn:fail:contract?
-      (λ () (parse-config-string ""))))
+      (λ () (string->configuration ""))))
 
   (test-case "parse-times-string"
     (check-equal?

@@ -31,6 +31,14 @@
      (-> benchmark-info? natural?)]
     ;; Return the number of modules in the given benchmark
 
+    [benchmark->num-configurations
+     (-> benchmark-info? natural?)]
+    ;; Return the number of configurations in the benchmark
+
+    [benchmark->max-configuration
+     (-> benchmark-info? configuration?)]
+    ;; Return the largest-plus-one configuration in the benchmark
+
     [benchmark->sloc
      (-> benchmark-info? natural?)]
     ;; Estimate the source-lines-of-code (SLOC) in the benchmark's modules
@@ -46,11 +54,26 @@
     [->benchmark-info
      (-> (or/c symbol? string? path-string?) benchmark-info?)]
     ;; Return the benchmark that the given data refers to
-  )
 
-  make-benchmark-info
-  ;; Low-level constructor. Provided for testing.
-)
+    ;[configuration->natural
+    ; (-> configuration? natural?)]
+    ;;; Map a configuration to a natural number,
+    ;;;  isomorphism with natural->configuration
+
+    [configuration<?
+     (-> configuration? configuration? boolean?)]
+    ;; True if first argument is lexicographically less than the second,
+    ;;  assumes arguments of equal length
+
+    [configuration->string
+     (-> configuration? string?)]
+    ;; Render a configuration as a string, e.g., 0-0-7
+
+    [natural->configuration
+     (-> benchmark-info? exact-nonnegative-integer? configuration?)]
+    ;; If second argument is `N`, return the `N`-th configuration
+    ;;  according to some deterministic, undocumented order
+))
 
 (require
   "config.rkt"
@@ -61,6 +84,7 @@
   (only-in racket/path
     file-name-from-path)
   (only-in racket/string
+    string-join
     string-contains?)
   (only-in racket/format
     ~a))
@@ -70,7 +94,6 @@
 (define HOME (retic-performance-home-dir))
 
 (define DLS-2014-BENCHMARK-NAMES '(
-  PythonFlow ;; TODO where did this come from?
   futen ;; TODO from where?
   http2 ;; TODO from where?
   slowSHA
@@ -80,12 +103,12 @@
   call_method_slots
   call_simple
 ;  chaos
-;  fannkuch
+  fannkuch
   float
   go
   meteor
   nbody
-;  nqueens
+  nqueens
 ;  pidigits
 ;  pystone
   spectralnorm
@@ -94,6 +117,7 @@
   Espionage
 ;  Evolution
 ;  sample_fsm_python
+  PythonFlow ;; TODO where did this come from?
   take5
 ))
 
@@ -101,10 +125,17 @@
   module* ;; (Listof String)
   name    ;; Symbol
   src     ;; Path-String
-) #:transparent )
+  cfg*    ;; Configuration (the max. configuration)
+) #:transparent
+  #:methods gen:custom-write
+  [(define (write-proc bm port mode)
+     (fprintf port "#<benchmark-info:~a>" (benchmark-info-name bm)))])
+
+;; -----------------------------------------------------------------------------
 
 (define (make-benchmark-info name #:module* module* #:src src)
-  (benchmark-info module* name src))
+  (define cfg* (->max-configuration src module*))
+  (benchmark-info module* name src cfg*))
 
 (define (benchmark->num-modules bm)
   (length (benchmark-info-module* bm)))
@@ -124,6 +155,37 @@
 (define (benchmark->typed-dir bm)
   (benchmark-dir->typed-dir (benchmark-info-src bm)))
 
+(define (benchmark->max-configuration bm)
+  (benchmark-info-cfg* bm))
+
+(define (benchmark->num-configurations bm)
+  (configuration->natural (benchmark->max-configuration bm)))
+
+;; TODO broken ... please fix
+(define (configuration->natural cfg)
+  (for/product ([n (in-list cfg)])
+    n))
+
+(define (configuration<? c0 c1)
+  (for/and ([v0 (in-list c0)]
+            [v1 (in-list c1)])
+    (< v0 v1)))
+
+(define (->max-configuration src mod*)
+  (or (benchmark-dir->max-configuration src mod*)
+      (python->max-configuration src)))
+
+(define (benchmark-dir->max-configuration ps mod*)
+  (and (directory-exists? ps)
+       (let ([cfg-rev*
+              (for/fold ([acc '()])
+                        ([m (in-list mod*)])
+                (define m-dir (build-path ps CONFIG-DIR (path-replace-extension m #"")))
+                (and acc
+                     (directory-exists? m-dir)
+                     (cons (length (directory-list m-dir)) acc)))])
+         (and cfg-rev* (reverse cfg-rev*)))))
+
 (define (benchmark->sloc bm)
   (define ty (benchmark->typed-dir bm))
   (for/sum ([m (in-list (benchmark-info-module* bm))])
@@ -137,6 +199,13 @@
   (and (file-exists? karst-path)
        karst-path))
 
+(define (benchmark->exploded bm)
+  (define d (benchmark-dir->benchmarks-dir (benchmark-info-src bm)))
+  (and (directory-exists? d)
+       (for/and ([m (in-list (benchmark-info-module* bm))])
+         (directory-exists? (build-path d (path-replace-extension m #""))))
+       d))
+
 (define (all-benchmarks)
   (for/list ([bm-name (in-list (append DLS-2014-BENCHMARK-NAMES
                                        POPL-2017-BENCHMARK-NAMES
@@ -146,7 +215,10 @@
 (define (->benchmark-info bm-name)
   (cond
    [(simple-name? bm-name)
-    (->benchmark-info (build-path (retic-performance-benchmarks-dir HOME) (~a bm-name)))]
+    (define bm-dir (build-path (retic-performance-benchmarks-dir HOME) (~a bm-name)))
+    (unless (directory-exists? bm-dir)
+      (raise-argument-error '->benchmark-info "benchmark name" bm-name))
+    (->benchmark-info bm-dir)]
    [(is-benchmark-directory? bm-name)
     (path->benchmark-info bm-name)]
    [else
@@ -169,10 +241,52 @@
       (and (string? bm-name)
            (not (string-contains? bm-name "/")))))
 
+(define (configuration->string cfg)
+  (string-join (map number->string cfg) "-"))
+
+;; natural->configuration : benchmark-info? natural? -> configuration?
+;;
+;; The max configuration for a benchmark defines a sort-of base,
+;;  instead of base N numbers its base A-B-C-.... (idk what to call that)
+;; Suppose the max configuration is `N1-N2-N3`,
+;; - the max number representable in this base is `(N1*N2*N3)-1`
+;; - all numbers in this base can be represented as "bitstrings" of 3 bits,
+;;   where the first bit is less than `N1`,
+;;   and the second bit it less than `N2`,
+;;   and the third bit is less than `N3`
+;; - a way to derive a bitstring is to pick `k1` `k2` `k3` in order, such that
+;;   - `(k1 * N2 * N3) < N1*N2*N3` and `((k1 + 1) * N2 * N3) >= N1*N2*N3`
+;;   - `(k2 * N3) < ((N1*N2*N3)-(k1 * N2 * N3))` and `((k1 + 1) * N3) >= ((N1*N2*N3)-(k1 * N2 * N3))`
+;;   - ditto for `k3 * 1`
+;;
+;; So much hot air. Time to call a mathematician?
+;;
+;; Maybe, simpler to expand the configuration to the (classic) bitstring it
+;;  stands for and go from there. Max config -> bitstring -> natural to bits
+;;  -> chunk bits into numbers
+(define (natural->configuration bm n)
+  (when (< n 0)
+    (raise-argument-error 'natural->configuration "exact-nonnegative-integer?" n))
+  (define max-config (benchmark->max-configuration bm))
+  (define offset*
+    (for/fold ([acc '(1)])
+              ([base-k (in-list (reverse (cdr max-config)))])
+      (cons (* base-k (car acc)) acc)))
+  (define max-natural
+    (* (car max-config) (car offset*)))
+  (unless (< n max-natural)
+    (raise-argument-error 'natural->configuration (format "integer less than ~a" max-natural) 1 bm n))
+  (define num-left (box n))
+  (for/list ([offset-k (in-list offset*)])
+    (for/first ([i (in-naturals)]
+                #:when (> (* (+ i 1) offset-k) (unbox num-left)))
+      (begin (set-box! num-left (- (unbox num-left) (* i offset-k)))
+             i))))
+
 ;; =============================================================================
 
 (module+ test
-  (require rackunit)
+  (require rackunit rackunit-abbrevs)
 
   (test-case "->benchmark-info"
     (let* ([n (car DLS-2014-BENCHMARK-NAMES)]
@@ -207,5 +321,94 @@
     (check-true (simple-name? "hello"))
     (check-true (simple-name? 'hello))
     (check-false (simple-name? "hello/world")))
+
+  (test-case "max-configuration"
+    (define (check-max-configuration bm-name expected)
+      (define bm (->benchmark-info bm-name))
+      (define src (benchmark-info-src bm))
+      (define mod* (benchmark-info-module* bm))
+      (define c1 (->max-configuration src mod*))
+      (define c2 (benchmark-dir->max-configuration src mod*))
+      (check-equal? c1 c2)
+      (check-equal? c2 expected))
+
+    (check-max-configuration 'fannkuch '(2))
+    (check-max-configuration 'Espionage '(128 32))
+    (check-max-configuration 'slowSHA '(16 64 32 4)))
+
+  (test-case "configuration<?"
+    (check-apply* configuration<?
+     ['(0) '(1)
+      ==> #t]
+     ['(0) '(0)
+      ==> #f]
+     ['(2 2 4) '(3 3 9)
+      ==> #t]
+     ['(5 2 4) '(3 3 9)
+      ==> #f]))
+
+  ;; TODO what should this do?
+  ;(test-case "configuration->natural"
+  ;  (check-apply* configuration->natural
+  ;   ['(0 0 0 0)
+  ;    ==> 0]
+  ;   ['(8 6 7 5 3 0 9)
+  ;    ==> (* 8 6 7 5 3 0 9)]
+  ;   ['(1 1 1)
+  ;    ==> 
+
+  (test-case "configuration->string"
+    (check-apply* configuration->string
+     ['()
+      ==> ""]
+     ['(3)
+      ==> "3"]
+     ['(1 2 3)
+      ==> "1-2-3"]))
+
+  (test-case "natural->configuration"
+    (define (check-natural->configuration bm-name in/out* err*)
+      (define bm (->benchmark-info bm-name))
+      (for ([io (in-list in/out*)])
+        (define msg (format "(natural->configuration ~a ~a)" bm-name (car io)))
+        (check-equal? (natural->configuration bm (car io)) (cadr io) msg))
+      (for ([e (in-list err*)])
+        (define msg (format "(natural->configuration ~a ~a)" bm-name e))
+        (check-exn exn:fail:contract?
+          (lambda () (natural->configuration bm e))
+          msg)))
+
+    (check-natural->configuration 'nqueens
+      '((0 (0))
+        (1 (1))
+        (2 (2))
+        (3 (3)))
+      '(4 -1))
+
+    (check-natural->configuration 'futen
+      '((0 (0 0 0))
+        (6 (0 0 6))
+        (1025 (0 1 1))
+        (2048 (1 0 0))
+        (2050 (1 0 2)))
+      (list (* 16 2 1024)))
+
+    (check-natural->configuration 'slowSHA
+      `((0 (0 0 0 0))
+        (4 (0 0 1 0))
+        (128 (0 1 0 0))
+        (8192 (1 0 0 0))
+        (16385 (2 0 0 1))
+        (32768 (4 0 0 0))
+        (,(sub1 (* 16 64 32 4)) (15 63 31 3)))
+      (list (* 16 64 32 4)))
+  )
+
+  (test-case "benchmark->num-configurations"
+    (check-apply* benchmark->num-configurations
+     [(->benchmark-info 'futen)
+      ==> (* 16 2 1024)]
+     [(->benchmark-info 'fannkuch)
+      ==> 2]))
 
 )
