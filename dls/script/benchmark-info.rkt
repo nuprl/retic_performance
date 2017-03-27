@@ -309,6 +309,16 @@
 
 ;; =============================================================================
 
+(module+ main
+  (require racket/cmdline)
+  (command-line
+    #:program "rp-info"
+    #:args benchmark-name*
+    (for ([n (in-list benchmark-name*)])
+      (printf "~a : ~a configs~n" n (benchmark->num-configurations (->benchmark-info n))))))
+
+;; =============================================================================
+
 (module+ test
   (require rackunit rackunit-abbrevs)
 
