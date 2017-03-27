@@ -35,12 +35,19 @@
      (-> path-string? path-string?)]
     ;; Removes a Racket-added extension from a filename.
     ;; `(file-remove-extension "foo_tab.gz")` returns "foo.tab"
+
+    [add-commas
+     (-> real? string?)]
+    ;; Convert a decimal number to a string, adding commas in the normal English
+    ;;  places.
+    ;; Example: 1234.5678 ==> 1,234.5678
 ))
 
 (require
   (only-in racket/format
     ~r)
   (only-in racket/string
+    string-join
     string-split))
 
 ;; =============================================================================
@@ -88,10 +95,30 @@
         k
         (loop (+ k 1))))))
 
+(define (add-commas n)
+  (define str (number->string n))
+  (define str* (string-split str "."))
+  (string-append (add-commas/integer (car str*))
+                 (if (or (null? (cdr str*)) (< (string-length str) 4))
+                   ""
+                   (string-append "." (cadr str*)))))
+
+(define (add-commas/integer str)
+  (define L (string-length str))
+  (string-join
+    (let loop ([i L]
+               [acc '()])
+      (let ([i-3 (- i 3)])
+        (cond
+         [(<= i-3 0)
+          (cons (substring str 0 i) acc)]
+         [else
+          (loop i-3 (cons "," (cons (substring str i-3 i) acc)))]))) ""))
+
 ;; =============================================================================
 
 (module+ test
-  (require rackunit)
+  (require rackunit rackunit-abbrevs)
 
   (test-case "path-string->string"
     (check-equal? (path-string->string "hi") "hi")
@@ -125,4 +152,25 @@
     (check-equal? (log2 2) 1)
     (check-equal? (log2 8) 3)
     (check-equal? (log2 4096) 12))
+
+  (test-case "add-commas"
+    (check-apply* add-commas
+     [1
+      => "1"]
+     [10
+      => "10"]
+     [100
+      => "100"]
+     [1000
+      => "1,000"]
+     [999999
+      => "999,999"]
+     [12
+      => "12"]
+     [1234.56789
+      => "1,234.56789"]
+     [123456789
+      => "123,456,789"]
+     [12456789
+      => "12,456,789"]))
 )
