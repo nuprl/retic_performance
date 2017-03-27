@@ -55,10 +55,10 @@
      (-> (or/c symbol? string? path-string?) benchmark-info?)]
     ;; Return the benchmark that the given data refers to
 
-    ;[configuration->natural
-    ; (-> configuration? natural?)]
-    ;;; Map a configuration to a natural number,
-    ;;;  isomorphism with natural->configuration
+    [configuration->natural
+     (-> benchmark-info? configuration? natural?)]
+    ;; Map a configuration to a natural number,
+    ;;  isomorphism with natural->configuration
 
     [configuration<?
      (-> configuration? configuration? boolean?)]
@@ -159,11 +159,7 @@
   (benchmark-info-cfg* bm))
 
 (define (benchmark->num-configurations bm)
-  (configuration->natural (benchmark->max-configuration bm)))
-
-;; TODO broken ... please fix
-(define (configuration->natural cfg)
-  (for/product ([n (in-list cfg)])
+  (for/product ([n (in-list (benchmark->max-configuration bm))])
     n))
 
 (define (configuration<? c0 c1)
@@ -243,6 +239,34 @@
 
 (define (configuration->string cfg)
   (string-join (map number->string cfg) "-"))
+
+(define (configuration->natural bm cfg)
+  (define mc0 (benchmark->max-configuration bm))
+  (define-values [mc-rev cfg-rev]
+    (let loop ([mc mc0]
+               [cfg cfg]
+               [mc-rev '()]
+               [cfg-rev '()])
+      (cond
+       [(and (null? mc) (null? cfg))
+        (values mc-rev cfg-rev)]
+       [(or (null? mc) (null? cfg))
+        (raise-argument-error 'configuration->natural (format "~a-digit configuration" (length mc0)) 1 bm cfg)]
+       [else
+        (loop (cdr mc) (cdr cfg) (cons (car mc) mc-rev) (cons (car cfg) cfg-rev))])))
+  (define-values [n offset]
+    (for/fold ([acc 0]
+               [offset 1])
+              ([base (in-list mc-rev)]
+               [digit (in-list cfg-rev)]
+               [pos (in-naturals)])
+      (when (< digit 0)
+        (raise-argument-error 'configuration->natural (format "exact-nonnegative-integer? (position ~a)" pos) 1 bm cfg))
+      (unless (< digit base)
+        (raise-argument-error 'configuration->natural (format "configuration element too large at position ~a" pos) 1 bm cfg))
+      (values (+ acc (* digit offset))
+              (* base offset))))
+  n)
 
 ;; natural->configuration : benchmark-info? natural? -> configuration?
 ;;
@@ -366,34 +390,46 @@
      ['(1 2 3)
       ==> "1-2-3"]))
 
-  (test-case "natural->configuration"
-    (define (check-natural->configuration bm-name in/out* err*)
+  (test-case "natural<->configuration"
+    (define (check-natural<->configuration bm-name in/out* err-nat* err-cfg*)
       (define bm (->benchmark-info bm-name))
       (for ([io (in-list in/out*)])
-        (define msg (format "(natural->configuration ~a ~a)" bm-name (car io)))
-        (check-equal? (natural->configuration bm (car io)) (cadr io) msg))
-      (for ([e (in-list err*)])
+        (define n (car io))
+        (define cfg (cadr io))
+        (define msg1 (format "(natural->configuration ~a ~a)" bm-name n))
+        (define msg2 (format "(configuration->natural ~a ~a)" bm-name cfg))
+        (check-equal? (natural->configuration bm n) cfg msg1)
+        (check-equal? (configuration->natural bm cfg) n msg2)
+        (void))
+      (for ([e (in-list err-nat*)])
         (define msg (format "(natural->configuration ~a ~a)" bm-name e))
         (check-exn exn:fail:contract?
           (lambda () (natural->configuration bm e))
+          msg))
+      (for ([e (in-list err-cfg*)])
+        (define msg (format "(configuration->natural ~a ~a)" bm-name e))
+        (check-exn exn:fail:contract?
+          (lambda () (configuration->natural bm e))
           msg)))
 
-    (check-natural->configuration 'nqueens
+    (check-natural<->configuration 'nqueens
       '((0 (0))
         (1 (1))
         (2 (2))
         (3 (3)))
-      '(4 -1))
+      '(4 -1)
+      '((4) (-1)))
 
-    (check-natural->configuration 'futen
+    (check-natural<->configuration 'futen
       '((0 (0 0 0))
         (6 (0 0 6))
         (1025 (0 1 1))
         (2048 (1 0 0))
         (2050 (1 0 2)))
-      (list (* 16 2 1024)))
+      (list (* 16 2 1024))
+      '((0 0 1025) (0 0 1024) ()))
 
-    (check-natural->configuration 'slowSHA
+    (check-natural<->configuration 'slowSHA
       `((0 (0 0 0 0))
         (4 (0 0 1 0))
         (128 (0 1 0 0))
@@ -401,7 +437,8 @@
         (16385 (2 0 0 1))
         (32768 (4 0 0 0))
         (,(sub1 (* 16 64 32 4)) (15 63 31 3)))
-      (list (* 16 64 32 4)))
+      (list (* 16 64 32 4))
+      '((1 1 1 5) (16 64 32 4) (16 11 12 3)))
   )
 
   (test-case "benchmark->num-configurations"
