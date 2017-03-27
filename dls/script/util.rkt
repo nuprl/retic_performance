@@ -41,11 +41,21 @@
     ;; Convert a decimal number to a string, adding commas in the normal English
     ;;  places.
     ;; Example: 1234.5678 ==> 1,234.5678
+
+    [save-pict
+     (-> path-string? pict? boolean?)]
+    ;; Save the given pict to the given filename (in .png format)
+
 ))
 
 (require
   (only-in racket/format
     ~r)
+  (only-in racket/class
+    send)
+  (only-in pict
+    pict?
+    pict->bitmap)
   (only-in racket/string
     string-join
     string-split))
@@ -114,6 +124,10 @@
           (cons (substring str 0 i) acc)]
          [else
           (loop i-3 (cons "," (cons (substring str i-3 i) acc)))]))) ""))
+
+(define (save-pict fn p)
+  (define bm (pict->bitmap p))
+  (send bm save-file fn 'png))
 
 ;; =============================================================================
 
