@@ -18,6 +18,9 @@
     (-> any/c boolean?)]
    ;; Predicate for instances of the `preformance-info` struct
 
+   [rename performance-info-name performance-info->name
+    (-> performance-info? symbol?)]
+
    [benchmark->performance-info
     (-> benchmark-info? performance-info?)]
    ;; Construct a `performance-info` struct from a `benchmark-info` struct
@@ -77,6 +80,17 @@
    ;; Returns the overhead of the untyped configuration in `p`
    ;;  relative to the Python configuration
 
+   [make-D-deliverable?
+    (-> real? performance-info? (-> real? boolean?))]
+   ;; Return a function that decides whether a given running time is
+   ;;  D-deliverable.
+
+   [count-configurations
+    (-> performance-info? (-> real? boolean?) natural?)]
+   ;; Count the number of configurations
+   ;;  (encapsulted by the given `performance-info` struct)
+   ;;  that satisfy the given predicate.
+
   )
   string->configuration
   performance-info-src
@@ -108,7 +122,10 @@
   python-runtime
   untyped-runtime
   typed-runtime
-) #:transparent )
+) #:transparent
+  #:methods gen:custom-write
+  [(define (write-proc v port mode)
+     (fprintf port "#<performance-info:~a>" (performance-info-name v)))])
 
 (define (make-performance-info name #:src k
                                     #:num-configurations num-configs
@@ -286,10 +303,12 @@
             (f acc (line->mean ln i))))))))
 
 (define ((deliverable D) pf)
+  (count-configurations pf (make-D-deliverable? D pf)))
+
+(define (make-D-deliverable? D pf)
   (define overhead/pf (overhead pf))
-  (define (D-deliverable? t)
-    (<= (overhead/pf t) D))
-  (count-configurations pf D-deliverable?))
+  (lambda (t)
+    (<= (overhead/pf t) D)))
 
 (define (count-configurations pf good?)
   (define (add-good? count t)

@@ -1,8 +1,17 @@
 #lang racket/base
 
+;; Create and collect sampled data
+
+(require racket/contract)
+(provide
+  (contract-out
+    [sample-info?
+     (-> any/c boolean?)]
+))
+
 (require
   "benchmark-info.rkt"
-  "performance-info.rkt" ;; TODO remove this import
+  "performance-info.rkt"
   "util.rkt"
   racket/set
   (only-in racket/list
@@ -23,6 +32,10 @@
     (printf "[DEBUG] ")
     (apply printf msg arg*)
     (newline)))
+
+(struct sample-info (
+  ;; what should be here? how to connect to benchmark-info?
+) #:transparent )
 
 ;; -----------------------------------------------------------------------------
 
