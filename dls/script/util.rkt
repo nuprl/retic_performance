@@ -5,6 +5,8 @@
 
 (require racket/contract)
 (provide
+  configuration?
+
   (contract-out
     [tab-split
      (-> string? (listof string?))]
@@ -43,13 +45,16 @@
 
 ;; =============================================================================
 
-(define TAB "\t")
+(define configuration?
+  (non-empty-listof exact-nonnegative-integer?))
 
-(define (path-string->string ps)
-  (if (string? ps) ps (path->string ps)))
+(define TAB "\t")
 
 (define (tab-split str)
   (string-split str TAB))
+
+(define (path-string->string ps)
+  (if (string? ps) ps (path->string ps)))
 
 (define (rnd n)
   (~r n #:precision 2))

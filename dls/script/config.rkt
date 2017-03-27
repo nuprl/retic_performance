@@ -4,6 +4,8 @@
 
 (require racket/contract)
 (provide
+  CONFIG-DIR
+
   (contract-out
     [retic-performance-home-dir
      (-> path-string?)]
@@ -25,6 +27,11 @@
     ;; Build a path to a benchmark's typed code directory
     ;;  given a path to the benchmark's root directory
 
+    [benchmark-dir->benchmarks-dir
+     (-> path-string? path-string?)]
+    ;; Build a path to a benchmark's exploded configurations directory,
+    ;;  given a path to the benchmark's root directory
+
     [is-benchmark-directory?
      (-> any/c boolean?)]
     ;; Return `#true` if the given value is a benchmark's root directory
@@ -36,6 +43,7 @@
 ;; =============================================================================
 
 (define BENCHMARKS "benchmarks")
+(define CONFIG-DIR "Benchmark")
 (define DATA "data")
 (define KARST "karst")
 (define TYPED "typed")
@@ -54,6 +62,9 @@
 
 (define (benchmark-dir->typed-dir bm-dir)
   (build-path bm-dir TYPED))
+
+(define (benchmark-dir->benchmarks-dir bm-dir)
+  (build-path bm-dir CONFIG-DIR))
 
 (define (is-benchmark-directory? p)
   (and (path-string? p)

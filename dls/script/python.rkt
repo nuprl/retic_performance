@@ -13,6 +13,9 @@
    [python-path?
     (-> any/c boolean?)]
    ;; Return `#t` if the given path string ends in a `.py` suffix, and `#f` otherwise
+
+   [python->max-configuration
+    (-> path-string? configuration?)]
 ))
 
 (require
@@ -60,6 +63,9 @@
       "expected SLOCCOUNT to report a natural number of lines, got '~a'.~nSomething is very wrong."
       loc))
   n)
+
+(define (python->max-configuration ps)
+  (raise-user-error 'python->max-configuration "not implemented"))
 
 ;; =============================================================================
 
