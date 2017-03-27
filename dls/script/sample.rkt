@@ -103,7 +103,7 @@
   (debug "Storing output in ~a/" o)
   (for ([s (in-list sample*)]
         [i (in-naturals)])
-    (with-output-to-file (build-path o (format "~a-samples.txt~a" bm-name i))
+    (with-output-to-file (build-path o (format "samples.txt~a" i))
       #:exists 'replace
       (lambda ()
         (for-each displayln  s)))))
