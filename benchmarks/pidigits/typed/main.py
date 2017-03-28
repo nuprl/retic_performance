@@ -1,6 +1,6 @@
 from Timer import Timer
 
-"""Calculating (some of) the digits of π.  This stresses big integer
+"""Calculating (some of) the digits of pi.  This stresses big integer
 arithmetic."""
 
 """
