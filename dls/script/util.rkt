@@ -46,6 +46,11 @@
      (-> path-string? pict? boolean?)]
     ;; Save the given pict to the given filename (in .png format)
 
+    [columnize
+     (-> list? exact-nonnegative-integer? (listof list?))]
+    ;; Split a list into almost-equally-sized components.
+    ;; Order / partitioning of elements is unspecified.
+
 ))
 
 (require
@@ -56,6 +61,11 @@
   (only-in pict
     pict?
     pict->bitmap)
+  (only-in racket/set
+    set-union
+    list->set)
+  (only-in racket/list
+    make-list)
   (only-in racket/string
     string-join
     string-split))
@@ -129,6 +139,29 @@
   (define bm (pict->bitmap p))
   (send bm save-file fn 'png))
 
+(define (safe-take x* n)
+  (cond
+   [(zero? n)
+    (values '() x*)]
+   [(null? x*)
+    (values '() '())]
+   [else
+    (define-values [hd tl] (safe-take (cdr x*) (- n 1)))
+    (values (cons (car x*) hd) tl)]))
+
+(define (columnize x* n)
+  (let loop ([x* x*])
+    (define-values [hd tl] (safe-take x* n))
+    (define l (length hd))
+    (cond
+     [(< l n)
+      (append (map list hd) (make-list (- n l) '()))]
+     [else
+      (define y** (loop tl))
+      (for/list ([h (in-list hd)]
+                 [y* (in-list y**)])
+        (cons h y*))])))
+
 ;; =============================================================================
 
 (module+ test
@@ -187,4 +220,19 @@
       => "123,456,789"]
      [12456789
       => "12,456,789"]))
+
+  (test-case "halve"
+    (define (check-columnize x* n)
+      (define y** (columnize x* n))
+      (define L (length (car y**)))
+      (check-true (for/and ([y* (in-list (cdr y**))])
+                    (define m (length y*))
+                    (or (= L m) (= L (+ m 1)))))
+      (check-equal? (list->set x*) (apply set-union (map list->set y**))))
+
+    (check-columnize '() 2)
+    (check-columnize '(1) 2)
+    (check-columnize '(1 2) 2)
+    (check-columnize '(1 2 3) 2)
+    (check-columnize '(1 2 3 4 5 6 7) 3))
 )
