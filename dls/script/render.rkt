@@ -30,7 +30,6 @@
   (define bm-name* (map benchmark->name bm*))
   (with-cache (cachefile "overhead-plot.rktd")
     #:keys (list (λ () (list* OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE bm-name*)))
-    #:use-cache? #f
     (λ ()
       (define pi*
         (for/list ([bm (in-list bm*)])
