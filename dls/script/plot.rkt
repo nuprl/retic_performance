@@ -56,6 +56,7 @@
 (defparam *OVERHEAD-SHOW-RATIO* #t Boolean)
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
 (defparam *FONT-SIZE* 10 Natural)
+(defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
 
 ;; -----------------------------------------------------------------------------
 
@@ -88,18 +89,53 @@
         #:height (*OVERHEAD-PLOT-HEIGHT*))))
   (overhead-add-legend pi body))
 
-;; TODO add caching
 (define (make-count-configurations-function pi)
-  (define nc (num-configurations pi))
   (function
-    (λ (i)
-      (define good? (make-D-deliverable? i pi))
-      (pct (count-configurations pi good?) nc))
+    (make-deliverable-counter pi)
     0 (*OVERHEAD-MAX*)
     #:color (*OVERHEAD-LINE-COLOR*)
     #:samples (*OVERHEAD-SAMPLES*)
     #:style (*OVERHEAD-LINE-STYLE*)
     #:width (*OVERHEAD-LINE-WIDTH*)))
+
+;; make-simple-deliverable-counter : (-> performance-info? (-> real? natural?))
+;; Specification for `make-deliverable-counter`
+(define (make-simple-deliverable-counter pi)
+  (define nc (num-configurations pi))
+  (λ (D)
+    (pct (count-configurations pi (make-D-deliverable? D pi)) nc)))
+
+;; make-deliverable-counter : (-> performance-info? (-> real? natural?))
+;; Same behavior as `make-deliverable-counter`, but `(make-deliverable-counter p)`
+;;  has two side-effects for efficiency:
+;; - if called with `i` such that `(= 100 ((make-deliverable-counter p) i))`
+;;   then future calls to the function return 100 immediately
+;; - if called with `i` such that `(= N ((make-deliverable-counter p) i))`
+;;   and `(<= (* (- 100 N) (num-configurations pi)) (*CACHE-SIZE*))`,
+;;   then saves `N` and future calls only check whether the remaining configurations
+;;   are now deliverable
+;; Both side-effects assume monotonic calling contexts.
+;; If `plot` made calls in a non-monotonic order, these would be WRONG!
+(define (make-deliverable-counter pi)
+  (define nc (num-configurations pi))
+  (define all-good? (box #f))
+  (define cache (box #f)) ;; (U #f (Pairof Natural (Listof Real)))
+  (λ (D)
+    (if (unbox all-good?)
+      100
+      (let* ([good? (make-D-deliverable? D pi)]
+             [num-good (if (unbox cache)
+                         (+ (car (unbox cache))
+                            (for/sum ([t (in-list (cdr (unbox cache)))] #:when (good? t)) 1))
+                         (count-configurations pi good?))]
+             [n (pct num-good nc)])
+        (when (= n 100)
+          (set-box! all-good? #t))
+        (unless (or (unbox cache) (unbox all-good?))
+          (define num-configs-left (- nc num-good))
+          (when (<= num-configs-left (*CACHE-SIZE*))
+            (set-box! cache (cons num-good (filter-time* pi (λ (t) (not (good? t))))))))
+        n))))
 
 (define (make-overhead-x-ticks)
   (define MAJOR-TICKS (list 1 2 (*OVERHEAD-MAX*)))
@@ -195,7 +231,23 @@
   ;; - make ticks? also weird output format
   ;; - add legend? ditto idk what besides comparing argb pixels
 
-  (test-case "?"
+  (test-case "deliverable-counter"
+    (define (check-deliverable-counter/cache bm-name)
+      (define pi (benchmark->performance-info (->benchmark-info bm-name)))
+      (define f0 (make-simple-deliverable-counter pi))
+      (define f1 (make-deliverable-counter pi))
+      (define seq (linear-seq 1 (*OVERHEAD-MAX*) (*OVERHEAD-SAMPLES*)))
+      (define-values [v*0 t0]
+        (force/cpu-time (λ () (map f0 seq))))
+      (define-values [v*1 t1]
+        (force/cpu-time (λ () (map f1 seq))))
+      (check-equal? v*0 v*1)
+      (check < t1 t0)
+      (void))
+
+    ;; Maybe want to put a time limit on this. For me it's like 20 seconds, I don't mind --ben
+    (check-deliverable-counter/cache 'PythonFlow)
+    (check-deliverable-counter/cache 'call_simple)
   )
 
 )

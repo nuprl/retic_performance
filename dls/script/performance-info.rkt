@@ -91,6 +91,11 @@
    ;;  (encapsulted by the given `performance-info` struct)
    ;;  that satisfy the given predicate.
 
+   [filter-time*
+    (-> performance-info? (-> real? boolean?) (listof real?))]
+   ;; Return the MEAN RUNNING TIMES for configurations whose mean
+   ;;  running time satisfies the given predicate.
+
   )
   string->configuration
   performance-info-src
@@ -317,6 +322,11 @@
              add-good?
              #:init (λ (t) (add-good? 0 t))))
 
+(define (filter-time* pf keep?)
+  (define (keep-it acc t)
+    (if (keep? t) (cons t acc) acc))
+  (fold/mean (performance-info-src pf) keep-it #:init (λ (t) (keep-it '() t))))
+
 (define (typed/python-ratio pf)
   (/ (performance-info-typed-runtime pf)
      (performance-info-python-runtime pf)))
@@ -377,6 +387,11 @@
       (check-equal? (typed/retic-ratio pf) 2)
       (check-equal? ((deliverable 2) pf) 3)
       (check-equal? ((deliverable 10) pf) 4)
+      (let () ;; filter-time* tests
+        (check-equal? (filter-time* pf (λ (t) (= t 100))) (list 100))
+        (check-equal? (filter-time* pf (λ (t) (= t 5))) (list 5))
+        (check-equal? (filter-time* pf (λ (t) (< t 20))) (list 10 5))
+        (void))
       (void)))
 
   ;; general correctness/sanity for a real program

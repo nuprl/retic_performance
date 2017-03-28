@@ -51,6 +51,9 @@
     ;; Split a list into almost-equally-sized components.
     ;; Order / partitioning of elements is unspecified.
 
+    [force/cpu-time
+     (-> (-> any/c) (values any/c exact-nonnegative-integer?))]
+
 ))
 
 (require
@@ -162,6 +165,10 @@
                  [y* (in-list y**)])
         (cons h y*))])))
 
+(define (force/cpu-time t)
+  (let-values ([(r* cpu real gc) (time-apply t '())])
+    (values (car r*) cpu)))
+
 ;; =============================================================================
 
 (module+ test
@@ -235,4 +242,9 @@
     (check-columnize '(1 2) 2)
     (check-columnize '(1 2 3) 2)
     (check-columnize '(1 2 3 4 5 6 7) 3))
+
+  (test-case "force/cpu-time"
+    (let-values ([(v c) (force/cpu-time (λ () 42))])
+      (check-equal? v 42)
+      (check-true (< c 10))))
 )
