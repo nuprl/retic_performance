@@ -53,6 +53,7 @@
 (defparam *OVERHEAD-LINE-STYLE* 'solid plot-pen-style/c)
 (defparam *OVERHEAD-LINE-WIDTH* 2 Nonnegative-Real)
 (defparam *OVERHEAD-MAX* 10 Natural)
+(defparam *OVERHEAD-SHOW-RATIO* #t Boolean)
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
 (defparam *FONT-SIZE* 10 Natural)
 
@@ -129,7 +130,10 @@
 
 (define (overhead-add-legend pi pict)
   (define name (render-benchmark-name (performance-info->name pi)))
-  (define tp-ratio (render-typed/python-ratio (typed/python-ratio pi)))
+  (define tp-ratio
+    (if (*OVERHEAD-SHOW-RATIO*)
+      (render-typed/python-ratio (typed/python-ratio pi))
+      (blank 0 0)))
   (define nc (render-num-configurations (num-configurations pi)))
   (rt-superimpose
     (vl-append (*LEGEND-VSPACE*)
