@@ -2,3 +2,9 @@
 @title[#:tag "sec:measurements"]{Measuring Reticulated Python}
 
 @section{The Deliverable Count}
+
+@section{Results}
+
+@figure*["fig:overhead" "Overhead plots"
+  @render-overhead-plot*[ALL-BENCHMARKS]
+]

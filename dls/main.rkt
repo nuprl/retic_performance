@@ -115,6 +115,10 @@
   ;; Renders some Python code in the current line of text.
   ;; Useful for formatting identifiers
 
+  render-overhead-plot*
+  ;; (-> (listof symbol?) pict?)
+  ;; Render overhead plots for the given benchmarks
+
   sc
   ;; Usage `@sc{some text}`
   ;; Renders `text` in small caps style
