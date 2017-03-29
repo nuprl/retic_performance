@@ -12,6 +12,10 @@
      (-> string? (listof string?))]
     ;; Split a list of string by its tab characters
 
+    [tab-join
+     (-> (listof string?) string?)]
+    ;; Join a list of strings by tab characters
+
     [path-string->string
      (-> path-string? string?)]
     ;; Convert a string or a path to a string
@@ -54,6 +58,13 @@
     [force/cpu-time
      (-> (-> any/c) (values any/c exact-nonnegative-integer?))]
 
+    [natural->bitstring
+     (-> exact-nonnegative-integer? #:pad exact-nonnegative-integer? string?)]
+    ;; (natural->bitstring n k) converts `n` into a `k`-digit string of 1's and 0's
+
+    [count-zero-bits
+     (-> string? exact-nonnegative-integer?)]
+
 ))
 
 (require
@@ -82,6 +93,9 @@
 
 (define (tab-split str)
   (string-split str TAB))
+
+(define (tab-join str*)
+  (string-join str* TAB))
 
 (define (path-string->string ps)
   (if (string? ps) ps (path->string ps)))
@@ -169,6 +183,15 @@
   (let-values ([(r* cpu real gc) (time-apply t '())])
     (values (car r*) cpu)))
 
+;; Convert a natural number to a binary string, padded to the supplied width
+(define (natural->bitstring n #:pad pad-width)
+  (~r n #:base 2 #:min-width pad-width #:pad-string "0"))
+
+(define (count-zero-bits str)
+  (for/sum ([c (in-string str)]
+            #:when (eq? c #\0))
+    1))
+
 ;; =============================================================================
 
 (module+ test
@@ -182,6 +205,13 @@
     (check-equal? (tab-split "hello") '("hello"))
     (check-equal? (tab-split "dr racket") '("dr racket"))
     (check-equal? (tab-split "dr\tracket") '("dr" "racket")))
+
+  (test-case "tab-join"
+    (check-apply* tab-join
+     ['()
+      ==> ""]
+     ['("a" "b" "c")
+      ==> "a\tb\tc"]))
 
   (test-case "rnd"
     (check-equal? (rnd 2) "2")
@@ -247,4 +277,18 @@
     (let-values ([(v c) (force/cpu-time (λ () 42))])
       (check-equal? v 42)
       (check-true (< c 10))))
+
+  (test-case "natural->bitstring"
+    (check-apply* natural->bitstring
+     [2 #:pad 2
+      ==> "10"]
+     [2 #:pad 10
+      ==> "0000000010"]))
+
+  (test-case "count-zero-bits"
+    (check-apply* count-zero-bits
+     ["10"
+      ==> 1]
+     ["0000000010"
+      ==> 9]))
 )

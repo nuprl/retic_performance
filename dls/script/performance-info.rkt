@@ -102,13 +102,18 @@
    ;; Return the MEAN RUNNING TIMES for configurations whose mean
    ;;  running time satisfies the given predicate.
 
+   [performance-info->sample*
+    (-> performance-info? (cons/c natural? (listof path-string?)))]
+
   )
   string->configuration
   performance-info-src
   line->configuration-string
 
   fold/karst
-  ;; (-> performance-info? #:f (-> A configuration? natural? (listof real?) A) #:init A A)
+  ;; (-> (or/c path-string? performance-info?)
+  ;;     #:f (-> A configuration? natural? (listof real?) A)
+  ;;     #:init A A)
   ;; Fold (left) function for Karst data.
   ;; Given function is called with:
   ;; - the accumulated data so far
@@ -119,7 +124,10 @@
 
 (require
   "benchmark-info.rkt"
+  "config.rkt"
   "util.rkt"
+  (only-in racket/path
+    path-only)
   (only-in racket/math
     natural?)
   (only-in file/gunzip
@@ -320,13 +328,22 @@
   (overhead pf (fold/mean (performance-info-src pf) avg #:init (λ (v) (* 1/N v)))))
 
 (define (fold/karst pf #:init init #:f f)
-  (with-input-from-file (performance-info-src pf)
+  (define src
+    (cond
+     [(path-string? pf) pf]
+     [(performance-info? pf) (performance-info-src pf)]
+     [else (raise-argument-error 'fold/karst "(or/c path-string? performance-info?)" 0 pf init f)]))
+  (with-input-from-file src 
     (λ ()
       (for/fold ([acc init])
                 ([ln (in-lines)]
                  [i (in-naturals)])
         (define-values [cfg nt t*] (line->values ln i))
         (f acc cfg nt t*)))))
+
+(define count-karst-lines
+  (let ([lines++ (λ (acc cfg nt t*) (+ acc 1))])
+    (λ (ps) (fold/karst ps #:f lines++ #:init 0))))
 
 ;; fold/mean : (All (A) Path-String (-> A Real A) #:init (U #f (-> Real A)) -> A)
 (define fold/mean
@@ -396,10 +413,60 @@
     (printf "- 5 deliv.     : ~a (~a%)~n" d5 (rnd (pct d5 nc))))
   (void))
 
+(define (performance-info->sample* pi)
+  (define src (performance-info-src pi))
+  (define karst (and src (path-only src)))
+  (unless karst
+    (raise-argument-error 'performance-info->sample* "performance-info? with karst data" pi))
+  (define sample* (karst-dir->sample* karst (performance-info-name pi)))
+  (when (null? sample*)
+    (raise-argument-error 'performance-info->sample* "performance-info? with sample data" pi))
+  (define line*
+    (with-handlers ([exn:fail:read? (λ (e) (printf "ERROR reading samples files '~a'~n" sample*) (raise e))])
+      (map count-karst-lines sample*)))
+  (define sample-size (car line*))
+  (for ([s (in-list (cdr sample*))]
+        [l (in-list (cdr line*))])
+    (unless (= l sample-size)
+      (raise-user-error 'performance-info->sample* "sample file ~a should have ~a lines, but has ~a instead" s sample-size l)))
+  (cons sample-size sample*))
+
+(define (fix-num-types sample-file)
+  (printf "fixing types in '~a'..." sample-file)
+  (define bm-name (infer-benchmark-name sample-file))
+  (define bm (->benchmark-info bm-name))
+  (define mc (benchmark->max-configuration bm))
+  (define tmp (path-add-extension sample-file #".tmp"))
+  (with-output-to-file tmp #:exists 'replace
+    (λ ()
+      (with-input-from-file sample-file
+        (λ ()
+          (for ([ln (in-lines)])
+            (define str* (parse-line ln))
+            (define cfg (string->configuration (car str*)))
+            (define new-num-types (count-types cfg mc))
+            (displayln (tab-join (list (car str*) (number->string new-num-types) (caddr str*))))
+            (void))))))
+  (copy-file tmp sample-file #t)
+  (delete-file tmp)
+  (void))
+
+(define (count-types cfg max-cfg)
+  (for/sum ([c (in-list cfg)]
+            [x (in-list max-cfg)])
+    (count-zero-bits (natural->bitstring c #:pad (log2 x)))))
+
+(define (infer-benchmark-name sample-file)
+  (define dir (or (path-only sample-file) (current-directory)))
+  (define-values [base name must-be-dir] (split-path dir))
+  (if (path? name)
+    (path->string name)
+    (raise-user-error 'fix-num-types "could not infer benchmark name from file '~a'" sample-file)))
+
 ;; =============================================================================
 
 (module+ test
-  (require rackunit racket/runtime-path)
+  (require rackunit racket/runtime-path rackunit-abbrevs)
 
   (define-runtime-path karst-example "./test/karst-example_tab.gz")
 
@@ -492,7 +559,7 @@
 
   (test-case "string->num-types"
     (check-equal?
-      (string->time* "8")
+      (string->num-types "8")
       8)
     (check-exn exn:fail:contract?
       (λ () (string->num-types "0.3")))
@@ -511,18 +578,64 @@
     (check-exn exn:fail:contract?
       (λ () (string->time* "[1, -2]"))))
 
+  (test-case "samples"
+    (define (check-sample* bm-name)
+      (define pi (benchmark->performance-info (->benchmark-info bm-name)))
+      (define n+s* (performance-info->sample* pi))
+      (define num-configs (car n+s*))
+      (define s* (cdr n+s*))
+      (check-true (< 0 (length s*)) "positive number of sample files")
+      (define count* (map count-karst-lines s*))
+      (check-true (apply = num-configs count*))
+      (void))
+
+    (check-sample* 'Espionage))
+
+  (test-case "count-types"
+    (check-apply* count-types
+     ['(0) '(2)
+      ==> 1]
+     ['(1) '(2)
+      ==> 0]
+     ['(0 9) '(128 32)
+      ==> 10]
+     ['(2 16) '(128 32)
+      ==> 10]
+     ['(5 9) '(128 32)
+      ==> 8]
+     ['(6 18) '(128 32)
+      ==> 8]
+     ['(13 18) '(128 32)
+      ==> 7]
+     ['(14 17 30 2) '(16 64 32 4)
+      ==> 7]
+     ['(15 55 31 3) '(16 64 32 4)
+      ==> 1]
+     ['(3 12 21 0) '(16 64 32 4)
+      ==> 10]
+     ['(0 6 24 1) '(16 64 32 4)
+      ==> 12]
+     ['(0 6 8 1) '(16 64 32 4)
+      ==> 13]
+     ['(0 6 8 0) '(16 64 32 4)
+      ==> 14]))
 )
 
 ;; -----------------------------------------------------------------------------
 
 (module+ main
   (require racket/cmdline)
+  (define *fix-num-types?* (make-parameter #f))
   (command-line
    #:program "perf-info"
+   #:once-each
+   [("--fix-num-types") "Reset the type counts in the given files" (*fix-num-types?* #t)]
    #:args benchmark-name*
    (cond
     [(null? benchmark-name*)
      (printf "usage: rp:perf-info <benchmark-name> ...~n")]
+    [(*fix-num-types?*)
+     (void (map fix-num-types benchmark-name*))]
     [(null? (cdr benchmark-name*))
      (quick-performance-info (car benchmark-name*))]
     [else
