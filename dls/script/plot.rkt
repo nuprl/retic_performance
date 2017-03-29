@@ -16,6 +16,9 @@
      (-> performance-info? pict?)]
     ;; Render an overhead plot for the given benchmark
 
+    [samples-plot
+     (-> performance-info? pict?)]
+
     [exact-runtime-plot
      (-> performance-info? pict?)]
     ;; TODO once implemented, check whether y-axis permits graphing all on ONE axis
@@ -64,11 +67,6 @@
 
 ;; -----------------------------------------------------------------------------
 
-(define overhead-plot
-  (case-lambda
-   [(pi) (performance-info->overhead-plot pi)]
-   [(si) (sample-info->overhead-plot si)]))
-
 (define (exact-runtime-plot pi)
   (define nt (num-types pi))
   (define max-runtime (box 0))
@@ -104,7 +102,7 @@
         #:height (*OVERHEAD-PLOT-HEIGHT*))))
   (exact-add-legend (performance-info->name pi) (unbox num-points) body))
 
-(define (performance-info->overhead-plot pi)
+(define (overhead-plot pi)
   (define body
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
@@ -127,6 +125,35 @@
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*))))
   (overhead-add-legend pi body))
+
+(define (samples-plot pi)
+  (define-values [sample-size sample*]
+    (let ([a+b (performance-info->sample* pi)]) (values (car a+b) (cdr a+b))))
+  (define body
+    (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
+                   [plot-x-transform log-transform]
+                   [plot-y-ticks (make-overhead-y-ticks)]
+                   [plot-x-far-ticks no-ticks]
+                   [plot-y-far-ticks no-ticks]
+                   [plot-tick-size TICK-SIZE]
+                   [plot-font-face (*OVERHEAD-FONT-FACE*)]
+                   [plot-font-size (*FONT-SIZE*)]
+                   [*OVERHEAD-LINE-WIDTH* (- (*OVERHEAD-LINE-WIDTH*) 1)]
+                   [*OVERHEAD-LINE-COLOR* 4])
+      (plot-pict
+        (list
+          (tick-grid)
+          (for/list ([s (in-list sample*)] [i (in-naturals 1)])
+            (make-count-configurations-function (performance-info%sample pi s))))
+        #:x-min 1
+        #:x-max (*OVERHEAD-MAX*)
+        #:y-min 0
+        #:y-max 100
+        #:x-label (and (*OVERHEAD-LABEL?*) "Overhead (vs. retic-untyped)")
+        #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
+        #:width (*OVERHEAD-PLOT-WIDTH*)
+        #:height (*OVERHEAD-PLOT-HEIGHT*))))
+  (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
 
 ;; -----------------------------------------------------------------------------
 
@@ -233,6 +260,11 @@
   (define np (render-count num-points "trials"))
   (add-legend name pict np))
 
+(define (samples-add-legend bm-name sample-size num-samples pict)
+  (define name (render-benchmark-name bm-name))
+  (define s-info (title-text (format "~a samples of ~a configurations" num-samples sample-size)))
+  (add-legend name pict s-info))
+
 (define (add-legend top-left body top-right)
   (rt-superimpose
     (vl-append (*LEGEND-VSPACE*) top-left body)
@@ -263,12 +295,14 @@
   (require racket/cmdline)
   (define OVERHEAD 'overhead)
   (define EXACT 'exact)
+  (define SAMPLE 'sample)
   (define *plot-type* (make-parameter OVERHEAD))
   (command-line
    #:program "rp-plot"
    #:once-any
    [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
    [("-e" "--exact") "Plot exact running times" (*plot-type* EXACT)]
+   [("-s" "--sample") "Plot samples" (*plot-type* SAMPLE)]
    #:args benchmark-name*
    (cond
     [(null? benchmark-name*)
@@ -284,6 +318,7 @@
        (case (*plot-type*)
         [(overhead) overhead-plot]
         [(exact) exact-runtime-plot]
+        [(sample) samples-plot]
         [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
      (define p*
        (parameterize ([*FONT-SIZE* 14])
