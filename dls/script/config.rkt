@@ -27,6 +27,9 @@
     ;; Build a path to a benchmark's typed code directory
     ;;  given a path to the benchmark's root directory
 
+    [karst-dir->sample*
+     (-> path-string? symbol? (listof path-string?))]
+
     [benchmark-dir->benchmarks-dir
      (-> path-string? path-string?)]
     ;; Build a path to a benchmark's exploded configurations directory,
@@ -38,7 +41,8 @@
 ))
 
 (require
-  "system.rkt")
+  "system.rkt"
+  file/glob)
 
 ;; =============================================================================
 
@@ -47,6 +51,7 @@
 (define DATA "data")
 (define KARST "karst")
 (define TYPED "typed")
+(define SAMPLE "sample")
 
 (define (retic-performance-home-dir)
   (shell "git" '("rev-parse" "--show-toplevel")))
@@ -65,6 +70,12 @@
 
 (define (benchmark-dir->benchmarks-dir bm-dir)
   (build-path bm-dir CONFIG-DIR))
+
+(define (karst-dir->sample* k-dir bm-name)
+  (define prefix (build-path k-dir SAMPLE (symbol->string bm-name)))
+  (unless (directory-exists? prefix)
+    (raise-user-error 'karst-dir->sample* "directory '~a' does not exist, no samples for '~a'" prefix bm-name))
+  (glob (build-path prefix "sample*.txt")))
 
 (define (is-benchmark-directory? p)
   (and (path-string? p)
