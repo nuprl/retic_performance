@@ -16,9 +16,9 @@
      (-> performance-info? pict?)]
     ;; Render an overhead plot for the given benchmark
 
-    [performance-vs-num-types-plot
+    [exact-runtime-plot
      (-> performance-info? pict?)]
-    ;; TODO
+    ;; TODO once implemented, check whether y-axis permits graphing all on ONE axis
 ))
 
 (require
@@ -30,6 +30,7 @@
   plot/no-gui
   plot/utils
   (only-in racket/math
+    exact-ceiling
     exact-floor))
 
 ;; =============================================================================
@@ -57,6 +58,9 @@
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
 (defparam *FONT-SIZE* 10 Natural)
 (defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
+(defparam *POINT-SIZE* 5 Positive-Index)
+(defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
+(defparam *CONFIGURATION-X-JITTER* 0.4 Real)
 
 ;; -----------------------------------------------------------------------------
 
@@ -64,6 +68,41 @@
   (case-lambda
    [(pi) (performance-info->overhead-plot pi)]
    [(si) (sample-info->overhead-plot si)]))
+
+(define (exact-runtime-plot pi)
+  (define nt (num-types pi))
+  (define max-runtime (box 0))
+  (define num-points (box 0))
+  (define body
+    (parameterize ([plot-x-ticks (linear-ticks #:number 5)]
+                   [plot-y-ticks (linear-ticks #:number 3)]
+                   [plot-x-far-ticks no-ticks]
+                   [plot-y-far-ticks no-ticks]
+                   [plot-tick-size TICK-SIZE]
+                   [plot-font-face (*OVERHEAD-FONT-FACE*)]
+                   [plot-font-size (*FONT-SIZE*)])
+      (plot-pict
+        (list
+          (if (< nt 6) (make-vrule* nt) '())
+          (fold/karst pi
+            #:init '()
+            #:f (λ (acc cfg num-types t*)
+                  (cons (configuration-points
+                          (for/list ([t (in-list t*)]
+                                     [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
+                            (set-box! max-runtime (max (unbox max-runtime) t))
+                            (set-box! num-points (+ (unbox num-points) 1))
+                            (list x t)))
+                        acc))))
+        #:x-min 0
+        #:x-max (+ nt 0.5)
+        #:y-min 0
+        #:y-max (exact-ceiling (unbox max-runtime))
+        #:x-label (and (*OVERHEAD-LABEL?*) "Num Type Ann.")
+        #:y-label (and (*OVERHEAD-LABEL?*) "Time (ms)")
+        #:width (*OVERHEAD-PLOT-WIDTH*)
+        #:height (*OVERHEAD-PLOT-HEIGHT*))))
+  (exact-add-legend (performance-info->name pi) (unbox num-points) body))
 
 (define (performance-info->overhead-plot pi)
   (define body
@@ -88,6 +127,20 @@
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*))))
   (overhead-add-legend pi body))
+
+;; -----------------------------------------------------------------------------
+
+(define (configuration-points p**)
+  (define i 2)
+  (points p**
+    #:color (->pen-color i)
+    #:alpha (*POINT-ALPHA*)
+    #:sym 'fullcircle
+    #:size (*POINT-SIZE*)))
+
+(define (make-vrule* count)
+  (for/list ([i (in-range (+ 1 count))])
+    (vrule (- i 0.5) #:width 0.6 #:color 0)))
 
 (define (make-count-configurations-function pi)
   (function
@@ -170,13 +223,20 @@
     (if (*OVERHEAD-SHOW-RATIO*)
       (render-typed/python-ratio (typed/python-ratio pi))
       (blank 0 0)))
-  (define nc (render-num-configurations (num-configurations pi)))
+  (define nc (render-count (num-configurations pi) "configurations"))
+  (add-legend (hb-append (*LEGEND-HSPACE*) name tp-ratio)
+              pict
+              nc))
+
+(define (exact-add-legend bm-name num-points pict)
+  (define name (render-benchmark-name bm-name))
+  (define np (render-count num-points "trials"))
+  (add-legend name pict np))
+
+(define (add-legend top-left body top-right)
   (rt-superimpose
-    (vl-append (*LEGEND-VSPACE*)
-      (hb-append (*LEGEND-HSPACE*)
-        name tp-ratio)
-      pict)
-    nc))
+    (vl-append (*LEGEND-VSPACE*) top-left body)
+    top-right))
 
 (define (title-text str [angle 0])
   (text str (cons 'bold TITLE-FACE) (*FONT-SIZE*) angle))
@@ -188,8 +248,8 @@
   (parameterize ([*FONT-SIZE* (sub1 (*FONT-SIZE*))])
     (title-text (format "typed/python ratio: ~ax" (rnd r)))))
 
-(define (render-num-configurations n)
-  (title-text (format "~a configurations" (add-commas n))))
+(define (render-count n descr)
+  (title-text (format "~a ~a" (add-commas n) descr)))
 
 (define (sample-info->overhead-plot si)
   (raise-user-error 'sample-info->overhead "not implemented"))
@@ -201,8 +261,14 @@
 
 (module+ main
   (require racket/cmdline)
+  (define OVERHEAD 'overhead)
+  (define EXACT 'exact)
+  (define *plot-type* (make-parameter OVERHEAD))
   (command-line
    #:program "rp-plot"
+   #:once-any
+   [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
+   [("-e" "--exact") "Plot exact running times" (*plot-type* EXACT)]
    #:args benchmark-name*
    (cond
     [(null? benchmark-name*)
@@ -214,9 +280,14 @@
          (for/list ([n (in-list benchmark-name*)])
            (with-handlers ([exn:fail? (λ (e) (printf "Error processing '~a', run 'raco rp-plot ~a' to debug.~n" n n))])
              (benchmark->performance-info (->benchmark-info n))))))
+     (define render-one
+       (case (*plot-type*)
+        [(overhead) overhead-plot]
+        [(exact) exact-runtime-plot]
+        [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
      (define p*
        (parameterize ([*FONT-SIZE* 14])
-         (map overhead-plot pi*)))
+         (map render-one pi*)))
      (save-pict "rp-plot.png" (apply vl-append 50 p*))])))
 
 ;; =============================================================================
