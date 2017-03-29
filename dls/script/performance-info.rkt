@@ -105,6 +105,9 @@
    [performance-info->sample*
     (-> performance-info? (cons/c natural? (listof path-string?)))]
 
+   [performance-info%sample
+    (-> performance-info? path-string? performance-info?)]
+
   )
   string->configuration
   performance-info-src
@@ -431,6 +434,7 @@
       (raise-user-error 'performance-info->sample* "sample file ~a should have ~a lines, but has ~a instead" s sample-size l)))
   (cons sample-size sample*))
 
+;; Doesn't really belong here, oh well
 (define (fix-num-types sample-file)
   (printf "fixing types in '~a'..." sample-file)
   (define bm-name (infer-benchmark-name sample-file))
@@ -462,6 +466,15 @@
   (if (path? name)
     (path->string name)
     (raise-user-error 'fix-num-types "could not infer benchmark name from file '~a'" sample-file)))
+
+(define (performance-info%sample pi new-src)
+  (performance-info (performance-info-name pi)
+                    new-src
+                    (count-karst-lines new-src)
+                    (performance-info-configs/module* pi)
+                    (performance-info-python-runtime pi)
+                    (performance-info-untyped-runtime pi)
+                    (performance-info-typed-runtime pi)))
 
 ;; =============================================================================
 
