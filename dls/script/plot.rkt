@@ -64,6 +64,7 @@
 (defparam *POINT-SIZE* 5 Positive-Index)
 (defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
 (defparam *CONFIGURATION-X-JITTER* 0.4 Real)
+(defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
 
 ;; -----------------------------------------------------------------------------
 
@@ -71,7 +72,7 @@
   (define nt (num-types pi))
   (define max-runtime (box 0))
   (define num-points (box 0))
-  (define body
+  (define body (maybe-freeze
     (parameterize ([plot-x-ticks (linear-ticks #:number 5)]
                    [plot-y-ticks (linear-ticks #:number 3)]
                    [plot-x-far-ticks no-ticks]
@@ -99,11 +100,11 @@
         #:x-label (and (*OVERHEAD-LABEL?*) "Num Type Ann.")
         #:y-label (and (*OVERHEAD-LABEL?*) "Time (ms)")
         #:width (*OVERHEAD-PLOT-WIDTH*)
-        #:height (*OVERHEAD-PLOT-HEIGHT*))))
+        #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (exact-add-legend (performance-info->name pi) (unbox num-points) body))
 
 (define (overhead-plot pi)
-  (define body
+  (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
                    [plot-y-ticks (make-overhead-y-ticks)]
@@ -123,13 +124,13 @@
         #:x-label (and (*OVERHEAD-LABEL?*) "Overhead (vs. retic-untyped)")
         #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
         #:width (*OVERHEAD-PLOT-WIDTH*)
-        #:height (*OVERHEAD-PLOT-HEIGHT*))))
+        #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (overhead-add-legend pi body))
 
 (define (samples-plot pi)
   (define-values [sample-size sample*]
     (let ([a+b (performance-info->sample* pi)]) (values (car a+b) (cdr a+b))))
-  (define body
+  (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
                    [plot-y-ticks (make-overhead-y-ticks)]
@@ -152,10 +153,15 @@
         #:x-label (and (*OVERHEAD-LABEL?*) "Overhead (vs. retic-untyped)")
         #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
         #:width (*OVERHEAD-PLOT-WIDTH*)
-        #:height (*OVERHEAD-PLOT-HEIGHT*))))
+        #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
 
 ;; -----------------------------------------------------------------------------
+
+(define (maybe-freeze p)
+  (if (*OVERHEAD-FREEZE-BODY*)
+    (freeze p)
+    p))
 
 (define (configuration-points p**)
   (define i 2)
