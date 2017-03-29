@@ -116,8 +116,13 @@
   ;; Useful for formatting identifiers
 
   render-overhead-plot*
-  ;; (-> (listof symbol?) pict?)
+  ;; (-> (listof benchmark-info?) pict?)
   ;; Render overhead plots for the given benchmarks
+
+  render-exact-runtime-plot*
+  ;; (-> (listof benchmark-info?) pict?)
+  ;; Render the exact running times for the given benchmarks.
+  ;; Running times ordered by number of types.
 
   sc
   ;; Usage `@sc{some text}`

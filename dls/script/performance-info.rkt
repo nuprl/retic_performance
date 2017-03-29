@@ -41,6 +41,12 @@
     (-> performance-info? natural?)]
    ;; Count the number of configurations in a benchmark
 
+   [num-types
+    (-> performance-info? natural?)]
+   ;; Count the number of annotatable-positions in the benchmark (for our experiment)
+   ;; A benchmark with `F` functions and `C` classes with fields and `M` methods
+   ;;  across all the classes has `F + C + M` types.
+
    [overhead
     (case->
      (-> performance-info? real? real?)
@@ -100,6 +106,15 @@
   string->configuration
   performance-info-src
   line->configuration-string
+
+  fold/karst
+  ;; (-> performance-info? #:f (-> A configuration? natural? (listof real?) A) #:init A A)
+  ;; Fold (left) function for Karst data.
+  ;; Given function is called with:
+  ;; - the accumulated data so far
+  ;; - the current line's configuration
+  ;; - the number of types in the current configuration
+  ;; - the running times for that configuration
 )
 
 (require
@@ -198,11 +213,11 @@
               tr
               (λ (times-str)
                 (set-box! ur
-                  (mean (parse-times-string times-str))))
+                  (mean (string->time* times-str))))
               (λ (times-str)
                 (when (not (unbox tr))
                   (set-box! tr
-                    (mean (parse-times-string times-str))))))))
+                    (mean (string->time* times-str))))))))
   (with-input-from-file k
     (λ ()
       (for ([ln (in-lines)])
@@ -251,10 +266,22 @@
   (-> string? configuration?)
   (map string->number (string-split cfg-str "-")))
 
-(define/contract (parse-times-string times-str)
+(define/contract (string->num-types t-str)
+  (-> string? natural?)
+  (string->number t-str))
+
+(define/contract (string->time* times-str)
   (-> string? (non-empty-listof (and/c real? (>=/c 0))))
   (let ([sp (open-input-string (string-replace times-str "," ""))])
     (begin0 (read sp) (close-input-port sp))))
+
+(define (line->values ln line-number)
+  (with-handlers ([exn:fail:read? (λ (e) (printf "PARSE ERROR on line ~a~n" line-number) (raise e))])
+    (define str* (parse-line ln))
+    (define cfg (string->configuration (car str*)))
+    (define nt (string->num-types (cadr str*)))
+    (define t* (string->time* (caddr str*)))
+    (values cfg nt t*)))
 
 (define (untyped-runtime pf)
   (performance-info-untyped-runtime pf))
@@ -267,6 +294,9 @@
 
 (define (num-configurations pf)
   (performance-info-num-configs pf))
+
+(define (num-types pf)
+  (log2 (num-configurations pf)))
 
 (define overhead
   (case-lambda
@@ -289,6 +319,15 @@
     (+ acc (* 1/N v)))
   (overhead pf (fold/mean (performance-info-src pf) avg #:init (λ (v) (* 1/N v)))))
 
+(define (fold/karst pf #:init init #:f f)
+  (with-input-from-file (performance-info-src pf)
+    (λ ()
+      (for/fold ([acc init])
+                ([ln (in-lines)]
+                 [i (in-naturals)])
+        (define-values [cfg nt t*] (line->values ln i))
+        (f acc cfg nt t*)))))
+
 ;; fold/mean : (All (A) Path-String (-> A Real A) #:init (U #f (-> Real A)) -> A)
 (define fold/mean
   (let ([line->mean (λ (ln line-number)
@@ -297,7 +336,7 @@
                                          (printf "PARSE ERROR on line ~a~n" line-number)
                                          (raise e))])
                         (let ([times-str (caddr (parse-line ln))])
-                          (mean (parse-times-string times-str)))))])
+                          (mean (string->time* times-str)))))])
     (λ (filename f #:init [init-f #f])
       (with-input-from-file filename
         (λ ()
@@ -451,17 +490,26 @@
     (check-exn exn:fail:contract?
       (λ () (string->configuration ""))))
 
-  (test-case "parse-times-string"
+  (test-case "string->num-types"
     (check-equal?
-      (parse-times-string "[1, 2, 3]")
+      (string->time* "8")
+      8)
+    (check-exn exn:fail:contract?
+      (λ () (string->num-types "0.3")))
+    (check-exn exn:fail:contract?
+      (λ () (string->num-types "#f"))))
+
+  (test-case "string->time*"
+    (check-equal?
+      (string->time* "[1, 2, 3]")
       '(1 2 3))
     (check-equal?
-      (parse-times-string "[1.23, 4.554]")
+      (string->time* "[1.23, 4.554]")
       '(1.23 4.554))
     (check-exn exn:fail:contract?
-      (λ () (parse-times-string "[]")))
+      (λ () (string->time* "[]")))
     (check-exn exn:fail:contract?
-      (λ () (parse-times-string "[1, -2]"))))
+      (λ () (string->time* "[1, -2]"))))
 
 )
 

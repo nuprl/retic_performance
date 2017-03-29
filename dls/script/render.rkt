@@ -4,6 +4,10 @@
 
 (provide
   render-overhead-plot*
+  ;; (-> (listof benchmark-info?) pict?)
+
+  render-exact-runtime-plot*
+  ;; (-> (listof benchmark-info?) pict?)
 )
 
 (require
@@ -27,8 +31,14 @@
 ;; -----------------------------------------------------------------------------
 
 (define (render-overhead-plot* bm*)
+  (render-benchmark* bm* "overhead" overhead-plot))
+
+(define (render-exact-runtime-plot* bm*)
+  (render-benchmark* bm* "exact-runtime" exact-runtime-plot))
+
+(define (render-benchmark* bm* descr render-one)
   (define bm-name* (map benchmark->name bm*))
-  (with-cache (cachefile "overhead-plot.rktd")
+  (with-cache (cachefile (format "~a-plot.rktd" descr))
     #:keys (list (λ () (list* OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE bm-name*)))
     (λ ()
       (define pi*
@@ -43,7 +53,7 @@
                        [*OVERHEAD-SHOW-RATIO* #f]
                        [*LEGEND-VSPACE* 2]
                        [*FONT-SIZE* 8])
-          (columnize (map overhead-plot pi*) NUM-COLUMNS)))
+          (columnize (map render-one pi*) NUM-COLUMNS)))
       (define col*
         (map (λ (p*) (apply vl-append OVERHEADS-VSPACE p*)) p**))
       (apply ht-append OVERHEADS-HSPACE col*))))
