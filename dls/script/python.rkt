@@ -73,12 +73,6 @@
 
 ;; TODO static call graph??
 
-;; TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING
-;; TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING
-;;    the order of `module*` needs to match the order we used on Karst
-;;    NEEEEEEDS to!!!
-;; TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING
-;; TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING TODO WARNING
 (struct python-info (
   name    ;; Symbol
   module* ;; (Listof module-info)
@@ -234,8 +228,6 @@
   (define-runtime-path bad-extension-example "test/bad-extension.md")
   (define-runtime-path Espionage-dir "../../benchmarks/Espionage")
 
-  (define py-sloc (path-string->module-info sloc-example))
-  (define py-parse (path-string->module-info parse-example))
   (define py-Espionage (benchmark-dir->python-info Espionage-dir))
 
   ;; -------------------------------------------------------
@@ -250,93 +242,7 @@
       2))
 
   (test-case "python->max-configuration"
-    (check-equal? (python-info->max-configuration (python-info 'test (list py-sloc))) '(2))
-    (check-equal? (python-info->max-configuration (python-info 'test (list py-parse))) '(512))
     (check-equal? (python-info->max-configuration py-Espionage) '(128 32)))
-
-  (test-case "path-string->module-info:basic"
-
-    (define (name=? n1 n2)
-      (unless (eq? n1 n2)
-        (raise-user-error 'module-info=? "unequal names, ~a /= ~a" n1 n2)))
-
-    (define (type=? t1 t2)
-      (if (not t2)
-        (when t1
-          (raise-user-error 'type=? "got type ~a, expected #f" t1))
-        (unless (string=? t1 t2)
-          (raise-user-error 'type=? "got type ~a, expected ~a" t1 t2))))
-
-    (define (field-info=? actual expected)
-      (and (name=? (field-info-name actual) (field-info-name expected))
-           (type=? (field-info-type actual) (field-info-type expected))))
-
-    (define (module-info=? actual expected)
-      (and (name=? (module-info-name actual) (module-info-name expected))
-           (map function-info=? (module-info-function* actual) (module-info-function* expected))
-           (map class-info=? (module-info-class* actual) (module-info-class* expected))))
-
-    (define (function-info=? actual expected)
-      (and (name=? (function-info-name actual) (function-info-name expected))
-           (map field-info=? (function-info-dom* actual) (function-info-dom* expected))
-           (type=? (function-info-cod actual) (function-info-cod expected))))
-
-    (define (class-info=? actual expected)
-      (and (name=? (class-info-name actual) (class-info-name expected))
-           (if (not (class-info-field* expected))
-             (when (class-info-field* actual)
-               (raise-user-error 'class-info=? "got fields, did not expect fields ~a" actual))
-             (map field-info=? (class-info-field* actual) (class-info-field* expected)))
-           (map function-info=? (class-info-method* actual) (class-info-method* expected))))
-
-    (check module-info=?
-      py-sloc
-      (module-info 'sloc-example
-        (list
-          (function-info 'f
-            (list (field-info 'x #f))
-            #f))
-        (list)))
-
-    (check module-info=?
-      py-parse
-      (module-info 'parse-example
-        (list
-          (function-info 'untyped_function
-            (list (field-info 'x #f) (field-info 'y #f))
-            #f)
-          (function-info 'typed_function
-            (list (field-info 'x "int") (field-info 'y "List(Void)"))
-            "Int")
-          (function-info 'gradual_function
-            (list (field-info 'x "int") (field-info 'y #f))
-            #f))
-        (list
-          (class-info 'without_fields
-            #f
-            (list
-              (function-info 'untyped_method
-                (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
-                #f)
-              (function-info 'typed_method
-                (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
-                "Int")
-              (function-info 'gradual_method
-                (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
-                #f)))
-          (class-info 'with_fields
-            (list (field-info 'f1 "List(List(Int))"))
-            (list (function-info '__init__
-                    (list (field-info 'self "with_fields"))
-                    #f)
-                  (function-info 'm
-                    (list (field-info 'self "with_fields")
-                          (field-info 'x "int"))
-                    "int"))))))
-  )
-
-  (test-case "path-string->exploded-module"
-    (check-pred jsexpr? (path-string->exploded-module sloc-example)))
 
   (test-case "check-python-file!"
     (check-pred check-python-file! sloc-example)
@@ -347,5 +253,97 @@
     (check-true (valid-python-version? "Python 3.4"))
     (check-true (valid-python-version? "Python 3.4.4"))
     (check-false (valid-python-version? "Python 2.7.1")))
+
+  (test-case "python-tests"
+    ;; These tests depend on a working Python3.4 executable,
+    (when (with-handlers ((exn:fail? (λ (e) #f)))
+            (check-python-exe! (*python-exe*)))
+      (define py-sloc (path-string->module-info sloc-example))
+      (define py-parse (path-string->module-info parse-example))
+        (check-equal? (python-info->max-configuration (python-info 'test (list py-sloc))) '(2))
+        (check-equal? (python-info->max-configuration (python-info 'test (list py-parse))) '(512))
+      (test-case "path-string->exploded-module"
+        (check-pred jsexpr? (path-string->exploded-module sloc-example)))
+
+      (test-case "path-string->module-info:basic"
+
+        (define (name=? n1 n2)
+          (unless (eq? n1 n2)
+            (raise-user-error 'module-info=? "unequal names, ~a /= ~a" n1 n2)))
+
+        (define (type=? t1 t2)
+          (if (not t2)
+            (when t1
+              (raise-user-error 'type=? "got type ~a, expected #f" t1))
+            (unless (string=? t1 t2)
+              (raise-user-error 'type=? "got type ~a, expected ~a" t1 t2))))
+
+        (define (field-info=? actual expected)
+          (and (name=? (field-info-name actual) (field-info-name expected))
+               (type=? (field-info-type actual) (field-info-type expected))))
+
+        (define (module-info=? actual expected)
+          (and (name=? (module-info-name actual) (module-info-name expected))
+               (map function-info=? (module-info-function* actual) (module-info-function* expected))
+               (map class-info=? (module-info-class* actual) (module-info-class* expected))))
+
+        (define (function-info=? actual expected)
+          (and (name=? (function-info-name actual) (function-info-name expected))
+               (map field-info=? (function-info-dom* actual) (function-info-dom* expected))
+               (type=? (function-info-cod actual) (function-info-cod expected))))
+
+        (define (class-info=? actual expected)
+          (and (name=? (class-info-name actual) (class-info-name expected))
+               (if (not (class-info-field* expected))
+                 (when (class-info-field* actual)
+                   (raise-user-error 'class-info=? "got fields, did not expect fields ~a" actual))
+                 (map field-info=? (class-info-field* actual) (class-info-field* expected)))
+               (map function-info=? (class-info-method* actual) (class-info-method* expected))))
+
+        (check module-info=?
+          py-sloc
+          (module-info 'sloc-example
+            (list
+              (function-info 'f
+                (list (field-info 'x #f))
+                #f))
+            (list)))
+
+        (check module-info=?
+          py-parse
+          (module-info 'parse-example
+            (list
+              (function-info 'untyped_function
+                (list (field-info 'x #f) (field-info 'y #f))
+                #f)
+              (function-info 'typed_function
+                (list (field-info 'x "int") (field-info 'y "List(Void)"))
+                "Int")
+              (function-info 'gradual_function
+                (list (field-info 'x "int") (field-info 'y #f))
+                #f))
+            (list
+              (class-info 'without_fields
+                #f
+                (list
+                  (function-info 'untyped_method
+                    (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
+                    #f)
+                  (function-info 'typed_method
+                    (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
+                    "Int")
+                  (function-info 'gradual_method
+                    (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
+                    #f)))
+              (class-info 'with_fields
+                (list (field-info 'f1 "List(List(Int))"))
+                (list (function-info '__init__
+                        (list (field-info 'self "with_fields"))
+                        #f)
+                      (function-info 'm
+                        (list (field-info 'self "with_fields")
+                              (field-info 'x "int"))
+                        "int"))))))
+      )))
 
 )
