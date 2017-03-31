@@ -436,7 +436,7 @@
 
 ;; Doesn't really belong here, oh well
 (define (fix-num-types sample-file)
-  (printf "fixing types in '~a'..." sample-file)
+  (printf "fixing types in '~a'...~n" sample-file)
   (define bm-name (infer-benchmark-name sample-file))
   (define bm (->benchmark-info bm-name))
   (define mc (benchmark->max-configuration bm))
