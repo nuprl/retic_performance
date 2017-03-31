@@ -117,7 +117,7 @@
   Espionage
 ;  Evolution
 ;  sample_fsm_python
-  PythonFlow ;; TODO where did this come from?
+  PythonFlow ;; TODO where did this come from? ... maybe https://github.com/masphei/PythonFlow ???
   take5
 ))
 
@@ -389,7 +389,7 @@
   ;   ['(8 6 7 5 3 0 9)
   ;    ==> (* 8 6 7 5 3 0 9)]
   ;   ['(1 1 1)
-  ;    ==> 
+  ;    ==> ))
 
   (test-case "configuration->string"
     (check-apply* configuration->string

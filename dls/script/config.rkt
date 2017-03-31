@@ -30,6 +30,9 @@
     [karst-dir->sample*
      (-> path-string? symbol? (listof path-string?))]
 
+    [benchmark-dir->name
+     (-> is-benchmark-directory? symbol?)]
+
     [benchmark-dir->benchmarks-dir
      (-> path-string? path-string?)]
     ;; Build a path to a benchmark's exploded configurations directory,
@@ -82,6 +85,10 @@
        (directory-exists? p)
        (directory-exists? (build-path p TYPED))))
 
+(define (benchmark-dir->name bm-dir)
+  (define-values [base name must-be-dir] (split-path bm-dir))
+  (string->symbol (path->string name)))
+
 ;; =============================================================================
 
 (module+ test
@@ -95,5 +102,8 @@
   (test-case "is-benchmark-directory?"
     (define futen (build-path (retic-performance-benchmarks-dir home) "futen"))
     (check-true (is-benchmark-directory? futen))
-    (check-false (is-benchmark-directory? home))))
+    (check-false (is-benchmark-directory? home)))
 
+  (test-case "benchmark-dir->name"
+    (check-equal? (benchmark-dir->name "foo/bar/baz/") 'baz))
+)
