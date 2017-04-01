@@ -7,9 +7,7 @@
 ;; Prints summary stats for each `<benchmark-name>`
 
 ;; TODO
-;; - make sure "alphabetical in Racket" matches configuration order
 ;; - maybe don't need this, maybe should be part of `benchmark-info`
-;; - get max configuration from bm info, isntead of inferring from file?
 
 (require racket/contract)
 (provide

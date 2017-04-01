@@ -2,12 +2,6 @@
 
 ;; Static information about the benchmark programs.
 
-;; TODO
-;; - num typed functions (in experiment)
-;; - num function parameters
-;; - num classes
-;; - num methods
-
 (require racket/contract)
 (provide
   (contract-out
@@ -73,12 +67,16 @@
      (-> benchmark-info? exact-nonnegative-integer? configuration?)]
     ;; If second argument is `N`, return the `N`-th configuration
     ;;  according to some deterministic, undocumented order
+
+    [benchmark-info->python-info
+     (-> benchmark-info? python-info?)]
 ))
 
 (require
   "config.rkt"
   "python.rkt"
   "util.rkt"
+  file/glob
   (only-in racket/math
     natural?)
   (only-in racket/path
@@ -169,7 +167,7 @@
 
 (define (->max-configuration src mod*)
   (or (benchmark-dir->max-configuration src mod*)
-      (python->max-configuration src)))
+      (python-info->max-configuration (benchmark-dir->python-info src))))
 
 (define (benchmark-dir->max-configuration ps mod*)
   (and (directory-exists? ps)
@@ -179,13 +177,16 @@
                 (define m-dir (build-path ps CONFIG-DIR (path-replace-extension m #"")))
                 (and acc
                      (directory-exists? m-dir)
-                     (cons (length (directory-list m-dir)) acc)))])
+                     (cons (length (glob (build-path m-dir "*.py"))) acc)))])
          (and cfg-rev* (reverse cfg-rev*)))))
 
 (define (benchmark->sloc bm)
   (define ty (benchmark->typed-dir bm))
   (for/sum ([m (in-list (benchmark-info-module* bm))])
     (python-sloc (build-path ty m))))
+
+(define (benchmark-info->python-info bm)
+  (benchmark-dir->python-info (benchmark-info-src bm)))
 
 ;; benchmark->karst-data : (-> benchmark-info? (U #f path-string?))
 (define (benchmark->karst-data bm)
@@ -223,7 +224,7 @@
 (define (path->benchmark-info src)
   (define simple-name (path->simple-name src))
   (define mod*
-    (for/list ([p (in-list (directory-list (benchmark-dir->typed-dir src)))])
+    (for/list ([p (in-list (glob (build-path (benchmark-dir->typed-dir src) "*")))])
       (path->string (file-name-from-path p))))
   (make-benchmark-info simple-name
     #:module* mod*
@@ -363,8 +364,11 @@
       (define mod* (benchmark-info-module* bm))
       (define c1 (->max-configuration src mod*))
       (define c2 (benchmark-dir->max-configuration src mod*))
-      (check-equal? c1 c2)
-      (check-equal? c2 expected))
+      (define c3 (python-info->max-configuration (benchmark-dir->python-info src)))
+      (check-equal? c1 c2
+        (format "~a : ->max = ~a, benchmark-dir->max = ~a" src c1 c2))
+      (check-equal? c2 c3)
+      (check-equal? c3 expected))
 
     (check-max-configuration 'fannkuch '(2))
     (check-max-configuration 'Espionage '(128 32))
@@ -380,16 +384,6 @@
       ==> #t]
      ['(5 2 4) '(3 3 9)
       ==> #f]))
-
-  ;; TODO what should this do?
-  ;(test-case "configuration->natural"
-  ;  (check-apply* configuration->natural
-  ;   ['(0 0 0 0)
-  ;    ==> 0]
-  ;   ['(8 6 7 5 3 0 9)
-  ;    ==> (* 8 6 7 5 3 0 9)]
-  ;   ['(1 1 1)
-  ;    ==> ))
 
   (test-case "configuration->string"
     (check-apply* configuration->string
@@ -457,5 +451,17 @@
       ==> (* 16 2 1024)]
      [(->benchmark-info 'fannkuch)
       ==> 2]))
+
+  (test-case "benchmark-info->python-info"
+    (define (check-python-info bm)
+      (define py (benchmark-info->python-info bm))
+      (check-pred python-info? py)
+      (check-equal? (benchmark-info-module* bm) (python-info->module* py)
+        (format "~a module names" (benchmark-info-name bm)))
+      (check-equal? (benchmark->max-configuration bm) (python-info->max-configuration py)
+        (format "~a max configuration" (benchmark-info-name bm)))
+      (void))
+
+    (for-each check-python-info (all-benchmarks)))
 
 )

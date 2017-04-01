@@ -571,6 +571,15 @@ def implode_annotation(node):
     return "%s(%s)" % (implode_annotation(node.func), ",".join([implode_annotation(x) for x in node.args]))
   elif isinstance(node, ast.Str):
     return node.s
+  elif isinstance(node, ast.Dict):
+    kv_strs = [" : ".join([implode_annotation(k), implode_annotation(v)]) for k,v in zip(node.keys, node.values)]
+    return "{" + ",".join(kv_strs) + "}"
+  elif isinstance(node, ast.Tuple) or isinstance(node, ast.List):
+    v_strs = [implode_annotation(v) for v in node.elts]
+    return "[" + ",".join(v_strs) + "]"
+  elif isinstance(node, ast.Tuple):
+    v_strs = [implode_annotation(v) for v in node.elts]
+    return "(" + ",".join(v_strs) + ")"
   else:
     raise ValueError("cannot implode '%s'" % node)
 
