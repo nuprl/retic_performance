@@ -124,6 +124,10 @@
   ;; Render the exact running times for the given benchmarks.
   ;; Running times ordered by number of types.
 
+  render-static-information
+  ;; (-> (listof benchmark-info?) table?)
+  ;; Build a table of static information about each benchmark
+
   sc
   ;; Usage `@sc{some text}`
   ;; Renders `text` in small caps style

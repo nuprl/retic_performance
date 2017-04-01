@@ -111,8 +111,9 @@
   "config.rkt"
   "system.rkt"
   "util.rkt"
-  json
   file/glob
+  json
+  racket/runtime-path
   with-cache
   (only-in racket/set
     list->set
@@ -135,7 +136,8 @@
 ;; =============================================================================
 
 (define *python-exe* (make-parameter "python3.4"))
-(define EXPLODE.PY "explode_module.py")
+(define-runtime-path EXPLODE.PY "explode_module.py")
+(define-runtime-path PYTHON-INFO-CACHE "cache-python-info") ;; directory
 
 ;; TODO static call graph??
 
@@ -222,7 +224,7 @@
     (define md5* (map md5sum m*)) ;; keys for `with-cache`
     (if (null? m*)
       (raise-user-error 'benchmark-dir->python-info "benchmark ~a has no (typed) Python files" bm-name)
-      (parameterize ([*current-cache-directory* "cache-python-info"]
+      (parameterize ([*current-cache-directory* PYTHON-INFO-CACHE]
                      [*current-cache-keys* (list (λ () (cons bm-name (map list m* md5*))))])
         (ensure-directory (*current-cache-directory*))
         (with-cache (cachefile (format "~a.rktd" bm-name))

@@ -1,27 +1,9 @@
 #lang gm-dls-2017
 @title[#:tag "sec:benchmarks"]{Benchmarks}
 
- @figure["fig:static-benchmark" "Static Benchmark Characteristics"
-   @tabular[
-    #:sep @hspace[2]
-    #:row-properties '(bottom-border 1)
-    #:column-properties '(left right right right)
-    @list[
-     @list[@bold{Name}       @bold{# Mod} @bold{\# Func (\% typed)} @bold{\# Param}]
-@;     @list[@elem{Sample FSM} @elem{ 5}    @elem{999  (10%)}         @elem{999}]
-     @list[@elem{Take5}      @elem{ 3}    @elem{999}                @elem{999}]
-     @list[@elem{Evolution}  @elem{77}    @elem{999}                @elem{999}]
-     @list[@elem{Espionage}  @elem{ 2}    @elem{999}                @elem{999}]
-     @list[@elem{Slow SHA}   @elem{ 4}    @elem{999}                @elem{999}]]]
+ @figure["fig:static-benchmark" "Static summary of benchmarks"
+   @render-static-information[ALL-BENCHMARKS]]
  ]
-
-  @; remove BSL
-  @; mention size of the reader, parser etc. - how much computation time does each part take to run
-  @; for take5, talk about making the program loop to inc. time > 1 sec
-
-
-@;@Figure-ref{fig:static-benchmark} talks about the size of our benchmarks.
-
 
 
 In this section we give a brief description of the benchmarks used in our performance evaluation. and denote the portion of the benchmark that was annotated with types. If the total number of functions is less than or equal to x for a given benchmark, we annotated all functions. Otherwise, we chose at most x functions to annotate.

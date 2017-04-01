@@ -8,15 +8,27 @@
 
   render-exact-runtime-plot*
   ;; (-> (listof benchmark-info?) pict?)
+
+  render-static-information
 )
 
 (require
   "benchmark-info.rkt"
   "performance-info.rkt"
   "plot.rkt"
+  "python.rkt"
   "util.rkt"
   pict
   with-cache
+  (only-in racket/format
+    ~a)
+  (only-in scribble/manual
+    tt
+    tabular
+    hspace
+    bold)
+  (only-in racket/list
+    make-list)
   (only-in racket/math
     exact-floor))
 
@@ -58,12 +70,35 @@
          (columnize p* NUM-COLUMNS)))
   (apply ht-append OVERHEADS-HSPACE col*))
 
+(define STATIC-INFO-TITLE*
+  (map bold '("Benchmark" "SLOC" "M" "F" "C" "m")))
+
+(define (render-static-information bm*)
+  (tabular
+    #:sep (hspace 2)
+    #:row-properties '(bottom-border 1)
+    #:column-properties (cons 'left (make-list (sub1 (length STATIC-INFO-TITLE*)) 'right))
+    (cons STATIC-INFO-TITLE*
+          (map render-static-row bm*))))
+
+(define (render-static-row bm)
+  (define py (benchmark-info->python-info bm))
+  (cons
+    (tt (symbol->string (benchmark->name bm)))
+    (map number->string (list
+      (benchmark->sloc bm)
+      (python-info->num-modules py)
+      (python-info->num-functions py)
+      (python-info->num-classes py)
+      (python-info->num-methods py)))))
+
 ;; =============================================================================
 
 (module+ test
-  (require rackunit)
+  (require rackunit (only-in scribble/core table?))
 
-  (test-case ""
+  (test-case "render-table"
+    (check-pred table? (render-static-information (list (->benchmark-info 'futen))))
   )
 )
 
