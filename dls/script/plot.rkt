@@ -32,6 +32,10 @@
   pict
   plot/no-gui
   plot/utils
+  (only-in racket/format
+    ~r)
+  (only-in racket/list
+    range)
   (only-in racket/math
     exact-ceiling
     exact-floor))
@@ -61,7 +65,7 @@
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
 (defparam *FONT-SIZE* 10 Natural)
 (defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
-(defparam *POINT-SIZE* 5 Positive-Index)
+(defparam *POINT-SIZE* 3 Positive-Index)
 (defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
 (defparam *CONFIGURATION-X-JITTER* 0.4 Real)
 (defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
@@ -72,31 +76,33 @@
   (define nt (num-types pi))
   (define max-runtime (box 0))
   (define num-points (box 0))
+  (define elem*
+    (list
+      #;(if (< nt 6) (make-vrule* nt) '())
+      (fold/karst pi
+        #:init '()
+        #:f (λ (acc cfg num-types t*)
+              (cons (configuration-points
+                      (for/list ([t (in-list t*)]
+                                 [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
+                        (set-box! max-runtime (max (unbox max-runtime) t))
+                        (set-box! num-points (+ (unbox num-points) 1))
+                        (list x t)))
+                    acc)))))
+  (define y-max (exact-ceiling (unbox max-runtime)))
   (define body (maybe-freeze
-    (parameterize ([plot-x-ticks (linear-ticks #:number 5)]
-                   [plot-y-ticks (linear-ticks #:number 3)]
+    (parameterize ([plot-x-ticks (make-exact-runtime-xticks nt)]
+                   [plot-y-ticks (make-exact-runtime-yticks y-max)]
                    [plot-x-far-ticks no-ticks]
                    [plot-y-far-ticks no-ticks]
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)])
-      (plot-pict
-        (list
-          (if (< nt 6) (make-vrule* nt) '())
-          (fold/karst pi
-            #:init '()
-            #:f (λ (acc cfg num-types t*)
-                  (cons (configuration-points
-                          (for/list ([t (in-list t*)]
-                                     [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
-                            (set-box! max-runtime (max (unbox max-runtime) t))
-                            (set-box! num-points (+ (unbox num-points) 1))
-                            (list x t)))
-                        acc))))
+      (plot-pict elem*
         #:x-min 0
         #:x-max (+ nt 0.5)
         #:y-min 0
-        #:y-max (exact-ceiling (unbox max-runtime))
+        #:y-max y-max
         #:x-label (and (*OVERHEAD-LABEL?*) "Num Type Ann.")
         #:y-label (and (*OVERHEAD-LABEL?*) "Time (ms)")
         #:width (*OVERHEAD-PLOT-WIDTH*)
@@ -229,9 +235,7 @@
     (append (for/list ([i (in-range 12 20 2)]) (/ i 10))
             (for/list ([i (in-range 4 20 2)]) i)))
   (define m-ticks
-    (ticks (λ (ax-min ax-max)
-             (for/list ([i (in-list MAJOR-TICKS)])
-               (pre-tick i #t)))
+    (ticks (real*->ticks-layout MAJOR-TICKS)
            (ticks-format/units "x")))
   (ticks-add m-ticks MINOR-TICKS #f))
 
@@ -239,9 +243,35 @@
   (define NUM-TICKS 3)
   (define UNITS "%")
   (ticks (λ (ax-min ax-max)
-           (for/list ([y (in-list (linear-seq ax-min ax-max NUM-TICKS #:end? #t))])
+           (for/list ([y (in-list )])
              (pre-tick (exact-floor y) #t)))
          (ticks-format/units UNITS)))
+
+(define (make-exact-runtime-xticks num-types)
+  (define x*
+    (if (<= num-types 6)
+      (range (+ 1 num-types))
+      (map exact-floor (linear-seq 0 num-types 5 #:start? #t #:end? #t))))
+  (ticks (real*->ticks-layout x*)
+         (λ (ax-min ax-max pre-ticks)
+           (for/list ([pt (in-list pre-ticks)])
+             (number->string (pre-tick-value pt))))))
+
+(define (make-exact-runtime-yticks max-runtime)
+  (define x* (list 0 (exact->inexact (/ max-runtime 2)) max-runtime))
+  (ticks (real*->ticks-layout x*)
+         (λ (ax-min ax-max pre-ticks)
+           (for/list ([pt (in-list pre-ticks)])
+             (define v (pre-tick-value pt))
+             (cond
+              [(= v max-runtime)
+               (format "~as" v)]
+              [else
+               (~r v #:precision 1)])))))
+
+(define ((real*->ticks-layout x*) ax-min ax-max)
+  (for/list ([x (in-list x*)])
+    (pre-tick x #t)))
 
 (define ((ticks-format/units units) ax-min ax-max pre-ticks)
   (for/list ([pt (in-list pre-ticks)])

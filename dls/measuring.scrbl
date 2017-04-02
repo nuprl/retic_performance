@@ -1,5 +1,4 @@
 #lang gm-dls-2017
-@require[racket/list]
 @title[#:tag "sec:measurements"]{Measuring Reticulated Python}
 
 @section{The Deliverable Count}
