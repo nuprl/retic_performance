@@ -58,7 +58,8 @@
                    [*LEGEND-VSPACE* 2]
                    [*FONT-SIZE* 8]
                    [*current-cache-directory* (build-path (current-directory) "with-cache")]
-                   [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE)))])
+                   [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE)))]
+                   [*with-cache-fasl?* #f])
       (filter values
         (for/list ([bm (in-list bm*)])
           (with-cache (cachefile (format "~a-~a.rktd" descr (benchmark->name bm)))

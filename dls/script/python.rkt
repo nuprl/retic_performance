@@ -126,6 +126,7 @@
   (only-in racket/math
     natural?)
   (only-in racket/path
+    file-name-from-path
     path-get-extension)
   (only-in racket/list
     last)
@@ -221,11 +222,12 @@
    [(is-benchmark-directory? x)
     (define bm-name (benchmark-dir->name x))
     (define m* (glob (build-path (benchmark-dir->typed-dir x) "*.py")))
-    (define md5* (map md5sum m*)) ;; keys for `with-cache`
+    (define filename+md5* (for/list ([m (in-list m*)]) (list (path-string->string (file-name-from-path m)) (md5sum m))))
     (if (null? m*)
       (raise-user-error 'benchmark-dir->python-info "benchmark ~a has no (typed) Python files" bm-name)
       (parameterize ([*current-cache-directory* PYTHON-INFO-CACHE]
-                     [*current-cache-keys* (list (λ () (cons bm-name (map list m* md5*))))])
+                     [*current-cache-keys* (list (λ () (cons bm-name filename+md5*)))]
+                     [*with-cache-fasl?* #f])
         (ensure-directory (*current-cache-directory*))
         (with-cache (cachefile (format "~a.rktd" bm-name))
           (λ () (python-info bm-name (map path-string->module-info m*))))))]
