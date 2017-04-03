@@ -3,13 +3,15 @@
 (define deps '(
   "base"
   "at-exp-lib"
+  "math-lib"
+  "pict-lib"
+  "plot-lib"
   "scribble-lib"
   "with-cache"
 ))
 (define build-deps '(
-  "math-lib"
-  "rackunit-lib"
   "rackunit-abbrevs"
+  "rackunit-lib"
 ))
 (define pkg-desc "Source for _Performance Evaluation of Reticulated Python_")
 (define version "0.1")
