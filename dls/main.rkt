@@ -23,6 +23,7 @@
     scriblib/autobib
     scribble/manual)
   generate-bibliography
+  bm-desc
 
   (rename-out
    [acmart:#%module-begin #%module-begin]
@@ -73,7 +74,7 @@
   ;; Renders "et al." with proper spacing between the words.
   ;; Use `citet` instead.
 
-;;  exact
+  exact
   ;; Usage: `@exact|{some text}|`
   ;;    or `@exact{some text}`
   ;;  where `some text` is text that should go directly to LaTeX
@@ -260,3 +261,10 @@
 (define (section-ref section-name)
   (elem (exact "section~")
         (secref section-name)))
+	
+(define (bm-desc title author [url ""] . descr)
+   (elem
+     (parag title)  (smaller "from " author)
+     (linebreak)
+     ;ignore URL
+     descr))
