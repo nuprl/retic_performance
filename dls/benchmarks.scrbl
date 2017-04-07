@@ -6,55 +6,43 @@
  ]
 
 
-In this section we give a brief description of the benchmarks used in our performance evaluation. and denote the portion of the benchmark that was annotated with types. If the total number of functions is less than or equal to x for a given benchmark, we annotated all functions. Otherwise, we chose at most x functions to annotate.
-We wrote some of the benchmarks and the rest was adapted from other sources. We mention the main changes made to those benchmarks. All of our benchmarks use Timer.py from our utilities library benchmark_tools. This allows us to measure the time it takes for each configuration to run. 
+In this section we give a brief description to each of our benchmarks. Unless we state otherwise, all benchmarks are fully annotated and use Timer.py, a class from our utilities library benchmark_tools. This allows us to measure the time taken for each configuration to run. Similarly, all benchmarks are written by us, unless we state otherwise. In case of the adopted benchmarks, we state any changes made such as adding missing type annotations.
+Some of the benchmarks were scaled to run multiple iterations of the program because the runtime was too small to notice a significant difference across the various configurations. We denote that in the benchmark descriptions.
 
 @parag{Sample_FSM}
-This benchmark simulates the tension between individuals focused on their own
-interest, and the interest of the general population.  In this program,
-individuals are represented by finite state automaton. An automata describes
-how an individual acts. The transitions between the different states of the
-automaton represent how the individual interacts with other individuals. This
-simulation assumes a fixed number of actions. The program was fully annotated.
+Represents how individuals interact with each other in a population. 
+
 
 @parag{Take5}
-This program is a simulation  of  a Take5 game. The game consists of a dealer
-and a number of players. It  is played in rounds, each round consists of turns.
-The game is played following a set of rules, and after each turn, the players'
-scores are updated. At the end of the game the program outputs the final scores
-This program was fully annotated. On average, a Take5 configuration runs in x
-seconds. Since that time was too small to measure the differences in
-performance across various configurations, The time was scaled by X by letting
-the program run x consequtive  simulations of the  game.
+Simulates a Take5 game.
+The benchmark runs 500 consecutive  simulations of the  game.
 
 @parag{Evolution}
-Simulation of an Evolution game. The program takes an argument n, representing
-the number of players participating in the game. It then creates a dealer which
-runs a complete simulation of the game. The program then outputs the players'
-scores. Since the number of functions in this benchmark was too large, we annotated three files: cardplay.py, exchange_for_population.py and exchange_for_species.py.
+Simulates an Evolution game. 
+Since the number of functions in this benchmark was too large, we annotated three files which represent all card plays a player can make during a turn.
 
 
 @parag{Espionage}
-This program finds the minimum spanning tree of a graph using Kruskal's algorithm and was fully annotated.
+Finds the minimum spanning tree of a graph using Kruskal's algorithm.
 
 @parag{slowSHA}
 Adapted from @citet[vksb-dls-2014]. Originally from
 @url{http://github.com/sfstpala/SlowSHA}  Computes SHA-1  and SHA-512 for a
-sequence of English words. This benchmark was fully annotated.
+sequence of English words.
 
 @parag{PythonFlow} @note{masphei-2013}
-Implements Ford-Fulkerson's Algorithm for finding the maximum flow of a graph. The benchmark was fully annotated.
+Implements Ford-Fulkerson's Algorithm for finding the maximum flow of a graph. 
 
-@parag{N-Queens} @note{@url{https://github.com/cython/cython/blob/master/Demos/benchmarks/nqueens.py}}. A simple fully annotated, brute-force N-Queens solver.
+@parag{N-Queens} @note{@url{https://github.com/cython/cython/blob/master/Demos/benchmarks/nqueens.py}}. A simple brute-force N-Queens solver.
 
 @parag{CallMethods}
 A Microbenchmark for evaluating the overhead of function calls. It consists of 32*10^5 calls to trivial functions. The calls do not use varargs or
-kwargs, and do not use tuple unpacking. This benchmark was fully annotated. 
+kwargs, and do not use tuple unpacking. 
 
 @parag{CallMethodSlots}
 A Microbenchmark for measuring the overhead of function calls  that that define __slots__ and that have no __dict__ attribute. The calls do not use varargs or kwargs, and do not use tuple unpacking.
 When an object has no __dict__ attribute, the JIT can optimize away most of the
-attribute lookup. This benchmark measures this optimization. The benchmark was fully annotated.
+attribute lookup. This benchmark measures this optimization. 
 
 @parag{Float}
 Generates and normalizes a list of points then maximizes them. Adapted from [??]. We added missing type annotations.
