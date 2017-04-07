@@ -243,7 +243,7 @@
   (define NUM-TICKS 3)
   (define UNITS "%")
   (ticks (λ (ax-min ax-max)
-           (for/list ([y (in-list )])
+           (for/list ([y (in-list (linear-seq ax-min ax-max NUM-TICKS #:end? #t))])
              (pre-tick (exact-floor y) #t)))
          (ticks-format/units UNITS)))
 

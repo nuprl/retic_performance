@@ -6,7 +6,7 @@
 (provide
   (contract-out
    [shell
-    (-> string? (or/c string? (listof string?)) string?)]
+    (-> path-string? (or/c path-string? (listof path-string?)) string?)]
    ;; `(shell cmd arg*)` finds the executable that `cmd` denotes,
    ;;  then invokes the executable with arguments `arg*`.
    ;; Raises an exception if the executable exists uncleanly,
@@ -36,7 +36,7 @@
 (define (shell pre-exe pre-cmd)
   (define exe (find-exe pre-exe))
   (define success? (box #f))
-  (define cmd* (if (string? pre-cmd) (list pre-cmd) pre-cmd))
+  (define cmd* (map path-string->string (if (path-string? pre-cmd) (list pre-cmd) pre-cmd)))
   (define str
     (with-output-to-string
       (lambda ()
@@ -45,7 +45,7 @@
     (string-trim str)
     (raise-user-error 'shell "failed to apply '~a' to arguments '~a'" exe cmd*)))
 
-;; find-exe : string? -> path-string?
+;; find-exe : path-string? -> path-string?
 (define (find-exe pre-exe)
   (define fep (find-executable-path pre-exe))
   (if (path? fep)
