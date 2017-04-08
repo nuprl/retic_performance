@@ -53,9 +53,10 @@
   (define p*
     (parameterize ([*OVERHEAD-PLOT-WIDTH* (exact-floor (/ (- OVERHEADS-WIDTH OVERHEADS-HSPACE) NUM-COLUMNS))]
                    [*OVERHEAD-PLOT-HEIGHT* (exact-floor (/ (+ OVERHEADS-HEIGHT OVERHEADS-VSPACE) num-pict))]
-                   [*OVERHEAD-SHOW-RATIO* #f]
+                   [*OVERHEAD-SHOW-RATIO* 'short]
                    [*OVERHEAD-FREEZE-BODY* freeze?]
                    [*LEGEND-VSPACE* 2]
+                   [*LEGEND-HSPACE* 4]
                    [*FONT-SIZE* 8]
                    [*current-cache-directory* (build-path (current-directory) "with-cache")]
                    [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE)))]

@@ -139,8 +139,6 @@
     string-split
     string-replace))
 
-(define-syntax-rule (TODO) (raise-user-error "not implemented"))
-
 ;; =============================================================================
 
 (struct performance-info (
@@ -181,7 +179,8 @@
       "cannot find Karst data for benchmark '~a'" name))
   (define-values [num-configs configs/module* base-retic typed-retic]
     (scan-karst-file k))
-  (define python 1) ;; TODO !!!!
+  (define python
+    (mean (benchmark->python-data bm)))
   (make-performance-info name
     #:src k
     #:num-configurations num-configs
@@ -312,8 +311,7 @@
    [(pf v)
     ((overhead pf) v)]
    [(pf)
-    ;; TODO use python runtime
-    (let ([baseline (performance-info-untyped-runtime pf)])
+    (let ([baseline (performance-info-python-runtime pf)])
       (λ (v) (/ v baseline)))]))
 
 (define (min-overhead pf)
@@ -402,7 +400,7 @@
   (define nc (performance-info-num-configs pf))
   (printf "~a~n" bm-name)
   (printf "- num configs  : ~a~n" nc)
-  (printf "- Python  time : ~a~n" "???")
+  (printf "- Python  time : ~a~n" (performance-info-python-runtime pf))
   (printf "- untyped time : ~a~n" (performance-info-untyped-runtime pf))
   (printf "- typed time   : ~a~n" (performance-info-typed-runtime pf))
   (printf "- min overhead : ~a~n" (min-overhead pf))
@@ -494,7 +492,7 @@
                 #:src karst-example-gunzip
                 #:num-configurations num-configs
                 #:configurations/module* configs/module*
-                #:python-runtime base-retic ;; TODO
+                #:python-runtime base-retic
                 #:untyped-retic-runtime base-retic
                 #:typed-retic-runtime typed-retic)])
       (check-equal? (num-configurations pf) 4)
@@ -516,6 +514,7 @@
          [pf (benchmark->performance-info bm)])
     (test-case "performance-info:spot-check"
       (check-true (performance-info? pf))
+      (check <= (performance-info-python-runtime pf) (performance-info-untyped-runtime pf))
       (let* ([lo (min-overhead pf)]
              [hi (max-overhead pf)]
              [avg (mean-overhead pf)]

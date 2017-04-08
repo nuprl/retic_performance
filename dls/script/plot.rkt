@@ -61,7 +61,7 @@
 (defparam *OVERHEAD-LINE-STYLE* 'solid plot-pen-style/c)
 (defparam *OVERHEAD-LINE-WIDTH* 2 Nonnegative-Real)
 (defparam *OVERHEAD-MAX* 10 Natural)
-(defparam *OVERHEAD-SHOW-RATIO* #t Boolean)
+(defparam *OVERHEAD-SHOW-RATIO* #t (U Symbol Boolean))
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
 (defparam *FONT-SIZE* 10 Natural)
 (defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
@@ -313,8 +313,12 @@
   (title-text (symbol->string sym)))
 
 (define (render-typed/python-ratio r)
+  (define text
+    (case (*OVERHEAD-SHOW-RATIO*)
+     ['short (format "(~ax)" (rnd r))]
+     [else (format "typed/python ratio: ~ax" (rnd r))]))
   (parameterize ([*FONT-SIZE* (sub1 (*FONT-SIZE*))])
-    (title-text (format "typed/python ratio: ~ax" (rnd r)))))
+    (title-text text)))
 
 (define (render-count n descr)
   (title-text (format "~a ~a" (add-commas n) descr)))

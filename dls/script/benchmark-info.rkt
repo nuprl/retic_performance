@@ -41,6 +41,10 @@
      (-> benchmark-info? (or/c #f path-string?))]
     ;; Return a path to the benchmark's data from the Karst cluster, if any
 
+    [benchmark->python-data
+     (-> benchmark-info? (or/c (listof real?) #f))]
+    ;; Return the benchmark's Python runtimes, if any
+
     [all-benchmarks
      (-> (listof benchmark-info?))]
     ;; Return a list of all known benchmarks
@@ -196,6 +200,24 @@
   (and (file-exists? karst-path)
        karst-path))
 
+(define (benchmark->python-data bm)
+  (define name (symbol->string (benchmark-info-name bm)))
+  (define python-path
+    (path-add-extension (build-path (retic-performance-karst-dir HOME) name) "_untyped.tab"))
+  (if (not (file-exists? python-path))
+    (begin (printf "WARNING: no Python data for benchmark '~a' at location '~a'~n" name python-path)
+           '(1))
+    (with-input-from-file python-path
+      (λ ()
+        (let loop ()
+          (define v (read-line))
+          (if (eof-object? v)
+            '()
+            (let ([n (string->number v)])
+              (if n
+                (cons n (loop))
+                (raise-user-error 'python-data "corrupted data file '~a', please fix" python-path)))))))))
+
 (define (benchmark->exploded bm)
   (define d (benchmark-dir->benchmarks-dir (benchmark-info-src bm)))
   (and (directory-exists? d)
@@ -333,7 +355,11 @@
       (check-equal?
         (benchmark->num-modules bm)
         (length (benchmark-info-module* bm)))
-      (check-pred benchmark->karst-data bm)
+      (check-pred file-exists? (benchmark->karst-data bm))
+      (let ([pd (benchmark->python-data bm)])
+        (check-pred list? pd)
+        (check < 1 (length pd))
+        (check-true (andmap real? pd)))
       (check > (benchmark->sloc bm) small-loc
         (format "expected benchmark '~a' to contain at least ~a LOC" n small-loc))
       ))
