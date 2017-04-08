@@ -29,7 +29,7 @@ class SSHConfig (object):
     SETTINGS_REGEX = r'(\w+)(?:\s*=\s*|\s+)(.+)' #bg: originally a regex, but cannot type those
     _config = []
 
-    def __init__(self):
+    def __init__(self:SSHConfig)->Void:
         """
         Create a new OpenSSH config object.
         """

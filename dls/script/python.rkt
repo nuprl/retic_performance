@@ -23,6 +23,11 @@
      [method* (listof function-info?)])]
    ;; Type information for a Python class
 
+   [struct function-info (
+     [name symbol?]
+     [dom* (listof field-info?)]
+     [cod (or/c string? #f)])]
+
    [struct field-info (
      [name symbol?]
      [type string?])]
@@ -358,6 +363,36 @@
     (for*/set ([d (in-list (python-info->domain* py))]
                [f (in-list d)])
       (field-info-type f))))
+
+;; -----------------------------------------------------------------------------
+;; search
+
+(define (get-method-by-name n ci)
+  (for/first ([fi (in-list (class-info-method* ci))]
+              #:when (eq? n (function-info-name fi)))
+    fi))
+
+(define (get-class-by-name n mi)
+  (for/first ([c (in-list (module-info-class* mi))]
+              #:when (eq? n (class-info-name c)))
+    c))
+
+(define (is-typed-function? m)
+  (and (function-info-cod m)
+       (for/and ([d (in-list (function-info-dom* m))])
+         (field-info-type d))))
+  
+;; =============================================================================
+
+(module+ main
+  (require racket/cmdline)
+  (command-line
+   #:program "rp-python"
+   #:args (PAT)
+   (for ([fn (in-glob PAT)])
+     (define mi (path-string->module-info fn))
+     (when (is-typed-function? (get-method-by-name '__init__ (get-class-by-name 'SSHConfig mi)))
+       (displayln (path-replace-extension (file-name-from-path fn) #""))))))
 
 ;; =============================================================================
 
