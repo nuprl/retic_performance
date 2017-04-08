@@ -1,0 +1,225 @@
+### output when line "AAA" replaced with
+###     check_type_function(check0(1).bar)(a, b, c)
+# Traceback (most recent call last):
+#   File "127.py", line 14, in check0
+#     val.bar
+# AttributeError: 'int' object has no attribute 'bar'
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "127.py", line 190, in <module>
+#     test_calls()
+#   File "127.py", line 165, in test_calls
+#     check_type_function(f.foo)(1, 2, 3, 4)
+#   File "127.py", line 67, in foo
+#     check_type_function(check0(1).bar)(a, b, c) #bg: AAA
+#   File "127.py", line 17, in check0
+#     raise CheckError(val)
+# retic.transient.CheckError: 1
+#
+### output when line "AAA" replaced with:
+###     check_type_function(check0(B()).bar)(a, b, c)
+### for empty class B
+# Traceback (most recent call last):
+#   File "127.py", line 29, in check0
+#     val.bar
+# AttributeError: 'B' object has no attribute 'bar'
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "127.py", line 205, in <module>
+#     test_calls()
+#   File "127.py", line 180, in test_calls
+#     check_type_function(f.foo)(1, 2, 3, 4)
+#   File "127.py", line 82, in foo
+#     check_type_function(check0(B()).bar)(a, b, c) #bg: AAA
+#   File "127.py", line 32, in check0
+#     raise CheckError(val)
+# retic.transient.CheckError: <__main__.B object at 0x7f076655f400>
+
+from retic.runtime import *
+from retic.transient import *
+from retic.typing import *
+
+def check0(val):
+    try:
+        val.bar
+        return val
+    except:
+        raise CheckError(val)
+
+def check1(val):
+    try:
+        val.baz
+        return val
+    except:
+        raise CheckError(val)
+
+def check3(val):
+    try:
+        val.qux
+        return val
+    except:
+        raise CheckError(val)
+
+def check4(val):
+    try:
+        val.baz
+        val.quux
+        val.bar
+        val.foo
+        val.qux
+        return val
+    except:
+        raise CheckError(val)
+
+def check5(val):
+    try:
+        val.__exit__
+        val.__enter__
+        val.print_time
+        return val
+    except:
+        raise CheckError(val)
+
+def check2(val):
+    try:
+        val.quux
+        return val
+    except:
+        raise CheckError(val)
+from Timer import Timer
+
+class B:
+  #bg: new dummy class
+  pass
+
+class Foo(retic_actual(object)):
+
+    def foo(self, a, b, c, d):
+        check_type_function(check0(B()).bar)(a, b, c) #bg: AAA
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+        check_type_function(check0(self).bar)(a, b, c)
+    foo = check_type_function(foo)
+
+    def bar(self, a, b, c):
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+        check_type_function(check1(self).baz)(a, b)
+    bar = check_type_function(bar)
+
+    def baz(self, a, b):
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+        check_type_function(check2(self).quux)(a)
+    baz = check_type_function(baz)
+
+    def quux(self, a):
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+        check_type_function(check3(self).qux)()
+    quux = check_type_function(quux)
+
+    def qux(self):
+        pass
+    qux = check_type_function(qux)
+Foo = check_type_class(Foo, ['baz', 'quux', 'bar', 'foo', 'qux'])
+
+def test_calls():
+    f = check4(Foo())
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    check_type_function(f.foo)(1, 2, 3, 4)
+    return
+test_calls = check_type_function(test_calls)
+if (__name__ == '__main__'):
+    t = check5(Timer())
+    with t:
+        test_calls()
