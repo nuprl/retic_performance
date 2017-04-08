@@ -10,6 +10,7 @@
   ;; (-> (listof benchmark-info?) pict?)
 
   render-static-information
+  render-ratios-table
 )
 
 (require
@@ -28,7 +29,11 @@
     hspace
     bold)
   (only-in racket/list
+    second
+    third
     make-list)
+  (only-in math/statistics
+    mean)
   (only-in racket/math
     exact-floor))
 
@@ -93,6 +98,39 @@
       (python-info->num-functions py)
       (python-info->num-classes py)
       (python-info->num-methods py)))))
+
+(define RATIOS-TITLE*
+  (map bold '("Benchmark" "untyped/python" "typed/untyped")))
+
+(define (render-ratios-table bm*)
+  (define name* (map benchmark->name bm*))
+  (tabular
+    #:sep (hspace 2)
+    #:row-properties '(bottom-border 1)
+    #:column-properties '(left right right)
+    (cons RATIOS-TITLE*
+          (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                         [*current-cache-keys* (list (λ () name*))]
+                         [*with-cache-fasl?* #f])
+            (with-cache (cachefile "ratios-table.rktd")
+              (λ ()
+                (define pi* (map benchmark->performance-info bm*))
+                (append
+                  (map render-ratios-row pi*)
+                  #;(list (render-ratios-average-row pi*)))))))))
+
+(define (render-ratios-row pi)
+  (list (tt (symbol->string (performance-info->name pi)))
+        (rnd (untyped/python-ratio pi))
+        (rnd (typed/retic-ratio pi))))
+
+;; 2.32, 1.59 .... not too interesting, but also AVERAGE is a useless measure
+(define (render-ratios-average-row pi*)
+  (define (render-pi*-mean sel)
+    (bold (rnd (mean (map sel pi*)))))
+  (list (bold "average")
+        (render-pi*-mean untyped/python-ratio)
+        (render-pi*-mean typed/retic-ratio)))
 
 ;; =============================================================================
 

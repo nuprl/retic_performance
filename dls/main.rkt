@@ -129,6 +129,10 @@
   ;; (-> (listof benchmark-info?) table?)
   ;; Build a table of static information about each benchmark
 
+  render-ratios-table
+  ;; (-> (listof benchmark-info?) table?)
+  ;; Build a table of Python/Retic/Typed ratios
+
   sc
   ;; Usage `@sc{some text}`
   ;; Renders `text` in small caps style

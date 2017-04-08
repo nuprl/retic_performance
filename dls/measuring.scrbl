@@ -5,6 +5,10 @@
 
 @section{Results}
 
+@figure["fig:ratio" "Performance ratios"
+  @render-ratios-table[ALL-BENCHMARKS]
+]
+
 @figure*["fig:overhead" "Proportion of D-deliverable configurations"
   @render-overhead-plot*[ALL-BENCHMARKS]
 ]

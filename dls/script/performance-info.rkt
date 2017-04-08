@@ -77,7 +77,7 @@
    [typed/retic-ratio
     (-> performance-info? real?)]
    ;; Returns the overhead of the fully-typed configuration in `p`
-   ;;  relative to the untyped configuration
+   ;;  relative to the untyped configuration (aka typed/untyped-ratio)
 
    [untyped/python-ratio
     (-> performance-info? real?)]
@@ -403,6 +403,9 @@
   (printf "- Python  time : ~a~n" (performance-info-python-runtime pf))
   (printf "- untyped time : ~a~n" (performance-info-untyped-runtime pf))
   (printf "- typed time   : ~a~n" (performance-info-typed-runtime pf))
+  (printf "- untyped/python : ~a~n" (untyped/python-ratio pf))
+  (printf "- typed/untyped : ~a~n" (typed/retic-ratio pf))
+  (printf "- typed/python : ~a~n" (typed/python-ratio pf))
   (printf "- min overhead : ~a~n" (min-overhead pf))
   (printf "- max overhead : ~a~n" (max-overhead pf))
   (printf "- avg overhead : ~a~n" (mean-overhead pf))
