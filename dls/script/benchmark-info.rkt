@@ -96,30 +96,30 @@
 (define HOME (retic-performance-home-dir))
 
 (define DLS-2014-BENCHMARK-NAMES '(
-  futen ;; TODO from where?
-  http2 ;; TODO from where?
+  futen
+  http2
   slowSHA
 ))
 (define POPL-2017-BENCHMARK-NAMES '(
   call_method
   call_method_slots
   call_simple
-;  chaos
+  chaos
   fannkuch
   float
   go
   meteor
   nbody
   nqueens
-;  pidigits
-;  pystone
+  pidigits
+  pystone
   spectralnorm
 ))
 (define DLS-2017-BENCHMARK-NAMES '(
   Espionage
 ;  Evolution
 ;  sample_fsm_python
-  PythonFlow ;; TODO where did this come from? ... maybe https://github.com/masphei/PythonFlow ???
+  PythonFlow
   take5
 ))
 
