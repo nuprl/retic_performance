@@ -1927,12 +1927,9 @@
     ;#:url "http://dx.doi.org/10.1007/978-3-662-44202-9_11"
     #:date 2014))
 
-
-(define dls-2014
+(define vss-popl-2017
   (make-bib
-    #:title "Design and Evaluation of Gradual Typing for Python"
-    #:author (authors "Michael M. Vitousek" "Andrew M. Kent" "Jeremy G. Siek" "Jim Baker")
-    #:location (proceedings-location ecoop #:pages '(257 281))
-    ;#:url "http://homes.soic.indiana.edu/mvitouse/papers/dls14.pdf"
-    #:date 2014))
-
+    #:title "Big Types in Little Runtime: Open-World Soundness and Collaborative Blame for Gradual Type Systems"
+    #:author (authors "Michael M. Vitousek" "Cameron Swords" "Jeremy G. Siek")
+    #:location (proceedings-location popl #:pages '(762 774))
+    #:date 2017))

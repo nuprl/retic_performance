@@ -65,6 +65,10 @@
     [count-zero-bits
      (-> string? exact-nonnegative-integer?)]
 
+    [integer->word
+     (->* [integer?] [#:title? any/c] string?)]
+    ;; Convert an arabic digit (0-9) to an English word
+
 ))
 
 (require
@@ -191,6 +195,33 @@
   (for/sum ([c (in-string str)]
             #:when (eq? c #\0))
     1))
+
+(define (integer->word i #:title? [title? #f])
+  (define str (string-append (if (negative? i) "negative " "")
+    (case (abs i)
+     [(0) "zero"]
+     [(1) "one"]
+     [(2) "two"]
+     [(3) "three"]
+     [(4) "four"]
+     [(5) "five"]
+     [(6) "six"]
+     [(7) "seven"]
+     [(8) "eight"]
+     [(9) "nine"]
+     [(10) "ten"]
+     [(11) "eleven"]
+     [(12) "twelve"]
+     [(13) "thirteen"]
+     [(14) "fourteen"]
+     [(15) "fifteen"]
+     [(16) "sixteen"]
+     [(17) "seventeen"]
+     [(18) "eighteen"]
+     [(19) "nineteen"]
+     [(20) "twenty"]
+     [else (raise-argument-error 'integer->word "integer less than 20" i)])))
+  (if title? (string-titlecase str) str))
 
 ;; =============================================================================
 
