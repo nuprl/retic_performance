@@ -4,6 +4,9 @@
 
 (require racket/contract)
 (provide
+  DLS-2014-BENCHMARK-NAMES
+  POPL-2017-BENCHMARK-NAMES
+  DLS-2017-BENCHMARK-NAMES
   (contract-out
     [benchmark-info?
      (-> any/c boolean?)]
@@ -118,7 +121,7 @@
 (define DLS-2017-BENCHMARK-NAMES '(
   Espionage
 ;  Evolution
-;  sample_fsm_python
+;  sample_fsm
   PythonFlow
   take5
 ))

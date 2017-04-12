@@ -25,6 +25,11 @@
   generate-bibliography
   bm-desc
 
+  DLS-2014-BENCHMARK-NAMES
+  POPL-2017-BENCHMARK-NAMES
+  DLS-2017-BENCHMARK-NAMES
+  ;; (listof symbol?)
+
   (rename-out
    [acmart:#%module-begin #%module-begin]
 
@@ -85,6 +90,11 @@
   ;; Usage: `@id[foo]`
   ;;  where `foo` is a Racket identifier.
   ;; Renders the display-mode form of the value of `foo`
+
+  integer->word
+  ;; (->* [integer?] [#:title? any/c] string?)
+  ;; Coverts a small number into a string.
+  ;; Capitalizes the string when `#:title?` is non-#f
 
   note
   ;; Usage: `@note{some text}`
@@ -153,6 +163,7 @@
   "script/config.rkt"
   "script/benchmark-info.rkt"
   "script/render.rkt"
+  "script/util.rkt"
   (only-in racket/class
     class new super-new object% define/public)
   racket/format
