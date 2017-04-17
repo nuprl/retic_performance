@@ -25,6 +25,11 @@
   generate-bibliography
   bm-desc
 
+  lib-desc
+  ;; (->* [string?] [#:rest pre-content?] pre-content?)
+  ;; @lib-desc[lib-name]{descr}
+  ;; Render a description of a Python library used by one of the benchmarks
+
   DLS-2014-BENCHMARK-NAMES
   POPL-2017-BENCHMARK-NAMES
   DLS-2017-BENCHMARK-NAMES
@@ -277,9 +282,15 @@
   (elem (exact "section~")
         (secref section-name)))
 	
-(define (bm-desc title author [url ""] . descr)
+(define (bm-desc title author [url ""] [lib '()] . descr)
    (elem
      (parag title)  (smaller "from " author)
      (linebreak)
      ;ignore URL
+     ;ignore library descriptions, has type (or/c lib-desc? (listof lib-desc))
      descr))
+
+(define (lib-desc name . descr)
+  (void)
+  #;(apply elem (tt name) descr))
+
