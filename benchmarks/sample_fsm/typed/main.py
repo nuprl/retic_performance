@@ -1,5 +1,3 @@
-import os, sys
-
 from Timer import Timer
 from Population import Population
 from Utilities import relative_average

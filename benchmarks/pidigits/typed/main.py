@@ -11,7 +11,7 @@ bg
 - increased NDIGITS to `5000`
 """
 
-import itertools
+#import itertools
 
 NDIGITS = 5000
 

@@ -3,7 +3,7 @@ from Automata import Automaton
 from random import randrange
 from retic import Int
 
-import os, sys, itertools
+import os, itertools
 fname = os.path.join(os.path.dirname(__file__), "automata-random-numbers.txt")
 #TODO: Cannot type variable in retic
 rand_num = itertools.cycle((int(line.strip()) for line in open(fname, "r")))
