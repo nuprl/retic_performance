@@ -611,8 +611,8 @@ def get_all_files(dir_path):
 def gen_untyped(d, u_dir):
   both_dir = "%s/%s" % (d, BOTH)
   if os.path.exists(both_dir):
-    for fn in glob.glob("%s/*.py" % both_dir):
-      shutil.copyfile(fn, "%s/%s.py" % (u_dir, file_name(fn)))
+    for fn in glob.glob("%s/*.*" % both_dir):
+      shutil.copyfile(fn, "%s/%s" % (u_dir, os.path.basename(fn)))
   dir_path = "%s/%s" % (d, TYPED)
   all_files = get_all_files(dir_path)
   parsed = [parse_ast(os.path.join(dir_path, f))
