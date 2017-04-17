@@ -281,13 +281,13 @@
 (define (section-ref section-name)
   (elem (exact "section~")
         (secref section-name)))
-	
-(define (bm-desc title author [url ""] [lib '()] . descr)
+
+(define (bm-desc title author url lib . descr)
    (elem
      (parag title)  (smaller "from " author)
      (linebreak)
-     ;ignore URL
-     ;ignore library descriptions, has type (or/c lib-desc? (listof lib-desc))
+     ;ignore `url`
+     ;ignore `lib` descriptions, has type (or/c lib-desc? (listof lib-desc))
      descr))
 
 (define (lib-desc name . descr)
