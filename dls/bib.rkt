@@ -1933,3 +1933,21 @@
     #:author (authors "Michael M. Vitousek" "Cameron Swords" "Jeremy G. Siek")
     #:location (proceedings-location popl #:pages '(762 774))
     #:date 2017))
+
+(define ar-lp-1994
+  (make-bib
+    #:title "Performing Lisp analysis of the FANNKUCH benchmark"
+    #:author (authors "Kenneth R. Anderson" "Duane Rettig")
+    #:location (journal-location "ACM SIGPLAN Lisp Pointers"
+                                 #:volume 7
+                                 #:number 4
+                                 #:pages '(2 12))
+    #:date 1994))
+
+(define n-mthesis-2014
+  (make-bib
+   #:title "Tough Behavior in Repeated Bargaining game, A Computer Simulation Study"
+   #:author "Linh Chi Nguyen"
+   #:location (dissertation-location #:institution "University of Trento" #:degree "Master in Economics")
+   #:date 2014))
+

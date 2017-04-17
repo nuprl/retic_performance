@@ -18,153 +18,188 @@ Broadly speaking, the benchmark programs come from three sources:
   @integer->word[(length POPL-2017-BENCHMARK-NAMES)] benchmarks are from
    the recent evaluation of Transient Reticulated@~cite[vss-popl-2017] on
    microbenchmarks from the Python Performance Benchmark
-   Suite;@note{@url{https://github.com/python/performance}}
+   Suite;@note{@url{https://github.com/python/performance}} and
 }
 @item{
-  and the remaining @integer->word[(length DLS-2017-BENCHMARK-NAMES)] benchmarks
+  the remaining @integer->word[(length DLS-2017-BENCHMARK-NAMES)] benchmarks
   are open source programs converted to Reticulated by the second author.
 }
 ]
 
 The following summaries of the benchmark programs are sorted by their original
- source.
+source.
 The summaries also credit the original authors of each program and note
- whether each benchmark contains untyped modules.
+whether each benchmark contains untyped modules.
 
 @bm-desc["futen"
 @hyperlink["http://blog.amedama.jp/"]{@tt{momijiame}}
-@url{https://github.com/momijiame/futen}]{
-Generates an @hyperlink["https://www.ansible.com/"]{@tt{ansiable}} inventory
- file from an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
- file.
+@url{https://github.com/momijiame/futen}
+@list[
+  @lib-desc["os"]{Path split, path join, path expand, getenv}
+  @lib-desc["fnmatch"]{Filename matching}
+  @lib-desc["re"]{One regular expression match}
+  @lib-desc["shlex"]{Split host names from an input string}
+  @lib-desc["socket"]{Basic socket operations}
+]]{
+  Generates an @hyperlink["https://www.ansible.com/"]{@tt{ansiable}} inventory
+  file from an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
+  file.
 }
 
 @bm-desc["http2"
-""
-""]{
+@hyperlink["https://github.com/httplib2/httplib2"]{Joe Gregorio}
+@url{https://github.com/httplib2/httplib2}
+@lib-desc["urllib"]{To split an IRI into components}
+]{
+  Converts a collection of Internationalized Resource Identifiers
+  (@hyperlink["https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier"]{IRIs})
+  to equivalent @hyperlink["http://www.asciitable.com/"]{ASCII} resource
+  identifiers.
 }
 
 @bm-desc["slowSHA"
 "Stefano Palazzo"
-@url{http://github.com/sfstpala/SlowSHA}]{
-Computes SHA-1 and SHA-512 @TODO{double-check} for a sequence of English words.
+@url{http://github.com/sfstpala/SlowSHA}
+@lib-desc["os"]{path split}
+]{
+  Computes SHA-1 and SHA-512 digests for a sequence of English words.
 }
 
 @bm-desc["call_method"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-A Microbenchmark for evaluating the overhead of function calls. It consists of
-@${32*10^5} calls to trivial functions. The calls do not use varargs or kwargs,
-and do not use tuple unpacking.
+  Benchmarks the overhead of method calls; the calls do not use argument lists,
+  keyword arguments, or tuple unpacking.
+  @; Consists of @${32*10^5} calls to trivial functions.
 }
 
 @bm-desc["call_method_slots"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-A Microbenchmark for measuring the overhead of function calls  that that define
-__slots__ and that have no __dict__ attribute. The calls do not use varargs or
-kwargs, and do not use tuple unpacking.  When an object has no __dict__
-attribute, the JIT can optimize away most of the attribute lookup. This
-benchmark measures this optimization.
+  Benchmarks the overhead of method calls on objects that declare their
+  members.@note{Via the @hyperlink["https://docs.python.org/3/reference/datamodel.html"]{@tt{__slots__}}
+  attribute.}
 }
 
 @bm-desc["call_method_simple"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-@TODO{describe me!}
+  Benchmarks the overhead of function calls.
+  Similar to @tt{call_method}, but using functions rather than methods.
 }
 
 @bm-desc["chaos"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-Creates chaosgame-like fractals.
+@url{https://github.com/python/performance}
+@list[
+@lib-desc["math"]{Square root}
+@lib-desc["random"]{randrange}
+]]{
+  Creates fractals using the @hyperlink["https://en.wikipedia.org/wiki/Chaos_game"]{@emph{chaos game}} method.
 }
 
 @bm-desc["Fannkuch"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Python adaptation of Anderson and Rettig's microbenchmark.
+  Implements Anderson and Rettig's microbenchmark@~cite[ar-lp-1994].
 }
 
 @bm-desc["float"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-Generates and normalizes a list of points then maximizes them.
+@url{https://github.com/python/performance}
+@lib-desc["math"]{Sin, Cos, Sqrt}]{
+  Stress test for floating-point operations.
 }
 
 @bm-desc["go"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-Refactored benchmark into three files and only Squares.py because the number of
-functions in the benchmark was too large.
+@url{https://github.com/python/performance}
+@list[
+  @lib-desc["math"]{sqrt log}
+  @lib-desc["random"]{randrange random}
+]]{
+  Implements a simple AI for playing @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{go}.
+  This benchmark is split across three files: a typed module that implements
+  the game board, an untyped module that defines constants, and an untyped module
+  that implements the AI and drives the benchmark.
 }
 
 @bm-desc["meteor"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Implements a solution to the Meteor puzzle.
+  A solver for the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html#meteor}}
 }
 
 @bm-desc["nbody"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Model the orbits of Jovian planets, using the same simple symplectic-integrator.
+  Models the orbits of the @hyperlink["https://en.wikipedia.org/wiki/Giant_planet"]{Jovian planets}.
 }
 
 @bm-desc["nqueens"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-A simple brute-force N-Queens solver.
+  A brute-force solver for the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{N queens} problem.
 }
 
 @bm-desc["pidigits"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Computes some of the digits of π to stress big integer arithmetic.
+  Stress test for big-integer arithmetic.
 }
 
 @bm-desc["pystone"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Computes some of the digits of π to stress big integer arithmetic.
+  Python adaptation of Weicker's @emph{Dhrystone} benchmark.@note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
 }
 
 @bm-desc["spectralnorm"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}]{
-Computes the spectral norm of a matrix.
+  Computes the largest singular value of an infinite matrix.
 }
 
 @bm-desc["Espionage"
 "Zeina Migeed"
-""]{
-Finds the minimum spanning tree of a graph using Kruskal's algorithm.
+""
+@lib-desc["operator"]{itemgetter}]{
+  Finds the minimum spanning tree of a graph using Kruskal's algorithm.
 }
 
 @bm-desc["Evolution"
-"Maha Elkhairy & Kevin McDonough &  Zeina Migeed"
+"Maha Elkhairy, Kevin McDonough, and Zeina Migeed"
 ""]{
-Simulates an Evolution game.
-Since the number of functions in this benchmark was too large, we annotated
-three files which represent all card plays a player can make during a turn.
+  Implements a card game.
+  This benchmark tests the performance impact of gradual typing on the files
+  that represent possible card plays that a player can make.
+  The other 40 files in the original program are untyped in all configurations.
 }
 
 @bm-desc["sample_fsm"
 "Linh Chi Nguyen"
-@url{https://github.com/ayaderaghul/sample-fsm}]{
-Originally written in Racket and ported to Reticulated Python.
-Represents how individuals interact with each other in a population.
+@url{https://github.com/ayaderaghul/sample-fsm}
+@list[
+  @lib-desc["itertools"]{cycles}
+  @lib-desc["os"]{path split}
+  @lib-desc["random"]{random randrange}
+]]{
+  Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
+  This benchmark is adapted from a similar Racket program.
 }
 
 @bm-desc["PythonFlow"
 "Alfian Ramadhan"
-@url{https://github.com/masphei/PythonFlow}]{
-Implements Ford-Fulkerson's Algorithm for finding the maximum flow of a graph.
+@url{https://github.com/masphei/PythonFlow}
+@lib-desc["os"]{path join}]{
+  Implements the Ford-Fulkerson max flow algorithm.
 }
 
 @bm-desc["take5"
 "Maha Elkhairy & Zeina Migeed"
 ""]{
-Simulates a Take5 game.
-The benchmark runs 500 consecutive  simulations of the game.
+  Implements a card game.
+  @;The benchmark runs 500 consecutive  simulations of the game.
 }
+
+@; TODO double-check num iterations on all benchmarks
