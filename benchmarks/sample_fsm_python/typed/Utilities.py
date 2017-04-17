@@ -1,5 +1,5 @@
 from retic import List, Float, Int
-import os, sys, itertools
+import os, itertools
 fname = os.path.join(os.path.dirname(__file__), "util-random-numbers.txt")
 #TODO: Cannot type variable in retic
 rand_num = itertools.cycle((float(line.strip()) for line in open(fname, "r")))

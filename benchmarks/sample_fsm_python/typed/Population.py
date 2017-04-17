@@ -4,7 +4,7 @@ from Utilities import choose_randomly
 from Automata import Automaton
 from copy import copy
 
-import os, sys, itertools
+import os, itertools
 from retic import fields
 fname = os.path.join(os.path.dirname(__file__), "population-random-numbers.txt")
 #TODO: Cannot type variable in retic

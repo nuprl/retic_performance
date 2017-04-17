@@ -6,7 +6,7 @@
 
 """
 
-import timeit, os
+import os
 from Timer import Timer
 from retic import fields, Void, String, Int, List
 

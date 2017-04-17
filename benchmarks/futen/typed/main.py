@@ -1,5 +1,6 @@
 from os import path
-from collections import namedtuple
+#import argparse
+#from collections import namedtuple
 from futen import get_netlocs, execute
 from Timer import Timer
 from retic import Int
