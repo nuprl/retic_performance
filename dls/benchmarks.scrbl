@@ -67,25 +67,28 @@ whether each benchmark contains untyped modules.
 
 @bm-desc["call_method"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-  Benchmarks the overhead of method calls; the calls do not use argument lists,
+@url{https://github.com/python/performance}
+@list[]]{
+  Stress test for method calls; the calls do not use argument lists,
   keyword arguments, or tuple unpacking.
   @; Consists of @${32*10^5} calls to trivial functions.
 }
 
 @bm-desc["call_method_slots"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-  Benchmarks the overhead of method calls on objects that declare their
+@url{https://github.com/python/performance}
+@list[]]{
+  Stress test for method calls on objects that declare their
   members.@note{Via the @hyperlink["https://docs.python.org/3/reference/datamodel.html"]{@tt{__slots__}}
   attribute.}
 }
 
 @bm-desc["call_method_simple"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
-  Benchmarks the overhead of function calls.
-  Similar to @tt{call_method}, but using functions rather than methods.
+@url{https://github.com/python/performance}
+@list[]]{
+  Stress test for function calls.
+  This benchmark is similar to @tt{call_method}, but using functions rather than methods.
 }
 
 @bm-desc["chaos"
@@ -98,9 +101,10 @@ whether each benchmark contains untyped modules.
   Creates fractals using the @hyperlink["https://en.wikipedia.org/wiki/Chaos_game"]{@emph{chaos game}} method.
 }
 
-@bm-desc["Fannkuch"
+@bm-desc["fannkuch"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   Implements Anderson and Rettig's microbenchmark@~cite[ar-lp-1994].
 }
 
@@ -126,37 +130,43 @@ whether each benchmark contains untyped modules.
 
 @bm-desc["meteor"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   A solver for the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html#meteor}}
 }
 
 @bm-desc["nbody"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   Models the orbits of the @hyperlink["https://en.wikipedia.org/wiki/Giant_planet"]{Jovian planets}.
 }
 
 @bm-desc["nqueens"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   A brute-force solver for the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{N queens} problem.
 }
 
 @bm-desc["pidigits"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   Stress test for big-integer arithmetic.
 }
 
 @bm-desc["pystone"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   Python adaptation of Weicker's @emph{Dhrystone} benchmark.@note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
 }
 
 @bm-desc["spectralnorm"
 "The Python Benchmark Suite"
-@url{https://github.com/python/performance}]{
+@url{https://github.com/python/performance}
+@list[]]{
   Computes the largest singular value of an infinite matrix.
 }
 
@@ -164,16 +174,18 @@ whether each benchmark contains untyped modules.
 "Zeina Migeed"
 ""
 @lib-desc["operator"]{itemgetter}]{
-  Finds the minimum spanning tree of a graph using Kruskal's algorithm.
+  Implements and tests Kruskal's algorithm.
 }
 
 @bm-desc["Evolution"
 "Maha Elkhairy, Kevin McDonough, and Zeina Migeed"
-""]{
+""
+@list[]]{
   Implements a card game.
   This benchmark tests the performance impact of gradual typing on the files
   that represent possible card plays that a player can make.
-  The other 40 files in the original program are untyped in all configurations.
+  The other 40 files in the original program remain untyped throughout the
+  experiment.
 }
 
 @bm-desc["sample_fsm"
@@ -197,7 +209,8 @@ whether each benchmark contains untyped modules.
 
 @bm-desc["take5"
 "Maha Elkhairy & Zeina Migeed"
-""]{
+""
+@list[]]{
   Implements a card game.
   @;The benchmark runs 500 consecutive  simulations of the game.
 }
