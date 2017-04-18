@@ -1,8 +1,6 @@
 #lang gm-dls-2017
 @title[#:tag "sec:benchmarks"]{Benchmarks}
 
-@(define (TODO . arg*) (bold (cons "TODO" arg*))) @; delete this!
-
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[ALL-BENCHMARKS]]
 
@@ -44,6 +42,7 @@ whether each benchmark contains untyped modules.
   Generates an @hyperlink["https://www.ansible.com/"]{@tt{ansiable}} inventory
   file from an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
   file.
+  @; 1900 iterations
 }
 
 @bm-desc["http2"
@@ -55,6 +54,7 @@ whether each benchmark contains untyped modules.
   (@hyperlink["https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier"]{IRIs})
   to equivalent @hyperlink["http://www.asciitable.com/"]{ASCII} resource
   identifiers.
+  @; 10 iterations
 }
 
 @bm-desc["slowSHA"
@@ -63,6 +63,7 @@ whether each benchmark contains untyped modules.
 @lib-desc["os"]{path split}
 ]{
   Computes SHA-1 and SHA-512 digests for a sequence of English words.
+  @; 1 iteration
 }
 
 @bm-desc["call_method"
@@ -72,15 +73,15 @@ whether each benchmark contains untyped modules.
   Stress test for method calls; the calls do not use argument lists,
   keyword arguments, or tuple unpacking.
   @; Consists of @${32*10^5} calls to trivial functions.
+  @; 1 iteration
 }
 
 @bm-desc["call_method_slots"
 "The Python Benchmark Suite"
 @url{https://github.com/python/performance}
 @list[]]{
-  Stress test for method calls on objects that declare their
-  members.@note{Via the @hyperlink["https://docs.python.org/3/reference/datamodel.html"]{@tt{__slots__}}
-  attribute.}
+  Stresses calls to methods that have been declared through an object's @tt{__slots__} attribute.
+  @; 1 iteration
 }
 
 @bm-desc["call_method_simple"
@@ -99,6 +100,7 @@ whether each benchmark contains untyped modules.
 @lib-desc["random"]{randrange}
 ]]{
   Creates fractals using the @hyperlink["https://en.wikipedia.org/wiki/Chaos_game"]{@emph{chaos game}} method.
+  @; 1 iteration
 }
 
 @bm-desc["fannkuch"
@@ -106,6 +108,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   Implements Anderson and Rettig's microbenchmark@~cite[ar-lp-1994].
+  @; 1 iteration
 }
 
 @bm-desc["float"
@@ -113,6 +116,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @lib-desc["math"]{Sin, Cos, Sqrt}]{
   Stress test for floating-point operations.
+  @; 1 iteration (200,000 points)
 }
 
 @bm-desc["go"
@@ -126,6 +130,7 @@ whether each benchmark contains untyped modules.
   This benchmark is split across three files: a typed module that implements
   the game board, an untyped module that defines constants, and an untyped module
   that implements the AI and drives the benchmark.
+  @; 2 iterations
 }
 
 @bm-desc["meteor"
@@ -133,6 +138,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   A solver for the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html#meteor}}
+  @; 1 iterations (finds at most 6,000 solutions)
 }
 
 @bm-desc["nbody"
@@ -140,6 +146,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   Models the orbits of the @hyperlink["https://en.wikipedia.org/wiki/Giant_planet"]{Jovian planets}.
+  @; 1 iteration
 }
 
 @bm-desc["nqueens"
@@ -147,6 +154,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   A brute-force solver for the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{N queens} problem.
+  @; 10 iterations
 }
 
 @bm-desc["pidigits"
@@ -154,6 +162,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   Stress test for big-integer arithmetic.
+  @; 1 iteration (5,000 digits)
 }
 
 @bm-desc["pystone"
@@ -161,6 +170,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   Python adaptation of Weicker's @emph{Dhrystone} benchmark.@note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
+  @; 50,000 iterations
 }
 
 @bm-desc["spectralnorm"
@@ -168,6 +178,7 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/python/performance}
 @list[]]{
   Computes the largest singular value of an infinite matrix.
+  @; 10 iterations
 }
 
 @bm-desc["Espionage"
@@ -175,6 +186,7 @@ whether each benchmark contains untyped modules.
 ""
 @lib-desc["operator"]{itemgetter}]{
   Implements and tests Kruskal's algorithm.
+  @; 1 iteration
 }
 
 @bm-desc["Evolution"
@@ -184,8 +196,9 @@ whether each benchmark contains untyped modules.
   Implements a card game.
   This benchmark tests the performance impact of gradual typing on the files
   that represent possible card plays that a player can make.
-  The other 40 files in the original program remain untyped throughout the
+  The program includes 40 other files; these remain untyped throughout the
   experiment.
+  @; 20 iterations
 }
 
 @bm-desc["sample_fsm"
@@ -198,6 +211,7 @@ whether each benchmark contains untyped modules.
 ]]{
   Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
   This benchmark is adapted from a similar Racket program.
+  @; 100 iterations
 }
 
 @bm-desc["PythonFlow"
@@ -205,14 +219,14 @@ whether each benchmark contains untyped modules.
 @url{https://github.com/masphei/PythonFlow}
 @lib-desc["os"]{path join}]{
   Implements the Ford-Fulkerson max flow algorithm.
+  @; 1 iteration
 }
 
 @bm-desc["take5"
 "Maha Elkhairy & Zeina Migeed"
 ""
 @list[]]{
-  Implements a card game.
-  @;The benchmark runs 500 consecutive  simulations of the game.
+  Implements a card game and a simple player AI.
+  @; 500 iterations
 }
 
-@; TODO double-check num iterations on all benchmarks
