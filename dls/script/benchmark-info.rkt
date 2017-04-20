@@ -336,12 +336,19 @@
 ;; =============================================================================
 
 (module+ main
-  (require racket/cmdline)
+  (require racket/cmdline "python.rkt")
   (command-line
     #:program "rp-info"
     #:args benchmark-name*
     (for ([n (in-list benchmark-name*)])
-      (printf "~a : ~a configs~n" n (benchmark->num-configurations (->benchmark-info n))))))
+      (define bm (->benchmark-info n))
+      (define py (benchmark-info->python-info bm))
+      (printf "~a : ~a configs~n" n (benchmark->num-configurations bm))
+      (printf "  max cfg : ~a~n" (benchmark->max-configuration bm))
+      (printf "  #modules : ~a~n" (python-info->num-modules py))
+      (printf "  #functions : ~a~n" (python-info->num-functions py))
+      (printf "  #classes : ~a~n" (python-info->num-classes py))
+      (printf "  #methods : ~a~n" (python-info->num-methods py)))))
 
 ;; =============================================================================
 
