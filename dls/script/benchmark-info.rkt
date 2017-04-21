@@ -66,6 +66,10 @@
     ;; True if first argument is lexicographically less than the second,
     ;;  assumes arguments of equal length
 
+    [string->configuration
+     (-> string? configuration?)]
+    ;; Parse a configuration from a string
+
     [configuration->string
      (-> configuration? string?)]
     ;; Render a configuration as a string, e.g., 0-0-7
@@ -90,6 +94,7 @@
     file-name-from-path)
   (only-in racket/string
     string-join
+    string-split
     string-contains?)
   (only-in racket/format
     ~a))
@@ -266,6 +271,9 @@
 (define (configuration->string cfg)
   (string-join (map number->string cfg) "-"))
 
+(define (string->configuration cfg-str)
+  (map string->number (string-split cfg-str "-")))
+
 (define (configuration->natural bm cfg)
   (define mc0 (benchmark->max-configuration bm))
   (define-values [mc-rev cfg-rev]
@@ -421,15 +429,6 @@
      ['(5 2 4) '(3 3 9)
       ==> #f]))
 
-  (test-case "configuration->string"
-    (check-apply* configuration->string
-     ['()
-      ==> ""]
-     ['(3)
-      ==> "3"]
-     ['(1 2 3)
-      ==> "1-2-3"]))
-
   (test-case "natural<->configuration"
     (define (check-natural<->configuration bm-name in/out* err-nat* err-cfg*)
       (define bm (->benchmark-info bm-name))
@@ -499,5 +498,27 @@
       (void))
 
     (for-each check-python-info (all-benchmarks)))
+
+  (test-case "string<->configuration"
+    (define (check-string<->configuration cfg str)
+      (define cfg+ (string->configuration str))
+      (define str+ (configuration->string cfg))
+      (check-equal? str+ str)
+      (check-equal? cfg+ cfg)
+      (check-equal? (configuration->string cfg+) str)
+      (check-equal? (string->configuration str+) cfg+))
+
+    (check-string<->configuration '(0 0) "0-0")
+    (check-string<->configuration '(1 22 333) "1-22-333")
+    (check-string<->configuration '() "")
+    (check-string<->configuration '(3) "3")
+    (check-string<->configuration '(1 2 3) "1-2-3")
+
+    (check-exn exn:fail:contract?
+      (λ () (string->configuration "1-2-four")))
+    (check-exn exn:fail:contract?
+      (λ () (configuration->string '(A 2 3))))
+    (check-exn exn:fail:contract?
+      (λ () (string->configuration ""))))
 
 )

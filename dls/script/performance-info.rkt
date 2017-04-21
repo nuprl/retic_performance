@@ -107,7 +107,6 @@
     (-> performance-info? path-string? performance-info?)]
 
   )
-  string->configuration
   performance-info-src
   line->configuration-string
 
@@ -136,7 +135,6 @@
   (only-in math/statistics
     mean)
   (only-in racket/string
-    string-split
     string-replace))
 
 ;; =============================================================================
@@ -267,12 +265,6 @@
 (define/contract (parse-line str)
   (-> string? (list/c string? string? string?))
   (tab-split str))
-
-;; string->configuration : String -> (Listof Natural)
-;; Parse a string like `0-0-3` into a list of numbers `'(0 0 3)`
-(define/contract (string->configuration cfg-str)
-  (-> string? configuration?)
-  (map string->number (string-split cfg-str "-")))
 
 (define/contract (string->num-types t-str)
   (-> string? natural?)
@@ -557,18 +549,6 @@
       (list "0-0" "4" "[1, 2, 2, 3]"))
     (check-exn exn:fail:contract?
       (λ () (parse-line ""))))
-
-  (test-case "string->configuration"
-    (check-equal?
-      (string->configuration "0-0")
-      '(0 0))
-    (check-equal?
-      (string->configuration "1-22-333")
-      '(1 22 333))
-    (check-exn exn:fail:contract?
-      (λ () (string->configuration "1-2-four")))
-    (check-exn exn:fail:contract?
-      (λ () (string->configuration ""))))
 
   (test-case "string->num-types"
     (check-equal?

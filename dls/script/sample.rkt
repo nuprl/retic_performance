@@ -50,85 +50,63 @@
   (ensure-directory dirname)
   dirname)
 
-(define (make-sample-index** population-size sample-size trials)
-  (for/list ([_i (in-range trials)])
-    (let loop ([acc (set)])
-      (if (= sample-size (set-count acc))
-        acc
-        (loop (set-add acc (random population-size)))))))
+(define big-random
+  (let ([LIMIT 4294967087])
+    (lambda (k)
+      (if (<= k LIMIT)
+        (random k)
+        (let* ([p0 (/ LIMIT k)] ;; probability of choosing a bin with LIMIT items
+               [bin+prob*
+                ;; split big number into chunks we can draw from,
+                ;;  save "probability of picking from this bin" with each ... sort of
+                (let loop ([num-left k] [i 1])
+                  (if (<= num-left LIMIT)
+                    (list (cons num-left 1))
+                    (cons (cons LIMIT (* i p0)) (loop (- num-left LIMIT) (add1 i)))))]
+               ;;[_v (printf "bins ~a~n" (for/list ([x (in-list bin+prob*)]) (cons (car x) (exact->inexact (cdr x)))))]
+               [r (random)])
+          (for/first ([bp (in-list bin+prob*)]
+                      #:when (<= r (cdr bp)))
+            (car bp)))))))
 
 (define (num-configurations->sample-size nc rate)
   (let ([nm (log2 nc)])
     (* rate nm)))
 
-(define (performance-info->sample* pi rate trials)
-  (define nc (num-configurations pi))
-  (define sample-size (num-configurations->sample-size nc rate))
-  (define index-to-sample*
-    (make-sample-index** nc sample-size trials))
-  (with-input-from-file (performance-info-src pi)
-    (lambda ()
-      (for/fold ([c** (make-list trials '())])
-                ([ln (in-lines)]
-                 [i (in-naturals)])
-        (if (for/or ([i* (in-list index-to-sample*)])
-              (set-member? i* i))
-          (let ([cfg (line->configuration-string ln)])
-            (for/list ([c* (in-list c**)]
-                       [i* (in-list index-to-sample*)])
-              (if (set-member? i* i)
-                (cons cfg c*)
-                c*)))
-          c**)))))
-
-(define (benchmark-info->sample* bm sample-rate num-trials)
+(define (benchmark-info->sampler bm)
   (define nc (benchmark->num-configurations bm))
-  (define sample-size (num-configurations->sample-size nc sample-rate))
-  (define index-to-sample*
-    (make-sample-index** nc sample-size num-trials))
-  (for/list ([i* (in-list index-to-sample*)])
-    (for/list ([i (in-set i*)])
-      (configuration->string (natural->configuration bm i)))))
+  (λ ()
+    (configuration->string (natural->configuration bm (big-random nc)))))
 
+(define (max-configuration->sampler cfg)
+  (λ ()
+    (configuration->string
+      (for/list ([mx (in-list cfg)])
+        (random mx)))))
+
+;; 2017-04-21:
+;; The old algorithm for picking samples was:
+;; -- count num. configurations
+;; -- pick random natural numbers
+;; -- convert chosen naturals to configurations
+;; This algorithm is too slow on large benchmarks. New algorithm:
+;; -- get max configuration
+;; -- for all digits in configuration, pick random digit in range
+;; More direct, should scale the same way saving configurations on disk scales.
 (define (generate-samples bm-name)
   (define bm (->benchmark-info bm-name))
-  (define sample*
-    (cond
-     [(benchmark->karst-data bm)
-      (let ([pi (benchmark->performance-info bm)])
-        (performance-info->sample* pi (*sample-rate*) (*num-trials*)))]
-     [else
-      (benchmark-info->sample* bm (*sample-rate*) (*num-trials*))]))
+  (define random-configuration ;; (-> String)
+    (max-configuration->sampler (benchmark->max-configuration bm)))
   (define o (get-output-directory bm-name))
+  (define sample-size
+    (num-configurations->sample-size (benchmark->num-configurations bm) (*sample-rate*)))
   (debug "Storing output in ~a/" o)
-  (for ([s (in-list sample*)]
-        [i (in-naturals)])
+  (for ([i (in-range (*num-trials*))])
     (with-output-to-file (build-path o (format "samples.txt~a" i))
       #:exists 'replace
       (lambda ()
-        (for-each displayln  s)))))
-
-;; =============================================================================
-
-(module+ main
-  (require racket/cmdline)
-  (command-line
-   #:program "sample"
-   #:once-each
-   [("-r" "--rate") sp "sample rate" (*sample-rate* (parse-int sp "--rate"))]
-   [("-t" "--trials") tp "num. trials" (*num-trials* (parse-int tp "--trials"))]
-   [("-o" "--output") op "file (or directory) to store output" (*output* op)]
-   [("-q" "--quiet") "run quietly" (*verbose* #f)]
-   #:args benchmark-name*
-   (cond
-    [(null? benchmark-name*)
-     (printf "usage: raco rp-sample <benchmark-name> ...~n")]
-    [(null? (cdr benchmark-name*))
-     (generate-samples (car benchmark-name*))]
-    [else
-     (for ((bm (in-list benchmark-name*)))
-       (with-handlers ((exn:fail? (lambda (e) (printf "Error processing ~a, run 'raco rp-sample ~a' to debug~n" bm bm))))
-         (generate-samples bm)))])))
+        (for ([s (in-range sample-size)])
+          (displayln (random-configuration)))))))
 
 ;; =============================================================================
 
@@ -143,18 +121,6 @@
       ["3.14" dummy-name]
       ["()" dummy-name]
       ["hello" dummy-name]))
-
-  (test-case "make-sample-index**"
-    (define (random-check-sample-index** pop-size samp-size trials)
-      (let ([i** (make-sample-index** pop-size samp-size trials)])
-        (check-equal? (length i**) trials)
-        (for ([i* (in-list i**)])
-          (check-equal? (set-count i*) samp-size)
-          (check-true (for/and ([i (in-set (car i**))]) (<= 0 i (- pop-size 1)))))))
-      (random-check-sample-index** 50 5 0)
-      (random-check-sample-index** 50 5 1)
-      (random-check-sample-index** 100 9 3)
-      (void))
 
   (test-case "num-configurations->sample-size"
     (check-apply* num-configurations->sample-size
@@ -178,27 +144,46 @@
       (define mc (benchmark->max-configuration bm))
       (define nc (benchmark->num-configurations bm))
       (define sample-size (num-configurations->sample-size nc sample-rate))
-      (define s1 (benchmark-info->sample* bm sample-rate num-trials))
-      (define s2 (performance-info->sample* pi sample-rate num-trials))
-      (check-equal? (length s1) (length s2))
-      (check-equal? (length s2) num-trials)
+      (define s1 (benchmark-info->sampler bm))
+      (define s2 (max-configuration->sampler (benchmark->max-configuration bm)))
       (check-true
-        (for/and ([b* (in-list s1)]
-                  [p* (in-list s2)])
-          (= (length b*) (set-count (list->set b*))
-             (length p*) (set-count (list->set p*))
-             sample-size)))
-      (check-true
-        (for/and ([b* (in-list s1)]
-                  [p* (in-list s2)])
-          (for/and ([b (in-list b*)]
-                    [p (in-list p*)])
-            (and (configuration<? (string->configuration b) mc)
-                 (configuration<? (string->configuration p) mc)))))
+        (for/and ([i (in-range 200)])
+          (and (configuration<? (string->configuration (s1)) mc)
+               (configuration<? (string->configuration (s2)) mc))))
       (void))
 
     (check->sample 'Espionage)
     (check->sample 'futen)
   )
 
+  (test-case "big-random"
+    (check-pred big-random 4)
+    (check-pred big-random 4294967087)
+    (check-pred big-random 4294967088)
+    (check-pred big-random 8000000000)
+    (check-pred big-random 13000000000))
+
 )
+
+;; =============================================================================
+
+(module+ main
+  (require racket/cmdline)
+  (command-line
+   #:program "sample"
+   #:once-each
+   [("-r" "--rate") sp "sample rate" (*sample-rate* (parse-int sp "--rate"))]
+   [("-t" "--trials") tp "num. trials" (*num-trials* (parse-int tp "--trials"))]
+   [("-o" "--output") op "file (or directory) to store output" (*output* op)]
+   [("-q" "--quiet") "run quietly" (*verbose* #f)]
+   #:args benchmark-name*
+   (cond
+    [(null? benchmark-name*)
+     (printf "usage: raco rp-sample <benchmark-name> ...~n")]
+    [(null? (cdr benchmark-name*))
+     (generate-samples (car benchmark-name*))]
+    [else
+     (for ((bm (in-list benchmark-name*)))
+       (with-handlers ((exn:fail? (lambda (e) (printf "Error processing ~a, run 'raco rp-sample ~a' to debug~n" bm bm))))
+         (generate-samples bm)))])))
+
