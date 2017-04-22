@@ -148,9 +148,9 @@
   ;; (-> (listof benchmark-info?) pict?)
   ;; Plots the random-sample data for the given benchmarks
   ;;  as multiple lines on a single graph.
-  ;; See also `render-validation-plot*`
+  ;; See also `render-validate-samples-plot*`
 
-  render-validation-plot*
+  render-validate-samples-plot*
   ;; (-> (listof benchmark-info?) pict?)
   ;; Plots the overhead of each benchmark alongside a confidence interval
   ;;  generated from the benchmark's random samples.

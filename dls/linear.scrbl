@@ -7,6 +7,5 @@
    (filter (λ (bm) (memq (benchmark->name bm) TO-SAMPLE)) ALL-BENCHMARKS))
 
 @figure["fig:sample" "Valdiating Linear Measurements"
-  @render-samples-plot*[BENCHMARKS-TO-SAMPLE]
-  @;@render-validation-plot*[BENCHMARKS-TO-SAMPLE]
+  @render-validate-samples-plot*[BENCHMARKS-TO-SAMPLE]
 ]

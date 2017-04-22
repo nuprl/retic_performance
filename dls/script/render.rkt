@@ -12,7 +12,7 @@
   render-static-information
   render-ratios-table
   render-samples-plot*
-  render-validation-plot*
+  render-validate-samples-plot*
 )
 
 (require
@@ -58,7 +58,7 @@
 (define (render-samples-plot* bm*)
   (render-benchmark* bm* "samples" samples-plot))
 
-(define (render-validation-plot* bm*)
+(define (render-validate-samples-plot* bm*)
   (render-benchmark* bm* "validate" validate-samples-plot))
 
 (define (render-benchmark* bm* descr render-one [freeze? #f])
