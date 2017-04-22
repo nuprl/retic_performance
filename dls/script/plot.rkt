@@ -35,6 +35,9 @@
   pict
   plot/no-gui
   plot/utils
+  (only-in math/statistics
+    mean
+    stddev/mean)
   (only-in racket/format
     ~r)
   (only-in racket/list
@@ -72,6 +75,9 @@
 (defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
 (defparam *CONFIGURATION-X-JITTER* 0.4 Real)
 (defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
+(defparam *CONFIDENCE-LEVEL* 95 Percent)
+(defparam *INTERVAL-ALPHA* 0.4 Nonnegative-Real)
+
 
 ;; -----------------------------------------------------------------------------
 
@@ -137,8 +143,7 @@
   (overhead-add-legend pi body))
 
 (define (samples-plot pi)
-  (define-values [sample-size sample*]
-    (let ([a+b (performance-info->sample* pi)]) (values (car a+b) (cdr a+b))))
+  (define-values [sample-size sample*] (performance-info->sample-info pi))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
@@ -166,9 +171,39 @@
   (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
 
 (define (validate-samples-plot pi)
-  (error 'notimpol))
+  (define-values [sample-size sample*] (performance-info->sample-info pi))
+  (define body (maybe-freeze
+    (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
+                   [plot-x-transform log-transform]
+                   [plot-y-ticks (make-overhead-y-ticks)]
+                   [plot-x-far-ticks no-ticks]
+                   [plot-y-far-ticks no-ticks]
+                   [plot-tick-size TICK-SIZE]
+                   [plot-font-face (*OVERHEAD-FONT-FACE*)]
+                   [plot-font-size (*FONT-SIZE*)]
+                   [*OVERHEAD-LINE-WIDTH* (- (*OVERHEAD-LINE-WIDTH*) 2)])
+      (plot-pict
+        (list
+          (tick-grid)
+          (make-count-configurations-function pi)
+          (make-sample-function-interval
+            (for/list ([s (in-list sample*)])
+              (performance-info%sample pi s))))
+        #:x-min 1
+        #:x-max (*OVERHEAD-MAX*)
+        #:y-min 0
+        #:y-max 100
+        #:x-label (and (*OVERHEAD-LABEL?*) "Overhead (vs. retic-untyped)")
+        #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
+        #:width (*OVERHEAD-PLOT-WIDTH*)
+        #:height (*OVERHEAD-PLOT-HEIGHT*)))))
+  (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
 
 ;; -----------------------------------------------------------------------------
+
+(define (performance-info->sample-info pi)
+  (let ([a+b (performance-info->sample* pi)])
+    (values (car a+b) (cdr a+b))))
 
 (define (maybe-freeze p)
   (if (*OVERHEAD-FREEZE-BODY*)
@@ -234,6 +269,49 @@
           (when (<= num-configs-left (*CACHE-SIZE*))
             (set-box! cache (cons num-good (filter-time* pi (λ (t) (not (good? t))))))))
         n))))
+
+(define (make-sample-function-interval pi*)
+  (define (make-get-percents)
+    (let ([ctr* (map make-deliverable-counter pi*)])
+      (λ (r)
+        (for/list ([ctr (in-list ctr*)])
+          (ctr r)))))
+  (function-interval
+    (λ (r) (lower-confidence ((make-get-percents) r)))
+    (λ (r) (upper-confidence ((make-get-percents) r)))
+    0 (*OVERHEAD-MAX*)
+    #:color "brown"
+    #:samples (*OVERHEAD-SAMPLES*)
+    #:style 'solid
+    #:line1-color 0
+    #:line2-color 0
+    #:line1-width 1
+    #:line2-width 1
+    #:alpha (*INTERVAL-ALPHA*)
+    #:label #f))
+
+(define (lower-confidence n*)
+  (- (mean n*) (error-bound n*)))
+
+(define (upper-confidence n*)
+  (+ (mean n*) (error-bound n*)))
+
+(define (error-bound n*)
+  (define cv
+    (case (*CONFIDENCE-LEVEL*)
+     [(95) 1.96]
+     [(98) 2.326]
+     [else (error 'error-bounds "Unknown confidence level '~a'" (*CONFIDENCE-LEVEL*))]))
+  (confidence-interval n* #:cv cv))
+
+(define (confidence-interval x* #:cv [cv 1.96])
+  (define u (mean x*))
+  (define n (length x*))
+  (define s (stddev/mean u x*))
+  (define cv-offset (/ (* cv s) (sqrt n)))
+  (if (negative? cv-offset)
+    (raise-user-error 'confidence-interval "got negative cv offset ~a\n" cv-offset)
+    cv-offset))
 
 (define (make-overhead-x-ticks)
   (define MAJOR-TICKS (list 1 2 (*OVERHEAD-MAX*)))
@@ -342,6 +420,7 @@
   (define OVERHEAD 'overhead)
   (define EXACT 'exact)
   (define SAMPLE 'sample)
+  (define VALIDATE 'validate)
   (define *plot-type* (make-parameter OVERHEAD))
   (command-line
    #:program "rp-plot"
@@ -349,6 +428,7 @@
    [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
    [("-e" "--exact") "Plot exact running times" (*plot-type* EXACT)]
    [("-s" "--sample") "Plot samples" (*plot-type* SAMPLE)]
+   [("-v" "--validate") "Validate samples" (*plot-type* VALIDATE)]
    #:args benchmark-name*
    (cond
     [(null? benchmark-name*)
@@ -365,6 +445,7 @@
         [(overhead) overhead-plot]
         [(exact) exact-runtime-plot]
         [(sample) samples-plot]
+        [(validate) validate-samples-plot]
         [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
      (define p*
        (parameterize ([*FONT-SIZE* 14])
