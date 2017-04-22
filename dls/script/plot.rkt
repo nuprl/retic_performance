@@ -22,6 +22,9 @@
     [exact-runtime-plot
      (-> performance-info? pict?)]
     ;; TODO once implemented, check whether y-axis permits graphing all on ONE axis
+
+    [validate-samples-plot
+     (-> performance-info? pict?)]
 ))
 
 (require
@@ -161,6 +164,9 @@
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
+
+(define (validate-samples-plot pi)
+  (error 'notimpol))
 
 ;; -----------------------------------------------------------------------------
 
