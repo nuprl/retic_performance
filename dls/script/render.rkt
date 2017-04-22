@@ -11,6 +11,8 @@
 
   render-static-information
   render-ratios-table
+  render-samples-plot*
+  render-validation-plot*
 )
 
 (require
@@ -53,8 +55,16 @@
 (define (render-exact-runtime-plot* bm*)
   (render-benchmark* bm* "exact-runtime" exact-runtime-plot #t))
 
+(define (render-samples-plot* bm*)
+  (render-benchmark* bm* "samples" samples-plot))
+
+(define (render-validation-plot* bm*)
+  (render-benchmark* bm* "validate" validate-samples-plot))
+
 (define (render-benchmark* bm* descr render-one [freeze? #f])
   (define num-pict (length bm*))
+  (when (zero? num-pict)
+    (raise-user-error 'render-benchmark* "cannot render empty list of zero benchmarks"))
   (define p*
     (parameterize ([*OVERHEAD-PLOT-WIDTH* (exact-floor (/ (- OVERHEADS-WIDTH OVERHEADS-HSPACE) NUM-COLUMNS))]
                    [*OVERHEAD-PLOT-HEIGHT* (exact-floor (/ (+ OVERHEADS-HEIGHT OVERHEADS-VSPACE) num-pict))]

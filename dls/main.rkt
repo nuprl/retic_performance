@@ -7,12 +7,6 @@
 ;; Basically, extends `scribble/acmart` with project-specific options.
 ;; (The file `lang/reader.rkt` sets up the actual reader.)
 
-;; TODO
-;; - zeina did you talk to Mike about missing types?
-;; - `make python` to compute python info, cache it by the MD5 hash of files
-;;   - you can build paper without python3, sloccount installed
-;;   - but it will stop you if your cache is out of sync
-
 (provide
   (all-from-out
     "bib.rkt"
@@ -34,6 +28,8 @@
   POPL-2017-BENCHMARK-NAMES
   DLS-2017-BENCHMARK-NAMES
   ;; (listof symbol?)
+
+  benchmark->name
 
   (rename-out
    [acmart:#%module-begin #%module-begin]
@@ -147,6 +143,18 @@
   render-ratios-table
   ;; (-> (listof benchmark-info?) table?)
   ;; Build a table of Python/Retic/Typed ratios
+
+  render-samples-plot*
+  ;; (-> (listof benchmark-info?) pict?)
+  ;; Plots the random-sample data for the given benchmarks
+  ;;  as multiple lines on a single graph.
+  ;; See also `render-validation-plot*`
+
+  render-validation-plot*
+  ;; (-> (listof benchmark-info?) pict?)
+  ;; Plots the overhead of each benchmark alongside a confidence interval
+  ;;  generated from the benchmark's random samples.
+  ;; See also `render-samples-plot*`
 
   sc
   ;; Usage `@sc{some text}`
