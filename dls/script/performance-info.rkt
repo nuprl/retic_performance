@@ -392,7 +392,7 @@
   (define nc (performance-info-num-configs pf))
   (printf "~a~n" bm-name)
   (printf "- num configs  : ~a~n" nc)
-  (printf "- Python  time : ~a~n" (performance-info-python-runtime pf))
+  (printf "- Python time : ~a~n" (performance-info-python-runtime pf))
   (printf "- untyped time : ~a~n" (performance-info-untyped-runtime pf))
   (printf "- typed time   : ~a~n" (performance-info-typed-runtime pf))
   (printf "- untyped/python : ~a~n" (untyped/python-ratio pf))

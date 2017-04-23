@@ -54,7 +54,7 @@ Takikawa et al.'s method (see @section-ref{sec:method}) for Reticulated
 Python's gradual typing system@~cite[vksb-dls-2014], which is relatively
 faithful to Siek and Taha's original proposal. Second, it reports on the
 results of applying the adapted method to Reticulated (see
-@section-ref{sec:measurements}).  While the performance of Reticulated seems to
+@section-ref{sec:exhaustive}).  While the performance of Reticulated seems to
 be significantly better than Typed Racket's, we conjecture that this
 due to (1) a significant gap in Reticulated's soundness, (2)
 Reticulated's lack of expressiveness, and (3) low-quality error messages
