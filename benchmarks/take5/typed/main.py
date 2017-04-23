@@ -1,7 +1,6 @@
 from retic import Void,List,Int
 from player import Player
 from dealer import Dealer
-from inspect import getmembers, isfunction
 from Timer import Timer
 
 def generate_dealer(players:List(Player), cards_per_game:Int)->Dealer:
