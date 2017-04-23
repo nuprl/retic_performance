@@ -31,6 +31,9 @@
 
   benchmark->name
 
+  u/p-ratio
+  t/u-ratio
+
   (rename-out
    [acmart:#%module-begin #%module-begin]
 
@@ -50,10 +53,18 @@
   ;; natural?
   ;; Same as `(length ALL-BENCHMARKS)`
 
+  NUM-ITERATIONS
+  ;; TODO check this number against the datasets
+
   $
   ;; Usage: `@${some math}`
   ;;  where `some math` is LaTeX-formatted math.
   ;; Wraps its arguments in dollar signs `$ ....$` and sends the result to LaTeX
+
+  authors
+  ;; Usage: `@authors[author-name ...]
+  ;;  where `author-name` is a string
+  ;; Renders a sequence of author names
 
   ~cite
   ;; Usage: `@~cite[bib-name]`
@@ -179,6 +190,9 @@
   "script/util.rkt"
   (only-in racket/class
     class new super-new object% define/public)
+  (only-in racket/list
+    add-between
+    partition)
   racket/format
   scribble/acmart
   scribble/core
@@ -206,10 +220,31 @@
 (define NUM-BENCHMARKS
   (length ALL-BENCHMARKS))
 
+(define NUM-ITERATIONS
+  40)
+
 ;; -----------------------------------------------------------------------------
 
-(define (render-benchmark-name bm)
+(define (->benchmark x)
+  (define key
+    (cond
+     [(string? x) (string->symbol x)]
+     [(symbol? x) x]
+     [else (raise-argument-error '->benchmark "(or/c string? symbol?)" x)]))
+  (or
+    (for/first ([bm (in-list ALL-BENCHMARKS)]
+                #:when (eq? key (benchmark->name bm)))
+      bm)
+    (raise-argument-error '->benchmark "the name of a benchmark" x)))
+
+(define (render-benchmark-name str)
+  (define bm (->benchmark str))
   (tt (symbol->string (benchmark->name bm))))
+
+(define (warning msg . arg*)
+  (display "[WARNING] ")
+  (apply printf msg arg*)
+  (newline))
 
 ;; -----------------------------------------------------------------------------
 
@@ -254,6 +289,18 @@
 (define-cite ~cite citet generate-bibliography
   #:style small-number-style)
 
+(define (authors . a*)
+  (cond
+   [(null? a*)
+    (raise-argument-error 'authors "at least one argument" a*)]
+   [(null? (cdr a*))
+    (car a*)]
+   [(null? (cddr a*))
+    (string-append (car a*) " and " (cadr a*))]
+   [else
+    (apply string-append
+      (add-between a* ", " #:before-last ", and "))]))
+
 (define (sf x)
   (elem #:style "sfstyle" x))
 
@@ -295,10 +342,57 @@
      (parag title)  (smaller "from " author)
      (linebreak)
      ;ignore `url`
-     ;ignore `lib` descriptions, has type (or/c lib-desc? (listof lib-desc))
+     (format-deps lib)
+     (linebreak)
      descr))
 
-(define (lib-desc name . descr)
-  (void)
-  #;(apply elem (tt name) descr))
+(define (format-deps dep*)
+  (if (null? dep*)
+    "No dependencies."
+    (let-values ([(lib* other*) (partition lib? dep*)])
+      (list "Depends on "
+            (cond
+             [(null? lib*)
+              other*]
+             [(null? other*)
+              (format-lib lib*)]
+             [else
+              (list (format-lib lib*) ", and " other*)])
+            "."))))
 
+(define (format-lib lib*)
+  (define n*
+    (for/list ([l (in-list lib*)])
+      (hyperlink (lib-url l) (tt (lib-name l)))))
+  (define l-str (if (null? (cdr lib*)) "library" "libraries"))
+  (list "the " (add-between n* ", " #:before-last ", and ") " " l-str))
+
+(struct lib [name url] #:transparent)
+
+;; Names and URLs for standard Python libraries
+(define LIB-INDEX*
+  (list (lib "copy" "https://docs.python.org/3/library/copy.html")
+        (lib "fnmatch" "https://docs.python.org/3/library/fnmatch.html")
+        (lib "itertools" "https://docs.python.org/3/library/itertools.html")
+        (lib "math" "https://docs.python.org/3/library/math.html")
+        (lib "operator" "https://docs.python.org/3/library/operator.html")
+        (lib "os" "https://docs.python.org/3/library/os.html")
+        (lib "random" "https://docs.python.org/3/library/random.html")
+        (lib "re" "https://docs.python.org/3/library/re.html")
+        (lib "shlex" "https://docs.python.org/3/library/shlex.html")
+        (lib "socket" "https://docs.python.org/3/library/socket.html")
+        (lib "urllib" "https://docs.python.org/3/library/urllib.html")))
+
+(define (lib-desc name . why)
+  (or (for/first ([l (in-list LIB-INDEX*)]
+                  #:when (string=? name (lib-name l)))
+        l)
+      (begin
+        (warning "no URL for library ~a, please add to `lib-index*` in `main.rkt`")
+        (lib name ""))))
+
+(define u/p-ratio
+  "untyped/python ratio")
+
+(define t/u-ratio
+  "typed/untyped ratio")

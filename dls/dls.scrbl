@@ -51,8 +51,7 @@
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
 @include-section{methodology.scrbl}
-@include-section{benchmarks.scrbl}
-@include-section{measuring.scrbl}
+@include-section{exhaustive.scrbl}
 @include-section{threats.scrbl}
 @include-section{vs-tr.scrbl}
 @include-section{linear.scrbl}
