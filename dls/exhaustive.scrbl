@@ -325,9 +325,9 @@ Observations:
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in
  Reticulated @emph{relative to Python} across all
  configurations of the @integer->word[NUM-BENCHMARKS] benchmarks.
-Each overhead plot reports the percent of @deliverable[] configurations (@emph{y}-axis)
- for @emph{D} between 1 and @id[MAX-OVERHEAD] (@emph{x}-axis).
-Note that the @emph{x}-axes are log-scaled; vertical tick marks appear at 1.2x,
+Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
+ for @emph{D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
+Note that each @|x-axis| is log-scaled; vertical tick marks appear at 1.2x,
  1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
 Lastly, the benchmarks' name, @|t/p-ratio|, and number of configurations appear above
  each plot.
@@ -376,8 +376,18 @@ Observations:
 
 @section{Results III: Absolute Running Time}
 
-@figure*["fig:exact" "Exact running times (sec)"
+@figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
   @render-exact-runtime-plot*[ALL-BENCHMARKS]
 ]
 
+The graphs in @figure-ref{fig:exact} plot the number of types (@|x-axis|)
+ and the exact running time (@|y-axis|) of every data point in the experiment.
+For reference, the number of points in a given plot is printed at the top-right
+ of the plot.
+
+In general, the trend is that configurations with more typed components
+ run slower.
+Makes sense because Reticulated does not optimize; more types is more checks.
+
+Notable exceptions are @bm{spectralnorm} and the @tt{call_*} microbenchmarks.@note{Specifically: @bm{call_method}, @bm{call_method_slots}, and @bm{call_simple}.}
 
