@@ -19,6 +19,11 @@
   generate-bibliography
   bm-desc
 
+  TODO
+  ;; Usage: @TODO{message}
+  ;;  where `message` is an element.
+  ;; Renders a bold-style "TODO" message.
+
   lib-desc
   ;; (->* [string?] [#:rest pre-content?] pre-content?)
   ;; @lib-desc[lib-name]{descr}
@@ -29,10 +34,13 @@
   DLS-2017-BENCHMARK-NAMES
   ;; (listof symbol?)
 
+  MAX-OVERHEAD
+
   benchmark->name
 
   u/p-ratio
   t/u-ratio
+  t/p-ratio
 
   (rename-out
    [acmart:#%module-begin #%module-begin]
@@ -85,6 +93,11 @@
   ;; May render to:
   ;;  "See work by Felleisen 1901"
   ;; If `matthias` refers to a 1901 article by Felleisen.
+
+  deliverable
+  ;; Usage: `@deliverable[N]`
+  ;;  where `N` is a string or positive real number
+  ;; Renders as "N-deliverable"
 
   etal
   ;; Usage: `@|etal|`
@@ -188,6 +201,8 @@
   "script/benchmark-info.rkt"
   "script/render.rkt"
   "script/util.rkt"
+  (only-in "script/plot.rkt"
+    *OVERHEAD-MAX*)
   (only-in racket/class
     class new super-new object% define/public)
   (only-in racket/list
@@ -222,6 +237,10 @@
 
 (define NUM-ITERATIONS
   40)
+
+(define MAX-OVERHEAD
+  ;; TODO maybe MAX-OVERHEAD should be parameter?
+  (*OVERHEAD-MAX*))
 
 ;; -----------------------------------------------------------------------------
 
@@ -396,3 +415,20 @@
 
 (define t/u-ratio
   "typed/untyped ratio")
+
+(define t/p-ratio
+  "typed/python ratio")
+
+(define (deliverable [D "D"])
+  (define d-str
+    (cond
+     [(string? D)
+      D]
+     [(and (real? D) (positive? D))
+      (number->string D)]
+     [else
+      (raise-argument-error 'deliverable "(or/c positive-real? string?)" D)]))
+  (elem (emph d-str) "-deliverable"))
+
+(define (TODO . msg)
+  (apply bold "TODO: " msg))

@@ -5,7 +5,7 @@
   @render-static-information[ALL-BENCHMARKS]]
 
 This section presents the results of an @emph{exhaustive} performance
- evaluation of @id[NUM-BENCHMARKS] benchmark programs.
+ evaluation of @integer->word[NUM-BENCHMARKS] benchmark programs.
 The benchmarks are small Python programs whose @emph{implicit} types are
  expressible in Reticulated.
 Broadly speaking, the benchmark programs come from three sources:
@@ -278,10 +278,10 @@ In addition, the descriptions credit the original authors of each program and
   @render-ratios-table[ALL-BENCHMARKS]
 ]
 
-The table in @figure-ref{fig:ratio} presents two sets of performance ratios:
- the @emph[u/p-ratio] reports the overhead of Reticulated relative to Python and
- the @emph[t/u-ratio] reports the overhead of the fully-typed Reticulated configuration
- relative to the untyped configuration.
+The table in @figure-ref{fig:ratio} presents two sets of performance ratios.
+The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python and
+The @emph[t/u-ratio] reports the overhead of the fully-typed Reticulated
+ configuration relative to the untyped configuration.
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
  @bm{futen} benchmark using Reticulated was 1.61 times slower than the
@@ -318,8 +318,59 @@ Observations:
 
 @section{Results II: Overhead Plots}
 
-@figure*["fig:overhead" "Proportion of D-deliverable configurations"
+@figure*["fig:overhead" "Overhead plots"
   @render-overhead-plot*[ALL-BENCHMARKS]
+]
+
+@Figure-ref{fig:overhead} summarizes the overhead of gradual typing in
+ Reticulated @emph{relative to Python} across all
+ configurations of the @integer->word[NUM-BENCHMARKS] benchmarks.
+Each overhead plot reports the percent of @deliverable[] configurations (@emph{y}-axis)
+ for @emph{D} between 1 and @id[MAX-OVERHEAD] (@emph{x}-axis).
+Note that the @emph{x}-axes are log-scaled; vertical tick marks appear at 1.2x,
+ 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
+Lastly, the benchmarks' name, @|t/p-ratio|, and number of configurations appear above
+ each plot.
+
+@; To note:
+@; - lowest x-value with non-zero y-value = u/p-ratio
+@; - lowest x-value with y=100 = max overhead
+
+Observations:
+@itemlist[
+@item{
+  Every configuration in the experiment is @deliverable[10].
+  In other words, no combination of typed and untyped components in this
+   experiment led to a performance overhead that exceeded 10x.
+}
+@item{
+  In six benchmarks, every configuration is @deliverable[2].
+@;  @emph{Interpretation:} nearly one-third of the benchmark suite
+@;   demonstrates little-to-no overhead.
+}
+@item{
+  Eleven benchmarks have smooth slopes.
+  A smooth slope implies that gradual typing imposes a gradual performance
+   overhead, in the sense that adding a type annotation to any given component
+   adds roughly the same performance overhead.
+  @; TODO make this formal? Could be a cool slogan.
+  @; - how to check? delta with/without each compnoent?
+  @; - slogan to call it ... "continuous" ?
+  @; - validate on Racket?
+  @; - really matches gaps in the graph?
+}
+@item{
+  There is no apparent correlation between a benchmark's size and its worst-case
+   performance overhead.
+  @TODO{need to confirm with the largest benchmarks}
+}
+@item{
+  In ten benchmarks, nearly 100% of configurations are @deliverable{T}
+   where @emph{T} is the @|t/p-ratio|.
+  Contrariwise, the @bm{spectralnorm} benchmark has some partially-typed
+   configurations with significantly higher overhead than the fully-typed
+   configuration.
+}
 ]
 
 
@@ -328,3 +379,5 @@ Observations:
 @figure*["fig:exact" "Exact running times (sec)"
   @render-exact-runtime-plot*[ALL-BENCHMARKS]
 ]
+
+
