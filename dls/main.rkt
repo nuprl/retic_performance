@@ -19,6 +19,11 @@
   generate-bibliography
   bm-desc
 
+  x-axis
+  y-axis
+  ;; Usage: @|x-axis|
+  ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
+
   TODO
   ;; Usage: @TODO{message}
   ;;  where `message` is an element.
@@ -432,3 +437,12 @@
 
 (define (TODO . msg)
   (apply bold "TODO: " msg))
+
+(define (axis q)
+  (elem (emph q) "-axis"))
+
+(define x-axis
+  (axis "x"))
+
+(define y-axis
+  (axis "y"))
