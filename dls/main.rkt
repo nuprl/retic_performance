@@ -40,6 +40,7 @@
   ;; (listof symbol?)
 
   MAX-OVERHEAD
+  EXACT-RUNTIME-XSPACE
 
   benchmark->name
 
@@ -207,6 +208,7 @@
   "script/render.rkt"
   "script/util.rkt"
   (only-in "script/plot.rkt"
+    *CONFIGURATION-X-JITTER*
     *OVERHEAD-MAX*)
   (only-in racket/class
     class new super-new object% define/public)
@@ -246,6 +248,9 @@
 (define MAX-OVERHEAD
   ;; TODO maybe MAX-OVERHEAD should be parameter?
   (*OVERHEAD-MAX*))
+
+(define EXACT-RUNTIME-XSPACE
+  (*CONFIGURATION-X-JITTER*))
 
 ;; -----------------------------------------------------------------------------
 
