@@ -273,6 +273,10 @@ In addition, the descriptions credit the original authors of each program and
 @; - what/where timings
 
 @section{Results I: Performance Ratios}
+@; MOTIVATION (to appear in Section 3)
+@; - highlevel picture of performance, coarse answer to "what is perf"
+@; - overhead of choosing retic at all, vs. Python
+@; - overhead of fully typing, frames expectation
 
 @figure["fig:ratio" "Performance ratios"
   @render-ratios-table[ALL-BENCHMARKS]
@@ -317,6 +321,12 @@ Observations:
 
 
 @section{Results II: Overhead Plots}
+@; these plots are the main event!
+@; - given "any program any configuration", what is probability of OK perf?
+@; - how does prob. change as "OK" changes?
+@; and minor points for developers:
+@; - given U, what proportion of configs. are unusable (sort of, what is worst-case)
+@; - slopes => are there pathological type boundaries
 
 @figure*["fig:overhead" "Overhead plots"
   @render-overhead-plot*[ALL-BENCHMARKS]
@@ -329,8 +339,8 @@ Each overhead plot reports the percent of @deliverable[] configurations (@|y-axi
  for @emph{D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
 Note that each @|x-axis| is log-scaled; vertical tick marks appear at 1.2x,
  1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
-Lastly, the benchmarks' name, @|t/p-ratio|, and number of configurations appear above
- each plot.
+Lastly, the benchmarks' name, @|t/p-ratio|, and number of configurations appear
+ above each plot.
 
 @; To note:
 @; - lowest x-value with non-zero y-value = u/p-ratio
@@ -375,19 +385,69 @@ Observations:
 
 
 @section{Results III: Absolute Running Time}
+@; what do these tell us? (less than overhead plots and even ratios, but still interesting I think)
+@; for the developer:
+@; - overall trend, more types = more slow
+@;   - (usually, but NOT ALWAYS)
+@;   - generally, num.types as a predictive model
+@; for reader:
+@; - helps explain slope, vertical gap = flat slope
+@; - see outliers in measurements (very small number)
+@; - size of experiment & design space
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
   @render-exact-runtime-plot*[ALL-BENCHMARKS]
 ]
 
-The graphs in @figure-ref{fig:exact} plot the number of types (@|x-axis|)
- and the exact running time (@|y-axis|) of every data point in the experiment.
-For reference, the number of points in a given plot is printed at the top-right
- of the plot.
+The graphs in @figure-ref{fig:exact} are the final component of the exhaustive
+ evaluation of Reticulated.
+These graphs serve two purposes: they explain the @emph{slopes} of the
+ overhead plots (in @figure-ref{fig:overhead}) and illustrate an overall trend
+ in the dataset.
 
-In general, the trend is that configurations with more typed components
- run slower.
-Makes sense because Reticulated does not optimize; more types is more checks.
+Each graph in @figure-ref{fig:exact} contains one point for every trial of
+ every configuration in the dataset.
+These individual runs are summarized by their running time (on the @|y-axis|)
+ and the (integer) number of types in the underlying configuration
+ (on the @|x-axis|).
 
-Notable exceptions are @bm{spectralnorm} and the @tt{call_*} microbenchmarks.@note{Specifically: @bm{call_method}, @bm{call_method_slots}, and @bm{call_simple}.}
+Most plots contain a massive number of points.
+This is because the data for each benchmark consists of exponentially many
+ configurations, and the data for each configuration consists of
+ @id[NUM-ITERATIONS] trials.
+To make these plots readable, the points associated with a given configuration
+ are translucent and equally-spaced along the @|x-axis|.
+In particular, the points for a configuration with @math{N} type annotations
+ lie within the @|x-axis| interval [@math{N-@id[EXACT-RUNTIME-XSPACE]}
+ @math{N+@id[EXACT-RUNTIME-XSPACE]}].
+@; TLDR ROUND TO THE NEAREST INTEGER, VISUALLY!!!!!!!!!!!!
 
+In general, these plots clearly show that configurations with more type
+ annotations tend to run slower than configurations that use the dynamic type.
+@; A type annotation in Reticulated implies dynamic checks, plain and simple.
+@; The transpiler does not use types to generate more efficient code;
+@;  HOWEVER each check also doesn't cost that much, most curves are gradual
+The notable exception to this rule is @bm{spectralnorm}; the overhead in
+ @bm{spectralnorm} configurations with fewer type annotations comes from
+ assertions that a dynamically typed object implements certain methods.
+See @secref{sec:pathologies} for details.
+
+@; TODO is the gap from ANNOTATIONS or from BOUNDARIES ????
+@; - I think annotation, just because reticulated
+The second, more subtle, lesson underscored by @figure-ref{fig:exact} is the
+ reason for the flat slopes in the overhead plots of @figure-ref{fig:overhead}.
+Each flat slope in @figure-ref{fig:overhead} corresponds to a vertical space
+ between clusters of points in @figure-ref{fig:exact}.
+In terms of gradually-typed configurations, these ``gaps'' indicate an
+ ``expensive'' type annotation---a type annotation that imposes a large
+ runtime cost on the benchmark when it is enforced by Reticulated.
+@; TODO so awkward
+Many configurations will contain the same expensive annotation (or annotations);
+ such configurations are vertically clustered in @figure-ref{fig:exact}.
+@; TODO ha ha ha goto sleep and try again
+
+Lastly, @figure-ref{fig:exact} shows outliers in the dataset.
+The data for five benchmarks includes abnormally large running times.
+These benchmarks are:
+ @bm{futen}, @bm{float}, @bm{go}, @bm{meteor}, and @bm{Espionage}.
+@Secref{sec:threats} addresses these and other threats to validity.
