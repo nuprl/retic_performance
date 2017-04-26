@@ -14,11 +14,11 @@ Reticulated Python is implemented as a source-to-source translator, which means 
 In transient type semantics, objects are wrapped with a cast containing a target type. In line 4, the target type would be int. During runtime that cast checks that the target type is consistent with the type the given object already has. In Transient semantics, the object does not permanently get wrapped in proxies to determine its target type which means that during runtime an object can be mutated with a value of a new type. Transient addresses this by inserting extra checks at various points of the code to insure that the object's current type did not change incorrectly as a result of mutation. 
 
 
-
+@python{
 1 def f(x:int)->str:
 2 return str(x)
 3
 4 f(x)
-
+}
 
 
