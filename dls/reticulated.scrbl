@@ -3,22 +3,22 @@
 @title[#:tag "sec:reticulated"]{Gradual Typing}
 
 
-A gradual typing system aims to let programmers add type annotations to their programs incrementally. Unlike optional typing, gradual typing provides soundness guarantees by imposing type checks on the program in runtime. 
-The granularity of such type system varies according to the language. We currently have micro-level gradually typed languages such as Reticulated Python and macro-level gradually typed languages such as Typed Racket.
-We give a brief overview of micro-gradual typing and macro-gradual typing in sections 2.1 and 2.2 respectively. In section 2.3 we give an overview of Reticulated Python. Reticulated Python has three modes of implementation: transient, monotonic and guarded. We define the transient mode, which is the subject of our measurements.
+A gradual typing system allows programmers to add type annotations to their programs incrementally while providing soundness guarantees for the program in runtime.
+
+The granularity of such type system varies from language to language. For example, in Typed Racket we can only type modules as a whole but not smaller expressions, while Reticulated Python allows us to type individual function arguments, function return types and class fields. We cannot type statements like "x=4". The only expressions that are currently typable in Reticulated Python follow idiomatic Python the https://www.python.org/dev/peps/pep-0484/
+
+Furthermore, Reticulated Python does not support generics http://homes.soic.indiana.edu/mvitouse/papers/dls14.pdf, which according to Vitousek et al. is a constraint for how typable some expressions in Reticulated Python are. For example, to annotate List[x], we would have to use Dyn.
+
+Reticulated Python is implemented as a source-to-source translator, which means that it takes a Python program and generates Python code after adding the necessary checks to typecheck the program. The code is then executed as regular Python. paper@~cite[dls-2014]. It has three modes of implementation: Monotonic, Guarded and Transient, each with a different way of providing soundness guarantees. Our analysis uses Transient mode.
+
+In transient type semantics, objects are wrapped with a cast containing a target type. In line 4, the target type would be int. During runtime that cast checks that the target type is consistent with the type the given object already has. In Transient semantics, the object does not permanently get wrapped in proxies to determine its target type which means that during runtime an object can be mutated with a value of a new type. Transient addresses this by inserting extra checks at various points of the code to insure that the object's current type did not change incorrectly as a result of mutation. 
 
 
-@section{Macro-Gradual Typing}
-In macro-gradual typing, a programmer must annotate an entire module. Therefore, it relies on behavioral contracts between the typed and untyped modules to enforce soundness. Typed Racket is an example of such system. (citation)
 
-We note that the number of different ways in which we can annotate a program with n modules in such a system is @${2^n}.
+1 def f(x:int)->str:
+2 return str(x)
+3
+4 f(x)
 
-@section{Micro-Gradual Typing}
-Macro-graual typing allows the programmer to add type annotations to every expression that can be typed in the program. It does not rely on behavioral contracts. Instead annotates all untyped parts of the program with type Dyn (citation) and adds casts to these parts during runtime.
 
-Here, we note that there are many more different ways we can annotate a program compared to micro-gradual typing. For a program with n atomic expressions, we can annotate it in @${2^n} different ways.
-
-@section{Reticulated Python}
-Reticulated Python is a micro-gradual typing system. It's implemented as a source-to-source translator, which means that it takes a Python program and generates Python code after adding the necessary checks to typecheck the program. The code is then executed as regular Python. paper@~cite[vksb-dls-2014]
-There focus of our measurements is on transient semantics. The main idea is that during runtime, we check that the target type of a given value is consistent with its current type. We achieve that by inserting casts at the points of interaction between typed and untyped code in our program. The formal definition of consistency can be found in [?], but in the context of micro-gradual typing, we can think of two types as being consistent if they are the same up to Dyn.
 
