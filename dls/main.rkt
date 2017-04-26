@@ -367,13 +367,14 @@
         (secref section-name)))
 
 (define (bm-desc title author url lib . descr)
-   (elem
-     (parag title)  (smaller "from " author)
-     (linebreak)
-     ;ignore `url`
-     (format-deps lib)
-     (linebreak)
-     descr))
+  ;(void (->benchmark title)) ;; assert that 'title' is the name of a benchmark
+  (elem
+    (parag title)  (smaller "from " author)
+    (linebreak)
+    ;ignore `url`
+    (format-deps lib)
+    (linebreak)
+    descr))
 
 (define (format-deps dep*)
   (if (null? dep*)

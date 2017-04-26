@@ -86,7 +86,7 @@ In addition, the descriptions credit the original authors of each program and
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Microbenchmarks the overhead of standard method calls;
+  Microbenchmarks the overhead of simple method calls;
   the calls do not use argument lists,
   keyword arguments, or tuple unpacking.
   @; Consists of @${32*10^5} calls to trivial functions.
@@ -102,7 +102,7 @@ In addition, the descriptions credit the original authors of each program and
   @; 1 iteration
 }
 
-@bm-desc["call_method_simple"
+@bm-desc["call_simple"
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
@@ -175,7 +175,7 @@ In addition, the descriptions credit the original authors of each program and
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Solves the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{N queens} problem by a brute-force algorithm.
+  Solves the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{@math{N} queens} problem by a brute-force algorithm.
   @; 10 iterations
 }
 
@@ -354,7 +354,7 @@ Observations:
    experiment led to a performance overhead that exceeded 10x.
 }
 @item{
-  In six benchmarks, every configuration is @deliverable[2].
+  Six benchmarks are @deliverable[2].
 @;  @emph{Interpretation:} nearly one-third of the benchmark suite
 @;   demonstrates little-to-no overhead.
 }
@@ -375,7 +375,7 @@ Observations:
   @TODO{need to confirm with the largest benchmarks}
 }
 @item{
-  In ten benchmarks, nearly 100% of configurations are @deliverable{T}
+  Ten benchmarks are approximately @deliverable{T},
    where @emph{T} is the @|t/p-ratio|.
   Contrariwise, the @bm{spectralnorm} benchmark has some partially-typed
    configurations with significantly higher overhead than the fully-typed
