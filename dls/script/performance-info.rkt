@@ -6,9 +6,6 @@
 ;;     raco rp-perf <benchmark-name> ...
 ;; Prints summary stats for each `<benchmark-name>`
 
-;; TODO
-;; - maybe don't need this, maybe should be part of `benchmark-info`
-
 (require racket/contract)
 (provide
   (contract-out
@@ -324,7 +321,7 @@
      [(path-string? pf) pf]
      [(performance-info? pf) (performance-info-src pf)]
      [else (raise-argument-error 'fold/karst "(or/c path-string? performance-info?)" 0 pf init f)]))
-  (with-input-from-file src 
+  (with-input-from-file src
     (λ ()
       (for/fold ([acc init])
                 ([ln (in-lines)]
@@ -449,7 +446,9 @@
 (define (count-types cfg max-cfg)
   (for/sum ([c (in-list cfg)]
             [x (in-list max-cfg)])
-    (count-zero-bits (natural->bitstring c #:pad (log2 x)))))
+    (if (= 1 x) ;; TODO right place to test this? Checking for files with ZERO type annotations. Really the file should be in the "both" directory
+      0
+      (count-zero-bits (natural->bitstring c #:pad (log2 x))))))
 
 (define (infer-benchmark-name sample-file)
   (define dir (or (path-only sample-file) (current-directory)))
@@ -596,6 +595,8 @@
       ==> 10]
      ['(5 9) '(128 32)
       ==> 8]
+     ['(0) '(1)
+      ==> 0]
      ['(6 18) '(128 32)
       ==> 8]
      ['(13 18) '(128 32)
