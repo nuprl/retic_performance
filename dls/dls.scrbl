@@ -34,7 +34,7 @@
   programs is unknown.
 
   This paper studies the overhead of gradual typing in Reticulated Python.  We
-  examine @id[NUM-BENCHMARKS] programs taken from a variety of areas including
+  examine programs taken from a variety of areas including @; TODO give number?
   Python libraries, implementations of common algorithms, and games.  For each
   program we systematically measure all partially-typed @emph{configurations}
   obtained by assigning full type signatures to a subset of functions in the
