@@ -28,7 +28,7 @@
     ;;  given a path to the benchmark's root directory
 
     [karst-dir->sample*
-     (-> path-string? symbol? (listof path-string?))]
+     (-> path-string? symbol? (or/c #f (listof path-string?)))]
 
     [benchmark-dir->name
      (-> is-benchmark-directory? symbol?)]
@@ -76,9 +76,8 @@
 
 (define (karst-dir->sample* k-dir bm-name)
   (define prefix (build-path k-dir SAMPLE (symbol->string bm-name)))
-  (unless (directory-exists? prefix)
-    (raise-user-error 'karst-dir->sample* "directory '~a' does not exist, no samples for '~a'" prefix bm-name))
-  (glob (build-path prefix "sample*.tab")))
+  (and (directory-exists? prefix)
+       (glob (build-path prefix "sample*.tab"))))
 
 (define (is-benchmark-directory? p)
   (and (path-string? p)
