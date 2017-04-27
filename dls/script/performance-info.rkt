@@ -143,7 +143,6 @@
   name ;; Symbol, a benchmark name
   src  ;; Path-String, data from Karst
   num-configs
-  configs/module*
   python-runtime
   untyped-runtime
   typed-runtime
@@ -154,11 +153,10 @@
 
 (define (make-performance-info name #:src k
                                     #:num-configurations num-configs
-                                    #:configurations/module* configs/module*
                                     #:python-runtime python
                                     #:untyped-retic-runtime base-retic
                                     #:typed-retic-runtime typed-retic)
-  (performance-info name k num-configs configs/module* python base-retic typed-retic))
+  (performance-info name k num-configs python base-retic typed-retic))
 
 (define (gunzip/cd ps)
   (define-values [base name _dir?] (split-path ps))
@@ -173,17 +171,23 @@
 
 (define (benchmark->performance-info bm)
   (define name (benchmark->name bm))
-  (define k (unzip-karst-data (or (benchmark->karst-data bm)
-                                  (raise-user-error 'benchmark->performance-info
-                                    "cannot find Karst data for benchmark '~a'" name))))
+  (define kd (benchmark->karst-data bm))
+  (define k (and kd (unzip-karst-data kd)))
   (define-values [num-configs configs/module* base-retic typed-retic]
-    (scan-karst-file k))
+    (if kd
+      (scan-karst-file k)
+      (values (benchmark->num-configurations bm)
+              (benchmark->max-configuration bm)
+              #f
+              #f))) ;; Thank god we are untyped
+  (unless (and (= num-configs (benchmark->num-configurations bm))
+               (equal? configs/module* (benchmark->max-configuration bm)))
+    (raise-user-error 'benchmark->performance-info "fatal error processing ~a" name))
   (define python
     (mean (benchmark->python-data bm)))
   (make-performance-info name
     #:src k
     #:num-configurations num-configs
-    #:configurations/module* configs/module*
     #:python-runtime python
     #:untyped-retic-runtime base-retic
     #:typed-retic-runtime typed-retic))
@@ -241,7 +245,7 @@
           (update-base-retic times-str))
         (void))))
   (values (unbox num-configs)
-          (unbox configs/module*)
+          (map add1 (unbox configs/module*))
           (unbox base-retic)
           (unbox typed-retic)))
 
@@ -254,7 +258,7 @@
         (update-configs/module*
           (string->configuration (line->configuration-string ln)))
         (void))))
-  (unbox configs/module*))
+  (map add1 (unbox configs/module*)))
 
 (define (typed-configuration? cfg/mod*)
   (andmap zero? cfg/mod*))
@@ -465,7 +469,6 @@
   (performance-info (performance-info-name pi)
                     new-src
                     (count-karst-lines new-src)
-                    (performance-info-configs/module* pi)
                     (performance-info-python-runtime pi)
                     (performance-info-untyped-runtime pi)
                     (performance-info-typed-runtime pi)))
@@ -482,14 +485,13 @@
     (define-values [num-configs configs/module* base-retic typed-retic]
       (scan-karst-file karst-example-gunzip))
     (check-equal? num-configs 4)
-    (check-equal? configs/module* '(1 1))
+    (check-equal? configs/module* '(2 2))
     (check-equal? base-retic 10)
     (check-equal? typed-retic 20)
 
     (let ([pf (make-performance-info 'example
                 #:src karst-example-gunzip
                 #:num-configurations num-configs
-                #:configurations/module* configs/module*
                 #:python-runtime base-retic
                 #:untyped-retic-runtime base-retic
                 #:typed-retic-runtime typed-retic)])
@@ -508,8 +510,8 @@
       (void)))
 
   (test-case "benchmark->performance-info:no-data"
-    (check-exn #rx"cannot find Karst data"
-      (λ () (benchmark->performance-info (->benchmark-info 'stats)))))
+    (check-pred performance-info?
+      (benchmark->performance-info (->benchmark-info 'stats))))
 
   ;; general correctness/sanity for a real program
   (let* ([bm (->benchmark-info 'Espionage)]
