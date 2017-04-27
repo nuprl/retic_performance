@@ -58,17 +58,26 @@
 
   )
 
-  ALL-BENCHMARKS
+  EXHAUSTIVE-BENCHMARKS
+  SAMPLE-BENCHMARKS
   ;; (listof benchmark-info?)
   ;; Registry of all known benchmarks.
   ;; To change, edit `script/benchmark-info.rkt`.
 
-  NUM-BENCHMARKS
+  NUM-EXHAUSTIVE-BENCHMARKS
   ;; natural?
-  ;; Same as `(length ALL-BENCHMARKS)`
+  ;; Same as `(length EXHAUSTIVE-BENCHMARKS)`
+
+  NUM-VALIDATE-SAMPLES
+  ;; natural?
+  ;; Number of benchmarks in both the `EXHAUSTIVE-BENCHMARKS` and `SAMPLES-BENCHMARKS` lists
+
+  NUM-NEW-SAMPLES
+  ;; natural?
+  ;; Number of benchmarks that are exclusive to the `SAMPLE-BENCHMARKS` list
 
   NUM-ITERATIONS
-  ;; TODO check this number against the datasets
+  ;; Number of times we ran each configuration for each benchmark.
 
   $
   ;; Usage: `@${some math}`
@@ -236,14 +245,28 @@
 
 ;; =============================================================================
 
-(define ALL-BENCHMARKS
-  (all-benchmarks))
+(define-values [EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS]
+  (let ([bm* (all-benchmarks)])
+    (values (filter benchmark->karst-data bm*)
+            (filter benchmark->sample-data bm*))))
 
-(define NUM-BENCHMARKS
-  (length ALL-BENCHMARKS))
+(define-values [NUM-EXHAUSTIVE-BENCHMARKS NUM-VALIDATE-SAMPLES NUM-NEW-SAMPLES]
+  (let ([num-both
+         (let ([e-name* (map benchmark->name EXHAUSTIVE-BENCHMARKS)])
+           (for/sum ([bm (in-list SAMPLE-BENCHMARKS)])
+             (if (memq (benchmark->name bm) e-name*) 1 0)))])
+    (values (length EXHAUSTIVE-BENCHMARKS)
+            num-both
+            (- (length SAMPLE-BENCHMARKS) num-both))))
 
 (define NUM-ITERATIONS
   40)
+
+(define SAMPLE-RATE
+  10)
+
+(define NUM-SAMPLE-TRIALS
+  10)
 
 (define MAX-OVERHEAD
   ;; TODO maybe MAX-OVERHEAD should be parameter?
@@ -261,7 +284,10 @@
      [(symbol? x) x]
      [else (raise-argument-error '->benchmark "(or/c string? symbol?)" x)]))
   (or
-    (for/first ([bm (in-list ALL-BENCHMARKS)]
+    (for/first ([bm (in-list EXHAUSTIVE-BENCHMARKS)]
+                #:when (eq? key (benchmark->name bm)))
+      bm)
+    (for/first ([bm (in-list SAMPLE-BENCHMARKS)]
                 #:when (eq? key (benchmark->name bm)))
       bm)
     (raise-argument-error '->benchmark "the name of a benchmark" x)))
@@ -452,3 +478,107 @@
 
 (define y-axis
   (axis "y"))
+
+;; =============================================================================
+
+(module+ test
+  ;; Test claims & expectations from the paper
+  ;; aka extra layer of authentication
+
+  (require
+    rackunit
+    (only-in racket/set
+      set=?)
+    (only-in gm-dls-2017/script/benchmark-info
+      benchmark-info->python-info)
+    (only-in gm-dls-2017/script/python
+      python-info->num-types)
+    (only-in gm-dls-2017/script/performance-info
+      unzip-karst-data
+      fold/karst))
+
+  ;; ------------------------------------------------------------------
+
+  ;; TODO really make this an error
+  (define (test-error msg . arg*)
+    (display "WARNING: ")
+    (apply printf msg arg*)
+    (newline))
+
+  (define (count-lines fn)
+    (with-input-from-file fn
+      (λ () (for/sum ((ln (in-lines))) 1))))
+
+  (define (check-karst-iterations karst-file)
+    (fold/karst karst-file
+      #:init #true
+      #:f (λ (acc cfg num-types t*)
+            (unless (>= (length t*) NUM-ITERATIONS)
+              (test-error "configuration ~a has ~a iterations, expected at least ~a iterations (in file ~a)" cfg (length t*) NUM-ITERATIONS karst-file))
+            acc)))
+
+  ;; ------------------------------------------------------------------
+
+  (test-case "all-benchmarks"
+    (check set=?
+      (map benchmark->name EXHAUSTIVE-BENCHMARKS)
+      '(futen http2 slowSHA call_method call_method_slots call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
+    (check set=?
+      (map benchmark->name SAMPLE-BENCHMARKS)
+      '(futen slowSHA chaos pystone Espionage PythonFlow take5 sample_fsm Evolution aespython stats)))
+
+  (test-case "partitioning benchmarks"
+    (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 19)
+    (check-equal? NUM-VALIDATE-SAMPLES 7)
+    (check-equal? NUM-NEW-SAMPLES 4))
+
+  (test-case "num-iterations:exhaustive"
+    (for/and ([bm (in-list EXHAUSTIVE-BENCHMARKS)])
+      (check-true (check-karst-iterations (unzip-karst-data (benchmark->karst-data bm))))))
+
+  (test-case "num-iterations:sample"
+    (for*/and ([bm (in-list SAMPLE-BENCHMARKS)]
+               [d (in-list (benchmark->sample-data bm))])
+      (check-true (check-karst-iterations d))))
+
+  (test-case "num-iterations:python"
+    (for/and ([bm (in-list (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))])
+      (define t* (benchmark->python-data bm))
+      (check-true (and t* (>= (length t*) NUM-ITERATIONS)))))
+
+  (test-case "sample-rate"
+    (define (check-sample-rate bm)
+      (define expected-num-samples (* SAMPLE-RATE (python-info->num-types (benchmark-info->python-info bm))))
+      (check-true
+        (for/and ([d (in-list (benchmark->sample-data bm))])
+          (define nl (count-lines d))
+          (unless (= nl expected-num-samples)
+            (test-error "file ~a has ~a lines, expected ~a lines" d nl expected-num-samples))
+          #true)))
+
+    (for-each check-sample-rate SAMPLE-BENCHMARKS))
+
+  (test-case "sample-trials"
+    (define (check-sample-trials bm)
+      (define st (length (benchmark->sample-data bm)))
+      (unless (= NUM-SAMPLE-TRIALS st)
+        (test-error "benchmark ~a has ~a samples, expected ~a samples" (benchmark->name bm) st NUM-SAMPLE-TRIALS))
+      (void))
+
+    (for-each check-sample-trials SAMPLE-BENCHMARKS))
+
+  (test-case "->benchmark"
+    (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))
+    (check-exn #rx"the name of a benchmark"
+      (λ () (->benchmark 'zeina)))
+    (check-exn #rx"string?"
+      (λ () (->benchmark 8))))
+
+  (test-case "authors"
+    (check-exn exn:fail:contract?
+      (λ () (authors)))
+    (check-equal? (authors "john doe") "john doe")
+    (check-equal? (authors "a" "b") "a and b")
+    (check-equal? (authors "a" "b" "c") "a, b, and c"))
+
+)
