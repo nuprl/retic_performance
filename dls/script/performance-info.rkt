@@ -103,6 +103,9 @@
    [performance-info%sample
     (-> performance-info? path-string? performance-info?)]
 
+   [unzip-karst-data
+    (-> path-string? (or/c #f path-string?))]
+
   )
   performance-info-src
   line->configuration-string
@@ -163,15 +166,16 @@
     (gunzip name))
   (build-path base (file-remove-extension name)))
 
+(define (unzip-karst-data kd)
+  (let* ([tab.gz kd]
+         [tab (and tab.gz (gunzip/cd tab.gz))])
+    tab))
+
 (define (benchmark->performance-info bm)
-  (define k
-    (let* ([tab.gz (benchmark->karst-data bm)]
-           [tab (and tab.gz (gunzip/cd tab.gz))])
-      tab))
   (define name (benchmark->name bm))
-  (unless k
-    (raise-user-error 'benchmark->performance-info
-      "cannot find Karst data for benchmark '~a'" name))
+  (define k (unzip-karst-data (or (benchmark->karst-data bm)
+                                  (raise-user-error 'benchmark->performance-info
+                                    "cannot find Karst data for benchmark '~a'" name))))
   (define-values [num-configs configs/module* base-retic typed-retic]
     (scan-karst-file k))
   (define python
@@ -502,6 +506,10 @@
         (check-equal? (filter-time* pf (λ (t) (< t 20))) (list 10 5))
         (void))
       (void)))
+
+  (test-case "benchmark->performance-info:no-data"
+    (check-exn #rx"cannot find Karst data"
+      (λ () (benchmark->performance-info (->benchmark-info 'stats)))))
 
   ;; general correctness/sanity for a real program
   (let* ([bm (->benchmark-info 'Espionage)]
