@@ -139,6 +139,8 @@
 
 ;; =============================================================================
 
+(define HOME (retic-performance-home-dir))
+
 (struct performance-info (
   name ;; Symbol, a benchmark name
   src  ;; Path-String, data from Karst
@@ -413,11 +415,7 @@
   (void))
 
 (define (performance-info->sample* pi)
-  (define src (performance-info-src pi))
-  (define karst (and src (path-only src)))
-  (unless karst
-    (raise-argument-error 'performance-info->sample* "performance-info? with karst data" pi))
-  (define sample* (karst-dir->sample* karst (performance-info-name pi)))
+  (define sample* (karst-dir->sample* (retic-performance-karst-dir HOME) (performance-info-name pi)))
   (when (null? sample*)
     (raise-argument-error 'performance-info->sample* "performance-info? with sample data" pi))
   (define line*
