@@ -24,6 +24,9 @@
   ;; Usage: @|x-axis|
   ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
 
+  *PLOT-HEIGHT*
+  ;; Parameter to fix height of individual overhead plots
+
   TODO
   ;; Usage: @TODO{message}
   ;;  where `message` is an element.
@@ -59,6 +62,7 @@
   )
 
   EXHAUSTIVE-BENCHMARKS
+  VALIDATE-BENCHMARKS
   SAMPLE-BENCHMARKS
   ;; (listof benchmark-info?)
   ;; Registry of all known benchmarks.
@@ -245,19 +249,18 @@
 
 ;; =============================================================================
 
-(define-values [EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS]
+(define-values [EXHAUSTIVE-BENCHMARKS VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS]
   (let ([bm* (all-benchmarks)])
-    (values (filter benchmark->karst-data bm*)
-            (filter benchmark->sample-data bm*))))
+    (define e* (filter benchmark->karst-data bm*))
+    (define n* (map benchmark->name e*))
+    (define s* (filter benchmark->sample-data bm*))
+    (define-values [v* r*] (partition (λ (bm) (memq (benchmark->name bm) n*)) s*))
+    (values e* v* r*)))
 
 (define-values [NUM-EXHAUSTIVE-BENCHMARKS NUM-VALIDATE-SAMPLES NUM-NEW-SAMPLES]
-  (let ([num-both
-         (let ([e-name* (map benchmark->name EXHAUSTIVE-BENCHMARKS)])
-           (for/sum ([bm (in-list SAMPLE-BENCHMARKS)])
-             (if (memq (benchmark->name bm) e-name*) 1 0)))])
-    (values (length EXHAUSTIVE-BENCHMARKS)
-            num-both
-            (- (length SAMPLE-BENCHMARKS) num-both))))
+  (values (length EXHAUSTIVE-BENCHMARKS)
+          (length VALIDATE-BENCHMARKS)
+          (length SAMPLE-BENCHMARKS)))
 
 (define NUM-ITERATIONS
   40)
@@ -285,6 +288,9 @@
      [else (raise-argument-error '->benchmark "(or/c string? symbol?)" x)]))
   (or
     (for/first ([bm (in-list EXHAUSTIVE-BENCHMARKS)]
+                #:when (eq? key (benchmark->name bm)))
+      bm)
+    (for/first ([bm (in-list VALIDATE-BENCHMARKS)]
                 #:when (eq? key (benchmark->name bm)))
       bm)
     (for/first ([bm (in-list SAMPLE-BENCHMARKS)]
@@ -524,7 +530,7 @@
       (map benchmark->name EXHAUSTIVE-BENCHMARKS)
       '(futen http2 slowSHA call_method call_method_slots call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
     (check set=?
-      (map benchmark->name SAMPLE-BENCHMARKS)
+      (map benchmark->name (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))
       '(futen slowSHA chaos pystone Espionage PythonFlow take5 sample_fsm Evolution aespython stats)))
 
   (test-case "partitioning benchmarks"
@@ -537,12 +543,12 @@
       (check-true (check-karst-iterations (unzip-karst-data (benchmark->karst-data bm))))))
 
   (test-case "num-iterations:sample"
-    (for*/and ([bm (in-list SAMPLE-BENCHMARKS)]
+    (for*/and ([bm (in-list (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))]
                [d (in-list (benchmark->sample-data bm))])
       (check-true (check-karst-iterations d))))
 
   (test-case "num-iterations:python"
-    (for/and ([bm (in-list (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))])
+    (for/and ([bm (in-list (append EXHAUSTIVE-BENCHMARKS VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))])
       (define t* (benchmark->python-data bm))
       (check-true (and t* (>= (length t*) NUM-ITERATIONS)))))
 
@@ -556,7 +562,7 @@
             (test-error "file ~a has ~a lines, expected ~a lines" d nl expected-num-samples))
           #true)))
 
-    (for-each check-sample-rate SAMPLE-BENCHMARKS))
+    (for-each check-sample-rate (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS)))
 
   (test-case "sample-trials"
     (define (check-sample-trials bm)
@@ -565,7 +571,7 @@
         (test-error "benchmark ~a has ~a samples, expected ~a samples" (benchmark->name bm) st NUM-SAMPLE-TRIALS))
       (void))
 
-    (for-each check-sample-trials SAMPLE-BENCHMARKS))
+    (for-each check-sample-trials (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS)))
 
   (test-case "->benchmark"
     (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))

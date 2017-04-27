@@ -2,10 +2,10 @@
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"
-  @render-static-information[ALL-BENCHMARKS]]
+  @render-static-information[EXHAUSTIVE-BENCHMARKS]]
 
 This section presents the results of an @emph{exhaustive} performance
- evaluation of @integer->word[NUM-BENCHMARKS] benchmark programs.
+ evaluation of @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmark programs.
 The benchmarks are small Python programs whose @emph{implicit} types are
  expressible in Reticulated.
 Broadly speaking, the benchmark programs come from three sources:
@@ -279,7 +279,7 @@ In addition, the descriptions credit the original authors of each program and
 @; - overhead of fully typing, frames expectation
 
 @figure["fig:ratio" "Performance ratios"
-  @render-ratios-table[ALL-BENCHMARKS]
+  @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
 The table in @figure-ref{fig:ratio} presents two sets of performance ratios.
@@ -329,12 +329,12 @@ Observations:
 @; - slopes => are there pathological type boundaries
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[ALL-BENCHMARKS]
+  @render-overhead-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in
  Reticulated @emph{relative to Python} across all
- configurations of the @integer->word[NUM-BENCHMARKS] benchmarks.
+ configurations of the @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmarks.
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
  for @emph{D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
 Note that each @|x-axis| is log-scaled; vertical tick marks appear at 1.2x,
@@ -396,7 +396,7 @@ Observations:
 @; - size of experiment & design space
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[ALL-BENCHMARKS]
+  @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
 The graphs in @figure-ref{fig:exact} are the final component of the exhaustive
