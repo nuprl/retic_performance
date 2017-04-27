@@ -110,6 +110,10 @@
     (-> python-info? (set/c string?))]
    ;; Return a set of all types used in the program
 
+   [python-info->num-types
+    (-> python-info? natural?)]
+   ;; Count the number of type annotations
+
 ))
 
 (require
@@ -364,6 +368,11 @@
                [f (in-list d)])
       (field-info-type f))))
 
+(define (python-info->num-types py)
+  (+ (python-info->num-functions py)
+     (python-info->num-classes py)
+     (python-info->num-methods py)))
+
 ;; -----------------------------------------------------------------------------
 ;; search
 
@@ -461,7 +470,10 @@
       (+ 7 4))
     (check-equal?
       (python-info->all-types py-Espionage)
-      (list->set '("UnionFind" "Tuple(Int,Int)" "Tuple(Int,Int,Int)" "String" "Void" "Int" "Dict(Int,Tuple(Int,Int))" "List(String)" "List(Tuple(Int,Int))" "List(Tuple(Int,Int,Int))" "List(Int)"))))
+      (list->set '("UnionFind" "Tuple(Int,Int)" "Tuple(Int,Int,Int)" "String" "Void" "Int" "Dict(Int,Tuple(Int,Int))" "List(String)" "List(Tuple(Int,Int))" "List(Tuple(Int,Int,Int))" "List(Int)")))
+    (check-equal?
+      (python-info->num-types py-Espionage)
+      (+ 7 1 4)))
 
   (test-case "python-tests"
     ;; These tests depend on a working Python3.4 executable,
@@ -630,6 +642,10 @@
       (test-case "python-info->all-types"
         (check-equal? (python-info->all-types py-sloc) (list->set '(#f)))
         (check-equal? (python-info->all-types py-parse) (list->set '(#f "int" "without_fields" "with_fields" "List(Void)" "List(List(Int))" "Int"))))
+
+      (test-case "python-info->num-types"
+        (check-equal? (python-info->num-types py-sloc) 1)
+        (check-equal? (python-info->num-types py-parse) 10))
       ))
 
 )
