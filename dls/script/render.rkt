@@ -13,6 +13,8 @@
   render-ratios-table
   render-samples-plot*
   render-validate-samples-plot*
+
+  *PLOT-HEIGHT*
 )
 
 (require
@@ -47,6 +49,8 @@
 (define OVERHEADS-VSPACE 10)
 (define NUM-COLUMNS 3)
 
+(define *PLOT-HEIGHT* (make-parameter #f))
+
 ;; -----------------------------------------------------------------------------
 
 (define (render-overhead-plot* bm*)
@@ -65,16 +69,17 @@
   (define num-pict (length bm*))
   (when (zero? num-pict)
     (raise-user-error 'render-benchmark* "cannot render empty list of zero benchmarks"))
+  (define H (or (*PLOT-HEIGHT*) (exact-floor (/ (+ OVERHEADS-HEIGHT OVERHEADS-VSPACE) num-pict))))
   (define p*
     (parameterize ([*OVERHEAD-PLOT-WIDTH* (exact-floor (/ (- OVERHEADS-WIDTH OVERHEADS-HSPACE) NUM-COLUMNS))]
-                   [*OVERHEAD-PLOT-HEIGHT* (exact-floor (/ (+ OVERHEADS-HEIGHT OVERHEADS-VSPACE) num-pict))]
+                   [*OVERHEAD-PLOT-HEIGHT* H]
                    [*OVERHEAD-SHOW-RATIO* 'short]
                    [*OVERHEAD-FREEZE-BODY* freeze?]
                    [*LEGEND-VSPACE* 2]
                    [*LEGEND-HSPACE* 4]
                    [*FONT-SIZE* 8]
                    [*current-cache-directory* (build-path (current-directory) "with-cache")]
-                   [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH OVERHEADS-HEIGHT OVERHEADS-VSPACE OVERHEADS-HSPACE)))]
+                   [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH H OVERHEADS-VSPACE OVERHEADS-HSPACE)))]
                    [*with-cache-fasl?* #f])
       (filter values
         (for/list ([bm (in-list bm*)])
