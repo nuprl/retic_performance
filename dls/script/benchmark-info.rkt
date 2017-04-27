@@ -44,6 +44,10 @@
      (-> benchmark-info? (or/c #f path-string?))]
     ;; Return a path to the benchmark's data from the Karst cluster, if any
 
+    [benchmark->sample-data
+     (-> benchmark-info? (or/c #f (listof path-string?)))]
+    ;; Return a path to the benchmark's sample data from Karst, if any
+
     [benchmark->python-data
      (-> benchmark-info? (or/c (listof real?) #f))]
     ;; Return the benchmark's Python runtimes, if any
@@ -87,7 +91,11 @@
   "config.rkt"
   "python.rkt"
   "util.rkt"
+  (only-in "system.rkt"
+    md5sum)
   file/glob
+  racket/runtime-path
+  with-cache
   (only-in racket/math
     natural?)
   (only-in racket/path
@@ -100,6 +108,8 @@
     ~a))
 
 ;; =============================================================================
+
+(define-runtime-path MAX-CONFIG-CACHE "cache-python-info")
 
 (define HOME (retic-performance-home-dir))
 
@@ -125,10 +135,12 @@
 ))
 (define DLS-2017-BENCHMARK-NAMES '(
   Espionage
-;  Evolution
-;  sample_fsm
+  Evolution
+  sample_fsm
   PythonFlow
   take5
+  aespython
+  stats
 ))
 
 (struct benchmark-info (
@@ -143,8 +155,16 @@
 
 ;; -----------------------------------------------------------------------------
 
-(define (make-benchmark-info name #:module* module* #:src src)
-  (define cfg* (->max-configuration src module*))
+;; TODO better to have ONE cache file containing a dict, update the file anytime the dict misses
+(define (make-benchmark-info name #:module* module* #:src src #:max-config-cache-key [key #f])
+  (define cfg*
+    (parameterize ([*current-cache-directory* MAX-CONFIG-CACHE]
+                   [*current-cache-keys* (list (λ () key))]
+                   [*use-cache?* (and key #true)]
+                   [*with-cache-fasl?* #f])
+      (ensure-directory (*current-cache-directory*))
+      (with-cache (cachefile (format "max-config-~a.rktd" name))
+        (λ () (->max-configuration src module*)))))
   (benchmark-info module* name src cfg*))
 
 (define (benchmark->num-modules bm)
@@ -208,6 +228,12 @@
   (and (file-exists? karst-path)
        karst-path))
 
+;; benchmark->sample-data : (-> benchmark-info? (U #f (listof path-string?)))
+(define (benchmark->sample-data bm)
+  (define name (benchmark-info-name bm))
+  (define karst-dir (retic-performance-karst-dir HOME))
+  (karst-dir->sample* karst-dir name))
+
 (define (benchmark->python-data bm)
   (define name (symbol->string (benchmark-info-name bm)))
   (define python-path
@@ -253,12 +279,15 @@
 
 (define (path->benchmark-info src)
   (define simple-name (path->simple-name src))
-  (define mod*
-    (for/list ([p (in-list (glob (build-path (benchmark-dir->typed-dir src) "*")))])
-      (path->string (file-name-from-path p))))
+  (define-values [mod* md5*]
+    (for/lists (mod* md5*)
+               ([p (in-list (glob (build-path (benchmark-dir->typed-dir src) "*")))])
+      (values (path->string (file-name-from-path p))
+              (md5sum p))))
   (make-benchmark-info simple-name
     #:module* mod*
-    #:src src))
+    #:src src
+    #:max-config-cache-key md5*))
 
 (define (path->simple-name src)
   (string->symbol (path-string->string (file-name-from-path src))))
@@ -272,7 +301,16 @@
   (string-join (map number->string cfg) "-"))
 
 (define (string->configuration cfg-str)
-  (map string->number (string-split cfg-str "-")))
+  (define (arg-error)
+    (raise-argument-error 'string->configuration "string of hyphen-separated natural numbers" cfg-str))
+  (define cfg* (string-split cfg-str "-"))
+  (if (null? cfg*)
+    (arg-error)
+    (for/list ([str (in-list cfg*)])
+      (define n (string->number str))
+      (if (exact-nonnegative-integer? n)
+        n
+        (arg-error)))))
 
 (define (configuration->natural bm cfg)
   (define mc0 (benchmark->max-configuration bm))
@@ -364,29 +402,39 @@
   (require rackunit rackunit-abbrevs)
 
   (test-case "->benchmark-info"
-    (let* ([n (car DLS-2014-BENCHMARK-NAMES)]
-           [bm (->benchmark-info n)]
-           [k (benchmark->karst-data bm)]
-           [small-loc 50])
+    (define (check-->benchmark-info n)
+      (define bm (->benchmark-info n))
+      (define k (benchmark->karst-data bm))
+      (define small-loc 50)
       (check-equal? (benchmark-info-name bm) n)
       (check-true (and (member "main.py" (benchmark-info-module* bm)) #t))
       (check-equal?
         (benchmark->num-modules bm)
         (length (benchmark-info-module* bm)))
-      (check-pred file-exists? (benchmark->karst-data bm))
+      (let ([kd (benchmark->karst-data bm)]
+            [sd (benchmark->sample-data bm)])
+        (if kd
+          (check-pred file-exists? kd "karst data file does not exist")
+          (check-pred pair? sd (format "missing karst data and sample data for benchmark ~a" n))))
       (let ([pd (benchmark->python-data bm)])
         (check-pred list? pd)
         (check < 1 (length pd))
         (check-true (andmap real? pd)))
       (check > (benchmark->sloc bm) small-loc
         (format "expected benchmark '~a' to contain at least ~a LOC" n small-loc))
-      ))
+      (void))
+    (check-->benchmark-info (car DLS-2014-BENCHMARK-NAMES))
+    (check-->benchmark-info 'sample_fsm))
 
   (test-case "->benchmark-info:fail"
     (check-exn exn:fail:contract?
       (λ () (->benchmark-info 42)))
     (check-exn exn:fail:contract?
       (λ () (->benchmark-info '|hello world|))))
+
+  (test-case "benchmark->sample-data"
+    (check-pred list? (benchmark->sample-data (->benchmark-info 'take5)))
+    (check-false (benchmark->sample-data (->benchmark-info 'call_simple))))
 
   (test-case "path->simple-name"
     (check-equal?
@@ -510,7 +558,6 @@
 
     (check-string<->configuration '(0 0) "0-0")
     (check-string<->configuration '(1 22 333) "1-22-333")
-    (check-string<->configuration '() "")
     (check-string<->configuration '(3) "3")
     (check-string<->configuration '(1 2 3) "1-2-3")
 
