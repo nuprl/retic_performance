@@ -1,24 +1,48 @@
-
 #lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Gradual Typing}
 
+Outline:
 
-A gradual typing system allows programmers to add type annotations to their code incrementally while providing soundness guarantees for the code in runtime.
-
-The granularity of such type systems vary from language to language. For example, in Typed Racket we can only type modules as a whole but not smaller expressions, while Reticulated Python allows us to type individual function arguments, function return types and class fields. The only expressions that are currently typable in Reticulated Python follow idiomatic Python @note{@url{https://www.python.org/dev/peps/pep-0484/}} therefore we cannot expect to annotate assignment statements or any statements in general. 
-
-Furthermore, Reticulated Python does not support generics @~cite[vksb-dls-2014], which according to Vitousek et al. is a constraint for how typable some expressions are in Reticulated Python. Expressions that would require generic types are annotated using type Dyn.
+@section{Purpose of the section:Why is gradual typing useful for the programmer?}
+Allows them to incrementally type their programs. The reason they want their programs to be gradually typed is that gradual typing provides guarantees about soundness during runtime.
 
 
-Reticulated Python has three modes of implementation: Monotonic, Guarded and Transient, each with a different way of providing soundness guarantees. Our analysis uses Transient mode.
+@section{What is soundness for partially typed programs?}
+In order to see why soundness is important for the programmer in partially typed programs, we need to define it.
 
-In transient type semantics, objects are wrapped with a cast containing a target type. In line 4, the target type would be int. During runtime that cast checks that the target type is consistent with the type the given object already has. In Transient semantics, the object does not permanently get wrapped in proxies to determine its target type which means that during runtime an object can be mutated with a value of a new type. Transient addresses this by inserting extra checks at various points of the code to insure that the object's current type did not change incorrectly as a result of mutation. 
+Soundness:
 
-@python{
-1 def f(x:int)->str:
-2 return str(x)
-3
-4 f(x)
-}
+We use the similarity relation from SNAPL sim(a,b), which states that a and b are the same with a possibly having more types or casts.
 
+The definition states that given two programs P and P_M which are similar and where M is a typed module:
+
+1- if P evaluates to v then P_M evaluates to v' where sim(v,v') or it outputs an (runtime/static)? error where g != M. (not sure what that means)
+
+ ** what about when typing M catches a static type error in M?**
+
+2- If P results in an error, then P_M also results in an error and g != M
+
+3- If P does not terminate then P_M does not terminate, or outputs an error.
+
+
+Mention why this definition allows the programmer to produce less error prone programs and helps catch errors, possibly give an example.
+
+
+@section{Reticulated Python design}
+
+- Mention that we can type smaller expressions in the program within a module.
+
+- Those expressions are limited to those typable according to idiomatic python
+@note{@url{https://www.python.org/dev/peps/pep-0484/}}
+
+- Reticulated Python does not support generics @~cite[vksb-dls-2014], which means we use type Dyn instead (some of our benchmarks had generics, so this point can be postponed to the benchmark section)
+
+@section{Transient semantics}
+- Explain what transient semantics are, using the definition in DLS2014 "Design and Evaluation of Gradual Typing for Python".
+
+- Explain soundness in Reticulated Python and talk about the gradual guarantee
+
+
+@section{Is reticulated Python sound?}
+Does reticulated python actually follow the definition of soundness?
 
