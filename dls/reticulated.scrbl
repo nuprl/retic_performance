@@ -4,7 +4,7 @@
 Outline:
 
 @section{Purpose of the section:Why is gradual typing useful for the programmer?}
-Allows them to incrementally type their programs. The reason they want their programs to be gradually typed is that gradual typing provides guarantees about soundness during runtime.
+Allows programmers to incrementally type their programs. The reason they want their programs to be gradually typed is that gradual typing provides guarantees about soundness during runtime.
 
 
 @section{What is soundness for partially typed programs?}
@@ -37,8 +37,28 @@ Mention why this definition allows the programmer to produce less error prone pr
 
 - Reticulated Python does not support generics @~cite[vksb-dls-2014], which means we use type Dyn instead (some of our benchmarks had generics, so this point can be postponed to the benchmark section)
 
+Dyn is a type used in the absense of type annotations. 
+
 @section{Transient semantics}
-- Explain what transient semantics are, using the definition in DLS2014 "Design and Evaluation of Gradual Typing for Python".
+In Transient semantics, casts are inserted at different sites in the code to detect errors that would normally occur in Runtime.
+
+Consider the following example:
+
+@code{
+def f(l1:list) -> Int:
+  return sum(l1)
+
+f(["1", "2"])
+}
+
+
+ The casts are inserted at call sites, attribute reads, subscription, function definitions and for loops.
+
+for a function call, we insert a cast around the argument, for an attribute read, it would be around the object being modified etc.
+
+
+
+
 
 - Explain soundness in Reticulated Python and talk about the gradual guarantee
 
