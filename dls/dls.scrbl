@@ -50,7 +50,7 @@
 
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
-@include-section{methodology.scrbl}
+@include-section{method.scrbl}
 @include-section{exhaustive.scrbl}
 @include-section{linear.scrbl}
 @include-section{threats.scrbl}
