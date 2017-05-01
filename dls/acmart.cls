@@ -1310,7 +1310,7 @@ Computing Machinery]
     \fi
   \fi
   \if@printcopyright
-    \copyright\ \@copyrightyear\ \@copyrightowner\
+    \textcopyright\ \@copyrightyear\ \@copyrightowner\
   \else
     \@copyrightyear.\
   \fi
