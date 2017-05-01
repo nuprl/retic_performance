@@ -113,10 +113,24 @@
   ;;  "See work by Felleisen 1901"
   ;; If `matthias` refers to a 1901 article by Felleisen.
 
+  cspace
+  ;; Usage: `@cspace{C}`
+  ;;  where `C` is a string.
+  ;; Renders a meta-variable that represents a configuration space.
+
   deliverable
   ;; Usage: `@deliverable[N]`
   ;;  where `N` is a string or positive real number
   ;; Renders as "N-deliverable"
+
+  approximation
+  ;; Usage: `@approximation[s t pct]`
+  ;;  where `s`, `t` represent functions
+  ;;  and `pct` is a percentage.
+  ;; Renders as "pct% s,t-approximation"
+
+  sra
+  ;; Usage: @|sra|
 
   etal
   ;; Usage: `@|etal|`
@@ -394,10 +408,6 @@
 (define (pythonexternal a b)
   (apply exact (format "\\pythonexternal{~a}{~a}" a b)))
 
-(define (section-ref section-name)
-  (elem (exact "section~")
-        (secref section-name)))
-
 (define (bm-desc title author url lib . descr)
   ;(void (->benchmark title)) ;; assert that 'title' is the name of a benchmark
   (elem
@@ -473,11 +483,27 @@
       (raise-argument-error 'deliverable "(or/c positive-real? string?)" D)]))
   (elem (emph d-str) "-deliverable"))
 
+(define (approximation s t [pct #f])
+  (define pct-elem
+    (if pct
+      (elem ($ (~a pct)) "%-")
+      (elem)))
+  (elem pct-elem s "," t "-approximation"))
+
+(define sra
+  "simple random approximation")
+
 (define (TODO . msg)
   (apply bold "TODO: " msg))
 
 (define (axis q)
   (elem (emph q) "-axis"))
+
+(define (cspace [letter "C"])
+  (bold letter))
+
+(define (section-ref s)
+  (elem "section" ~ (secref s)))
 
 (define x-axis
   (axis "x"))
