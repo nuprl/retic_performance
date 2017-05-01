@@ -32,6 +32,15 @@
   ;;  where `message` is an element.
   ;; Renders a bold-style "TODO" message.
 
+  gnorm
+  ;; Usage: @${@gnorm{x}}
+  ;;  where `x` is measurable syntax
+
+  definition
+  ;; Usage: @definition[term]{defn ...}
+  ;;  where `term` is a term to define and `defn ...` defines the term.
+  ;; Renders a definition
+
   lib-desc
   ;; (->* [string?] [#:rest pre-content?] pre-content?)
   ;; @lib-desc[lib-name]{descr}
@@ -407,6 +416,17 @@
 
 (define (pythonexternal a b)
   (apply exact (format "\\pythonexternal{~a}{~a}" a b)))
+
+(define (gnorm var)
+  (format "\\|~a\\|" var))
+
+(define (definition term . defn*)
+  (make-paragraph plain
+    (list
+      (linebreak)
+      (bold "Definition")
+      (cons (element #f (list " (" (emph term) ") ")) defn*)
+      (linebreak))))
 
 (define (bm-desc title author url lib . descr)
   ;(void (->benchmark title)) ;; assert that 'title' is the name of a benchmark
