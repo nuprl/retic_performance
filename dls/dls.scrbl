@@ -52,9 +52,9 @@
 @include-section{reticulated.scrbl}
 @include-section{methodology.scrbl}
 @include-section{exhaustive.scrbl}
+@include-section{linear.scrbl}
 @include-section{threats.scrbl}
 @include-section{vs-tr.scrbl}
-@include-section{linear.scrbl}
 @include-section{experience.scrbl}
 @include-section{conclusion.scrbl}
 
