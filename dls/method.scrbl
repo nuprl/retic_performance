@@ -22,7 +22,7 @@ For each benchmark, we aimed to choose a set of configurations that represent th
 ]
 
 
-@section{Generalizing GTP}
+@section{Landscape}
 
 @; NOTE need to borrow terms from literature, e.g.
 @; - Thatte's type-precision relation
@@ -202,6 +202,8 @@ A @defn{proper} performance evaluation will measure the configuration space
 The control code in @${P} is everything not in the experimental portion,
  intuitively a subset @${P_c} such that @${P_c = P \setminus P'}.
 
+Unless we say otherwise, all control code is untyped.
+
 @definition[(elem u/p-ratio " " t/u-ratio " " t/p-ratio)]{
   TBA
 }
@@ -222,3 +224,39 @@ The control code in @${P} is everything not in the experimental portion,
   @; maybe explanation should use parameters. huh
 }
 
+
+@section[#:tag "sec:protocol"]{Protocol}
+
+The performance evaluations in this paper adhere to the following protocol.
+
+@; Except for the specific details of the Karst cluster, this protocol is generic.
+@; I mean, it's written as steps that you can follow
+
+@parag{Benchmark Creation}
+
+@parag{Data Collection}
+
+@parag{Machine Specifics}
+
+Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} present data
+ from the Indiana University Karst cluster.
+Jobs running on the cluster:
+@itemlist[#:style 'ordered
+@item{
+  reserved all processors on a cluster node for a 24-hour span;
+}
+@item{
+  downloaded fresh copies of Python 3.4 and Reticulated;@note{The @tt{master} branch, COMMIT} and
+}
+@item{
+  for the rest of the 24 hours:
+  selected a random configuration to measure,
+  ran the configuration's main module @id[NUM-ITERATIONS] times,
+  and recorded the result of each run.
+}
+]
+The data is the result of running such jobs in parallel and organizing their output.
+According to the Karst documentation, each node is identical (TODO exact specs).
+@; reason for 40 iterations is fear of outliers, exact-runtime data gives some justification for the fear
+
+The online supplement to this paper contains the aforementioned scripts and documentation.

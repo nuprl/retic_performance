@@ -9,6 +9,7 @@ This section presents the results of an @defn{exhaustive} performance
 The benchmarks are small Python programs whose @defn{implicit} types are
  expressible in Reticulated.
 Broadly speaking, the benchmark programs come from three sources:
+@; TODO tense is all wrong
 @itemlist[
 @item{
   @integer->word[(length DLS-2014-BENCHMARK-NAMES)] benchmarks are adaptations
@@ -22,7 +23,7 @@ Broadly speaking, the benchmark programs come from three sources:
 }
 @item{
   the remaining @integer->word[(length DLS-2017-BENCHMARK-NAMES)] benchmarks
-  are open source programs converted to Reticulated by the second author.
+  are open source programs that the second author converted to Reticulated.
 }
 ]
 
@@ -33,13 +34,19 @@ The five columns report the lines of code (@bold{SLOC}),@note{Computed using Dav
  number of function and method definitions (@bold{F}),
  and number of class definitions (@bold{C}).
 
-The following descriptions briefly summarize the purpose of each benchmark.
-In addition, the descriptions credit the original authors of each program and
- state whether the benchmark relies on any libraries or untyped modules.
+@; TODO so long
+The following descriptions list the @defn{control} code in each benchmark,
+ summarize the benchmarks' purpose, and credit the original authors.
+
+@; TODO make a note
+@; the original authors (often) helped with preliminary things:
+@; - inferring implicit types
+@; - separating experimental and control code
+@; - choosing test input
 
 @; -----------------------------------------------------------------------------
 @; --- WARNING: the order of benchmarks matters!
-@; ---  Do not re-order without changing the prose!
+@; ---  Do not re-order without checking ALL PROSE in this file
 @; -----------------------------------------------------------------------------
 
 @bm-desc["futen"
@@ -96,8 +103,8 @@ In addition, the descriptions credit the original authors of each program and
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Microbenchmarks the overhead of calls to methods that have been declared
-  through an object's @tt{__slots__} attribute.
+  Microbenchmarks the overhead of calls to methods listed in
+  an object's @tt{__slots__} attribute.
   @; 1 iteration
 }
 
@@ -106,8 +113,7 @@ In addition, the descriptions credit the original authors of each program and
 @url{https://github.com/python/performance}
 @list[]]{
   Microbenchmarks standard function calls.
-  This benchmark is similar to @tt{call_method}, but using functions rather
-  than methods.
+  This benchmark is similar to @tt{call_method}.
 }
 
 @bm-desc["chaos"
@@ -147,9 +153,9 @@ In addition, the descriptions credit the original authors of each program and
   @lib-desc["random"]{randrange random}
   "two untyped modules"
 ]]{
-  Implements a simple AI for playing @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{Go}.
-  This benchmark is split across three files: a typed module that implements
-  the game board, an untyped module that defines constants, and an untyped module
+  Implements the game @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{Go}.
+  This benchmark is split across three files: an @defn{experimental} module that implements
+  the game board, a @defn{control} module that defines constants, and a @defn{control} module
   that implements the AI and drives the benchmark.
   @; 2 iterations
 }
@@ -236,7 +242,7 @@ In addition, the descriptions credit the original authors of each program and
   @lib-desc["random"]{random randrange}
 ]]{
   Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
-  This benchmark is adapted from a similar Racket program.
+  This benchmark is adapted from a similar Racket program@~cite[greenman-jfp-2017].
   @; 100 iterations
 }
 
@@ -246,7 +252,7 @@ In addition, the descriptions credit the original authors of each program and
 @list[
   @lib-desc["os"]{path join}
 ]]{
-  Implements the Ford-Fulkerson max flow algorithm.
+  Implements the @hyperlink["TODO"]{Ford-Fulkerson} max flow algorithm.
   @; 1 iteration
 }
 
@@ -261,15 +267,6 @@ In addition, the descriptions credit the original authors of each program and
   @; 500 iterations
 }
 
-
-@section{Protocol}
-
-@; - pick types
-@; - type everyting
-@; - granularity
-@; - karst, specs
-@; - iterations
-@; - what/where timings
 
 @section{Results I: Performance Ratios}
 @; MOTIVATION (to appear in Section 3)
