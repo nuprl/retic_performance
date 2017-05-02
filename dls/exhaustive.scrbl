@@ -4,9 +4,9 @@
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[EXHAUSTIVE-BENCHMARKS]]
 
-This section presents the results of an @emph{exhaustive} performance
+This section presents the results of an @defn{exhaustive} performance
  evaluation of @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmark programs.
-The benchmarks are small Python programs whose @emph{implicit} types are
+The benchmarks are small Python programs whose @defn{implicit} types are
  expressible in Reticulated.
 Broadly speaking, the benchmark programs come from three sources:
 @itemlist[
@@ -16,7 +16,7 @@ Broadly speaking, the benchmark programs come from three sources:
 }
 @item{
   @integer->word[(length POPL-2017-BENCHMARK-NAMES)] benchmarks are from
-   the recent evaluation of Transient Reticulated@~cite[vss-popl-2017] on
+   the recent evaluation of Reticulated (with blame)@~cite[vss-popl-2017] on
    microbenchmarks from the Python Performance Benchmark
    Suite;@note{@url{https://github.com/python/performance}} and
 }
@@ -27,12 +27,11 @@ Broadly speaking, the benchmark programs come from three sources:
 ]
 
 @Figure-ref{fig:static-benchmark} tabulates information about the size and
- structure of the @emph{gradually typed} portions of the benchmarks.@note{In contrast, some benchmarks depend on third-party libraries or other untyped code.}
+ structure of the @defn{experimental} portions of the benchmarks.
 The five columns report the lines of code (@bold{SLOC}),@note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
  number of modules (@bold{M}),
- number of top-level function definitions (@bold{F}),
- number of class definitions (@bold{C}),
- and number of methods (@bold{m}).
+ number of function and method definitions (@bold{F}),
+ and number of class definitions (@bold{C}).
 
 The following descriptions briefly summarize the purpose of each benchmark.
 In addition, the descriptions credit the original authors of each program and

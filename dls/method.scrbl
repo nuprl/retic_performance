@@ -22,7 +22,7 @@ For each benchmark, we aimed to choose a set of configurations that represent th
 ]
 
 
-@section{Granularity Norm}
+@section{Generalizing GTP}
 
 @; NOTE need to borrow terms from literature, e.g.
 @; - Thatte's type-precision relation
@@ -95,6 +95,16 @@ Key insight from @citet[tfdffthf-ecoop-2015] is to define the notion of a
    syntax of @${L^\tau} allows.
 }
 
+@definition["implicit types"]{
+  An program @${P} is implicitly typed if @${P} has at least one
+   fully-typed configuration.
+  The type annotations in a given fully-typed configuration for @${P}
+   are a manifestation of the @emph{implicit types} in @${P}.
+}
+
+Of course, a given @${L} program may not have any fully-typed configurations.
+@; ... such programs are ??? (we don't need this definition so why bother)
+
 Instead of measuring the performance of @${L} programs per se,
  @citet[tfdffthf-ecoop-2015] propose a slightly different protocol:
 @itemlist[
@@ -159,6 +169,52 @@ Formally,
 }
 ]
 
-The norm we use is @${@gnorm{P}_z = @gnorm{P}_f + @gnorm{P}_C}.
+Other things being equal a larger norm is better, but the size of a configuration
+ space is exponential in the norm.
+Two ways to reduce the size:
+@itemlist[#:style 'ordered
+@item{
+  Use a coarser, non-trivial norm.
+}
+@item{
+  Refactor programs.
+  Remove unused functions or class fields,
+   inline simple functions,
+   do not measure libraries.
+  @; TODO did we do anything else?
+}
+]
 
+Makes sense not to measure external libraries.
+A programmer using gradual typing probably cannot change library code.
+Other code, may make less sense to not measure it.
+So, important to distinguish between experimental and control modules.
+
+Informally, a @emph{whole program} @${P} is self-contained code, e.g.
+ if a line of code in ${P} depends on some other code, that code is included
+ somewhere in @${P}.
+For performance evaluation we distinguish between @emph{experimental} and
+ @emph{control} portions of a whole program @${P}.
+The experimental code in @${P} is some code @${P' \subseteq P} for which a
+ fully-typed configuration exists.
+A @defn{proper} performance evaluation will measure the configuration space
+ of @${P'}.
+The control code in @${P} is everything not in the experimental portion,
+ intuitively a subset @${P_c} such that @${P_c = P \setminus P'}.
+
+@definition[@deliverable{D}]{
+  TBA
+}
+
+@definition["exhaustive evaluation"]{
+  Measure everything in configuration space.
+}
+
+@definition["approximate evaluation"]{
+  Measure some things in configuration space, in a principled way.
+  @Section-ref{sec:linear} introduces one form of approximation (@approximation["s" "t" "P"])
+   and demonstrates that linear-sized samples of a configuration space
+   provide a good approximation.
+  @; maybe explanation should use parameters. huh
+}
 
