@@ -41,6 +41,11 @@
   ;;  where `term` is a term to define and `defn ...` defines the term.
   ;; Renders a definition
 
+  defn
+  ;; Usage: @defn[term]
+  ;;  where `term` is previously defined in a `definition`
+  ;; Renders a reference to a technical term.
+
   lib-desc
   ;; (->* [string?] [#:rest pre-content?] pre-content?)
   ;; @lib-desc[lib-name]{descr}
@@ -230,6 +235,7 @@
   ;; Usage `@sf{some text}`
   ;; Renders `some text` in serif style
 
+  Section-ref
   section-ref
   ;; Usage: `@section-ref{section-name}`
   ;;  where `section-name` appears in a `@section[#:tag section-name]{...}` form
@@ -428,6 +434,9 @@
       (cons (element #f (list " (" (emph term) ") ")) defn*)
       (linebreak))))
 
+(define (defn term)
+  term)
+
 (define (bm-desc title author url lib . descr)
   ;(void (->benchmark title)) ;; assert that 'title' is the name of a benchmark
   (elem
@@ -521,6 +530,9 @@
 
 (define (cspace [letter "C"])
   (bold letter))
+
+(define (Section-ref s)
+  (elem "Section" ~ (secref s)))
 
 (define (section-ref s)
   (elem "section" ~ (secref s)))
