@@ -202,6 +202,10 @@ A @defn{proper} performance evaluation will measure the configuration space
 The control code in @${P} is everything not in the experimental portion,
  intuitively a subset @${P_c} such that @${P_c = P \setminus P'}.
 
+@definition[(elem u/p-ratio " " t/u-ratio " " t/p-ratio)]{
+  TBA
+}
+
 @definition[@deliverable{D}]{
   TBA
 }

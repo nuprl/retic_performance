@@ -141,8 +141,8 @@ For further evidence, the artifact for this paper contains scripts to reproduce
  this experiment.
 
 
-@section{Inexhaustive Evaluation}
-@; TODO need a slogan!
+@section{Approximate Evaluation}
+@; TODO is there a synonym for 'approximate' that starts with E ?
 
 @figure["fig:sample:static-benchmark" "Static summary of benchmarks" #:style center-figure-style
   @(parameterize ([*CACHE-SUFFIX* "-linear"])
