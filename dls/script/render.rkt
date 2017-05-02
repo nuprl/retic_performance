@@ -15,6 +15,12 @@
   render-validate-samples-plot*
 
   *PLOT-HEIGHT*
+
+  *CACHE-SUFFIX*
+  ;; (Parameterof String)
+  ;; Sometimes used to distinguish caches.
+  ;; As client, should set this if calling the same rendering function in
+  ;;  two different places in the same document.
 )
 
 (require
@@ -50,6 +56,7 @@
 (define NUM-COLUMNS 3)
 
 (define *PLOT-HEIGHT* (make-parameter #f))
+(define *CACHE-SUFFIX* (make-parameter ""))
 
 ;; -----------------------------------------------------------------------------
 
@@ -93,15 +100,21 @@
   (apply ht-append OVERHEADS-HSPACE col*))
 
 (define STATIC-INFO-TITLE*
-  (map bold '("Benchmark" "SLOC" "M" "F" "C" "m")))
+  (map bold '("Benchmark" "SLOC" "M" "F" "C")))
 
 (define (render-static-information bm*)
+  (define name* (map benchmark->name bm*))
   (tabular
     #:sep (hspace 2)
     #:row-properties '(bottom-border 1)
     #:column-properties (cons 'left (make-list (sub1 (length STATIC-INFO-TITLE*)) 'right))
     (cons STATIC-INFO-TITLE*
-          (map render-static-row bm*))))
+          (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                         [*current-cache-keys* (list (λ () name*))]
+                         [*with-cache-fasl?* #f])
+            (with-cache (cachefile (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
+              (λ ()
+                (map render-static-row bm*)))))))
 
 (define (render-static-row bm)
   (define py (benchmark-info->python-info bm))
@@ -110,9 +123,8 @@
     (map number->string (list
       (benchmark->sloc bm)
       (python-info->num-modules py)
-      (python-info->num-functions py)
-      (python-info->num-classes py)
-      (python-info->num-methods py)))))
+      (+ (python-info->num-functions py) (python-info->num-methods py))
+      (python-info->num-classes py)))))
 
 (define RATIOS-TITLE*
   (map bold '("Benchmark" "untyped/python" "typed/untyped")))

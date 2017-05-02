@@ -1,6 +1,10 @@
 #lang gm-dls-2017
 @title[#:tag "sec:linear"]{Scaling the Evaluation Method}
 
+@; TODO s,t is way way way too general,
+@;  should at least bring across we're doing LINEAR sampling,
+@;  and why can't you test whether constant-factor works?
+
 @; -----------------------------------------------------------------------------
 
 Linear measurements suffice to approximate the results of an exhaustive
@@ -140,8 +144,9 @@ For further evidence, the artifact for this paper contains scripts to reproduce
 @section{Inexhaustive Evaluation}
 @; TODO need a slogan!
 
-@figure["fig:sample:static-benchmark" "Static summary of benchmarks"
-  @render-static-information[SAMPLE-BENCHMARKS]]
+@figure["fig:sample:static-benchmark" "Static summary of benchmarks" #:style center-figure-style
+  @(parameterize ([*CACHE-SUFFIX* "-linear"])
+    @render-static-information[SAMPLE-BENCHMARKS])]
 
 @figure*["fig:sample" "Linear Measurements"
   (parameterize ([*PLOT-HEIGHT* 100])

@@ -27,6 +27,10 @@
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
 
+  *CACHE-SUFFIX*
+  ;; (Parameterof String)
+  ;; Optional tag to distinguish different cachefiles that would have the same name.
+
   TODO
   ;; Usage: @TODO{message}
   ;;  where `message` is an element.
