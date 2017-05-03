@@ -42,7 +42,7 @@ dist = p1.distance(p2)
 
 Here, @code{wrong} violates the class's types by incorrectly mutating the @code{x} field of @code{Point} with a string value.
 
-To prevent a runtime type error from occurring when calling the @code{distance} function, Reticulated inserts checks at the points where fields x and y are invoked as follows besides the checks which ensure that @code{p1} and @code{p2} are @code{Point} classes with members x and y. Therefore, the distance function is as follows:
+To prevent a runtime type error from occurring when calling the @code{distance} function, Reticulated inserts checks at the points where fields x and y are invoked besides the checks which ensure that @code{p1} and @code{p2} are @code{Point} classes with members x and y. Therefore, the distance function is as follows:
 
 @python{
   def distance(self, other):
