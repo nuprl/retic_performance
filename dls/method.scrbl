@@ -208,6 +208,10 @@ Unless we say otherwise, all control code is untyped.
   TBA
 }
 
+@definition["performance ratio"]{
+  TBA, need to generalize "typed/untyped" and "typed/python" and "untyped/python".
+}
+
 @definition[@deliverable{D}]{
   TBA
 }
