@@ -1,68 +1,72 @@
 #lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Gradual Typing}
 
-Outline:
 
-@section{Purpose of the section:Why is gradual typing useful for the programmer?}
-Allows programmers to incrementally type their programs. The reason they want their programs to be gradually typed is that gradual typing provides guarantees about soundness during runtime.
+Gradual typing does not only enable programmers to incrementally add types to their programs, but also provides soundness guarantees that describe the runtime behavior of a given program.
 
+In order to understand the soundness guarantees Gradual Typing provides, and why they are important for the programmer, we must define soundness for partially typed programs. In general, soundness means that if a program is well-typed, it will never terminate with a type error.
 
-@section{What is soundness for partially typed programs?}
-In order to see why soundness is important for the programmer in partially typed programs, we need to define it.
+For partially typed programs however, the definition is slightly different. A partially typed program is sound if it terminates with a type error at one of the boundaries between typed and untyped code, but otherwise does not terminate with a type error.
 
-Soundness:
+Reticulated enforces that definition by inserting runtime checks into various parts of the program to prevent it from terminating with a type error at the well-typed regions.
 
-We use the similarity relation from SNAPL sim(a,b), which states that a and b are the same with a possibly having more types or casts.
+Consider the following example from Reticulated of a @code{Point} class:
 
-The definition states that given two programs P and P_M which are similar and where M is a typed module:
+@python|{
+import math
 
-1- if P evaluates to v then P_M evaluates to v' where sim(v,v') or it outputs an (runtime/static)? error where g != M. (not sure what that means)
+@fields({'x': Float, 'y':Float})
+class Point:
+  def __init__(self:Point,
+  x:Float, y:Float)->Void:
+    self.x = x
+    self.y = y
+    
+  def distance(self:Point,
+  other:Point)->Float:
+    dx = self.x - other.x
+    dy = self.y - other.y
+    return math.sqrt(dx**2 + dy**2)
 
- ** what about when typing M catches a static type error in M?**
+def wrong(p):
+  p.x = str(p.x)
+  
+p1 = Point(1, 2)
+p2 = Point(3, 4)
 
-2- If P results in an error, then P_M also results in an error and g != M
+wrong(p1)
 
-3- If P does not terminate then P_M does not terminate, or outputs an error.
-
-
-Mention why this definition allows the programmer to produce less error prone programs and helps catch errors, possibly give an example.
-
-
-@section{Reticulated Python design}
-
-- Mention that we can type smaller expressions in the program within a module.
-
-- Those expressions are limited to those typable according to idiomatic python
-@note{@url{https://www.python.org/dev/peps/pep-0484/}}
-
-- Reticulated Python does not support generics @~cite[vksb-dls-2014], which means we use type Dyn instead (some of our benchmarks had generics, so this point can be postponed to the benchmark section)
-
-Dyn is a type used in the absense of type annotations. 
-
-@section{Transient semantics}
-In Transient semantics, casts are inserted at different sites in the code to detect errors that would normally occur in Runtime.
-
-Consider the following example:
-
-@code{
-def f(l1:list) -> Int:
-  return sum(l1)
-
-f(["1", "2"])
-}
+dist = p1.distance(p2)
+}|
 
 
- The casts are inserted at call sites, attribute reads, subscription, function definitions and for loops.
+Here, @code{wrong} violates the class's types by incorrectly mutating the @code{x} field of @code{Point} with a string value.
 
-for a function call, we insert a cast around the argument, for an attribute read, it would be around the object being modified etc.
+To prevent a runtime type error from occurring when calling the @code{distance} function, Reticulated inserts checks at the points where fields x and y are invoked as follows besides the checks which ensure that @code{p1} and @code{p2} are @code{Point} classes with members x and y. Therefore, the distance function is as follows:
+
+@python{
+  def distance(self, other):
+        check0(self)
+        check0(other)
+        dx = (check_type_float(self.x) -
+	      check_type_float(other.x))
+        dy = (check_type_float(self.y) -
+	      check_type_float(other.y))
+        return check_type_float
+	       (check_type_function
+	       (check1(math).sqrt)
+	       (((dx ** 2) + (dy ** 2))))}
+
+
+In this case,
+
+@code{check_type_float(self.x)} should fail terminating the program before the operation occurs and before the program can terminate with a type error.
+
+A full list of sites where checks are inserted can be found at @~cite[vksb-dls-2014] but they are generally inserted at entries to function bodies as we showed above, inside for loops and use-sites of variables with non-base types.
+
+In that sense, Reticulated Python adheres to the soundness definition above because the well-typed parts of the program do not terminate with a type-error due to the presence of the runtime checks.
 
 
 
 
-
-- Explain soundness in Reticulated Python and talk about the gradual guarantee
-
-
-@section{Is reticulated Python sound?}
-Does reticulated python actually follow the definition of soundness?
 
