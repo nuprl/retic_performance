@@ -227,7 +227,10 @@ Unless we say otherwise, all control code is untyped.
 
 @section[#:tag "sec:protocol"]{Protocol}
 
-The performance evaluations in this paper adhere to the following protocol.
+The performance evaluations in this paper adhere to the following protocols
+ for @emph{benchmark creation} and @emph{data collection}.
+@; In this application of the Takikawa method, experimental _components_
+@;  are always modules so we will not say "component"
 
 @; Except for the specific details of the Karst cluster, this protocol is generic.
 @; I mean, it's written as steps that you can follow
@@ -239,24 +242,27 @@ The performance evaluations in this paper adhere to the following protocol.
 @parag{Machine Specifics}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} present data
- from the Indiana University Karst cluster.
-Jobs running on the cluster:
+ from the @emph{Karst at Indiana University} high-throughput computing cluster.@note{@url{https://kb.iu.edu/d/bezu}}
+Each job that we scheduled on the cluster:
 @itemlist[#:style 'ordered
 @item{
-  reserved all processors on a cluster node for a 24-hour span;
+  reserved all processors on an arbitrary cluster node for a 24-hour span;
 }
 @item{
-  downloaded fresh copies of Python 3.4 and Reticulated;@note{The @tt{master} branch, COMMIT} and
+  downloaded fresh copies of Python 3.4.3@note{@url{https://www.python.org/download/releases/3.4.3/}}
+  and Reticulated (commit @hyperlink["https://github.com/mvitousek/reticulated/commit/e478343ce7c0f2bc50d897b0ad38055e8fd9487d"]{@tt{e478343}}
+  on the @hyperlink["https://github.com/mvitousek/reticulated"]{@tt{master}} branch);
 }
 @item{
-  for the rest of the 24 hours:
+  for the rest of the 24-hour span:
   selected a random configuration to measure,
   ran the configuration's main module @id[NUM-ITERATIONS] times,
   and recorded the result of each run.
 }
 ]
-The data is the result of running such jobs in parallel and organizing their output.
-According to the Karst documentation, each node is identical (TODO exact specs).
-@; reason for 40 iterations is fear of outliers, exact-runtime data gives some justification for the fear
+The data is the result of running such jobs in parallel on general-access nodes in the cluster.
+Such nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
+ 8-core processors, 32 GB of RAM, and 250 GB of local disk storage.@note{@url{https://kb.iu.edu/d/bezu#overview}}
 
-The online supplement to this paper contains the aforementioned scripts and documentation.
+The online supplement to this paper contains scripts that implement the above
+ protocol, both for the Karst cluster and for local use.
