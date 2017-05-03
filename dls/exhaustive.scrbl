@@ -5,44 +5,52 @@
   @render-static-information[EXHAUSTIVE-BENCHMARKS]]
 
 This section presents the results of an @defn{exhaustive} performance
- evaluation of @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmark programs.
+ evaluation of @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]
+ benchmark programs.
 The benchmarks are small Python programs whose @defn{implicit} types are
  expressible in Reticulated.
-Broadly speaking, the benchmark programs come from three sources:
-@; TODO tense is all wrong
-@itemlist[
-@item{
-  @integer->word[(length DLS-2014-BENCHMARK-NAMES)] benchmarks are adaptations
-   of case studies conducted by @citet[vksb-dls-2014];
-}
-@item{
-  @integer->word[(length POPL-2017-BENCHMARK-NAMES)] benchmarks are from
-   the recent evaluation of Reticulated (with blame)@~cite[vss-popl-2017] on
-   microbenchmarks from the Python Performance Benchmark
-   Suite;@note{@url{https://github.com/python/performance}} and
-}
-@item{
-  the remaining @integer->word[(length DLS-2017-BENCHMARK-NAMES)] benchmarks
-  are open source programs that the second author converted to Reticulated.
-}
-]
+The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
+ @defn["overhead plots"] (@figure-ref{fig:overhead}), and a series
+ of graphs comparing the @emph{number} of type annotations in a configuration
+ against the configuration's performance (@figure-ref{fig:exact}).
 
-@Figure-ref{fig:static-benchmark} tabulates information about the size and
- structure of the @defn{experimental} portions of the benchmarks.
-The five columns report the lines of code (@bold{SLOC}),@note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
- number of modules (@bold{M}),
- number of function and method definitions (@bold{F}),
- and number of class definitions (@bold{C}).
 
-@; TODO so long
-The following descriptions list the @defn{control} code in each benchmark,
- summarize the benchmarks' purpose, and credit the original authors.
+@section{About the Benchmarks}
 
-@; TODO make a note
-@; the original authors (often) helped with preliminary things:
-@; - inferring implicit types
-@; - separating experimental and control code
-@; - choosing test input
+@(let ([total @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]]
+       [num1 @integer->word[(length DLS-2014-BENCHMARK-NAMES)]]
+       [dls-names @authors*[(map (compose1 tt symbol->string) DLS-2014-BENCHMARK-NAMES)]]
+       [num2 @integer->word[(length POPL-2017-BENCHMARK-NAMES)]]
+       [num3 @integer->word[(length DLS-2017-BENCHMARK-NAMES)]]
+      ) @elem{
+  @; Many of the benchmark programs stem from prior work on Reticulated.
+  Of the @|total| benchmark programs,
+   @|num1| originate from case studies by @citet[vksb-dls-2014],@note{@|dls-names|.}
+   @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
+   @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
+   and the remaining @|num3| originate from open-source programs.
+  (Every list of the benchmarks in this section is ordered first by the
+   benchmarks' origin and second by the benchmark's names.)
+})
+@; REMARK: original authors helpful with (code, test input, comments)
+
+@(let* ([column-descr*
+         (list
+           @elem{lines of code (@bold{SLOC}),@note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.} }
+           @elem{number of modules (@bold{M}), }
+           @elem{number of function and method definitions (@bold{F}), }
+           @elem{and number of class definitions (@bold{C}).})]
+        [num-col @integer->word[(length column-descr*)]]
+       ) @elem{
+  @Figure-ref{fig:static-benchmark} tabulates information about the size and
+   structure of the @defn{experimental} portions of the benchmarks.
+  The @|num-col| columns report the @|column-descr*|
+})
+
+The following descriptions credit the benchmarks' original authors,
+ state whether the benchmarks depend on any @defn{control} modules,
+ and briefly summarize the purpose of the @defn{experimental} modules.
+
 
 @; -----------------------------------------------------------------------------
 @; --- WARNING: the order of benchmarks matters!
@@ -71,8 +79,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 @list[
   @lib-desc["urllib"]{To split an IRI into components}
 ]]{
-  Converts a collection of Internationalized Resource Identifiers
-  (@hyperlink["https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier"]{IRIs})
+  Converts a collection of @hyperlink["https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier"]{Internationalized Resource Identifiers}
   to equivalent @hyperlink["http://www.asciitable.com/"]{ASCII} resource
   identifiers.
   @; 10 iterations
@@ -92,7 +99,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Microbenchmarks the overhead of simple method calls;
+  Microbenchmarks simple method calls;
   the calls do not use argument lists,
   keyword arguments, or tuple unpacking.
   @; Consists of @${32*10^5} calls to trivial functions.
@@ -103,8 +110,9 @@ The following descriptions list the @defn{control} code in each benchmark,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Microbenchmarks the overhead of calls to methods listed in
-  an object's @tt{__slots__} attribute.
+  Same as @bm{call_method}, but using receiver objects that declare their methods
+   in their @hyperlink["https://docs.python.org/3/reference/datamodel.html#slots"]{@tt{__slots__}}
+   attribute.
   @; 1 iteration
 }
 
@@ -112,8 +120,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Microbenchmarks standard function calls.
-  This benchmark is similar to @tt{call_method}.
+  Same as @bm{call_method}, using functions rather than methods.
 }
 
 @bm-desc["chaos"
@@ -156,7 +163,7 @@ The following descriptions list the @defn{control} code in each benchmark,
   Implements the game @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{Go}.
   This benchmark is split across three files: an @defn{experimental} module that implements
   the game board, a @defn{control} module that defines constants, and a @defn{control} module
-  that implements the AI and drives the benchmark.
+  that implements an AI and drives the benchmark.
   @; 2 iterations
 }
 
@@ -214,7 +221,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 @list[
   @lib-desc["operator"]{itemgetter}
 ]]{
-  Implements Kruskal's spanning-tree algorithm.
+  Implements Kruskal's spanning-tree algorithm@~cite[k-ams-1956].
   @; 1 iteration
 }
 
@@ -227,9 +234,9 @@ The following descriptions list the @defn{control} code in each benchmark,
     @elem{@id[(- num-python-files-in-both-dir num-test-files)] untyped modules})
 ]]{
   Implements a card game.
-  The gradually typed modules in this benchmark represent the possible actions
-  that a player can take on each turn.
-  The untyped modules encode the players, cards, and game logic.
+  The experimental modules represent the possible actions
+   that a player can take on each turn.
+  The control modules encode the players, cards, and game logic.
   @; 20 iterations
 }
 
@@ -242,7 +249,7 @@ The following descriptions list the @defn{control} code in each benchmark,
   @lib-desc["random"]{random randrange}
 ]]{
   Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
-  This benchmark is adapted from a similar Racket program@~cite[greenman-jfp-2017].
+  This benchmark is adapted from a similar Racket program called @tt{fsmoo}@~cite[greenman-jfp-2017].
   @; 100 iterations
 }
 
@@ -252,7 +259,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 @list[
   @lib-desc["os"]{path join}
 ]]{
-  Implements the @hyperlink["TODO"]{Ford-Fulkerson} max flow algorithm.
+  Implements the Ford-Fulkerson max flow algorithm@~cite[ff-cjm-1956].
   @; 1 iteration
 }
 
@@ -268,7 +275,7 @@ The following descriptions list the @defn{control} code in each benchmark,
 }
 
 
-@section{Results I: Performance Ratios}
+@section{Performance Ratios}
 @; MOTIVATION (to appear in Section 3)
 @; - highlevel picture of performance, coarse answer to "what is perf"
 @; - overhead of choosing retic at all, vs. Python

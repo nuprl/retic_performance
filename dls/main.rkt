@@ -107,6 +107,7 @@
   ;; Wraps its arguments in dollar signs `$ ....$` and sends the result to LaTeX
 
   authors
+  authors*
   ;; Usage: `@authors[author-name ...]
   ;;  where `author-name` is a string
   ;; Renders a sequence of author names
@@ -384,16 +385,18 @@
   #:style small-number-style)
 
 (define (authors . a*)
+  (authors* a*))
+
+(define (authors* a*)
   (cond
    [(null? a*)
     (raise-argument-error 'authors "at least one argument" a*)]
    [(null? (cdr a*))
     (car a*)]
    [(null? (cddr a*))
-    (string-append (car a*) " and " (cadr a*))]
+    (list (car a*) " and " (cadr a*))]
    [else
-    (apply string-append
-      (add-between a* ", " #:before-last ", and "))]))
+    (add-between a* ", " #:before-last ", and ")]))
 
 (define (sf x)
   (elem #:style "sfstyle" x))
@@ -470,7 +473,7 @@
     (for/list ([l (in-list lib*)])
       (hyperlink (lib-url l) (tt (lib-name l)))))
   (define l-str (if (null? (cdr lib*)) "library" "libraries"))
-  (list "the " (add-between n* ", " #:before-last ", and ") " " l-str))
+  (list "the " (authors* n*) " " l-str))
 
 (struct lib [name url] #:transparent)
 
@@ -646,7 +649,7 @@
     (check-exn exn:fail:contract?
       (λ () (authors)))
     (check-equal? (authors "john doe") "john doe")
-    (check-equal? (authors "a" "b") "a and b")
-    (check-equal? (authors "a" "b" "c") "a, b, and c"))
+    (check-equal? (authors "a" "b") (list "a" " and " "b"))
+    (check-equal? (authors "a" "b" "c") (list "a" ", " "b" ", and " "c")))
 
 )

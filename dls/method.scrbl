@@ -229,11 +229,10 @@ Unless we say otherwise, all control code is untyped.
 
 The performance evaluations in this paper adhere to the following protocols
  for @emph{benchmark creation} and @emph{data collection}.
+
 @; In this application of the Takikawa method, experimental _components_
 @;  are always modules so we will not say "component"
-
-@; Except for the specific details of the Karst cluster, this protocol is generic.
-@; I mean, it's written as steps that you can follow
+@; Written as general "recipe to follow", except for details of Karst
 
 @parag{Benchmark Creation}
 Given a Python program, first build a driver module that performs some
@@ -254,8 +253,8 @@ When necessary, use details of the driver module to infer types;
 Enumerate the configuration space and choose a random permutation of the
  enumeration.
 Optionally divide the permutation across multiple processors or machines.
-For each configuration in the enumeration, run the main module of the
- configuration a fixed number of times and record each running time.
+Run the main module of the configuration a fixed number of times and record
+ each running time.
 Finally, run the main module of the untyped configuration using the standard
  Python interpreter.
 
@@ -290,7 +289,7 @@ First, nodes selected a random configuration by reading from a
  text file that contained a permutation of the configuration space.
 This text file was stored on a dedicated machine.
 Second, the same dedicated machine that stored the text file also stored
- an explicit representation of the configuration space of each module
+ an explicit representation of the configuration space of each @emph{module}
  of each benchmark.
 After a node selected a configuration to run, it copied the relevant files
  to private storage before running the main module.
@@ -300,4 +299,4 @@ Third, we wrapped the main computation of every benchmark in a
  @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}).
 
 The online supplement to this paper contains scripts that implement the above
- protocol, both for the Karst cluster and for local use.
+ protocol, both for the Karst cluster and for a typical workstation.

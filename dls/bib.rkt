@@ -1967,3 +1967,21 @@
    #:location (proceedings-location snapl)
    #:date 2017))
 
+(define ff-cjm-1956
+  (make-bib
+    #:title "Maximal flow through a network"
+    #:author (authors "L. R. Ford" "D. R. Fulkerson")
+    #:location (journal-location "Canadian Journal of Mathematics"
+                 #:volume 8
+                 #:pages '(399 404))
+    #:date 1956))
+
+(define k-ams-1956
+  (make-bib
+    #:title "On the shortest spanning subtree of a graph and the traveling salesman problem"
+    #:author "Joseph B. Kruskal, Jr."
+    #:location (journal-location "Proceedings of the American Mathematical Society"
+                 #:volume 7
+                 #:number 1
+                 #:pages '(48 50))
+    #:date 1956))
