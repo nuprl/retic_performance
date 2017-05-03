@@ -273,7 +273,7 @@ Each job that we scheduled on the cluster:
   reserved all processors on an arbitrary cluster node for a 24-hour span;
 }
 @item{
-  downloaded fresh copies of Python 3.4.3@note{@url{https://www.python.org/download/releases/3.4.3/}}
+  downloaded fresh copies of @|PYTHON|@note{@url{https://www.python.org/download/releases/3.4.3/}}
   and Reticulated (commit @hyperlink["https://github.com/mvitousek/reticulated/commit/e478343ce7c0f2bc50d897b0ad38055e8fd9487d"]{@tt{e478343}}
   on the @hyperlink["https://github.com/mvitousek/reticulated"]{@tt{master}} branch);
 }

@@ -101,6 +101,10 @@
   NUM-ITERATIONS
   ;; Number of times we ran each configuration for each benchmark.
 
+  PYTHON
+  ;; "Python 3.4.3",
+  ;;  the proper name of the version of python that we used to collect data
+
   $
   ;; Usage: `@${some math}`
   ;;  where `some math` is LaTeX-formatted math.
@@ -298,6 +302,9 @@
 
 (define NUM-ITERATIONS
   40)
+
+(define PYTHON
+  "Python 3.4.3")
 
 (define SAMPLE-RATE
   10)
