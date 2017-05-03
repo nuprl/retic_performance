@@ -251,8 +251,16 @@ When necessary, use details of the driver module to infer types;
 
 
 @parag{Data Collection}
+Enumerate the configuration space and choose a random permutation of the
+ enumeration.
+Optionally divide the permutation across multiple processors or machines.
+For each configuration in the enumeration, run the main module of the
+ configuration a fixed number of times and record each running time.
+Finally, run the main module of the untyped configuration using the standard
+ Python interpreter.
 
-@parag{Machine Specifics}
+
+@parag{Details of the Evaluations}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} present data
  from the @emph{Karst at Indiana University} high-throughput computing cluster.@note{@url{https://kb.iu.edu/d/bezu}}
@@ -273,9 +281,23 @@ Each job that we scheduled on the cluster:
   and recorded the result of each run.
 }
 ]
-The data is the result of running such jobs in parallel on general-access nodes in the cluster.
-Such nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
+The data is the result of running such jobs in parallel.
+Cluster nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
  8-core processors, 32 GB of RAM, and 250 GB of local disk storage.@note{@url{https://kb.iu.edu/d/bezu#overview}}
+
+Three details of the Karst protocol warrant further attention.
+First, nodes selected a random configuration by reading from a
+ text file that contained a permutation of the configuration space.
+This text file was stored on a dedicated machine.
+Second, the same dedicated machine that stored the text file also stored
+ an explicit representation of the configuration space of each module
+ of each benchmark.
+After a node selected a configuration to run, it copied the relevant files
+ to private storage before running the main module.
+Third, we wrapped the main computation of every benchmark in a
+ @tt{with} statement@note{@url{https://www.python.org/dev/peps/pep-0343/}}
+ to record execution time (via the Python function
+ @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}).
 
 The online supplement to this paper contains scripts that implement the above
  protocol, both for the Karst cluster and for local use.
