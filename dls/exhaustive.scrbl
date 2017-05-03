@@ -285,45 +285,44 @@ The following descriptions credit the benchmarks' original authors,
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
-The table in @figure-ref{fig:ratio} presents two sets of performance ratios.
-The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python and
-The @emph[t/u-ratio] reports the overhead of the fully-typed Reticulated
+The table in @figure-ref{fig:ratio} lists data for two performance ratios.
+The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python.
+The @emph[t/u-ratio] reports the overhead of the fully-typed
  configuration relative to the untyped configuration.
+
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
  @bm{futen} benchmark using Reticulated was 1.61 times slower than the
- average time of running the same source code using Python 3.4.
-The @|t/u-ratio| for @bm{futen} implies that the fully-typed configuration
- is 1.04 times slower than the untyped configuration, both run using Reticulated.
+ average time of running the same source code using @|PYTHON|.
+Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
+ is 1.04 times slower than the untyped configuration.
 
-Observations:
-@itemlist[
-@item{
-  Every ratio in the table is either 1x or greater.
-  @emph{Interpretation:} migrating from Python to Reticulated---or from the untyped
-   configuration to the fully-typed configuration---never leads to a performance
-   improvement in the benchmark programs.
-}
-@item{
-  Ten @|u/p-ratio|s are below 2x,
-  five @|u/p-ratio|s are between 2x and 3x,
-  and the remaining four @|u/p-ratio|s are below 4.5x.
-}
-@item{
-  Sixteen @|t/u-ratio|s are below 2x,
-  one @|t/u-ratio| is below 3x,
-  and the other two @|t/u-ratio|s are below 3.5x.
-}
-@item{
-  For fourteen benchmarks, the @|t/u-ratio| is less than the @|u/p-ratio|.
-  @emph{Interpretation:} migrating from the untyped configuration to the
-   fully-typed configuration typically adds less overhead than migrating
-   the untyped program from Python to Reticulated.
-}
-]
+These ratios demonstrate that migrating a benchmark to Reticulated, or
+ from untyped to fully-typed, adds performance overhead.
+In all cases, this overhead is somewhere between zero overhead (as opposed
+ to a non-zero @emph{speedup}) and an order-of-magnitude slowdown.
+
+Regarding the @|u/p-ratio|s: ten are below 2x,
+ five are between 2x and 3x, and
+ the remaining four are below 4.5x.
+The @|t/p-ratio|s are typically lower:
+  sixteen are below 2x,
+  one is between 2x and 3x,
+  and the final two are below 3.5x.
+In particular, fourteen of the benchmarks
+ have smaller @|t/u-ratio|s than @|u/p-ratio|s.
+This data suggests that migrating an arbitrary
+ Python program to Reticulated will add a relatively larger overhead
+ than migrating the same program to a fully-typed configuration.
+
+@; For developers:
+@; - the PERFORMANCE pain of choosing retic
+@; - should be LESS than the PERFORMANCE pain of adding type annotations
+@; - I mean, the overall pain will be their PRODUCT
+@; - but just running under retic should tell you what to expect
 
 
-@section{Results II: Overhead Plots}
+@section{Overhead Plots}
 @; these plots are the main event!
 @; - given "any program any configuration", what is probability of OK perf?
 @; - how does prob. change as "OK" changes?
