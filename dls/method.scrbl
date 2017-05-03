@@ -236,6 +236,19 @@ The performance evaluations in this paper adhere to the following protocols
 @; I mean, it's written as steps that you can follow
 
 @parag{Benchmark Creation}
+Given a Python program, first build a driver module that performs some
+ non-trivial computation using the program.
+Second, remove any non-determinism or unneccesary I/O actions@note{e.g. print
+ statements and requests for user input} from the program.
+Third, define the experimental modules.
+Fourth, infer fully-typed configurations for the experimental modules.
+
+When possible, use existing type annotations and comments to infer
+ the fully-typed configuration of the benchmark.
+When necessary, use details of the driver module to infer types;
+ for example, any polymorphic functions on lists must use monomorphic types
+ because Reticulated does not support Python's syntax for generics.@note{@url{https://www.python.org/dev/peps/pep-0484/#generics}}
+
 
 @parag{Data Collection}
 
