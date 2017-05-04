@@ -65,7 +65,7 @@
 (defparam *OVERHEAD-LABEL?* #f boolean?)
 (defparam *OVERHEAD-LINE-COLOR* 3 plot-color/c)
 (defparam *OVERHEAD-LINE-STYLE* 'solid plot-pen-style/c)
-(defparam *OVERHEAD-LINE-WIDTH* 2 Nonnegative-Real)
+(defparam *OVERHEAD-LINE-WIDTH* 1 Nonnegative-Real)
 (defparam *OVERHEAD-MAX* 10 Natural)
 (defparam *OVERHEAD-SHOW-RATIO* #t (U Symbol Boolean))
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
@@ -76,7 +76,7 @@
 (defparam *CONFIGURATION-X-JITTER* 0.4 Real)
 (defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
 (defparam *CONFIDENCE-LEVEL* 95 Percent)
-(defparam *INTERVAL-ALPHA* 0.4 Nonnegative-Real)
+(defparam *INTERVAL-ALPHA* 1 Nonnegative-Real)
 
 
 ;; -----------------------------------------------------------------------------
@@ -130,8 +130,8 @@
                    [plot-font-size (*FONT-SIZE*)])
       (plot-pict
         (list
-          (tick-grid)
-          (make-count-configurations-function pi))
+          (make-count-configurations-function pi)
+          (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
         #:y-min 0
@@ -153,13 +153,13 @@
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)]
-                   [*OVERHEAD-LINE-WIDTH* (- (*OVERHEAD-LINE-WIDTH*) 1)]
+                   [*INTERVAL-ALPHA* 0.4]
                    [*OVERHEAD-LINE-COLOR* 4])
       (plot-pict
         (list
-          (tick-grid)
           (for/list ([s (in-list sample*)] [i (in-naturals 1)])
-            (make-count-configurations-function (performance-info%sample pi s))))
+            (make-count-configurations-function (performance-info%sample pi s)))
+          (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
         #:y-min 0
@@ -180,15 +180,14 @@
                    [plot-y-far-ticks no-ticks]
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
-                   [plot-font-size (*FONT-SIZE*)]
-                   [*OVERHEAD-LINE-WIDTH* (- (*OVERHEAD-LINE-WIDTH*) 2)])
+                   [plot-font-size (*FONT-SIZE*)])
       (plot-pict
         (list
-          (tick-grid)
           (make-count-configurations-function pi)
           (make-sample-function-interval
             (for/list ([s (in-list sample*)])
-              (performance-info%sample pi s))))
+              (performance-info%sample pi s)))
+          (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
         #:y-min 0
@@ -223,13 +222,18 @@
     (vrule (- i 0.5) #:width 0.6 #:color 0)))
 
 (define (make-count-configurations-function pi)
-  (function
+  (function-interval
+    (λ (r) 0)
     (make-deliverable-counter pi)
     0 (*OVERHEAD-MAX*)
+    #:alpha (*INTERVAL-ALPHA*)
     #:color (*OVERHEAD-LINE-COLOR*)
+    #:line1-color (*OVERHEAD-LINE-COLOR*)
+    #:line2-color (*OVERHEAD-LINE-COLOR*)
+    #:line1-width (*OVERHEAD-LINE-WIDTH*)
+    #:line2-width (*OVERHEAD-LINE-WIDTH*)
     #:samples (*OVERHEAD-SAMPLES*)
-    #:style (*OVERHEAD-LINE-STYLE*)
-    #:width (*OVERHEAD-LINE-WIDTH*)))
+    #:style (*OVERHEAD-LINE-STYLE*)))
 
 ;; make-simple-deliverable-counter : (-> performance-info? (-> real? natural?))
 ;; Specification for `make-deliverable-counter`
@@ -280,14 +284,14 @@
     (λ (r) (lower-confidence ((make-get-percents) r)))
     (λ (r) (upper-confidence ((make-get-percents) r)))
     0 (*OVERHEAD-MAX*)
-    #:color "brown"
+    #:alpha (*INTERVAL-ALPHA*)
+    #:color "black"
+    #:line1-color 0
+    #:line1-width 1
+    #:line2-color 0
+    #:line2-width 1
     #:samples (*OVERHEAD-SAMPLES*)
     #:style 'solid
-    #:line1-color 0
-    #:line2-color 0
-    #:line1-width 1
-    #:line2-width 1
-    #:alpha (*INTERVAL-ALPHA*)
     #:label #f))
 
 (define (lower-confidence n*)
@@ -377,7 +381,7 @@
 
 (define (exact-add-legend bm-name num-points pict)
   (define name (render-benchmark-name bm-name))
-  (define np (render-count num-points "trials"))
+  (define np (render-count num-points "points"))
   (add-legend name pict np))
 
 (define (samples-add-legend bm-name sample-size num-samples pict)
