@@ -1,6 +1,10 @@
 #lang gm-dls-2017
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
+@; TODO
+@; dont forget, people will jump to these sections without reading the definitions
+@; - first pargraph on "distilling" needs work
+
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[EXHAUSTIVE-BENCHMARKS]]
 
@@ -339,55 +343,73 @@ This data suggests that migrating an arbitrary
  configurations of the @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmarks.
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
  for @emph{D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
-Note that each @|x-axis| is log-scaled; vertical tick marks appear at 1.2x,
- 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
-Lastly, the benchmarks' name, @|t/p-ratio|, and number of configurations appear
- above each plot.
+The @|x-axes| are log-scaled to emphasize the practical importance of low
+ overheads;
+ vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
 
-@; To note:
-@; - lowest x-value with non-zero y-value = u/p-ratio
-@; - lowest x-value with y=100 = max overhead
+The heading above the plot for a given benchmark lists the benchmark's name,
+ @|t/p-ratio| (in parentheses), and number of configurations.
+Note that the @|t/p-ratio| is equal to the product of the @|u/p-ratio| and
+ @|t/u-ratio| reported in @figure-ref{fig:ratio}.
+The number of configurations is equal to @$|{2^{F+C}}|,
+ where @${F} and @${C} denote the corresponding values from
+ @figure-ref{fig:static-benchmark}.
+@; TODO clarify "corresponding values"? Could say, "denote the number of functions (F) and number of classes (C) reported in ....
 
-Observations:
-@itemlist[
-@item{
-  Every configuration in the experiment is @deliverable[10].
-  In other words, no combination of typed and untyped components in this
-   experiment led to a performance overhead that exceeded 10x.
-}
-@item{
-  Six benchmarks are @deliverable[2].
-@;  @emph{Interpretation:} nearly one-third of the benchmark suite
-@;   demonstrates little-to-no overhead.
-}
-@item{
-  Eleven benchmarks have smooth slopes.
-  A smooth slope implies that gradual typing imposes a gradual performance
-   overhead, in the sense that adding a type annotation to any given component
-   adds roughly the same performance overhead.
-  @; TODO make this formal? Could be a cool slogan.
-  @; - how to check? delta with/without each compnoent?
-  @; - slogan to call it ... "continuous" ?
-  @; - validate on Racket?
-  @; - really matches gaps in the graph?
-}
-@item{
-  There is no apparent correlation between a benchmark's size and its worst-case
-   performance overhead.
-  @TODO{need to confirm with the largest benchmarks}
-}
-@item{
-  Ten benchmarks are approximately @deliverable{T},
-   where @emph{T} is the @|t/p-ratio|.
-  Contrariwise, the @bm{spectralnorm} benchmark has some partially-typed
-   configurations with significantly higher overhead than the fully-typed
-   configuration.
-}
-]
+@parag{How to Read the Overhead Plots}
+@; HMMMM "are" is NOT correct, but it sticks.
+Overhead plots are cumulative distribution functions.
+As the value of @${D} increases along the @|x-axis|, the number of
+ @deliverable{D} configurations can only increase.
+In other words, blue is better!
+The larger the shaded area under the curve on each plot, the more configurations
+ are @deliverable{D} for low values of @${D}.
+And if a benchmark has many @deliverable{D} configurations, a developer
+ that applies gradual typing has a higher chance of arriving at a configuration
+ that is @deliverable{D}.
+
+After surveying the area under a curve, the second most important aspects of
+ an overhead plot are the values of @${D} where the curve starts and ends.
+More precisely, if @${f} is a function that counts the number of @deliverable{D}
+ configurations in a fixed benchmark, the critical points are the smallest
+ values @${d_{min}, d_{max}} such
+ that @${f(d_{min}) > 0} and @${f(d_{max}) = 100}.
+An ideal start-value would lie between zero and one; if @${d_{min} < 1} then
+ at least one configuration runs faster than the original Python code.
+The end-value @${d_{max}} is the overhead of the slowest-running configuration
+ in the benchmark.
+@; given the choice of type annotations
+
+Lastly, the slope of a curve corresponds to the likelihood that
+ accepting a small increase in performance overhead makes a given configuration
+ deliverable.
+A flat curve (zero slope) indicates that the performance of a group of
+ configurations is dominated by a common set of type annotations.
 
 
-@section{Results III: Absolute Running Time}
-@; what do these tell us? (less than overhead plots and even ratios, but still interesting I think)
+@parag{Distilling the Overhead Plots}
+
+Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
+ top of the @|y-axis| at a low value of @${D}.
+This value is always less than 10; every configuration in the experiment is
+ @deliverable{10}.
+Six benchmarks are even @deliverable{2}.
+Including these six, @integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]] benchmarks are
+ roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
+The only exception is @bm{spectralnorm}, which has some configurations where
+ adding a type annotation can improve performance (see @section-ref{sec:exact}).
+@; TODO correct section to reference?
+
+None of the configurations in the experiment run faster than the Python baseline.
+This is no surprise, since Reticulated only adds runtime checks to Python code.
+
+Eleven benchmarks have smooth slopes.
+The other seven have flat segments because there are type boundaries in these
+ benchmarks that introduce significant overhead.
+
+
+@section[#:tag "sec:exact"]{Absolute Running Times}
+@; what do these tell us?
 @; for the developer:
 @; - overall trend, more types = more slow
 @;   - (usually, but NOT ALWAYS)

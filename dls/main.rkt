@@ -19,8 +19,8 @@
   generate-bibliography
   bm-desc
 
-  x-axis
-  y-axis
+  x-axis y-axis
+  x-axes y-axes
   ;; Usage: @|x-axis|
   ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
 
@@ -539,9 +539,6 @@
 (define (TODO . msg)
   (apply bold "TODO: " msg))
 
-(define (axis q)
-  (elem (emph q) "-axis"))
-
 (define (cspace [letter "C"])
   (bold letter))
 
@@ -550,6 +547,18 @@
 
 (define (section-ref s)
   (elem "section" ~ (secref s)))
+
+(define (axes q)
+  (elem (emph q) "-axes"))
+
+(define x-axes
+  (axes "x"))
+
+(define y-axes
+  (axes "y"))
+
+(define (axis q)
+  (elem (emph q) "-axis"))
 
 (define x-axis
   (axis "x"))
