@@ -397,7 +397,7 @@ Six benchmarks are even @deliverable{2}.
 Including these six, @integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]] benchmarks are
  roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
 The only exception is @bm{spectralnorm}, which has some configurations where
- adding a type annotation can improve performance (see @section-ref{sec:exact}).
+ adding a type annotation can improve performance (see @section-ref{sec:pathologies}).
 @; TODO correct section to reference?
 
 None of the configurations in the experiment run faster than the Python baseline.
@@ -423,11 +423,9 @@ The other seven have flat segments because there are type boundaries in these
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
-The graphs in @figure-ref{fig:exact} are the final component of the exhaustive
- evaluation of Reticulated.
-These graphs serve two purposes: they explain the @emph{slopes} of the
- overhead plots (in @figure-ref{fig:overhead}) and illustrate an overall trend
- in the dataset.
+@; Since different configurations of a Reticulated program can have significantly
+@;  different performance, a natural question is whether one can predict the
+@;  performance of a given configuration.
 
 Each graph in @figure-ref{fig:exact} contains one point for every trial of
  every configuration in the dataset.
@@ -435,40 +433,24 @@ These individual runs are summarized by their running time (on the @|y-axis|)
  and the (integer) number of types in the underlying configuration
  (on the @|x-axis|).
 
-Most plots contain a massive number of points.
-This is because the data for each benchmark consists of exponentially many
- configurations, and the data for each configuration consists of
- @id[NUM-ITERATIONS] trials.
-To make these plots readable, the points associated with a given configuration
- are translucent and equally-spaced along the @|x-axis|.
-In particular, the points for a configuration with @math{N} type annotations
- lie within the @|x-axis| interval [@math{N-@id[EXACT-RUNTIME-XSPACE]}
- @math{N+@id[EXACT-RUNTIME-XSPACE]}].
-@; TLDR ROUND TO THE NEAREST INTEGER, VISUALLY!!!!!!!!!!!!
+Most plots contain a massive number of points.@note{The plot for a given benchmark contains @${@id[NUM-ITERATIONS]*2^{F+C}} points, where @${F} and @${C} denote columns in @figure-ref{fig:static-benchmark}.}
+To make these plots readable, the points associated with a
+ given configuration are translucent and spread across the @|x-axis|.
+In particular, the @id[NUM-ITERATIONS] points for a configuration with @math{N}
+ type annotations lie within the @|x-axis| interval [@${N-@id[EXACT-RUNTIME-XSPACE]}
+ @${N+@id[EXACT-RUNTIME-XSPACE]}].
+@; aka, "round to the nearest integer" with your eyes
 
-In general, these plots clearly show that configurations with more type
- annotations tend to run slower than configurations that use the dynamic type.
-@; A type annotation in Reticulated implies dynamic checks, plain and simple.
-@; The transpiler does not use types to generate more efficient code;
-@;  HOWEVER each check also doesn't cost that much, most curves are gradual
-The notable exception to this rule is @bm{spectralnorm}; the overhead in
- @bm{spectralnorm} configurations with fewer type annotations comes from
- assertions that a dynamically typed object implements certain methods.
-See @secref{sec:pathologies} for details.
+These plots demonstrate that configurations with more type
+ annotations tend to run slower than configurations with fewer annotations.
+With the exception of @bm{spectralnorm}, the number of type annotations
+ in a configuration is good predictor of its performance relative to other
+ configurations.
 
-@; TODO is the gap from ANNOTATIONS or from BOUNDARIES ????
-@; - I think annotation, just because reticulated
-The second, more subtle, lesson underscored by @figure-ref{fig:exact} is the
- reason for the flat slopes in the overhead plots of @figure-ref{fig:overhead}.
+@Figure-ref{fig:exact} additionally confirms the reason for the flat slopes
+ in the overhead plots of @figure-ref{fig:overhead}.
 Each flat slope in @figure-ref{fig:overhead} corresponds to a vertical space
  between clusters of points in @figure-ref{fig:exact}.
-In terms of gradually-typed configurations, these ``gaps'' indicate an
- ``expensive'' type annotation---a type annotation that imposes a large
- runtime cost on the benchmark when it is enforced by Reticulated.
-@; TODO so awkward
-Many configurations will contain the same expensive annotation (or annotations);
- such configurations are vertically clustered in @figure-ref{fig:exact}.
-@; TODO ha ha ha goto sleep and try again
 
 Lastly, @figure-ref{fig:exact} shows outliers in the dataset.
 The data for five benchmarks includes abnormally large running times.
