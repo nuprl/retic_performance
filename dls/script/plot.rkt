@@ -108,7 +108,7 @@
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)])
       (plot-pict elem*
-        #:x-min 0
+        #:x-min (- 0 0.5)
         #:x-max (+ nt 0.5)
         #:y-min 0
         #:y-max y-max
