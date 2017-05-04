@@ -63,6 +63,7 @@
   Mike for Reticulated, bugfixes.
   Sam for access to IU cluster.
   Spenser Bauman for advice about cluster.
+  Tony GJ for insisting that overhead plots are CDFs.
 }
 
 @generate-bibliography[]
