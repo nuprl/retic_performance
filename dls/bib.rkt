@@ -75,6 +75,7 @@
   (define/short sas "SAS" (string-append International Symposium "on Static Analysis"))
   (define/short scala "SCALA" (string-append "Workshop on Scala"))
   (define/short scheme-workshop "SFP" (string-append "Scheme and Functional Programming Workshop"))
+  (define/short snapl "SNAPL" "Summit oN Advances in Programming Languages")
   (define/short sigmod "SIGMOD" (string-append ACM "SIGMOD " International Conference "on Management of Data"))
   (define/short sigplan-notices "SIGPLAN Notices" (string-append ACM "SIGPLAN Notices"))
   (define/short tacs (string-append International Symposium "Theoretical Aspects of Computer Science"))
@@ -1950,4 +1951,19 @@
    #:author "Linh Chi Nguyen"
    #:location (dissertation-location #:institution "University of Trento" #:degree "Master in Economics")
    #:date 2014))
+
+(define tfffgksst-snapl-2017
+  (make-bib
+   #:title "Migratory Typing: Ten years later"
+   #:author (authors "Sam Tobin-Hochstadt"
+                     "Matthias Felleisen"
+		     "Robert Bruce Findler"
+		     "Matthew Flatt"
+		     "Ben Greenman"
+		     "Andrew M. Kent"
+		     "Vincent St-Amour"
+		     "T. Stephen Strickland"
+		     "Asumu Takikawa")
+   #:location (proceedings-location snapl)
+   #:date 2017))
 
