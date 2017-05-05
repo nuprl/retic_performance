@@ -33,8 +33,8 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
    @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
    and the remaining @|num3| originate from open-source programs.
-  (Every list of the benchmarks in this section is ordered first by the
-   benchmarks' origin and second by the benchmark's names.)
+  Every list of the benchmarks in this section is ordered first by the
+   benchmarks' origin and second by the benchmark's names.
 })
 @; REMARK: original authors helpful with (code, test input, comments)
 
@@ -297,7 +297,7 @@ The @emph[t/u-ratio] reports the overhead of the fully-typed
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
  @bm{futen} benchmark using Reticulated was 1.61 times slower than the
- average time of running the same source code using @|PYTHON|.
+ average time of running the same code using @|PYTHON|.
 Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
  is 1.04 times slower than the untyped configuration.
 
@@ -309,12 +309,12 @@ In all cases, this overhead is somewhere between zero overhead (as opposed
 Regarding the @|u/p-ratio|s: ten are below 2x,
  five are between 2x and 3x, and
  the remaining four are below 4.5x.
-The @|t/p-ratio|s are typically lower:
+The @|t/u-ratio|s are typically lower:
   sixteen are below 2x,
   one is between 2x and 3x,
   and the final two are below 3.5x.
 In particular, fourteen of the benchmarks
- have smaller @|t/u-ratio|s than @|u/p-ratio|s.
+ have larger @|u/p-ratio|s than @|t/u-ratio|s.
 This data suggests that migrating an arbitrary
  Python program to Reticulated will add a relatively larger overhead
  than migrating the same program to a fully-typed configuration.
@@ -361,23 +361,29 @@ The number of configurations is equal to @$|{2^{F+C}}|,
 Overhead plots are cumulative distribution functions.
 As the value of @${D} increases along the @|x-axis|, the number of
  @deliverable{D} configurations can only increase.
-In other words, blue is better!
-The larger the shaded area under the curve on each plot, the more configurations
- are @deliverable{D} for low values of @${D}.
-And if a benchmark has many @deliverable{D} configurations, a developer
+The important question is how many configurations are @deliverable{D}
+ for low values of @${D}.
+The area under the curve is the answer; more is better.
+A curve with a large shaded area below it implies that a large number
+ of configurations have low performance overhead.
+And if a benchmark has many low-overhead configurations, a developer
  that applies gradual typing has a higher chance of arriving at a configuration
- that is @deliverable{D}.
+ that is @deliverable{D} for a value of @${D} suited to their engineering
+ requirements.
 
-After surveying the area under a curve, the second most important aspects of
- an overhead plot are the values of @${D} where the curve starts and ends.
-More precisely, if @${f} is a function that counts the number of @deliverable{D}
- configurations in a fixed benchmark, the critical points are the smallest
- values @${d_{min}, d_{max}} such
- that @${f(d_{min}) > 0} and @${f(d_{max}) = 100}.
-An ideal start-value would lie between zero and one; if @${d_{min} < 1} then
- at least one configuration runs faster than the original Python code.
-The end-value @${d_{max}} is the overhead of the slowest-running configuration
- in the benchmark.
+@(let ([d0 "d_0"]
+       [d1 "d_1"]) @elem{
+  After surveying the area under a curve, the second most important aspects of
+   an overhead plot are the values of @${D} where the curve starts and ends.
+  More precisely, if @${f} is a function that counts the number of @deliverable{D}
+   configurations in a fixed benchmark, the critical points are the smallest
+   values @${@|d0|, @|d1|} such
+   that @${f(@|d0|) > 0} and @${f(@|d1|) = 100}.
+  An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
+   at least one configuration runs faster than the original Python code.
+  The end-value @${@|d1|} is the overhead of the slowest-running configuration
+   in the benchmark.
+})
 @; given the choice of type annotations
 
 Lastly, the slope of a curve corresponds to the likelihood that
@@ -393,20 +399,28 @@ Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
 This value is always less than 10; every configuration in the experiment is
  @deliverable{10}.
-Six benchmarks are even @deliverable{2}.
-Including these six, @integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]] benchmarks are
- roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
-The only exception is @bm{spectralnorm}, which has some configurations where
- adding a type annotation can improve performance.
-In fact this improvement is due to a bug Reticulated's implementation, see
- @section-ref{sec:pathologies}.
+For many benchmarks, the maximum overhead is significantly lower.
+Indeed, six benchmarks are @deliverable{2}.
+
+@string-titlecase[@integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]]] benchmarks
+ are roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
+In these benchmarks, the fully-typed configuration is one of the slowest-running
+ configurations.
+The only exception is @bm{spectralnorm}, in which the fully-typed configuration
+ runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
+This apparent improvement, however, is due to a bug in the implementation
+ of Reticulated.
+@Section-ref{sec:pathologies} explains the issue in detail.
 
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated only adds runtime checks to Python code.
 
 Eleven benchmarks have smooth slopes.
-The other seven have flat segments because there are type boundaries in these
- benchmarks that introduce significant overhead.
+The plots for the other seven benchmarks have flat segments because those
+ benchmarks contain at least one function or method that is called frequently.
+For example, if a benchmark creates many instances of a class @tt{C},
+ adding a type annotation to the method @tt{C.__init__} will add significant
+ performance overhead.
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
@@ -415,30 +429,32 @@ The other seven have flat segments because there are type boundaries in these
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
-Since removing type annotations in a Reticulated program can change its
- performance, a natural question is whether one can @emph{predict} the
- performance for a given configuration.
+Since adding type annotations to a Reticulated program can change its
+ performance, the language should provide a cost model so that developers
+ can predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
-In @section-ref{sec:method} terms, @${P(c) \sim @gnorm{c}_\tau}.
+In @section-ref{sec:method} terms, the cost model is @${P(c) \sim @gnorm{c}_\tau}.
 @; TOO CUTE
 
 @Figure-ref{fig:exact} contains one green point for every run of every
  configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
  the data for each configuration is @id[NUM-ITERATIONS] runs.}
 @; This is the entire dataset of the exhaustive evaluation.
-Each point compares the number of @emph{typed components} in a configuration
- (@|x-axis|) against its running time in seconds (@|y-axis|).
-A typed component is either a typed function or a typed class definition.
+Each point compares the number of typed functions, methods, and classes in a
+ configuration (@|x-axis|) against its running time in seconds (@|y-axis|).
 
-Most plots contain a very large number of points; to make the plots readable,
- the points associated with a given configuration are spread across the @|x-axis|.
+The plots contain many points with both the same number of typed components
+ and similar performance.
+To reduce the visual overlap between such points, the data for a given
+ configuration are spread across the @|x-axis|.
 In particular, the @id[NUM-ITERATIONS] points for a configuration with @math{N}
- type annotations lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
+ typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
 For example, the @bm{fannkuch} benchmark has two configurations: one untyped
- configuration with zero types and one fully-typed configuration with one type.
+ configuration with zero typed components and one fully-typed configuration
+  with one typed component.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
  the untyped or fully-typed configuration, round the point's
  @${x}-component to the nearest integer.
@@ -451,11 +467,11 @@ The variations between individual plots fall into four overlapping categories:
   '(futen http2 slowSHA chaos float pystone PythonFlow take5)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
-     performance as the number of type annotations increases.
-    Adding @emph{any} single type annotation adds a small performance overhead.
+     performance as the number of typed components increases.
+    Typing any function, class, or method adds a small performance overhead.
 })]
 
-@exact-runtime-category[@elem{types make things really slow}
+@exact-runtime-category[@elem{types make things very slow}
   '(call_method call_method_slots call_simple go meteor nqueens spectralnorm Espionage)
   (λ (num-in-category) @elem{
     @string-titlecase[num-in-category] plots have vertical "gaps" between
@@ -464,13 +480,13 @@ The variations between individual plots fall into four overlapping categories:
      runtime cost.
     Configurations above the gap have some common type annotations that
      add significant overhead.
-    Each gaps corresponds to a flat slope in @figure-ref{fig:overhead}.
+    Each such gap corresponds to a flat slope in @figure-ref{fig:overhead}.
 })]
 
 @exact-runtime-category[@elem{types are free}
   '(fannkuch nbody pidigits)
   (λ (num-in-category) @elem{
-    In @|num-in-category| plots, all configurations have approximately equal performance.
+    In @|num-in-category| benchmarks, all configurations have similar performance.
     The dynamic checks that enforce type soundness add insignificant overhead.
 })]
 
@@ -478,13 +494,12 @@ The variations between individual plots fall into four overlapping categories:
 @exact-runtime-category[@elem{types make things fast}
   '(call_method call_method_slots spectralnorm)
   (λ (num-in-category) @elem{
-    In @|num-in-category| of the benchmarks, adding some types to some
-     configurations actually improves performance.
-    These speedups are due to issues in the implementation of Reticulated.
-    @bm{spectralnorm} types remove a check that the inner component of a tuple
-     is an integer.
-    Types in @bm{call_method} and @bm{call_method_slots} remove checks that
-     a value used as an object binds certain fields.
+    In @|num-in-category| benchmarks, there are some configurations
+     that run faster than similar configurations with fewer typed components.
+    These speedups are due to one of two causes: either Reticulated
+     added unnecessary checks to the less-typed configurations, or Reticulated
+     unsoundly removed necessary checks based on the type annotations.
+    See @section-ref{sec:pathologies} for details.
 })]
 
 
