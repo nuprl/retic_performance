@@ -57,3 +57,9 @@ give an example.
 
 
 
+@section[#:tag "sec:pathologies"]{Pathologies}
+
+Why do these benchmarks improve with fewer types?
+- spectralnorm
+- calls
+- http2
