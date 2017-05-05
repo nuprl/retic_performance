@@ -15,7 +15,7 @@ The benchmarks are small Python programs whose @defn{implicit} types are
  expressible in Reticulated.
 The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
  @defn["overhead plots"] (@figure-ref{fig:overhead}), and a series
- of graphs comparing the @emph{number} of type annotations in a configuration
+ of graphs comparing the @emph{number} of typed components in a configuration
  against the configuration's performance (@figure-ref{fig:exact}).
 
 
@@ -397,8 +397,9 @@ Six benchmarks are even @deliverable{2}.
 Including these six, @integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]] benchmarks are
  roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
 The only exception is @bm{spectralnorm}, which has some configurations where
- adding a type annotation can improve performance (see @section-ref{sec:pathologies}).
-@; TODO correct section to reference?
+ adding a type annotation can improve performance.
+In fact this improvement is due to a bug Reticulated's implementation, see
+ @section-ref{sec:pathologies}.
 
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated only adds runtime checks to Python code.
@@ -409,51 +410,85 @@ The other seven have flat segments because there are type boundaries in these
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
-@; what do these tell us?
-@; for the developer:
-@; - overall trend, more types = more slow
-@;   - (usually, but NOT ALWAYS)
-@;   - generally, num.types as a predictive model
-@; for reader:
-@; - helps explain slope, vertical gap = flat slope
-@; - see outliers in measurements (very small number)
-@; - size of experiment & design space
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
-@; Since different configurations of a Reticulated program can have significantly
-@;  different performance, a natural question is whether one can predict the
-@;  performance of a given configuration.
+Since removing type annotations in a Reticulated program can change its
+ performance, a natural question is whether one can @emph{predict} the
+ performance for a given configuration.
+The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
+ works well for these benchmarks: @emph{the performance of a configuration is
+ proportional to the number of typed components in the configuration}.
+In @section-ref{sec:method} terms, @${P(c) \sim @gnorm{c}_\tau}.
+@; TOO CUTE
 
-Each graph in @figure-ref{fig:exact} contains one point for every trial of
- every configuration in the dataset.
-These individual runs are summarized by their running time (on the @|y-axis|)
- and the (integer) number of types in the underlying configuration
- (on the @|x-axis|).
+@Figure-ref{fig:exact} contains one green point for every run of every
+ configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
+ the data for each configuration is @id[NUM-ITERATIONS] runs.}
+@; This is the entire dataset of the exhaustive evaluation.
+Each point compares the number of @emph{typed components} in a configuration
+ (@|x-axis|) against its running time in seconds (@|y-axis|).
+A typed component is either a typed function or a typed class definition.
 
-Most plots contain a massive number of points.@note{The plot for a given benchmark contains @${@id[NUM-ITERATIONS]*2^{F+C}} points, where @${F} and @${C} denote columns in @figure-ref{fig:static-benchmark}.}
-To make these plots readable, the points associated with a
- given configuration are translucent and spread across the @|x-axis|.
+Most plots contain a very large number of points; to make the plots readable,
+ the points associated with a given configuration are spread across the @|x-axis|.
 In particular, the @id[NUM-ITERATIONS] points for a configuration with @math{N}
- type annotations lie within the @|x-axis| interval [@${N-@id[EXACT-RUNTIME-XSPACE]}
- @${N+@id[EXACT-RUNTIME-XSPACE]}].
-@; aka, "round to the nearest integer" with your eyes
+ type annotations lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
+ on the @|x-axis|.
+For example, the @bm{fannkuch} benchmark has two configurations: one untyped
+ configuration with zero types and one fully-typed configuration with one type.
+To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
+ the untyped or fully-typed configuration, round the point's
+ @${x}-component to the nearest integer.
 
-These plots demonstrate that configurations with more type
- annotations tend to run slower than configurations with fewer annotations.
-With the exception of @bm{spectralnorm}, the number of type annotations
- in a configuration is good predictor of its performance relative to other
- configurations.
+Overall, there is a clear trend that adding type annotations adds performance
+ overhead.
+The variations between individual plots fall into four overlapping categories:
 
-@Figure-ref{fig:exact} additionally confirms the reason for the flat slopes
- in the overhead plots of @figure-ref{fig:overhead}.
-Each flat slope in @figure-ref{fig:overhead} corresponds to a vertical space
- between clusters of points in @figure-ref{fig:exact}.
+@exact-runtime-category["types make things slow"
+  '(futen http2 slowSHA chaos float pystone PythonFlow take5)
+  (λ (num-in-category) @elem{
+    The plots for @|num-in-category| benchmarks show a gradual increase in
+     performance as the number of type annotations increases.
+    Adding @emph{any} single type annotation adds a small performance overhead.
+})]
 
-Lastly, @figure-ref{fig:exact} shows outliers in the dataset.
-The data for five benchmarks includes abnormally large running times.
-These benchmarks are:
- @bm{futen}, @bm{float}, @bm{go}, @bm{meteor}, and @bm{Espionage}.
-@Secref{sec:threats} addresses these and other threats to validity.
+@exact-runtime-category[@elem{types make things really slow}
+  '(call_method call_method_slots call_simple go meteor nqueens spectralnorm Espionage)
+  (λ (num-in-category) @elem{
+    @string-titlecase[num-in-category] plots have vertical "gaps" between
+     clusters of configurations.
+    Configurations below the gap contain type annotations that impose little
+     runtime cost.
+    Configurations above the gap have some common type annotations that
+     add significant overhead.
+    Each gaps corresponds to a flat slope in @figure-ref{fig:overhead}.
+})]
+
+@exact-runtime-category[@elem{types are free}
+  '(fannkuch nbody pidigits)
+  (λ (num-in-category) @elem{
+    In @|num-in-category| plots, all configurations have approximately equal performance.
+    The dynamic checks that enforce type soundness add insignificant overhead.
+})]
+
+@; TODO is http2 a type IV ?
+@exact-runtime-category[@elem{types make things fast}
+  '(call_method call_method_slots spectralnorm)
+  (λ (num-in-category) @elem{
+    In @|num-in-category| of the benchmarks, adding some types to some
+     configurations actually improves performance.
+    These speedups are due to issues in the implementation of Reticulated.
+    @bm{spectralnorm} types remove a check that the inner component of a tuple
+     is an integer.
+    Types in @bm{call_method} and @bm{call_method_slots} remove checks that
+     a value used as an object binds certain fields.
+})]
+
+
+@(let* ([outliers (map bm '(futen float go meteor Espionage))]) @elem{
+  @emph{Note:} the data for @authors*[outliers] contain a small number of outliers.
+  @Section-ref{sec:threats} addresses these and other threats to validity.
+})

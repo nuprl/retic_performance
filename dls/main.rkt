@@ -19,6 +19,15 @@
   generate-bibliography
   bm-desc
 
+  exact-runtime-category
+  ;; Usage: @category[name bm* make-descr]
+  ;;  where `name` is a string, broadly describes the category
+  ;;    and `bm*` is a list of benchmark names (e.g. symbols)
+  ;;    and `make-descr` is a thunk (-> string? element?)
+  ;;        that accepts a string representing the length of `bm*`
+  ;;        and produces text that defines and carefully describes the category.
+  ;; Renders a "category describing a group of exact runtime plots"
+
   x-axis y-axis
   x-axes y-axes
   ;; Usage: @|x-axis|
@@ -460,6 +469,20 @@
     (format-deps lib)
     (linebreak)
     descr))
+
+(define exact-runtime-category
+   (let* ([cat-num (box 0)]
+          [get-number (λ ()
+                        (set-box! cat-num (+ (unbox cat-num) 1))
+                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
+     (λ (name pre-bm* make-descr)
+       (define bm-name* (map render-benchmark-name pre-bm*))
+       (elem (bold (format "Type ~a " (get-number)))
+             ~ ~
+             (emph "(" name ")") ": "
+             (make-descr (integer->word (length pre-bm*)))
+             (linebreak)
+             (elem "Applies to " (authors* bm-name*) ".")))))
 
 (define (format-deps dep*)
   (if (null? dep*)
