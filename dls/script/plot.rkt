@@ -51,6 +51,8 @@
 
 (define TICK-SIZE 4)
 (define TITLE-FACE "Liberation Serif")
+(define SAMPLE-COLOR "darkorange")
+;(define SAMPLE-COLOR "chocolate")
 
 (define-syntax-rule (defparam id val type)
   (begin (define id (make-parameter val))
@@ -144,6 +146,13 @@
 
 (define (samples-plot pi)
   (define-values [sample-size sample*] (performance-info->sample-info pi))
+  (define dc*
+    (for/list ([s (in-list sample*)])
+      (make-simple-deliverable-counter (performance-info%sample pi s))))
+  (define (min-dc* r)
+    (for/fold ([lo 100])
+              ([dc (in-list dc*)])
+      (min lo (dc r))))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
@@ -154,11 +163,12 @@
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)]
                    [*INTERVAL-ALPHA* 0.4]
-                   [*OVERHEAD-LINE-COLOR* 4])
+                   [*OVERHEAD-LINE-COLOR* SAMPLE-COLOR])
       (plot-pict
         (list
-          (for/list ([s (in-list sample*)] [i (in-naturals 1)])
-            (make-count-configurations-function (performance-info%sample pi s)))
+          (for/list ([dc (in-list dc*)])
+            (make-count-configurations-function dc #:interval? #f))
+          (make-count-configurations-function min-dc*)
           (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
@@ -184,10 +194,13 @@
       (plot-pict
         (list
           (make-count-configurations-function pi)
-          (make-sample-function-interval
-            (for/list ([s (in-list sample*)])
-              (performance-info%sample pi s)))
-          (tick-grid))
+          (parameterize ([*OVERHEAD-LINE-COLOR* SAMPLE-COLOR])
+            (make-sample-function-interval
+              (for/list ([s (in-list sample*)])
+                (performance-info%sample pi s))))
+          (tick-grid)
+          (parameterize ([*OVERHEAD-LINE-WIDTH* 0.5])
+            (make-count-configurations-function pi #:interval? #f)))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
         #:y-min 0
@@ -221,19 +234,28 @@
   (for/list ([i (in-range (+ 1 count))])
     (vrule (- i 0.5) #:width 0.6 #:color 0)))
 
-(define (make-count-configurations-function pi)
-  (function-interval
-    (λ (r) 0)
-    (make-deliverable-counter pi)
-    0 (*OVERHEAD-MAX*)
-    #:alpha (*INTERVAL-ALPHA*)
-    #:color (*OVERHEAD-LINE-COLOR*)
-    #:line1-color (*OVERHEAD-LINE-COLOR*)
-    #:line2-color (*OVERHEAD-LINE-COLOR*)
-    #:line1-width (*OVERHEAD-LINE-WIDTH*)
-    #:line2-width (*OVERHEAD-LINE-WIDTH*)
-    #:samples (*OVERHEAD-SAMPLES*)
-    #:style (*OVERHEAD-LINE-STYLE*)))
+(define (make-count-configurations-function pi #:interval? [ivl #t])
+  (define f (if (performance-info? pi) (make-deliverable-counter pi) pi))
+  (if ivl
+    (function-interval
+      (λ (r) 0)
+      f
+      0 (*OVERHEAD-MAX*)
+      #:alpha (*INTERVAL-ALPHA*)
+      #:color (*OVERHEAD-LINE-COLOR*)
+      #:line1-color (*OVERHEAD-LINE-COLOR*)
+      #:line2-color (*OVERHEAD-LINE-COLOR*)
+      #:line1-width (*OVERHEAD-LINE-WIDTH*)
+      #:line2-width (*OVERHEAD-LINE-WIDTH*)
+      #:samples (*OVERHEAD-SAMPLES*)
+      #:style (*OVERHEAD-LINE-STYLE*))
+    (function
+      f
+      0 (*OVERHEAD-MAX*)
+      #:color (*OVERHEAD-LINE-COLOR*)
+      #:width (*OVERHEAD-LINE-WIDTH*)
+      #:samples (*OVERHEAD-SAMPLES*)
+      #:style (*OVERHEAD-LINE-STYLE*))))
 
 ;; make-simple-deliverable-counter : (-> performance-info? (-> real? natural?))
 ;; Specification for `make-deliverable-counter`
@@ -285,11 +307,11 @@
     (λ (r) (upper-confidence ((make-get-percents) r)))
     0 (*OVERHEAD-MAX*)
     #:alpha (*INTERVAL-ALPHA*)
-    #:color "black"
-    #:line1-color 0
-    #:line1-width 1
-    #:line2-color 0
-    #:line2-width 1
+    #:color (*OVERHEAD-LINE-COLOR*)
+    #:line1-color (*OVERHEAD-LINE-COLOR*)
+    #:line1-width (*OVERHEAD-LINE-WIDTH*)
+    #:line2-color (*OVERHEAD-LINE-COLOR*)
+    #:line2-width (*OVERHEAD-LINE-WIDTH*)
     #:samples (*OVERHEAD-SAMPLES*)
     #:style 'solid
     #:label #f))
