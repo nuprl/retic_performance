@@ -106,6 +106,18 @@
    [unzip-karst-data
     (-> path-string? (or/c #f path-string?))]
 
+   [count-better-with-types
+    (-> (listof benchmark-info?) natural?)]
+   ;; Count the number of typed configurations that run faster than
+   ;;  some configuration with less types, across all the given benchmarks.
+
+   [find-speedy-types
+    (-> (listof benchmark-info?) (hash/c symbol? (listof (cons/c string? string?)) #:immutable #t #:flat? #t))]
+   ;; Enumerate all pairs of configurations C0 C1 such that:
+   ;; - C0 has fewer typed components than C1
+   ;; - C0 is SLOWER than C1
+   ;; Return a hash of all enumerations for all given benchmarks.
+
   )
   performance-info-src
   line->configuration-string
@@ -126,6 +138,12 @@
   "benchmark-info.rkt"
   "config.rkt"
   "util.rkt"
+  (only-in math/statistics
+    mean)
+  (only-in racket/list
+    append*
+    remove-duplicates
+    list-set)
   (only-in racket/path
     path-only)
   (only-in racket/math
@@ -171,6 +189,14 @@
          [tab (and tab.gz (gunzip/cd tab.gz))])
     tab))
 
+(define (->performance-info pi)
+  (cond
+   [(performance-info? pi)
+    pi]
+   [(benchmark-info? pi)
+    (benchmark->performance-info pi)]
+   [else
+    (benchmark->performance-info (->benchmark-info pi))]))
 (define (benchmark->performance-info bm)
   (define name (benchmark->name bm))
   (define kd (benchmark->karst-data bm))
@@ -181,7 +207,7 @@
       (values (benchmark->num-configurations bm)
               (benchmark->max-configuration bm)
               #f
-              #f))) ;; Thank god we are untyped
+              #f))) ;; So glad we are untyped
   (unless (and (= num-configs (benchmark->num-configurations bm))
                (equal? configs/module* (benchmark->max-configuration bm)))
     (raise-user-error 'benchmark->performance-info "fatal error processing ~a" name))
@@ -339,6 +365,11 @@
         (define-values [cfg nt t*] (line->values ln i))
         (f acc cfg nt t*)))))
 
+(define (all-configurations pi)
+  (define (add-config H cfg _nt t*)
+    (hash-set H cfg t*))
+  (fold/karst pi #:init (make-immutable-hash) #:f add-config))
+
 (define count-karst-lines
   (let ([lines++ (λ (acc cfg nt t*) (+ acc 1))])
     (λ (ps) (fold/karst ps #:f lines++ #:init 0))))
@@ -470,6 +501,55 @@
                     (performance-info-python-runtime pi)
                     (performance-info-untyped-runtime pi)
                     (performance-info-typed-runtime pi)))
+
+(define (count-better-with-types bm*)
+  (for/sum ([n+c* (in-list (better-with-types bm*))])
+    (length (cdr n+c*))))
+
+(define (better-with-types bm*)
+  (for/list ([(n cc*) (in-hash (find-speedy-types bm*))])
+    (cons n (remove-duplicates (map cdr cc*)))))
+
+(define (find-speedy-types bm*)
+  (for/hash ([bm (in-list bm*)])
+    (define name (benchmark->name bm))
+    (define mc (benchmark->max-configuration bm))
+    (define pi (benchmark->performance-info bm))
+    (when (< (expt 2 17) (performance-info-num-configs pi))
+      (raise-user-error 'find-speedy-types "benchmark '~a' is too large" name))
+    (define AC (all-configurations pi))
+    (define speedy-pairs
+      (for*/list ([(c0 t0*) (in-hash AC)]
+                  [c1 (in-list (successors c0 mc))]
+                  #:when (significantly-faster? (hash-ref AC c1) t0*))
+        (cons (configuration->string c0) (configuration->string c1))))
+    (values name speedy-pairs)))
+
+(define (significantly-faster? t1* t0*)
+  (define u0 (mean t0*))
+  (define u1 (mean t1*))
+  (and (< u1 u0)
+       (let ([c0 (confidence-interval t0*)]
+             [c1 (confidence-interval t1*)])
+         (and (< (+ u1 c1) u0)
+              (< u1 (- u0 c0))))))
+
+(define (successors cfg max-config)
+  (append*
+    (for/list ([mod-id (in-list cfg)]
+               [mod-num-bits (in-list max-config)]
+               [i (in-naturals)])
+      (define bits (natural->bitstring mod-id #:pad (log2 mod-num-bits)))
+      (for/list ([c (in-string bits)]
+                 [j (in-naturals)]
+                 #:when (eq? c #\1))
+        (list-set cfg i
+          (bitstring->natural (string-set bits j #\0)))))))
+
+(define (string-set str index new-char)
+  (define str2 (string-copy str))
+  (string-set! str2 index new-char)
+  str2)
 
 ;; =============================================================================
 
@@ -621,6 +701,51 @@
       ==> 13]
      ['(0 6 8 0) '(16 64 32 4)
       ==> 14]))
+
+  (test-case "successors"
+    (check-apply* successors
+     ['(1) '(32)
+      ==> '((0))]
+     ['(2) '(32)
+      ==> '((0))]
+     ['(16) '(32)
+      ==> '((0))]
+     ['(3) '(32)
+      ==> '((1) (2))]))
+
+  (test-case "string-set"
+    (check-apply* string-set
+     ["hello" 0 #\H
+      ==> "Hello"]
+     ["hello" 4 #\H
+      ==> "hellH"]))
+
+  (let ()
+    (define futen (->benchmark-info 'futen))
+    (define spectralnorm (->benchmark-info 'spectralnorm))
+    (define call_method (->benchmark-info 'call_method))
+    (define fannkuch (->benchmark-info 'fannkuch))
+
+    (test-case "better-with-types"
+      (check-apply* count-better-with-types
+       [(list fannkuch) ==> 0]
+       [(list spectralnorm) ==> 13]
+       [(list call_method) ==> 66]
+       [(list futen spectralnorm fannkuch) ==> 24511]))
+
+    (test-case "find-speedy-types"
+      (check-apply* find-speedy-types
+       [(list fannkuch)
+        ==> (make-immutable-hash '((fannkuch . ())))]
+       [(list fannkuch spectralnorm)
+        ==> (make-immutable-hash
+              '((fannkuch . ())
+                (spectralnorm . (("10" . "2") ("23" . "21") ("26" . "10")
+                                 ("26" . "18") ("28" . "12") ("28" . "20")
+                                 ("30" . "14") ("30" . "22") ("24" . "8")
+                                 ("24" . "16") ("16" . "0") ("18" . "2")
+                                 ("20" . "4") ("12" . "4") ("8" . "0")
+                                 ("14" . "6") ("22" . "6")))))])))
 )
 
 ;; -----------------------------------------------------------------------------

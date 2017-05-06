@@ -36,8 +36,7 @@
   plot/no-gui
   plot/utils
   (only-in math/statistics
-    mean
-    stddev/mean)
+    mean)
   (only-in racket/format
     ~r)
   (only-in racket/list
@@ -329,15 +328,6 @@
      [(98) 2.326]
      [else (error 'error-bounds "Unknown confidence level '~a'" (*CONFIDENCE-LEVEL*))]))
   (confidence-interval n* #:cv cv))
-
-(define (confidence-interval x* #:cv [cv 1.96])
-  (define u (mean x*))
-  (define n (length x*))
-  (define s (stddev/mean u x*))
-  (define cv-offset (/ (* cv s) (sqrt n)))
-  (if (negative? cv-offset)
-    (raise-user-error 'confidence-interval "got negative cv offset ~a\n" cv-offset)
-    cv-offset))
 
 (define (make-overhead-x-ticks)
   (define MAJOR-TICKS (list 1 2 (*OVERHEAD-MAX*)))
