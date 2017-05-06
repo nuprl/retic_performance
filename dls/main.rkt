@@ -28,6 +28,11 @@
   ;;        and produces text that defines and carefully describes the category.
   ;; Renders a "category describing a group of exact runtime plots"
 
+  percent-slower-than-typed
+  ;; Usage: @percent-slower-than-typed{benchmark-name}
+  ;; Extremely specialized function, count the number of configurations
+  ;;  that run slower than the typed configuration.
+
   x-axis y-axis
   x-axes y-axes
   ;; Usage: @|x-axis|
@@ -109,6 +114,10 @@
 
   NUM-ITERATIONS
   ;; Number of times we ran each configuration for each benchmark.
+
+  NUM-BETTER-WITH-TYPES
+  ;; Number of configurations that run faster than some configuration with
+  ;;  fewer typed components. (This is rare, and usually indicates a bug.)
 
   PYTHON
   ;; "Python 3.4.3",
@@ -265,6 +274,7 @@
   "bib.rkt"
   "script/config.rkt"
   "script/benchmark-info.rkt"
+  (prefix-in pi: "script/performance-info.rkt")
   "script/render.rkt"
   "script/util.rkt"
   (only-in "script/plot.rkt"
@@ -311,6 +321,11 @@
 
 (define NUM-ITERATIONS
   40)
+
+(define NUM-BETTER-WITH-TYPES
+  ;; See unit test for this constant below
+  ;; Maybe better to have count per benchmark?
+  140197)
 
 (define PYTHON
   "Python 3.4.3")
@@ -474,14 +489,15 @@
    (let* ([cat-num (box 0)]
           [get-number (λ ()
                         (set-box! cat-num (+ (unbox cat-num) 1))
-                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
+                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "⊥"] [else (error 'get-number)]))])
      (λ (name pre-bm* make-descr)
        (define bm-name* (map render-benchmark-name pre-bm*))
        (elem (bold (format "Type ~a " (get-number)))
              ~ ~
              (emph "(" name ")") ": "
              (make-descr (integer->word (length pre-bm*)))
-             (linebreak)
+             "\n"
+             "\n"
              (elem "Applies to " (authors* bm-name*) ".")))))
 
 (define (format-deps dep*)
@@ -589,6 +605,12 @@
 (define y-axis
   (axis "y"))
 
+(define (percent-slower-than-typed pre-bm)
+  (define pi (pi:benchmark->performance-info (->benchmark pre-bm)))
+  (define total (pi:num-configurations pi))
+  (define num-good ((pi:deliverable (pi:typed/python-ratio pi)) pi))
+  (round (pct (- total num-good) total)))
+
 ;; =============================================================================
 
 (module+ test
@@ -691,4 +713,11 @@
     (check-equal? (authors "a" "b") (list "a" " and " "b"))
     (check-equal? (authors "a" "b" "c") (list "a" ", " "b" ", and " "c")))
 
+  (test-case "percent-slower-than-typed"
+    (check-equal? (percent-slower-than-typed "spectralnorm") 38))
+
+  (test-case "num-better-with-types"
+    (check-equal?
+      (pi:count-better-with-types EXHAUSTIVE-BENCHMARKS)
+      NUM-BETTER-WITH-TYPES))
 )

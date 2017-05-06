@@ -7,6 +7,8 @@
 (provide
   configuration?
 
+  confidence-interval
+
   (contract-out
     [tab-split
      (-> string? (listof string?))]
@@ -62,6 +64,10 @@
      (-> exact-nonnegative-integer? #:pad exact-nonnegative-integer? string?)]
     ;; (natural->bitstring n k) converts `n` into a `k`-digit string of 1's and 0's
 
+    [bitstring->natural
+     (-> string? exact-nonnegative-integer?)]
+    ;; Inverse of natural->bitstring
+
     [count-zero-bits
      (-> string? exact-nonnegative-integer?)]
 
@@ -72,6 +78,9 @@
 ))
 
 (require
+  (only-in math/statistics
+    mean
+    stddev/mean)
   (only-in racket/format
     ~r)
   (only-in racket/class
@@ -127,6 +136,15 @@
   (define no-ext (path->string (path-replace-extension str #"")))
   (define i (string-last-index-of no-ext #\_))
   (string-append (substring no-ext 0 i) "." (substring no-ext (+ i 1))))
+
+(define (confidence-interval x* #:cv [cv 1.96])
+  (define u (mean x*))
+  (define n (length x*))
+  (define s (stddev/mean u x*))
+  (define cv-offset (/ (* cv s) (sqrt n)))
+  (if (negative? cv-offset)
+    (raise-user-error 'confidence-interval "got negative cv offset ~a\n" cv-offset)
+    cv-offset))
 
 (define (log2 n)
   (if (= n 1)
@@ -190,6 +208,14 @@
 ;; Convert a natural number to a binary string, padded to the supplied width
 (define (natural->bitstring n #:pad pad-width)
   (~r n #:base 2 #:min-width pad-width #:pad-string "0"))
+
+(define (bitstring->natural str)
+  (define N (string-length str))
+  (for/sum ([i (in-range N)])
+    (define c (string-ref str (- N (add1 i))))
+    (if (equal? #\1 c)
+        (expt 2 i)
+        0)))
 
 (define (count-zero-bits str)
   (for/sum ([c (in-string str)]
@@ -315,6 +341,15 @@
       ==> "10"]
      [2 #:pad 10
       ==> "0000000010"]))
+
+  (test-case "bitstring->natural"
+    (check-apply* bitstring->natural
+     ["10"
+      ==> 2]
+     ["111"
+      ==> 7]
+     ["0000000010"
+      ==> 2]))
 
   (test-case "count-zero-bits"
     (check-apply* count-zero-bits
