@@ -7,30 +7,20 @@
 
 @; -----------------------------------------------------------------------------
 
-Linear measurements suffice to approximate the results of an exhaustive
- performance evaluation.
-This section presents a modified evaluation method, and provides both
- theoretical and empirical justification of its validity.
+Simple random sampling is a viable technique for approximating the number
+ of @deliverable{D} configurations in a benchmark.
+In particular, a sampling protocol based on elementary
+ statistics (@section-ref{sec:sampling:protocol})
+ is able to reproduce the largest overhead plots in @figure-ref{fig:overhead}
+ with a fraction of the measurements (@section-ref{sec:sampling:overhead}).
+The protocol scales to significantly larger benchmarks than the exhaustive
+ technique presented in @section-ref{sec:method} (@section-ref{sec:sampling:new}).
+Whereas exhaustive evaluation cannot feasibly be applied to programs containing
+ hundreds of functions, the main bottleneck applying the sampling technique
+ is the human cost of inferring fully-typed configurations.
 
 
-@section{Motivation}
-
-The benchmark programs in @section-ref{sec:exhaustive} are rather small.
-Any experienced Python programmer could infer type annotations for these
- programs in a matter of hours.
-Widely-used Python programs are typically much larger.
-For example @TODO{examples}.
-@; "jumping" to fully-typed makes even less sense for reticualted,
-@;  since number-of-types is a decent predictor of performance
-In theory, gradual typing offers important engineering benefits to such projects;
- designers can choose the precise amount of typing that best suits the project
- and developers can run end-to-end tests on the program at each stage of the
- migration.
-It is not clear, however, that the resuts of @section-ref{sec:exhaustive} will hold
- for significantly larger programs.
-
-
-@section{Method}
+@section[#:tag "sec:sampling:protocol"]{Sampling Protocol}
 
 To approximate the number of @deliverable[] configurations in a configuration
  space @cspace[]:
@@ -69,7 +59,7 @@ If @cspace[] is also clear, we may say @approximation[@${n_s} @${n_t}].
  values @${P}, @${s}, and @${t}.
 
 
-@section{Justification}
+@section[#:tag "sec:sampling:overhead"]{Justification}
 
 Let @cspace{C} be a configuration space,
  let @emph{D} be a small natural number,
@@ -141,8 +131,7 @@ For further evidence, the artifact for this paper contains scripts to reproduce
  this experiment.
 
 
-@section{Approximate Evaluation}
-@; TODO is there a synonym for 'approximate' that starts with E ?
+@section[#:tag "sec:sampling:new"]{Approximate Evaluation}
 
 @figure["fig:sample:static-benchmark" "Static summary of benchmarks" #:style center-figure-style
   @(parameterize ([*CACHE-SUFFIX* "-linear"])
@@ -156,4 +145,27 @@ The table in @figure-ref{fig:sample:static-benchmark} and plots in @figure-ref{f
  present an inexhaustive evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs.
 @TODO{benchmark descriptions}
 The results confirm the trends in @figure-ref{fig:overhead}.
+
+@; -----------------------------------------------------------------------------
+
+@; @; This belongs in one of three places:
+@; @; 1. Intro
+@; @; 2. Conclusion
+@; @; 3. Trash
+@; @section{Motivation}
+@; 
+@; The benchmark programs in @section-ref{sec:exhaustive} are rather small.
+@; Any experienced Python programmer could infer type annotations for these
+@;  programs in a matter of hours.
+@; Widely-used Python programs are typically much larger.
+@; For example @TODO{examples}.
+@; @; "jumping" to fully-typed makes even less sense for reticualted,
+@; @;  since number-of-types is a decent predictor of performance
+@; In theory, gradual typing offers important engineering benefits to such projects;
+@;  designers can choose the precise amount of typing that best suits the project
+@;  and developers can run end-to-end tests on the program at each stage of the
+@;  migration.
+@; It is not clear, however, that the resuts of @section-ref{sec:exhaustive} will hold
+@;  for significantly larger programs.
+
 
