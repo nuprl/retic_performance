@@ -1,5 +1,12 @@
 #lang gm-dls-2017 @anonymous @sigplan @10pt
 
+@; You see, there are two kinds of people in this world: the workers and the
+@; hustlers.  The hustlers never work and the workers never hustle.  And you,
+@; my friend, are a worker.  God knows I've tried to beat that instinct out of
+@; him... but it's there ingrained in your immigrant blood.  Look how tasty your
+@; cocktails are.  Look how clean you keep your bar.  Why, man, you actually
+@; take pride in your work. --- Cocktail, 1988
+
 @;title{Performance Evaluation of Reticulated Python}
 @title{Is Gradual Typing Alive?}
 
