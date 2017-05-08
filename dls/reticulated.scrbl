@@ -5,9 +5,9 @@
 Gradual typing enables programmers to incrementally add sound types to
 their programs.
 
-In order to understand the soundness guarantees gradual typing
-provides, we must
-define soundness for partially typed programs.
+In order to understand how gradual typing aims to provide soundness guarantees
+we must define soundness for partially typed programs.
+
 In general, soundness
 means that if a program is well-typed, one of the following outcomes
 will occur@~cite[tfffgksst-snapl-2017]:
@@ -25,9 +25,12 @@ code:
 4- The program throws an exception at one of the boundaries between the
 typed and untyped code.
 
-
 Reticulated Python a is sound gradual typing system developed by
 Vitousek et al. at Indiana University.
+
+It is a source-to-source translator for Python 3.
+Given a Python program, it outputs a Python program with the necesairy checks
+and casts for soundness.
 
 Reticulated enforces the soundness definition stated above by
 inserting runtime checks into various parts of the program to prevent
@@ -66,9 +69,7 @@ To prevent a runtime type error from occurring when calling the
 @code{distance} function, Reticulated inserts checks at the places
 where fields x and y are invoked besides the checks which ensure that
 @code{p1} and @code{p2} are @code{Point} classes with members x and y
-and checking that the function returns a @code{float}
-
-
+and checking that the function returns a @code{float}.
 
 since @code{self.x} is not a @code{float}, that check should fail
 terminating the program before the operation occurs and before the
@@ -79,7 +80,7 @@ A full list of sites where checks are inserted can be found at
 function bodies as we showed above, inside for loops and use-sites of
 variables with non-base types.
 
-In that sense, Reticulated Python adheres to the soundness definition
+Reticulated Python aims to achieve the soundness definition
 above because the well-typed parts of the program do not terminate
 with a type-error due to the presence of the runtime checks.
 
