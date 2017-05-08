@@ -22,122 +22,128 @@ Whereas exhaustive evaluation cannot feasibly be applied to programs containing
 
 @section[#:tag "sec:sampling:protocol"]{Sampling Protocol}
 
-To approximate the number of @deliverable[] configurations in a configuration
- space @cspace[]:
-@itemlist[
-@item{
-  Choose a confidence level @${L \in [0,1]} for the approximation.
+Counting the proportion of @deliverable{D} configurations is a useful way to
+ measure the performance overhead of gradual typing because it addresses two
+ forms of uncertainty.
+First, the parameter @${D} addresses the fact that different software applications
+ have different performance requirements.
+Second, the proportion quantifies over the entire configuration space of a program
+ because it is impossible to predict how developers will apply gradual
+  typing.@note{ @; TODO: the note needs work, but it needs to be here.
+    The promise of gradual typing is @emph{any configuration}. At
+    present, there is no data to suggest that developers choose @emph{particular
+    configuration}.}
+For an arbitrary configuration, the proportion of @deliverable{D} configurations
+ @emph{is} the probability that this configuration is @deliverable{D}.
+
+There is, however, a natural way to approximate the same conclusion.
+Suppose a few developers independently apply gradual typing to a program.
+Each arrives at some configuration and observes some performance overhead.
+Therefore, for a given value of @${D} some proportion of the developers have
+ @deliverable{D} configurations.
+There is a remote chance that this proportion coincides with the true proportion
+ of @deliverable{D} configurations.
+Intuitively, the chance is less remote if the number of developers is very
+ large.
+But even for a small number of developers, if they repeat this experiment
+ multiple times then the average proportion of @deliverable{D} configurations
+ should tend towards the true proportion.
+After all, if the true proportion of @deliverable{D} configurations is
+ 10% then approximately 1 in 10 randomly sampled configurations will be
+ @deliverable{D}.
+
+The following definition capture the informal sampling protocol outlined above:
+
+@definition[@approximation["r" "s" "95"]]{
+  A @approximation["r" "s" "95"] of the proportion of @deliverable{D} configurations is
+   a 95% confidence interval generated from @${r} samples, each made of @${s}
+   configurations.
+  (Informally: a @emph{simple random approximation}.)
+  @; ^^^ to disambiguate from other approximations
 }
-@item{
-  Define two functions @${s} and @${t} such that @${n_s = s(@cspace[])}
-  and @${n_t = t(@cspace[])}
-  and both @${n_s} and @${n_t} are small natural numbers.
-}
-@item{
-  Sample @${n_s} configurations from @cspace[] uniformly at random
-   and count the proportion of @deliverable[] configurations in the sample.
-}
-@item{
-  Repeat the previous step @${n_t} times to compute a sequence of
-   proportions @$|{y_0 \ldots y_{n_t - 1}}|.
-}
-@item{
-  Report the @${L}% confidence interval determined by the sample proportions.
-}
-]
 
-@bold{Definition} a @approximation["s" "t" "P"] is a @${P}% confidence interval
- computed through the above protocol.
+A given sample of @${s} randomly-selected configurations contains some
+ number @${n} of @deliverable{D} configurations.
+The proportion @${n/s} is the proportion of @deliverable{D} configurations
+ in the sample.
+Repeating the sampling process @${r} times yields a sequence of proportions;
+ the 95% confidence interval of such a sequence is a @approximation["r" "s" "95"].
 
-@; TODO need this?
-@;  well it's not about us, it's about future communication
+The theoretical justification for why this protocol should yield a useful
+ estimate requires some basic statistics.
+Let @${d} be a predicate that checks whether a particular configuration of
+ a fixed program is @deliverable{D}.
+This predicate defines a Bernoulli random variable @${X_d} with parameter
+ @${p}, where @${p} is the true proportion of @deliverable{D} configurations.@note{
+  In particular, @${X_d = } @racket[(lambda () (if (@${d} (random-config)) 1 0))]}
+Consequently, the expected value of this random variable is @${p}.
+The law of large numbers therefore states that the average of infinitely
+ many samples of @${X_d} converges to @${p}, the true proportion
+ of deliverable configurations.
+Convergence suggests that the average of ``enough'' samples will be ``close to''
+ @${p}.
+The central limit theorem provides a similar guarantee---any sequence of
+ such averages will be normally distributed around the true proportion.
+Hence a 95% confidence interval generated from such averages is likely
+ to contain the true proportion.
 
-If @${P} is clear from context we may say @approximation["s" "t"].
-If @cspace[] is also clear, we may say @approximation[@${n_s} @${n_t}].
+@; Taken alone, this observation is useless; the protocol in @section-ref{sec:method}
+@;  finds the same proportion @${p} in finite time.
+@; The CLT turns the suggestion into a guarantee
 
-@bold{Definition} a @emph[sra] is an @approximation["s" "t" "P"] for some
- values @${P}, @${s}, and @${t}.
+@; TODO cite sources
 
 
-@section[#:tag "sec:sampling:overhead"]{Justification}
+@section[#:tag "sec:sampling:overhead"]{Empirical Validation}
 
-Let @cspace{C} be a configuration space,
- let @emph{D} be a small natural number,
- and let @${y} be the true number of @deliverable{D} configurations in @cspace{C}.
+In principle, a @approximation["r" "s" "95"] should give precise and accurate
+ bounds.
+It remains to be seen whether the data from a small number of samples (@${r})
+ each containing a small number of configurations (@${s}) actually do so in
+ practice.
+@; The bounds might be wide, and the bounds might not contain the true proportion
+@;  of @deliverable{D} configurations.
+Fortunately, the data from the exhaustive evaluation of @section-ref{sec:exhaustive}
+ is an adequate source-of-truth to test against.
 
-A @emph{sample} from the space @cspace{C} is a sequence @cspace{S} of
- configurations in @cspace{C}.
-Some proportion @${y_{\bf S}} of configurations in @cspace{S} are @deliverable{D}.@note{
- More formally, the predicate @tt{D? : @cspace{C} -> Boolean} defines a
- Bernoulli random variable.}
-
-In general, there is no useful relation between @${y} and @${y_{\bf S}};
- thus assume there exist functions @${s} and @${t} such that:
-@itemlist[
-@item{
- @$|{|{\bf S}| = s({\bf C})}|,
-}
-@item{
- there are @$|{t({\bf C})}| such samples,
-}
-@item{
- the @$|{y_{\bf S_i}}| are normally distributed around @${y}.
-}
-]
-
-Given such functions @${s} and @${t}, the @${P}% confidence interval of the
- sample proportions @$|{y_{\bf S_i}}| is an interval @${[y_{lo}, y_{hi}]} with
- the desired property.
-In other words, repeating this process @${k} times will yield a sequence of
- intervals @$|{[y_{lo}, y_{hi}]_0 \ldots [y_{lo}, y_{hi}]_{k-1}}| and @${P}% of these
- intervals will contain the true proportion @${y}.
-
-The formal intuition for why the function @${s} should exist is the Law of Large
- Numbers.
-@TODO{explain}.
-The formal intuition for why @${t} should exist is the Central Limit Theorem.
-@TODO{explain}.
-
-@figure*["fig:validate-sample" "Valdiating Linear Measurements"
+@figure*["fig:sample:validate" @elem{Validating the @emph{simple random approximation} method}
   (parameterize ([*PLOT-HEIGHT* 100])
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
 ]
 
-@Figure-ref{fig:validate-sample} provides empirical justification.
-Specifically, the figure demonstrates that the functions:
-@itemlist[
-@item{
-  @$|{s = \lambda\,{\bf C}.\,10 * \mathsf{log}_2(|C|)}|
-}
-@item{
-  @$|{t = \lambda\,{\bf C}.\,10}|
-}
-]
-produced samples that formed correct, tight bounds on the
+@Figure-ref{fig:sample:validate} demonstrates that linear samples
+ suffice to approximate the performance overhead in the
  @integer->word[NUM-VALIDATE-SAMPLES] largest benchmarks from
  @section-ref{sec:exhaustive}.
-    @; TODO  emphasize "LINEAR" !!!
-Note that each plot in @figure-ref{fig:validate-sample} represents two datasets:
-@itemlist[
-@item{
-  the solid blue line in each plot is from @figure-ref{fig:overhead}, and
-}
-@item{
-  the orange intervals around these lines are the @approximation["s" "t" 95]
-  for consecutive values of @math{D}.
-}
-]
-For further evidence, the artifact for this paper contains scripts to reproduce
- this experiment.
+For a benchmark containing @${F} functions and @${C} classes,
+ the figure plots the confidence interval generated by
+ @integer->word[NUM-SAMPLE-TRIALS] samples of @${@id[SAMPLE-RATE]*(F+C)}
+ configurations selected at random @emph{with replacement}.@note{The theoretical
+  justification in @section-ref{sec:sampling:protocol} assumes random sampling
+  without replacement, but (to paraphrase Knuth@~cite[k-cs-1974] out of context)
+  the chance of drawing the same configuration twice is quite small, and removing
+  this chance slightly increases the odds of drawing an extreme outlier.}
+These intervals are superimposed on the overhead plots from @figure-ref{fig:overhead}.
+
+These particular @approximation[NUM-SAMPLE-TRIALS @smaller{@${[@id[SAMPLE-RATE](F+C)]}} "95"]s
+ @; ... could just say "simple random approximation"
+ all contain the the true number of @deliverable{D} configurations for values of
+ @${D} between 1 and @id[MAX-OVERHEAD].
+The intervals are futhermore small, and thus practical substitutes for the overhead plots.
+@; TODO I mean, the message they give to USERS is the same, more-or-less.
+@;      the added benefit of collecting all the data is small
+
+The online supplement to this paper contains scripts for generating new samples
+ and reproducing this experiment.
 
 
 @section[#:tag "sec:sampling:new"]{Approximate Evaluation}
 
-@figure["fig:sample:static-benchmark" "Static summary of benchmarks" #:style center-figure-style
+@figure["fig:sample:static-benchmark" "Static summary of benchmarks"
   @(parameterize ([*CACHE-SUFFIX* "-linear"])
     @render-static-information[SAMPLE-BENCHMARKS])]
 
-@figure*["fig:sample" "Linear Measurements"
+@figure*["fig:sample" "Simple random approximation plots"
   (parameterize ([*PLOT-HEIGHT* 100])
     @render-samples-plot*[SAMPLE-BENCHMARKS])]
 

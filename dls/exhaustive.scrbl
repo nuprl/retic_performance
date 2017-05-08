@@ -342,7 +342,7 @@ This data suggests that migrating an arbitrary
  Reticulated @emph{relative to Python} across all
  configurations of the @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmarks.
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
- for @emph{D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
+ for values of @${D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
 The @|x-axes| are log-scaled to emphasize the practical importance of low
  overheads;
  vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.

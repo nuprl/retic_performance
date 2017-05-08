@@ -7,6 +7,13 @@
 ;; Basically, extends `scribble/acmart` with project-specific options.
 ;; (The file `lang/reader.rkt` sets up the actual reader.)
 
+;; TODO
+;; - 4.3 : costly type annotations = type annotations on methods called many times
+;; - ??? : no FUTURE TENSE
+;; - also VALIDATE with go and meteor? They're the next biggest, and will
+;;   bring us to 9 figures
+;; - formatting variables, $ vs emph
+
 (provide
   (all-from-out
     "bib.rkt"
@@ -115,6 +122,15 @@
   NUM-ITERATIONS
   ;; Number of times we ran each configuration for each benchmark.
 
+  SAMPLE-RATE
+  ;; Constant, defines sample size.
+  ;; The sample size for a benchmark with N type-able components is
+  ;;  `SAMPLE-RATE * N`
+
+  NUM-SAMPLE-TRIALS
+  ;; Constant, defines number of sample trials.
+  ;; i.e. how many times we took random samples for each benchmark
+
   NUM-BETTER-WITH-TYPES
   ;; Number of configurations that run faster than some configuration with
   ;;  fewer typed components. (This is rare, and usually indicates a bug.)
@@ -165,10 +181,10 @@
   ;; Renders as "N-deliverable"
 
   approximation
-  ;; Usage: `@approximation[s t pct]`
-  ;;  where `s`, `t` represent functions
+  ;; Usage: `@approximation[r s pct]`
+  ;;  where `r`, `s` are variables
   ;;  and `pct` is a percentage.
-  ;; Renders as "pct% s,t-approximation"
+  ;; Renders as "pct% r,s-approximation"
 
   sra
   ;; Usage: @|sra|
@@ -565,12 +581,16 @@
       (raise-argument-error 'deliverable "(or/c positive-real? string?)" D)]))
   (elem (emph d-str) "-deliverable"))
 
-(define (approximation s t [pct #f])
+(define (approximation r s [pct #f])
   (define pct-elem
     (if pct
       (elem ($ (~a pct)) "%-")
       (elem)))
-  (elem pct-elem s "," t "-approximation"))
+  (define r-elem
+    (if (real? r) (id r) r))
+  (define s-elem
+    (if (real? s) (id s) s))
+  (elem pct-elem r-elem "," s-elem "-approximation"))
 
 (define sra
   "simple random approximation")
