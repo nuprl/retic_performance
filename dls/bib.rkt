@@ -1985,3 +1985,14 @@
                  #:number 1
                  #:pages '(48 50))
     #:date 1956))
+
+(define k-cs-1974
+  (make-bib
+    #:title "Structured programming with go to statements"
+    #:author "Donald E. Knuth"
+    #:location (journal-location "Computing Surveys"
+                                 #:volume 6
+                                 #:number 4
+                                 #:pages '(261 301))
+    #:date 1974))
+
