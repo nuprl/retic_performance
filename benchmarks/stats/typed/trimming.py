@@ -1,5 +1,3 @@
-#import frequency
-#import support
 from typed_math import pow, sqrt, exp, abs, fabs, log, round, pi
 
 ####################################
