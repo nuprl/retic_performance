@@ -398,7 +398,8 @@
   (command-line
    #:program "rp-python"
    #:args (PAT)
-   (for ([fn (in-glob PAT)])
+   (python-info->all-types (benchmark-dir->python-info PAT))
+   #;(for ([fn (in-glob PAT)])
      (define mi (path-string->module-info fn))
      (when (is-typed-function? (get-method-by-name '__init__ (get-class-by-name 'SSHConfig mi)))
        (displayln (path-replace-extension (file-name-from-path fn) #""))))))
