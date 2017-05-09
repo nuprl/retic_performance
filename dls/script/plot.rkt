@@ -145,13 +145,12 @@
 
 (define (samples-plot pi)
   (define-values [sample-size sample*] (performance-info->sample-info pi))
-  (define dc*
-    (for/list ([s (in-list sample*)])
-      (make-simple-deliverable-counter (performance-info%sample pi s))))
-  (define (min-dc* r)
-    (for/fold ([lo 100])
-              ([dc (in-list dc*)])
-      (min lo (dc r))))
+  (define mean-overhead
+    (let ([dc*
+           (for/list ([s (in-list sample*)])
+             (make-simple-deliverable-counter (performance-info%sample pi s)))])
+      (λ (r)
+        (mean (for/list ([dc (in-list dc*)]) (dc r))))))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
@@ -161,13 +160,14 @@
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)]
-                   [*INTERVAL-ALPHA* 0.4]
                    [*OVERHEAD-LINE-COLOR* SAMPLE-COLOR])
       (plot-pict
         (list
-          (for/list ([dc (in-list dc*)])
-            (make-count-configurations-function dc #:interval? #f))
-          (make-count-configurations-function min-dc*)
+          (parameterize ([*INTERVAL-ALPHA* 0.4])
+            (make-count-configurations-function mean-overhead))
+          (make-sample-function-interval
+            (for/list ([s (in-list sample*)])
+              (performance-info%sample pi s)))
           (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
@@ -189,7 +189,8 @@
                    [plot-y-far-ticks no-ticks]
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
-                   [plot-font-size (*FONT-SIZE*)])
+                   [plot-font-size (*FONT-SIZE*)]
+                   [*OVERHEAD-LINE-WIDTH* 0.5])
       (plot-pict
         (list
           (make-count-configurations-function pi)
@@ -198,8 +199,7 @@
               (for/list ([s (in-list sample*)])
                 (performance-info%sample pi s))))
           (tick-grid)
-          (parameterize ([*OVERHEAD-LINE-WIDTH* 0.5])
-            (make-count-configurations-function pi #:interval? #f)))
+          (make-count-configurations-function pi #:interval? #f))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
         #:y-min 0

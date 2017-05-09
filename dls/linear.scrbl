@@ -258,8 +258,6 @@ These results confirm many trends in earlier data; in particular,
 }
 ]
 
-
-
 @; -----------------------------------------------------------------------------
 
 @; @; This belongs in one of three places:
@@ -281,5 +279,4 @@ These results confirm many trends in earlier data; in particular,
 @;  migration.
 @; It is not clear, however, that the resuts of @section-ref{sec:exhaustive} will hold
 @;  for significantly larger programs.
-
 
