@@ -651,11 +651,11 @@
 
   (require
     rackunit
-    (only-in racket/set
-      set=?)
+    racket/set
     (only-in gm-dls-2017/script/benchmark-info
       benchmark-info->python-info)
     (only-in gm-dls-2017/script/python
+      python-info->all-types
       python-info->num-types)
     (only-in gm-dls-2017/script/performance-info
       unzip-karst-data
@@ -680,6 +680,13 @@
             (unless (>= (length t*) NUM-ITERATIONS)
               (test-error "configuration ~a has ~a iterations, expected at least ~a iterations (in file ~a)" cfg (length t*) NUM-ITERATIONS karst-file))
             acc)))
+
+  (define (check-fully-annotated bm)
+    (define t* (python-info->all-types (benchmark-info->python-info bm)))
+    (when (set-member? t* #f)
+      (test-error "benchmark ~a is missing some type annotation(s)" (benchmark->name bm)))
+    (when (for/or ([t (in-set t*)]) (and t (regexp-match? #rx"Dyn" t)))
+      (test-error "benchmark ~a uses the Dyn type" (benchmark->name bm))))
 
   ;; ------------------------------------------------------------------
 
@@ -752,4 +759,7 @@
     (check-equal?
       (pi:count-better-with-types EXHAUSTIVE-BENCHMARKS)
       NUM-BETTER-WITH-TYPES))
+
+  (test-case "fully-annotated"
+    (for-each check-fully-annotated (all-benchmarks)))
 )

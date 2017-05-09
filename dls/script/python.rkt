@@ -107,7 +107,8 @@
    ;; Count the number of class fields
 
    [python-info->all-types
-    (-> python-info? (set/c string?))]
+    ;; TODO codomain should not include #f
+    (-> python-info? (set/c (or/c #f string?)))]
    ;; Return a set of all types used in the program
 
    [python-info->num-types
@@ -351,9 +352,11 @@
   (length (python-info->return* py)))
 
 (define (python-info->field* py)
+  (define missing-field* (list (field-info 'missing-field #f)))
   (for*/list ([mi (in-list (python-info-module* py))]
               [ci (in-list (module-info-class* mi))]
-              [f (in-list (or (class-info-field* ci) '()))])
+              [f (in-list (or (class-info-field* ci)
+                              (list (field-info (string->symbol (format "missing-fields:~a" (class-info-name ci))) #f))))])
     f))
 
 (define (python-info->num-fields py)
@@ -394,11 +397,13 @@
 ;; =============================================================================
 
 (module+ main
-  (require racket/cmdline)
+  (require racket/cmdline racket/set)
   (command-line
    #:program "rp-python"
-   #:args (PAT)
-   (python-info->all-types (benchmark-dir->python-info PAT))
+   #:args PAT*
+   (for ((PAT (in-list PAT*)))
+     (when (set-member? (python-info->all-types (benchmark-dir->python-info PAT)) #f)
+       (printf "MISSING TYPE IN ~a~n" PAT)))
    #;(for ([fn (in-glob PAT)])
      (define mi (path-string->module-info fn))
      (when (is-typed-function? (get-method-by-name '__init__ (get-class-by-name 'SSHConfig mi)))
