@@ -63,3 +63,6 @@ Why do these benchmarks improve with fewer types?
 - spectralnorm
 - calls
 - http2
+
+There are @id[NUM-BETTER-WITH-TYPES] configurations that run faster that
+ at least one configuration with fewer typed components.

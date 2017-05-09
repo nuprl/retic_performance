@@ -212,6 +212,7 @@
   ;; Renders the display-mode form of the value of `foo`
 
   integer->word
+  Integer->word
   ;; (->* [integer?] [#:title? any/c] string?)
   ;; Coverts a small number into a string.
   ;; Capitalizes the string when `#:title?` is non-#f
@@ -642,6 +643,9 @@
   (define total (pi:num-configurations pi))
   (define num-good ((pi:deliverable (pi:typed/python-ratio pi)) pi))
   (round (pct (- total num-good) total)))
+
+(define (Integer->word i)
+  (integer->word i #:title? #t))
 
 ;; =============================================================================
 

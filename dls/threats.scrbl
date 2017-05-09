@@ -8,6 +8,9 @@ These threats question the accuracy of the data
 
 
 @section{Measurement Error}
+@; - did some preliminary measurements to see if different nodes or
+@;   different usage patterns
+@; - ran 40 iterations to control
 
 The data are timings recorded on the Karst at Indiana University cluster
  using the Python function @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}.
@@ -22,16 +25,85 @@ These measurement biases@~cite[mdhs-asplos-2009] may explain the outliers eviden
 
 @section{Systematic Bias}
 
-The first and most significant threat is that the experiment considers only one
- fully-typed configuration per benchmark.
-In general there are many ways of typing a given program.
+@(let* (
+        @; @; All about src/simplejson/simplejson/
+        @; @; - 7 modules
+        @; @; - 22 functions
+        @; @; - 6 classes
+        @; @; - 26 methods
+        @;
+        @; @; All about src/jinja/jinja2/
+        @; @; - 26 modules
+        @; @; - 136 functions
+        @; @; - 146 classes
+        @; @; - 503 methods
+        @;
+        @; @; All about src/requests/requests/
+        @; @; - 15 modules
+        @; @; - 59 functions
+        @; @; - 40 classes
+        @; @; - 149 methods
+        [lib-data* '((simplejson 50 "https://github.com/simplejson/simplejson")
+                     (requests 200 "https://github.com/kennethreitz/requests")
+                     (jinja2 600 "https://github.com/pallets/jinja/tree/master/jinja2"))]
+        [rank-info @elem{PyPI Ranking@note{@url{http://pypi-ranking.info/alltime}}}]
+        [lib-info (authors*
+                    (for/list ([ld (in-list lib-data*)]
+                               [long-style? (in-sequences '(#t)
+                                                          (in-cycle '(#f)))])
+                      @elem{
+                        @(if long-style? "The" "the")
+                        @hyperlink[(caddr ld)]{@tt[@symbol->string[(car ld)]]}
+                        library contains over @id[(cadr ld)]@;
+                        @(if long-style? " functions and methods" "")}))]
+       ) @elem{
+  First, the experiment includes very few benchmarks, and these benchmarks are
+   rather small.
+  For example, an ad-hoc sample of the @|rank-info| reveals that even small
+   packages have many functions and methods.
+  @|lib-info|.
+})
+
+Second, the experiment considers one fully-typed configuration per benchmark;
+ however there are many ways of typing a given program.
 The types in this experiment may differ from types inferred by another Python
- programmer, and the different types may lead to different performance overhead.
+ programmer, and may lead to different performance overhead.
 
-Second, a few benchmarks are either missing annotations or use the dynamic type.
-
-Third, the benchmarks are relatively small compared to widely-used Python libraries.
-TODO data
+@(let ([missing-fields '(futen PythonFlow Evolution)]
+       [retic-limited '(go pystone take5 stats)]
+       [format-bm* (lambda (bm*) (authors* (map bm bm*)))]
+       @; see also https://github.com/nuprl/retic_performance/issues/55
+       @;
+       @; - futen is missing some type annotation(s)
+       @;   - LazyFqdn missing @fields
+       @; - call_method is missing some type annotation(s)
+       @;   - missing @fields, but actually empty
+       @; - call_method_slots is missing some type annotation(s)
+       @;   - missing @fields, but actually empty
+       @; - go uses the Dyn type
+       @;   - to avoid circular reference
+       @; - pystone uses the Dyn type
+       @;   - union type, (U PSRecord None)
+       @; - Evolution is missing some type annotation(s)
+       @;   - none of classes have @fields
+       @; - PythonFlow is missing some type annotation(s)
+       @;   - class missing fields
+       @; - take5 is missing some type annotation(s)
+       @;   - `create_deck`, argument 'deck_size' is unannotated
+       @;   - same function has optional arguments, so the types ignored
+       @; - stats is missing some type annotation(s)
+       @;   - only on the print function
+       @; - stats uses the Dyn type
+       @;   - for polymorphism, "rank polymorphism", and union types
+      ) @elem{
+  Third, some benchmarks are either missing annotations or use the dynamic type.
+  @Integer->word[(length missing-fields)]
+   benchmarks (@format-bm*[missing-fields]) have
+   classes with untyped fields due to an oversight on our part.
+  @Integer->word[(length retic-limited)]
+   benchmarks (@format-bm*[retic-limited]) use the
+   dynamic type (@tt{Dyn}) to overcome limitations in Reticulated's type theory.
+})
 
 Fourth, Reticulated supports a finer granularity of type annotations than the
  experiment considers.

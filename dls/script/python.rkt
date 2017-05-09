@@ -244,6 +244,13 @@
    [else
     (raise-user-error 'benchmark-dir->python-info "cannot coerce ~a into static info about a Python program" x)]))
 
+(define (directory->python-info ps)
+  (define-values [_base name _mbd] (split-path ps))
+  (define m* (glob (build-path ps "*.py")))
+  (if (null? m*)
+    (raise-user-error 'directory->python-info "directory ~a has no Python files")
+    (python-info name (map path-string->module-info m*))))
+
 (define (path-string->module-info ps)
   (define py-json (path-string->exploded-module ps))
   (module-json->module-info py-json))
@@ -397,11 +404,19 @@
 ;; =============================================================================
 
 (module+ main
-  (require racket/cmdline racket/set)
+  (require racket/cmdline racket/set racket/pretty)
   (command-line
    #:program "rp-python"
-   #:args PAT*
-   (for ((PAT (in-list PAT*)))
+   #:args (p)
+   (pretty-print (benchmark-dir->python-info p))
+   #;(let ([py (directory->python-info DIR)])
+     (printf "All about ~a~n" DIR)
+     (printf "- ~a modules~n" (python-info->num-modules py))
+     (printf "- ~a functions~n" (python-info->num-functions py))
+     (printf "- ~a classes~n" (python-info->num-classes py))
+     (printf "- ~a methods~n" (python-info->num-methods py))
+     (void))
+   #;(for ((PAT (in-list PAT*)))
      (when (set-member? (python-info->all-types (benchmark-dir->python-info PAT)) #f)
        (printf "MISSING TYPE IN ~a~n" PAT)))
    #;(for ([fn (in-glob PAT)])

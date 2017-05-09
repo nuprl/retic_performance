@@ -28,6 +28,9 @@ For each benchmark, we aimed to choose a set of configurations that represent th
 @; - Thatte's type-precision relation
 @; - Henglein's "completions" (also erasures?)
 
+@; TODO
+@; - syntax for P(c) ~ ||c||t
+
 Let @${L} be a programming language.
 Let @${P} be some program written in the language, composed of @${n_M} modules
  @${M_0 \ldots M_{n_M - 1}}.

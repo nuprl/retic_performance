@@ -74,7 +74,6 @@
     [integer->word
      (->* [integer?] [#:title? any/c] string?)]
     ;; Convert an arabic digit (0-9) to an English word
-
 ))
 
 (require
