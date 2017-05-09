@@ -25,7 +25,7 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
        [num1 @integer->word[(length DLS-2014-BENCHMARK-NAMES)]]
        [dls-names @authors*[(map (compose1 tt symbol->string) DLS-2014-BENCHMARK-NAMES)]]
        [num2 @integer->word[(length POPL-2017-BENCHMARK-NAMES)]]
-       [num3 @integer->word[(length DLS-2017-BENCHMARK-NAMES)]]
+       [num3 @integer->word[(length '(Espionage PythonFlow take5))]]
       ) @elem{
   @; Many of the benchmark programs stem from prior work on Reticulated.
   Of the @|total| benchmark programs,
@@ -229,34 +229,6 @@ The following descriptions credit the benchmarks' original authors,
   @; 1 iteration
 }
 
-@bm-desc["Evolution"
-@authors["Maha Elkhairy" "Kevin McDonough" "Zeina Migeed"]
-""
-@list[
-  @(let ([num-python-files-in-both-dir 90] @;; ./find "../benchmarks/Evolution/both" -name "*.py" | wc -l
-         [num-test-files 21]) @;; ./find "../benchmarks/Evolution/both/evo_test" -name "*.py" | wc -l
-    @elem{@id[(- num-python-files-in-both-dir num-test-files)] untyped modules})
-]]{
-  Implements a card game.
-  The experimental modules represent the possible actions
-   that a player can take on each turn.
-  The control modules encode the players, cards, and game logic.
-  @; 20 iterations
-}
-
-@bm-desc["sample_fsm"
-@authors["Linh Chi Nguyen"]
-@url{https://github.com/ayaderaghul/sample-fsm}
-@list[
-  @lib-desc["itertools"]{cycles}
-  @lib-desc["os"]{path split}
-  @lib-desc["random"]{random randrange}
-]]{
-  Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
-  This benchmark is adapted from a similar Racket program called @tt{fsmoo}@~cite[greenman-jfp-2017].
-  @; 100 iterations
-}
-
 @bm-desc["PythonFlow"
 @authors["Alfian Ramadhan"]
 @url{https://github.com/masphei/PythonFlow}
@@ -397,8 +369,8 @@ A flat curve (zero slope) indicates that the performance of a group of
 
 Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
-This value is always less than 10; every configuration in the experiment is
- @deliverable{10}.
+This value is always less than @id[MAX-OVERHEAD]; every configuration in the
+ experiment is @deliverable[MAX-OVERHEAD].
 For many benchmarks, the maximum overhead is significantly lower.
 Indeed, six benchmarks are @deliverable{2}.
 

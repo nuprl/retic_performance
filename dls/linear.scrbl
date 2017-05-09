@@ -143,14 +143,122 @@ The online supplement to this paper contains scripts for generating new samples
   @(parameterize ([*CACHE-SUFFIX* "-linear"])
     @render-static-information[SAMPLE-BENCHMARKS])]
 
-@figure*["fig:sample" "Simple random approximation plots"
+The simple random approximation method scales to large programs.
+Given any fully-typed program, a @approximation["r" "s" 95] can estimate its
+ performance in reasonable time.
+The exact amount of time, as well as the quality of the estimate, depends
+ on the chosen values of @${r} (number of repetitions) and @${s} (sample size).
+
+@; continues the evaluation started in section 4
+@(let* ([DLS '(aespython stats)]
+        [NEW '(Evolution sample_fsm)]) @elem{
+   This section presents the results of an @defn{approximate} performance
+    evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs.
+   @string-titlecase[@integer->word[(length DLS)]] of these programs,
+    @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
+   The other @integer->word[(length NEW)], @bm*[NEW], originate from open-source
+    programs.
+   @Figure-ref{fig:sample:static-benchmark} and the following descriptions
+    provide more information about the benchmarks' size and purpose.
+})
+
+@; -----------------------------------------------------------------------------
+@; --- WARNING: the order of benchmarks matters!
+@; ---  Do not re-order without checking ALL PROSE in this file
+@; -----------------------------------------------------------------------------
+
+@bm-desc["Evolution"
+@authors["Maha Elkhairy" "Kevin McDonough" "Zeina Migeed"]
+""
+@list[
+  @(let ([num-python-files-in-both-dir 90] @;; ./find "../benchmarks/Evolution/both" -name "*.py" | wc -l
+         [num-test-files 21]) @;; ./find "../benchmarks/Evolution/both/evo_test" -name "*.py" | wc -l
+    @elem{@id[(- num-python-files-in-both-dir num-test-files)] untyped modules})
+]]{
+  Implements a card game.
+  The experimental modules represent the possible actions
+   that a player can take on each turn.
+  The control modules encode the players, cards, and game logic.
+  @; 20 iterations
+}
+
+@bm-desc["sample_fsm"
+@authors["Linh Chi Nguyen"]
+@url{https://github.com/ayaderaghul/sample-fsm}
+@list[
+  @lib-desc["itertools"]{cycles}
+  @lib-desc["os"]{path split}
+  @lib-desc["random"]{random randrange}
+]]{
+  Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
+  This benchmark is adapted from a similar Racket program called @tt{fsmoo}@~cite[greenman-jfp-2017].
+  @; 100 iterations
+}
+
+@bm-desc["aespython"
+@authors[@hyperlink["http://caller9.com/"]{Adam Newman}
+         @hyperlink["https://github.com/serprex"]{Demur Remud}]
+@url{https://github.com/serprex/pythonaes}
+@list[
+  @lib-desc["os"]{random stat}
+  @lib-desc["struct"]{pack unpack calcsize}
+]]{
+  @; Second sentence is a little awkward. I just want to say, "this is really
+  @;  a Python implementation of AES, not just a wrapper to some UNIX implementation"
+  Implements the @hyperlink["http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf"]{Advanced Encryption Standard}.
+  Uses the @tt{os} library only to generate random bytes and invoke the
+   @hyperlink["http://man7.org/linux/man-pages/man2/stat.2.html"]{@tt{stat()}}
+   system call.
+  @; 1 iteration, encrypts the book of Leviticus (2800 lines)
+}
+
+@bm-desc["stats"
+@authors[@hyperlink["https://connects.catalyst.harvard.edu/Profiles/display/Person/12467"]{Gary Strangman}]
+@url{https://github.com/seperman/python-statlib/blob/master/statlib/pstat.py}
+@list[
+  @lib-desc["copy"]{deepcopy}
+  @lib-desc["math"]{pow abs etc.}
+]]{
+  Implements first-order statistics functions; in other words, transformations
+   on either floats or (possibly-nested) lists of floats.
+  The original program consists of two modules.
+  The benchmark is modularized according to comments in the program's source
+   code to reduce the size of each module's configuration space.
+  @; 1 iteration
+}
+
+
+@subsection{Results}
+
+@figure*["fig:sample:overhead" "Simple random approximation plots"
   (parameterize ([*PLOT-HEIGHT* 100])
     @render-samples-plot*[SAMPLE-BENCHMARKS])]
 
-The table in @figure-ref{fig:sample:static-benchmark} and plots in @figure-ref{fig:sample}
- present an inexhaustive evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs.
-@TODO{benchmark descriptions}
-The results confirm the trends in @figure-ref{fig:overhead}.
+@Figure-ref{fig:sample:overhead} plots the results of applying the protocol
+ in @section-ref{sec:protocol} to randomly sampled configurations.
+These results confirm many trends in earlier data; in particular,
+@itemlist[
+@item{
+  The @|u/p-ratio|s are relatively low.
+  @; TODO compute these, call functions
+  The smallest is 1.1x and the largest is 4x.
+}
+@item{
+  All configurations are @deliverable[MAX-OVERHEAD].
+}
+@item{
+  The curves typically have smooth slopes, implying the cost of annotating
+   a single function or class is low.
+}
+@item{
+  @TODO{plot and address typed/untyped ratios}
+}
+@item{
+  The intervals are tight.
+}
+]
+
+
 
 @; -----------------------------------------------------------------------------
 
