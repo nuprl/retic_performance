@@ -94,9 +94,14 @@
    [acmart:#%module-begin #%module-begin]
 
    [render-benchmark-name bm]
-   ;; Usage: `@bm[benchmark-info]`
-   ;; Given a benchmark-info struct, render the name of the benchmark
-   ;;  in a standard way.
+   ;; Usage: `@bm{name}`
+   ;; Given something that uniquely identifies a benchmark, render the
+   ;;  benchmark's canonical name.
+   ;; This is essentially `tt`, but it catches typos.
+
+   [render-benchmark-names* bm*]
+   ;; Usage: `@bm*{name1 name2 ...}
+   ;; Render multiple benchmark names.
 
   )
 
@@ -383,6 +388,12 @@
   (define bm (->benchmark str))
   (tt (symbol->string (benchmark->name bm))))
 
+(define (render-benchmark-names . str*)
+  (render-benchmark-names* str*))
+
+(define (render-benchmark-names* str*)
+  (authors* (map render-benchmark-name str*)))
+
 (define (warning msg . arg*)
   (display "[WARNING] ")
   (apply printf msg arg*)
@@ -551,6 +562,7 @@
         (lib "re" "https://docs.python.org/3/library/re.html")
         (lib "shlex" "https://docs.python.org/3/library/shlex.html")
         (lib "socket" "https://docs.python.org/3/library/socket.html")
+        (lib "struct" "https://docs.python.org/3/library/struct.html")
         (lib "urllib" "https://docs.python.org/3/library/urllib.html")))
 
 (define (lib-desc name . why)
@@ -558,8 +570,8 @@
                   #:when (string=? name (lib-name l)))
         l)
       (begin
-        (warning "no URL for library ~a, please add to `lib-index*` in `main.rkt`")
-        (lib name ""))))
+        (warning "no URL for library ~a, please add to `lib-index*` in `main.rkt`" name)
+        (lib name "https://www.google.com"))))
 
 (define u/p-ratio
   "untyped/python ratio")
