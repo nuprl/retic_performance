@@ -37,6 +37,7 @@
 
   (define/short aosd "AOSD" (string-append International Conference "on Aspect-Oriented Software Development"))
   (define/short asplas "APLAS" (string-append "Asian " Symposium "Programming Languages and Systems"))
+  (define/short asplos "ASPLOS" (string-append International Conference "on Architectural Support for Programming Languages and Operating Systems"))
   (define/short cc "CC" (string-append International Conference "on Compiler Construction"))
   (define/short dls "DLS" "Dynamic Languages Symposium")
   (define/short dsl "DSL" (string-append ACM Conference "on Domain-specific languages"))
@@ -1996,3 +1997,9 @@
                                  #:pages '(261 301))
     #:date 1974))
 
+(define mdhs-asplos-2009
+  (make-bib
+    #:title "Producing Wrong Data Without Doing Anything Obviously Wrong!"
+    #:author (authors "Todd Mytkowicz" "Amer Diwan" "Matthias Hauswirth" "Peter F. Sweeney")
+    #:location (proceedings-location asplos #:pages '(265 276))
+    #:date 2009))
