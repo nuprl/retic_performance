@@ -207,8 +207,8 @@
       (scan-karst-file k)
       (values (benchmark->num-configurations bm)
               (benchmark->max-configuration bm)
-              #f
-              #f))) ;; So glad we are untyped
+              (mean (benchmark->karst-retic-untyped bm))
+              (mean (benchmark->karst-retic-typed bm)))))
   (unless (and (= num-configs (benchmark->num-configurations bm))
                (equal? configs/module* (benchmark->max-configuration bm)))
     (raise-user-error 'benchmark->performance-info "fatal error processing ~a" name))
@@ -747,6 +747,17 @@
                                  ("24" . "16") ("16" . "0") ("18" . "2")
                                  ("20" . "4") ("12" . "4") ("8" . "0")
                                  ("14" . "6") ("22" . "6")))))])))
+
+  (test-case "ratio-for-samples"
+    (define (check-t/p-ratio bm-name)
+      (define pi (->performance-info bm-name))
+      (void ;; assert that `pi` has ONLY sample data
+        (when (performance-info-src pi)
+          (raise-user-error 'check-t/p-ratio "benchmark '~a' has more than just sample data" bm-name))
+        (performance-info->sample* pi))
+      (check-pred typed/python-ratio pi)
+      (void))
+    (check-t/p-ratio 'Evolution))
 )
 
 ;; -----------------------------------------------------------------------------

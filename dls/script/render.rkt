@@ -83,7 +83,7 @@
                    [*OVERHEAD-SHOW-RATIO* 'short]
                    [*OVERHEAD-FREEZE-BODY* freeze?]
                    [*LEGEND-VSPACE* 2]
-                   [*LEGEND-HSPACE* 4]
+                   [*LEGEND-HSPACE* (if (string=? descr "samples") 1 4)]
                    [*FONT-SIZE* 8]
                    [*current-cache-directory* (build-path (current-directory) "with-cache")]
                    [*current-cache-keys* (list (λ () (list OVERHEADS-WIDTH H OVERHEADS-VSPACE OVERHEADS-HSPACE)))]

@@ -49,8 +49,16 @@
     ;; Return a path to the benchmark's sample data from Karst, if any
 
     [benchmark->python-data
-     (-> benchmark-info? (or/c (listof real?) #f))]
+     (-> benchmark-info? (listof real?))]
     ;; Return the benchmark's Python runtimes, if any
+
+    [benchmark->karst-retic-untyped
+     (-> benchmark-info? (listof real?))]
+    ;; Return the benchmark's untyped runtimes, if any
+
+    [benchmark->karst-retic-typed
+     (-> benchmark-info? (listof real?))]
+    ;; Return the benchmark's typed runtimes, if any
 
     [all-benchmarks
      (-> (listof benchmark-info?))]
@@ -234,14 +242,14 @@
   (define karst-dir (retic-performance-karst-dir HOME))
   (karst-dir->sample* karst-dir name))
 
-(define (benchmark->python-data bm)
+(define (read-karst-file/suffix bm suffix)
   (define name (symbol->string (benchmark-info-name bm)))
-  (define python-path
-    (path-add-extension (build-path (retic-performance-karst-dir HOME) name) "_untyped.tab"))
-  (if (not (file-exists? python-path))
-    (begin (printf "WARNING: no Python data for benchmark '~a' at location '~a'~n" name python-path)
+  (define data-path
+    (path-add-extension (build-path (retic-performance-karst-dir HOME) name) suffix))
+  (if (not (file-exists? data-path))
+    (begin (printf "WARNING: no data for benchmark '~a' at location '~a'~n" name data-path)
            '(1))
-    (with-input-from-file python-path
+    (with-input-from-file data-path
       (λ ()
         (let loop ()
           (define v (read-line))
@@ -250,7 +258,16 @@
             (let ([n (string->number v)])
               (if n
                 (cons n (loop))
-                (raise-user-error 'python-data "corrupted data file '~a', please fix" python-path)))))))))
+                (raise-user-error 'read-karst-file/suffixe"corrupted data file '~a', please fix" data-path)))))))))
+
+(define (benchmark->python-data bm)
+  (read-karst-file/suffix bm "_untyped.tab"))
+
+(define (benchmark->karst-retic-untyped bm)
+  (read-karst-file/suffix bm "_retic-untyped.tab"))
+
+(define (benchmark->karst-retic-typed bm)
+  (read-karst-file/suffix bm "_retic-typed.tab"))
 
 (define (benchmark->exploded bm)
   (define d (benchmark-dir->benchmarks-dir (benchmark-info-src bm)))

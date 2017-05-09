@@ -239,19 +239,19 @@ The exact amount of time, as well as the quality of the estimate, depends
 These results confirm many trends in earlier data; in particular,
 @itemlist[
 @item{
-  The @|u/p-ratio|s are relatively low.
-  @; TODO compute these, call functions
-  The smallest is 1.1x and the largest is 4x.
+  No configurations run faster than the untyped Python program.
+  The lowest overheads range between 1.1x and 4.x
 }
 @item{
   All configurations are @deliverable[MAX-OVERHEAD].
 }
 @item{
-  The curves typically have smooth slopes, implying the cost of annotating
-   a single function or class is low.
+  Most configurations are @deliverable{T}, where @${T} is the benchmark's
+   @|t/p-ratio|.
 }
 @item{
-  @TODO{plot and address typed/untyped ratios}
+  The curves typically have smooth slopes, implying the cost of annotating
+   a single function or class is low.
 }
 @item{
   The intervals are tight.

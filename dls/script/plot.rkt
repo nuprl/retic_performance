@@ -177,7 +177,7 @@
         #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
-  (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
+  (samples-add-legend pi sample-size (length sample*) body))
 
 (define (validate-samples-plot pi)
   (define-values [sample-size sample*] (performance-info->sample-info pi))
@@ -396,10 +396,19 @@
   (define np (render-count num-points "points"))
   (add-legend name pict np))
 
-(define (samples-add-legend bm-name sample-size num-samples pict)
-  (define name (render-benchmark-name bm-name))
+(define (samples-add-legend pi sample-size num-samples pict)
+  (define-values [name tp-ratio]
+    (cond
+     [(performance-info? pi)
+      (values (performance-info->name pi)
+              (if (*OVERHEAD-SHOW-RATIO*)
+                (render-typed/python-ratio (typed/python-ratio pi))
+                (blank 0 0)))]
+     [else
+      (values pi (blank 0 0))]))
   (define s-info (title-text (format "~a samples of ~a configurations" num-samples sample-size)))
-  (add-legend name pict s-info))
+  (add-legend (hb-append (*LEGEND-HSPACE*) (render-benchmark-name name) tp-ratio)
+              pict s-info))
 
 (define (add-legend top-left body top-right)
   (rt-superimpose
