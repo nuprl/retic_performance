@@ -212,7 +212,7 @@ class SSHConfig (object):
         except ValueError:
             raise Exception("Unparsable host %s" % host)
 
-
+@fields({'fqdn': Dyn, 'config': Dict(String, String), 'host': String})
 class LazyFqdn(object):
     """
     Returns the host's fqdn on request as string.

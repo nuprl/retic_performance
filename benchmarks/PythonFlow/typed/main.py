@@ -10,6 +10,7 @@ import os
 from Timer import Timer
 from retic import fields, Void, String, Int, List
 
+@fields({'graph': List(List(Int)), 'flow': List(List(Int)), 'residual': List(List(Int)), 'total_flow': Int, 'file_name': String})
 class PythonFlow:
     # PythonFlow implement Ford-Fulkerson method to maximize flow on graph problems.
     # example of input text:
