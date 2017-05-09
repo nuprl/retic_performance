@@ -197,6 +197,7 @@
     (benchmark->performance-info pi)]
    [else
     (benchmark->performance-info (->benchmark-info pi))]))
+
 (define (benchmark->performance-info bm)
   (define name (benchmark->name bm))
   (define kd (benchmark->karst-data bm))
