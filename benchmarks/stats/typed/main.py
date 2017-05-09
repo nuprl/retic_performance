@@ -10,7 +10,6 @@ import pstat
 import support
 import trimming
 import variability
-import variability
 
 ##bg: use to test correctness
 #def print_debug(*args):
