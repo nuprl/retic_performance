@@ -1,8 +1,10 @@
 from cardplay import CardPlay
-from retic import Int, Bool, List, Void, Dyn, String
+from retic import Int, Bool, List, Void, Dyn, String, fields
 from evolution.player.player_state import PlayerState
 
 
+
+@fields({'played_card_index':Int, 'species_index': Int})
 class ExchangeForPopulation(CardPlay):
     """
     Represents exchanging cards for Population

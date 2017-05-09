@@ -1,7 +1,8 @@
-from retic import Void, List, Int, Bool, Dyn
+from retic import Void, List, Int, Bool, Dyn, fields
 from evolution.player.player_state import PlayerState
 
 
+@fields({'played_card_index': Int})
 class CardPlay:
     """
     CardPlay is one of:
