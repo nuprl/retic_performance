@@ -29,11 +29,7 @@ Licensed under the MIT license http://www.opensource.org/licenses/mit-license.ph
 __author__ = "Adam Newman"
 
 import os
-import hashlib
 import struct
-import getopt
-import sys
-import time
 
 import key_expander
 import aes_cipher
