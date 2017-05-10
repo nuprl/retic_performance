@@ -106,7 +106,7 @@ It remains to be seen whether the data from a small number of samples (@${r})
 Fortunately, the data from the exhaustive evaluation of @section-ref{sec:exhaustive}
  is an adequate source-of-truth to test against.
 
-@figure*["fig:sample:validate" @elem{Validating the @emph{simple random approximation} method}
+@figure*["fig:sample:validate" @elem{Validating the simple random approximation method}
   (parameterize ([*PLOT-HEIGHT* 100])
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
 ]

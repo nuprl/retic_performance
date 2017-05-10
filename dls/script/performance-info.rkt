@@ -219,7 +219,9 @@
     #:num-configurations num-configs
     #:python-runtime python
     #:untyped-retic-runtime base-retic
-    #:typed-retic-runtime typed-retic))
+    #:typed-retic-runtime (if (eq? name 'PythonFlow) ;; TODO fix this hack
+                            (mean (benchmark->karst-retic-typed bm))
+                            typed-retic)))
 
 (define (make-configuration-counter)
   (let ([cm (box #f)])
