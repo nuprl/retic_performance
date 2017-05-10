@@ -1953,6 +1953,13 @@
    #:location (dissertation-location #:institution "University of Trento" #:degree "Master in Economics")
    #:date 2014))
 
+(define svcb-snapl-2015
+  (make-bib
+    #:title "Refined Criteria for Gradual Typing"
+    #:author (authors "Jeremy G. Siek" "Michael M. Vitousek" "Matteo Cimini" "John Tang Boyland")
+    #:location (proceedings-location snapl #:pages '(274 293))
+    #:date 2015))
+
 (define tfffgksst-snapl-2017
   (make-bib
    #:title "Migratory Typing: Ten years later"
