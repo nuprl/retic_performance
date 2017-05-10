@@ -57,6 +57,9 @@
   ;;  where `message` is an element.
   ;; Renders a bold-style "TODO" message.
 
+  SNAPL-2015-URL
+  ;; URL to the SNAPL paper by Siek et.al
+
   gnorm
   ;; Usage: @${@gnorm{x}}
   ;;  where `x` is measurable syntax
@@ -364,6 +367,9 @@
 
 (define EXACT-RUNTIME-XSPACE
   (*CONFIGURATION-X-JITTER*))
+
+(define SNAPL-2015-URL
+  "http://drops.dagstuhl.de/opus/volltexte/2015/5031/")
 
 ;; -----------------------------------------------------------------------------
 

@@ -1,68 +1,34 @@
 #lang gm-dls-2017
-@title[#:tag "sec:vs-tr"]{Comparing with Typed Racket}
+@title[#:tag "sec:vs-tr"]{Related Work}
 
-@section{A Lack of Soundness}
+@; TODO
+@; - safe typescript?
+@; - strongscript?
+@; these are micro systems with reasonable soundness
 
-@section{A Lack of Expressiveness}
+@; TODO this is ugly text, but hey the information content is all here
+@citet[vksb-dls-2014] introduce the syntax of Reticulated Python and three
+ semantics for enforcing type annotations: guarded, monotonic@~cite[vcgts-esop-2015], and transient.@note{The implementation of Reticulated has some support for all three semantics. Support for transient is the most mature.}
+They do not discuss type soundness.
+They report a 10x @|t/p-ratio| for @tt{slowSHA} (specifically, ``the slowSHA test suite ... 10x slowdown under transient compared to normal Python.'')
+@; Quite different from ours, is transient better? or is it just different inputs?
+They report the @tt{stats} test suite took 1.6 seconds under transient.
+@; on par with what we see, our input is definitely bigger
 
-@section{A Lack of Error-Messages}
+@citet[svcb-snapl-2015] state a theorem that relates the runtime behavior of
+ a given well-typed term to the runtime behavior of less precise@note{Term precision is defined in @hyperlink[SNAPL-2015-URL]{Figure 6}@~cite[svcb-snapl-2015].}
+ terms (Theorem 5, the @emph{gradual guarantee}).
+They furthermore state that this theorem classifies gradual type systems.
+They do not argue that Reticulated satisfies an analogous theorem.
 
-In 2001, Felleisen used the slogan ``errors matter'' for his POPL
-keynote. He meant that when systems work, everyone is happy, but when
-systems break, developers really want to see high quality error messages. 
+@citet[vss-popl-2017] formalize the transient semantics for a lambda calculus.
+They conjecture that Reticulated satisfies their main theorem (Theorem 5.5, @emph{open-world soundness}).
+They measure the performance of Reticulated on 13 programs from
+ @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite}@note{@TODO{compare their ratios/benchmarks to ours}}
+ and report @|t/p-ratio|s.
+They do not present data on the performance of any gradually typed configurations.
 
+@citet[takikawa-popl-2016] evaluate the performance of Typed Racket.
+They conclude that the cost of preserving type soundness is intolerable,
+ and question whether the ideal of gradual typing is realizable in practice.
 
-@section{A Lack of Type Boundaries}
-
-In Typed Racket, if @racket[f] is a typed function and
- @racket[g] is a typed function that calls @racket[f], then
- values that flow from @racket[g] into @racket[f] are not dynamically checked.
-Such values are safe because they do not cross a type boundary.
-
-Type boundaries are complicated, and very important to Typed Racket.
-
-Reticulated is much simpler.
-If @racket[f] is a typed function, then it will check its inputs
- no matter what.
-Even if they come from a typed context.
-
-(Maybe this discussion belongs in "Lack of Error Messages")
-
-
-@;=============================================================================
-@; https://www.toptal.com/python/top-10-mistakes-that-python-programmers-make
-@; - default arguments are "shared"
-@; - subclasses dont get COPY of fields ... wow
-
-
-@; https://blog.codinghorror.com/loose-typing-sinks-ships/
-@;
-@; The only errors that matter are runtime errors: until you have eliminated
-@; those, you don't have a functional app. And those errors tend to be a hell of a
-@; lot more subtle than "Oops, I called the .Bark method on a Cat!"
-@;
-@; Basically the value of compile time checking isn't that great, compared to the
-@; overwhelming value of real world testing. That's what all these hardcore Java
-@; figures are saying: they used to feel that way, too.. until experience taught
-@; them otherwise. Just because your program compiles means basically nothing.
-@;
-@; Once you factor in the cost (both mental overhead and simple keyboard typing)
-@; of all that "checking" in terms of programmer productivity (forced inheritance
-@; model to get a .Bark method, cast cast cast) .. it's pretty clear that dynamic
-@; typing is superior.
-
-
-@; https://docs.google.com/document/d/1aXs1tpwzPjW9MdsG5dI7clNFyYayFBkcXwRDo-qvbIk/preview
-@; question: how was author able to build large apps in Python without
-@;           static typechecking?
-@; - tests
-@; - test cases define correctness, nothing else
-@; - types just catch some things earlier,
-@; - what matters, is they get CAUGHT
-@; - dynamic typing catches these
-@; - and since Python easier to write code, easier to write tests and be happy
-
-@; TODO read PEPs
-@; http://legacy.python.org/dev/peps/pep-0484/
-@; http://legacy.python.org/dev/peps/pep-0483/
-@; http://legacy.python.org/dev/peps/
