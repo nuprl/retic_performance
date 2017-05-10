@@ -459,7 +459,8 @@
   (for ([s (in-list (cdr sample*))]
         [l (in-list (cdr line*))])
     (unless (= l sample-size)
-      (raise-user-error 'performance-info->sample* "sample file ~a should have ~a lines, but has ~a instead" s sample-size l)))
+      (printf "WARNING: sample file ~a should have ~a lines, but has ~a instead" s sample-size l)
+      #;(raise-user-error 'performance-info->sample* "sample file ~a should have ~a lines, but has ~a instead" s sample-size l)))
   (cons sample-size sample*))
 
 ;; Doesn't really belong here, oh well
