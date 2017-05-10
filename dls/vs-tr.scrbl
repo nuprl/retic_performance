@@ -32,3 +32,4 @@ They do not present data on the performance of any gradually typed configuration
 They conclude that the cost of preserving type soundness is intolerable,
  and question whether the ideal of gradual typing is realizable in practice.
 
+@; our results are not directly comparable to theirs, apples to oranges
