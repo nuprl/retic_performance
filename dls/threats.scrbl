@@ -16,8 +16,8 @@ The data are timings recorded on the Karst at Indiana University cluster
  using the Python function @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}.
 Assuming @tt{process_time()} is accurate, the cluster infrastructure is prone
  to at least two sources of error.
-First, cluster nodes may have non-uniform performance despite being identical
- servers.
+First, cluster nodes may have non-uniform performance (despite being identical
+ servers).
 Second, the load on other nodes in the cluster may affect the latency of
  system calls.
 These measurement biases@~cite[mdhs-asplos-2009] may explain the outliers evident in @figure-ref{fig:exact}.
@@ -108,7 +108,7 @@ The types in this experiment may differ from types inferred by another Python
 Fourth, Reticulated supports a finer granularity of type annotations than the
  experiment considers.
 Partially-typed function signatures or classes with some typed fields and some
- untyped fields might have interesting performance characteristics.
-More importantly, such combinations of typed and untyped code might be more
+ untyped fields may have interesting performance characteristics.
+More importantly, such combinations of typed and untyped code may be more
  representative of what Python programmers use in practice.
 
