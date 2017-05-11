@@ -2,16 +2,14 @@
 @title[#:tag "sec:reticulated"]{Gradual Typing}
 
 Reticulated Python a is sound gradual typing system developed by
-Vitousek et al. at Indiana University for Python 3. It is
-syntactically identical to Python. In Reticulated, programmers can
-express types in their programs using Python annotations specified in
-PEP 484 @note{@url{https://www.python.org/dev/peps/pep-0484/}}.
-
-Reticulated is a source-to-source translator. Given a Python program,
-Reticulated outputs a Python program with checks and casts that should
-guarantee the soundness of the program. In order to discuss how those
-checks enforce soundness, we define soundness for partially typed
-programs. 
+Vitousek et al. at Indiana University for Python 3. In Reticulated,
+programmers can express types in their programs using Python
+annotations stated in PEP 484
+@note{@url{https://www.python.org/dev/peps/pep-0484/}}.  Given a
+Python program, Reticulated outputs a Python program with checks and
+casts that should guarantee the soundness of the program. In order to
+discuss how those checks enforce soundness, we define soundness for
+partially typed programs.
 
 In general, soundness means that if a program is well-typed, one of
 three outcomes will occur@~cite[tfffgksst-snapl-2017]:The program
@@ -26,8 +24,7 @@ statement by inserting runtime checks into various parts of the
 program to prevent it from terminating with a type error at the
 well-typed regions.
 
-Consider the following example from Reticulated of a fully typed @code{Currency}
-class:
+Consider the following fully typed class definition in Reticulated:
 
 @python|{
 import math
@@ -35,51 +32,36 @@ import math
 @fields({'dollars': Int, 'cents':Int})
 class Currency:
   def __init__(self:Currency,
-               dollars:Int,
-	       cents:Int)
-	       -> Void:
-    self.dollars = dollars 
-    self.cents = self.dollars
-    
-  def add_currency(self:Currency,
-                   other:Currency)
-		   -> Currency:
-    return Currency(self.dollars +
-                    other.dollars,
-                    self.cents +
-		    other.cents)
-    
-c1 = Currency(1000, 0)
-c1.add_currency(20)
-
-}|
-
-Here, Reticulated expectedly terminates with a static type error
-because @code{add_currency} is called with an argument of type
-@code{int}, while it expects a @code{Currency}. However if we consider
-the following modification to the program:
-
-@python|{
-import math
-
-@fields({'dollars': Int, 'cents':Int})
-class Currency:
-  def __init__(self:Currency,
-               dollars:Int,
+	       dollars:Int,
 	       cents:Int)
 	       ->Void:
     self.dollars = dollars 
-    self.cents = self.dollars
+    self.cents = cents
     
   def add_currency(self:Currency,
                    other:Currency)
 		   -> Currency:
-    return Currency(self.dollars +
-                    other.dollars,
-                    self.cents +
-		    other.cents)
+    d = self.dollars +
+        other.dollars
+    c = self.cents +
+        other.cents
+    return Currency(d + int (c / 100),
+                    c % 100)
     
-c1 = Currency(1000, 0)
+c1 = Currency(1000, 0)   
+}|
+
+
+By adding the following call to our code:
+
+@code{c1.add_currency(20)}
+
+Reticulated expectedly terminates with a static type error because
+@code{add_currency} is called with an argument of type @code{int},
+while it expects a @code{Currency}. However if we consider adding
+@code{main} to our program and making a call to that function instead,
+
+@python|{
 
 def main(curr1:Dyn, curr2:Dyn):
   return curr1.add_currency(curr2)
@@ -87,7 +69,7 @@ def main(curr1:Dyn, curr2:Dyn):
 main(c1,20)
 }|
 
-We notice that the program is no longer fully typed. Furthermore, the
+we notice that the program is no longer fully typed. Furthermore, the
 call @code{main(c1, 20)} causes a violation the signature of @code{add_currency} by
 incorrectly passing it an @code{int} instead of a @code{Currency}. To
 prevent a runtime type error from occurring when calling @code{main},
