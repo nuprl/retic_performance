@@ -350,7 +350,7 @@
 (define NUM-BETTER-WITH-TYPES
   ;; See unit test for this constant below
   ;; Maybe better to have count per benchmark?
-  140197)
+  139975)
 
 (define PYTHON
   "Python 3.4.3")
