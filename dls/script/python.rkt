@@ -251,6 +251,9 @@
     (raise-user-error 'directory->python-info "directory ~a has no Python files")
     (python-info name (map path-string->module-info m*))))
 
+(define (path-string->python-info ps)
+  (python-info (file-name-from-path ps) (path-string->module-info ps)))
+
 (define (path-string->module-info ps)
   (define py-json (path-string->exploded-module ps))
   (module-json->module-info py-json))
@@ -400,22 +403,46 @@
   (and (function-info-cod m)
        (for/and ([d (in-list (function-info-dom* m))])
          (field-info-type d))))
-  
+
+;; -----------------------------------------------------------------------------
+;; Scan command
+
+(define (scan fd*)
+  (for ((fd (in-list fd*)))
+    (define pi
+      (cond
+       [(file-exists? fd)
+        (path-string->python-info fd)]
+       [(directory-exists? fd)
+        (directory->python-info fd)]
+       [else
+        (printf "WARNING: expected path to file or directory, given '~a'~n" fd)]))
+    (and pi (print-python-info pi))))
+
+(define (print-python-info pi)
+  (printf "~a~n" (python-info-name pi))
+  (printf "- ~a modules~n" (python-info->num-modules pi))
+  (printf "- ~a functions~n" (python-info->num-functions pi))
+  (printf "- ~a classes~n" (python-info->num-classes pi))
+  (printf "- ~a methods~n" (python-info->num-methods pi))
+  (void))
+
 ;; =============================================================================
 
 (module+ main
   (require racket/cmdline racket/set racket/pretty)
+  (define scan-mode? (box #f))
   (command-line
    #:program "rp-python"
-   #:args (p)
-   (pretty-print (benchmark-dir->python-info p))
-   #;(let ([py (directory->python-info DIR)])
-     (printf "All about ~a~n" DIR)
-     (printf "- ~a modules~n" (python-info->num-modules py))
-     (printf "- ~a functions~n" (python-info->num-functions py))
-     (printf "- ~a classes~n" (python-info->num-classes py))
-     (printf "- ~a methods~n" (python-info->num-methods py))
-     (void))
+   #:once-any
+   [("-s" "--scan") "Scan a Python file (or flat directory of Python files)" (set-box! scan-mode? #t)]
+   #:args ARG*
+   (cond
+    [(unbox scan-mode?)
+     (scan ARG*)]
+    [else
+     (raise-user-error 'die)])
+   #;(pretty-print (benchmark-dir->python-info p))
    #;(for ((PAT (in-list PAT*)))
      (when (set-member? (python-info->all-types (benchmark-dir->python-info PAT)) #f)
        (printf "MISSING TYPE IN ~a~n" PAT)))
