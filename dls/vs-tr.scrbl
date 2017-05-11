@@ -22,7 +22,8 @@ They furthermore state that this theorem classifies gradual type systems.
 They do not argue that Reticulated satisfies an analogous theorem.
 
 @citet[vss-popl-2017] formalize the transient semantics for a lambda calculus.
-They conjecture that Reticulated satisfies their main theorem (Theorem 5.5, @emph{open-world soundness}).
+They conjecture that Reticulated satisfies their main theorem (Theorem 5.5, @emph{open-world soundness});
+ this may be true, but the examples in the next section question the usefulness of the theorem.
 They measure the performance of Reticulated on 13 programs from
  @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite}@note{@TODO{compare their ratios/benchmarks to ours}}
  and report @|t/p-ratio|s.
