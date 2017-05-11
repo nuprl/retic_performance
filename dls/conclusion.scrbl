@@ -1,5 +1,5 @@
 #lang gm-dls-2017
-@title[#:tag "sec:conclusion"]{Conclusion}
+@title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
 Reticulated Python is an experimental language that uses programmer-supplied
  type annotations to perform some static type checks, and furthermore compiles the
@@ -8,6 +8,7 @@ The data in this paper suggests that the performance overhead imposed by the
  runtime assertions will not exceed 10x in typical Python programs, no
  matter how many functions and class definitions the programmer chooses to
  annotate with types.
+For many gradually typed programs, the overhead will be much lower.
 
 Reticulated is a research prototype.
 Its type system is able to express the types in basic Python programs
