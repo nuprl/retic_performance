@@ -1,10 +1,6 @@
 #lang gm-dls-2017
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
-@; TODO
-@; dont forget, people will jump to these sections without reading the definitions
-@; - first pargraph on "distilling" needs work
-
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[EXHAUSTIVE-BENCHMARKS]]
 
@@ -29,7 +25,8 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
       ) @elem{
   @; Many of the benchmark programs stem from prior work on Reticulated.
   Of the @|total| benchmark programs,
-   @|num1| originate from case studies by @citet[vksb-dls-2014],@note{@|dls-names|.}
+   @|num1| originate from case studies by @citet[vksb-dls-2014],
+   @;@note{@|dls-names|.}
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
    @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
    and the remaining @|num3| originate from open-source programs.
@@ -252,10 +249,6 @@ The following descriptions credit the benchmarks' original authors,
 
 
 @section{Performance Ratios}
-@; MOTIVATION (to appear in Section 3)
-@; - highlevel picture of performance, coarse answer to "what is perf"
-@; - overhead of choosing retic at all, vs. Python
-@; - overhead of fully typing, frames expectation
 
 @figure["fig:ratio" "Performance ratios"
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
@@ -273,11 +266,10 @@ This means that the average time to run the untyped configuration of the
 Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
  is 1.04 times slower than the untyped configuration.
 
-These ratios demonstrate that migrating a benchmark to Reticulated, or
- from untyped to fully-typed, adds performance overhead.
-In all cases, this overhead is somewhere between zero overhead (as opposed
- to a non-zero @emph{speedup}) and an order-of-magnitude slowdown.
-
+On one hand, these ratios demonstrate that migrating a benchmark to
+ Reticulated, or from untyped to fully-typed, always adds performance overhead.
+The migration never improves performance.
+On the other hand, the overhead is always within an order-of-magnitude.
 Regarding the @|u/p-ratio|s: ten are below 2x,
  five are between 2x and 3x, and
  the remaining four are below 4.5x.
@@ -315,8 +307,7 @@ This data suggests that migrating an arbitrary
  configurations of the @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmarks.
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
  for values of @${D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
-The @|x-axes| are log-scaled to emphasize the practical importance of low
- overheads;
+The @|x-axes| are log-scaled to focus on low overheads;
  vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
 
 The heading above the plot for a given benchmark lists the benchmark's name,
@@ -332,7 +323,7 @@ The number of configurations is equal to @$|{2^{F+C}}|,
 @; HMMMM "are" is NOT correct, but it sticks.
 Overhead plots are cumulative distribution functions.
 As the value of @${D} increases along the @|x-axis|, the number of
- @deliverable{D} configurations can only increase.
+ @deliverable{D} configurations can only increase or stay the same.
 The important question is how many configurations are @deliverable{D}
  for low values of @${D}.
 The area under the curve is the answer; more is better.
@@ -407,7 +398,7 @@ Since adding type annotations to a Reticulated program can change its
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
-In @section-ref{sec:method} terms, the cost model is @${P(c) \sim @gnorm{c}_\tau}.
+In @section-ref{sec:method} terms, the cost model is @${P(c) \propto @gnorm{c}_\tau}.
 @; TOO CUTE
 
 @Figure-ref{fig:exact} contains one green point for every run of every
@@ -436,7 +427,7 @@ Overall, there is a clear trend that adding type annotations adds performance
 The variations between individual plots fall into four overlapping categories:
 
 @exact-runtime-category["types make things slow"
-  '(futen http2 slowSHA chaos float pystone PythonFlow take5)
+  '(futen http2 slowSHA chaos float pystone take5)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
      performance as the number of typed components increases.
@@ -444,10 +435,10 @@ The variations between individual plots fall into four overlapping categories:
 })]
 
 @exact-runtime-category[@elem{types make things very slow}
-  '(call_method call_method_slots call_simple go meteor nqueens spectralnorm Espionage)
+  '(call_method call_method_slots call_simple go meteor nqueens spectralnorm Espionage PythonFlow)
   (λ (num-in-category) @elem{
-    @string-titlecase[num-in-category] plots have vertical "gaps" between
-     clusters of configurations.
+    @string-titlecase[num-in-category] plots have visible gaps between
+     clusters of configurations with the same number of types.
     Configurations below the gap contain type annotations that impose little
      runtime cost.
     Configurations above the gap have some common type annotations that

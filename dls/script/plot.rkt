@@ -88,7 +88,7 @@
   (define num-points (box 0))
   (define elem*
     (list
-      #;(if (< nt 6) (make-vrule* nt) '())
+      (make-vrule* nt)
       (fold/karst pi
         #:init '()
         #:f (λ (acc cfg num-types t*)
@@ -231,7 +231,7 @@
 
 (define (make-vrule* count)
   (for/list ([i (in-range (+ 1 count))])
-    (vrule (- i 0.5) #:width 0.6 #:color 0)))
+    (vrule (- i 0.5) #:width 0.2 #:color 0)))
 
 (define (make-count-configurations-function pi #:interval? [ivl #t])
   (define f (if (performance-info? pi) (make-deliverable-counter pi) pi))
