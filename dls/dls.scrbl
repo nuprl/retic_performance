@@ -8,6 +8,8 @@
 @; take pride in your work. --- Cocktail, 1988
 
 @;title{Performance Evaluation of Reticulated Python}
+@;title{Linear Samples Suffice}
+@;title{You Get What you Pay For (Gradual Typing for Low, Low Prices)}
 @title{Is Gradual Typing Alive?}
 
 @(define NEU
