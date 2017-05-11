@@ -25,27 +25,10 @@ These measurement biases@~cite[mdhs-asplos-2009] may explain the outliers eviden
 
 @section{Systematic Bias}
 
-@(let* (
-        @; @; All about src/simplejson/simplejson/
-        @; @; - 7 modules
-        @; @; - 22 functions
-        @; @; - 6 classes
-        @; @; - 26 methods
-        @;
-        @; @; All about src/jinja/jinja2/
-        @; @; - 26 modules
-        @; @; - 136 functions
-        @; @; - 146 classes
-        @; @; - 503 methods
-        @;
-        @; @; All about src/requests/requests/
-        @; @; - 15 modules
-        @; @; - 59 functions
-        @; @; - 40 classes
-        @; @; - 149 methods
+@(let* ( @; See `src/PyPI-ranking/README.md` to reproduce these claims
         [lib-data* '((simplejson 50 "https://github.com/simplejson/simplejson")
                      (requests 200 "https://github.com/kennethreitz/requests")
-                     (jinja2 600 "https://github.com/pallets/jinja/tree/master/jinja2"))]
+                     (Jinja2 600 "https://github.com/pallets/jinja/tree/master/jinja2"))]
         [rank-info @elem{PyPI Ranking@note{@url{http://pypi-ranking.info/alltime}}}]
         [lib-info (authors*
                     (for/list ([ld (in-list lib-data*)]
