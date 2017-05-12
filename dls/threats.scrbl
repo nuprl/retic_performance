@@ -52,7 +52,7 @@ Second, the experiment considers one fully-typed configuration per benchmark;
 The types in this experiment may differ from types inferred by another Python
  programmer, and may lead to different performance overhead.
 
-@(let ([missing-fields '(futen PythonFlow Evolution)]
+@(let ([missing-fields '(futen Evolution)]
        [retic-limited '(go pystone take5 stats)]
        [format-bm* (lambda (bm*) (authors* (map bm bm*)))]
        @; see also https://github.com/nuprl/retic_performance/issues/55
@@ -69,8 +69,6 @@ The types in this experiment may differ from types inferred by another Python
        @;   - union type, (U PSRecord None)
        @; - Evolution is missing some type annotation(s)
        @;   - none of classes have @fields
-       @; - PythonFlow is missing some type annotation(s)
-       @;   - class missing fields
        @; - take5 is missing some type annotation(s)
        @;   - `create_deck`, argument 'deck_size' is unannotated
        @;   - same function has optional arguments, so the types ignored
@@ -93,5 +91,5 @@ Fourth, Reticulated supports a finer granularity of type annotations than the
 Partially-typed function signatures or classes with some typed fields and some
  untyped fields may have interesting performance characteristics.
 More importantly, such combinations of typed and untyped code may be more
- representative of what Python programmers use in practice.
+ representative of what Python programmers eventually use in practice.
 
