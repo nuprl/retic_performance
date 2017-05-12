@@ -16,7 +16,7 @@ In particular, a sampling protocol based on elementary
 The protocol scales to significantly larger benchmarks than the exhaustive
  technique presented in @section-ref{sec:method} (@section-ref{sec:sampling:new}).
 Whereas exhaustive evaluation cannot feasibly be applied to programs containing
- hundreds of functions, the main bottleneck applying the sampling technique
+ tens of functions, the main bottleneck applying the sampling technique
  is the human cost of inferring fully-typed configurations.
 
 
@@ -27,12 +27,12 @@ Counting the proportion of @deliverable{D} configurations is a useful way to
  forms of uncertainty.
 First, the parameter @${D} addresses the fact that different software applications
  have different performance requirements.
-Second, the proportion quantifies over the entire configuration space of a program
- because it is impossible to predict how developers will apply gradual
+Second, the proportion quantifies over the entire configuration space of a
+ program---because it is impossible to predict how developers will apply gradual
   typing.@note{ @; TODO: the note needs work, but it needs to be here.
     The promise of gradual typing is @emph{any configuration}. At
-    present, there is no data to suggest that developers choose @emph{particular
-    configuration}.}
+    present, there is no data to suggest that developers are more likely to
+    choose some configurations over others.}
 For an arbitrary configuration, the proportion of @deliverable{D} configurations
  @emph{is} the probability that this configuration is @deliverable{D}.
 
@@ -84,7 +84,7 @@ Convergence suggests that the average of ``enough'' samples will be ``close to''
  @${p}.
 The central limit theorem provides a similar guarantee---any sequence of
  such averages will be normally distributed around the true proportion.
-Hence a 95% confidence interval generated from such averages is likely
+Hence a 95% confidence interval generated from sample averages is likely
  to contain the true proportion.
 
 @; Taken alone, this observation is useless; the protocol in @section-ref{sec:method}

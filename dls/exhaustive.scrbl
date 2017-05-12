@@ -469,4 +469,5 @@ The variations between individual plots fall into four overlapping categories:
 @(let* ([outliers (map bm '(futen float go meteor Espionage))]) @elem{
   @emph{Note:} the data for @authors*[outliers] contain a small number of outliers.
   @Section-ref{sec:threats} addresses these and other threats to validity.
+  @; TODO really not much of an address at the moment
 })
