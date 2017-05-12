@@ -25,7 +25,7 @@ The paper does not state a type safety guarantee for Reticulated,
  nor does it include data on the performance of partially typed programs.
 
 @citet[svcb-snapl-2015] define a property that relates the runtime behavior of
- two programs along the same path in a configuration lattice (Theorem 5, the @emph{gradual guarantee}).@note{To be precise, the theorem relates programs @${e_0}, @${e_1} such that @${e_0 \righarrow_k e_1} for some @${k}. @hyperlink[SNAPL-2015-URL]{Figure 6} of @citet[svcb-snapl-2015] defines a similar @emph{term precision relation}.}
+ two programs along the same path in a configuration lattice (Theorem 5, the @emph{gradual guarantee}).@note{To be precise, the theorem relates programs @${e_0}, @${e_1} such that @${e_0 \rightarrow_k e_1} for some @${k}. @hyperlink[SNAPL-2015-URL]{Figure 6} of @citet[svcb-snapl-2015] defines a similar @emph{term precision relation}.}
 They claim that this property captures the essential benefit of gradual typing.
 They furthermore remark that proving this property for a language with mutable
  references and/or polymorphism is non-trivial.
