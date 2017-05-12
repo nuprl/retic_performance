@@ -1,59 +1,76 @@
 #lang gm-dls-2017 @title[#:tag "sec:method"]{Adapting Takikawa et
-al.'s Method}
+al.'s Method} @section{Takikawa et al. method}
 
-The Takikawa et al. method considers a space of configurations
-obtained by taking a number of typable components at a given
-granularity, and generating the set of all possible permutations
-obtained by adding or removing the type annotations from these
-components. More specifically, a gradually typed system for @${L} defines a syntax
-@${L^\tau} for adding type annotations to programs written in
-@${L}.  Let @${P} be a program written in @${L} and let
-@${P’} be the same program with the possible addition of type
-annotations. Then @${P'} is a @emph{gradually typed
-configuration} of @${P}.
-@definition["configuration"]{ Let
-@${u : L^\tau \rightarrow L} be a function that strips all
-type annotations from an @${L^\tau} program.  A given
-@${L^\tau} program @${P} is a @emph{gradually typed
-configuration} of the @${L} progam @${u(P)}.  }
-@definition["configuration space"]{ The configuration space
-of a fully-typed configuration @${P^\tau} is the set @${\{P'
-\mid P' \sqsubseteq P^\tau\}}.  } The size of the configuration space is
-bound by the number of locations in @${P} where the
-programmer may add a type annotation. Informally, we call
-this the @emph{granularity} of @${L^\tau}. For example, if
-the smallest component we can type is a module, then for a
-given program P the size of the configuration space is @${2^m}
-where m is the total number of modules in @${P}.
+Takikawa et al. describe a method for measuring the
+performance of a gradually typed system.  A gradually typed system for
+a language @${L} defines a syntax @${L^\tau} for adding type
+annotations to programs written in @${L}. The method first considers a
+space of configurations obtained by taking a number of typable
+components at a given granularity, and generating the set of all
+possible permutations obtained by adding or removing the type
+annotations from these components.
 
-In Reticulated Python, we are allowed to type all components of
-a function signature as well as class fields. Therefore, the
-upper bound of the number of elements in a configuration
-space for Reticulated is @${2^{c+a+f}} where @${c} is the total
-number of class fields, @${a} is the arity for all functions and
-@${f} is the total number of functions. The Takikawa et
-al. method adapted to Typed Racket measures the largest configuration space
-possible, exhaustively. For Reticulated, such space
-would be too large due to the finer granularity of the
-language. Therefore, we let the typable components generating our configuration space @${C} be function signatures and class fields. Therefore
-for some program @${P}, @${C} contains
-@${2^{f+c}} elements where @${c} is the number of classes and @${f}
-is the number of functions in @${P}.
+@definition["configuration"]{Let @${P} be a program written in @${L}
+and let @${P’} be the same program with the possible addition of type
+annotations. Then @${P'} is a @emph{configuration} of @${P}.}
 
-After determining @${C}, we evaluate the performance
-of every element according the metrics described by Takikawa et al,
-and interpret the data in a number of ways.
-Overhead plots in figure 3 show how many of our benchmarks are D-deliverable.
+@definition["configuration space"]{A configuration space of a
+fully-typed configuration @${P^\tau} is the set @${\{P' \mid P'
+\sqsubseteq P^\tau\}}.  } The size of a given configuration space is
+bound by the number of locations in @${P} where the programmer may add
+a type annotation. Informally, we call this the @emph{granularity} of
+@${L^\tau}. For example, if the smallest component we can type is a
+module, then for a given program P the size of the configuration space
+is @${2^m} where m is the total number of modules in @${P}.
+
+In the method proposed by Takikawa et al., we generate a configuration
+lattice, which is a way to visualize a configuration space C. We then
+measure all the elements of C. This allows us to generate a
+performance lattice which labels all c @${\in} C with its performance.
+The performance of the system overall which is represented by a number
+of representative programs overall (and hence a set of confuguration
+spaces), is evaluated in a number of ways.
+
+Overhead plots show how many benchmarks are @${D}-deliverable.
 @definition["D-deliverable"]{ A configuration is D-deliverable if its
 performance is no worse than a factor of D slowdown compared to the
-untyped configuration.}
-Figure 4 describes the running time of a
-given configuration vs. the number of typed components in that configuration.
-We refer to this as the typed/untyped ratio.
+untyped configuration.} We also consider the performance of each
+configuration relative to its typed/untyped ratio.
 @definition["typed/untyped ratio"]{The typed/untyped ratio of a
 performance lattice is the time needed to run the top configuration
-divided by the time needed to run the bottom configuration.}
+divided by the time needed to run the bottom configuration.}  This
+gives us an idea about how many components need to be typed in order
+to achieve a @${D}-deliverable configuration for some constant @${D}.
 
+This method could not be adapted to Reticulated in the exact way it
+was adapted to Typed Racket.  Specifically, in case of Typed Racket,
+where the smallest typable component for a given program @${P} is a module
+@${m}, the number of elements in the largest configuration space possible
+for @${P} is @${2^m}. In Reticulated Python, we are allowed to type all
+components of a function signature as well as class fields. Therefore,
+the upper bound of the number of elements in a configuration space for
+Reticulated is @${2^{c+a+f}} where @${c} is the total number of class
+fields, @${a} is the arity for all functions and @${f} is the total
+number of functions. The Takikawa et al. method adapted to Typed
+Racket measures the largest configuration space possible,
+exhaustively. For Reticulated, such space would be too large due to
+the finer granularity of the language. Therefore, we let the typable
+components generating our configuration space @${C} be function
+signatures and class fields. Therefore for some program @${P}, @${C}
+contains @${2^{f+c}} elements where @${c} is the number of classes and
+@${f} is the number of functions in @${P}.
+
+Unlike the performance evaluation for Typed Racket, we are unable to
+draw the performance and configuration lattices due to the size of our
+configuration spaces, but we note that our performance lattice looks
+different from a Typed Racket performance lattice. In Reticulated
+Python, there is an extra configuration to consider. Namely the
+regular Python configuration. That also implies that we have two
+variations of the typed/untyped ratio. One that compares the fully
+typed Reticulated configuration to the untyped Reticulated
+configuration, and another that compares it to the untyped Python
+configuration. In the following section, we describe the evaluation
+process in detail.
 
 
 @section[#:tag "sec:protocol"]{Protocol}
