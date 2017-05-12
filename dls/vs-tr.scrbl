@@ -1,19 +1,25 @@
 #lang gm-dls-2017
-@title[#:tag "sec:vs-tr"]{Related Work}
+@title[#:tag "sec:vs-tr"]{Whence this Paper}
 
 @; TODO
 @; - safe typescript?
 @; - strongscript?
 @; these are micro systems with reasonable soundness
 
-@; TODO this is ugly text, but hey the information content is all here
-@citet[vksb-dls-2014] introduce the syntax of Reticulated Python and three
- semantics for enforcing type annotations: guarded, monotonic@~cite[vcgts-esop-2015], and transient.@note{The implementation of Reticulated has some support for all three semantics. Support for transient is the most mature.}
-They do not discuss type soundness.
-They report a 10x @|t/p-ratio| for @tt{slowSHA} (specifically, ``the slowSHA test suite ... 10x slowdown under transient compared to normal Python.'')
-@; Quite different from ours, is transient better? or is it just different inputs?
-They report the @tt{stats} test suite took 1.6 seconds under transient.
-@; on par with what we see, our input is definitely bigger
+Performance is one important aspect of a gradual type system.
+Two other, equally important aspects are (1) the system's ability to express common programming
+ @; --- especially idioms of the host language but lets not get ahead of ourselves ---
+ idioms and (2) the guarantees its types provide.
+@; Prior work starts these off??
+
+@citet[vksb-dls-2014] introduce Reticulated Python and three
+ semantics for enforcing type annotations: guarded, monotonic@~cite[vcgts-esop-2015], and transient.@note{Reticulated has some support for all three semantics. Support for transient is the most mature.}
+Regarding transient, the paper reports a @|t/u-ratio| of 10x on the @tt{slowSHA}
+ program and links to a proof of type safety for a core calculus.@note{The link is superceded by a technical report@~cite[vs-tr-2016].}
+The paper does not include data on the performance of partially typed programs,
+ nor does it state a type safety guarantee for Reticulated.
+@; nor define type soundness for transient
+@; ^^^^ YO BEN, your paper is about performance not soundness so the RW should be focused like that
 
 @citet[svcb-snapl-2015] state a theorem that relates the runtime behavior of
  a given well-typed term to the runtime behavior of less precise@note{Term precision is defined in @hyperlink[SNAPL-2015-URL]{Figure 6}@~cite[svcb-snapl-2015].}

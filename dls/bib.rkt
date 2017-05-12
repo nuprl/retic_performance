@@ -2010,3 +2010,10 @@
     #:author (authors "Todd Mytkowicz" "Amer Diwan" "Matthias Hauswirth" "Peter F. Sweeney")
     #:location (proceedings-location asplos #:pages '(265 276))
     #:date 2009))
+
+(define vs-tr-2016
+  (make-bib
+   #:title "Gradual typing in an open world"
+   #:author (authors "Michael M. Vitousek" "Jeremy Siek")
+   #:location (techrpt-location #:institution "Indiana University" #:number "729")
+   #:date 2016))
