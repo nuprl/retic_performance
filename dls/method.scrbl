@@ -1,49 +1,60 @@
-#lang gm-dls-2017
-@title[#:tag "sec:method"]{Adapting Takikawa et al.'s Method}
+#lang gm-dls-2017 @title[#:tag "sec:method"]{Adapting Takikawa et
+al.'s Method}
 
-The Takikawa et al. method considers a space of configurations obtained by taking a number of typable components at a given granularity, and generating the set of all possible combinations obtained by varing types over these components. 
+The Takikawa et al. method considers a space of configurations
+obtained by taking a number of typable components at a given
+granularity, and generating the set of all possible permutations
+obtained by adding or removing the type annotations from these
+components. More specifically, a gradually typed system for @${L} defines a syntax
+@${L^\tau} for adding type annotations to programs written in
+@${L}.  Let @${P} be a program written in @${L} and let
+@${P’} be the same program with the possible addition of type
+annotations. Then @${P'} is a @emph{gradually typed
+configuration} of @${P}.
+@definition["configuration"]{ Let
+@${u : L^\tau \rightarrow L} be a function that strips all
+type annotations from an @${L^\tau} program.  A given
+@${L^\tau} program @${P} is a @emph{gradually typed
+configuration} of the @${L} progam @${u(P)}.  }
+@definition["configuration space"]{ The configuration space
+of a fully-typed configuration @${P^\tau} is the set @${\{P'
+\mid P' \sqsubseteq P^\tau\}}.  } The size of the configuration space is
+bound by the number of locations in @${P} where the
+programmer may add a type annotation. Informally, we call
+this the @emph{granularity} of @${L^\tau}. For example, if
+the smallest component we can type is a module, then for a
+given program P the size of the configuration space is @${2^m}
+where m is the total number of modules in @${P}.
 
-More formally, let @${L} be a programming language.
-Let @${P} be some program written in the language, composed of @${n_M} modules
- @${M_0 \ldots M_{n_M - 1}}.
-@definition["configuration"]{
-  Let @${u : L^\tau \rightarrow L} be a function that strips all type annotations
-   from an @${L^\tau} program.
-  A given @${L^\tau} program @${P} is a @emph{gradually typed configuration}
-   of the @${L} progam @${u(P)}.
-}
-@definition["configuration space"]{
-...
-}
- 
-After obtaining the configuration space, we evaluate all of its configurations. This method has been previously been
-adapted to evaluate the performance of Typed Racket where the typable components are Racket modules.
-With this fact, the total number of elements in the space is @${2^m} for m modules in a given benchmark.
-In case of Reticulated, we deal with finer gradually because
-we are allowed to type any combination of function arguments, classes
-and return types which means the number of elements in the set of
-configurations is @${2^{c+a+f}} where c is the number of classes, a is the
-total number of all function arguments and f is the total number of
-functions.
+In Reticulated Python, we are allowed to type all components of
+a function signature as well as class fields. Therefore, the
+upper bound of the number of elements in a configuration
+space for Reticulated is @${2^{c+a+f}} where @${c} is the total
+number of class fields, @${a} is the arity for all functions and
+@${f} is the total number of functions. The Takikawa et
+al. method adapted to Typed Racket measures the largest configuration space
+possible, exhaustively. For Reticulated, such space
+would be too large due to the finer granularity of the
+language. Therefore, we let the typable components generating our configuration space @${C} be function signatures and class fields. Therefore
+for some program @${P}, @${C} contains
+@${2^{f+c}} elements where @${c} is the number of classes and @${f}
+is the number of functions in @${P}.
 
-According to Takikawa et al. a comprehensive evaluation should consider
-the entire space between typed and untyped configurations. In Reticulated,
-that space is too large to measure exhaustively so we consider the space
-which measures benchmarks with the finest granuality possible while being
-small enough to measure exhaustively. We define this space as the subset of configurations that describes varying types
-over function signatures and class fields. That set contains @${2^{f+c}} elements.
-
-We evaluate the performance of every element in the space according the metrics defined in the Takikawa et al. method, and describe the data in a number of ways.
+After determining @${C}, we evaluate the performance
+of every element according the metrics described by Takikawa et al,
+and interpret the data in a number of ways.
 Overhead plots in figure 3 show how many of our benchmarks are D-deliverable.
-@definition["D-deliverable"]{ A configuration is D-deliverable if its performance
-is no worse than a factor of D slowdown compared to the untyped configuration.}
-Figure 4 describes the running time of a given configuration vs. the number of typed components.
-We also report the overhead
-of the fully-typed configuration relative to the untyped and the python configuration for each benchmark in figure 2.
+@definition["D-deliverable"]{ A configuration is D-deliverable if its
+performance is no worse than a factor of D slowdown compared to the
+untyped configuration.}
+Figure 4 describes the running time of a
+given configuration vs. the number of typed components in that configuration.
+We refer to this as the typed/untyped ratio.
+@definition["typed/untyped ratio"]{The typed/untyped ratio of a
+performance lattice is the time needed to run the top configuration
+divided by the time needed to run the bottom configuration.}
 
-@definition["typed/untyped ratio"]{The typed/untyped ratio of a performance
-lattice is the time needed to run the top configuration divided by the time needed
-to run the bottom configuration.}
+
 
 @section[#:tag "sec:protocol"]{Protocol}
 
