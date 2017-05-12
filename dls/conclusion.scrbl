@@ -16,7 +16,7 @@ Its type system is able to express the types in basic Python programs
  but Reticulated is not an implementation of @emph{PEP 484: Type Hints}@note{@url{https://www.python.org/dev/peps/pep-0484/}}
  and does not guarantee type soundness in the SML, Haskell, or Typed Racket sense@~cite[tfffgksst-snapl-2017].
 For example, if a Reticulated function is declared with the return type @pythoninline{List(Int)},
- Reticulated inserts a tag check that ensures the function returns a @pythoninline{List} of some sort, but ignores the contents.@note{@citet[vss-popl-2017] give a similar example at the end of @hyperlink["http://homes.soic.indiana.edu/mvitouse/papers/popl17.pdf"]{section 2.2.2}. Their function @emph{avg} expects a list of floating-point numbers, but will not error if given a list of integers. If @emph{avg} is given a list of strings, the call will terminate in an error raised by the Python function @pythoninline{sum}.}
+ Reticulated inserts a tag check that ensures the function returns a @pythoninline{List} of some sort, but ignores the contents.@note{@citet[vss-popl-2017] give a similar example at the end of @hyperlink["http://homes.soic.indiana.edu/mvitouse/papers/popl17.pdf"]{section 2.2.2}. Their function @emph{avg} expects a list of floating-point numbers, but will not error if given a list of integers. If @emph{avg} is given a list of strings, the call will terminate in an error raised by the Python function @tt{sum}.}
 
 Nevertheless, the language's integration with Python and its performance overhead
  due to type annotations suggest that Reticulated has a bright future.
