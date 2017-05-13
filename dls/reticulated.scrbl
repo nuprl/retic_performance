@@ -30,72 +30,63 @@ Consider the following fully typed class definition in Reticulated:
 import math
 
 @fields({'dollars': Int, 'cents':Int})
-class Currency:
-  def __init__(self:Currency,
-	       dollars:Int,
-	       cents:Int)
-	       ->Void:
-    self.dollars = dollars 
-    self.cents = cents
-    
-  def add_currency(self:Currency,
-                   other:Currency)
-		   -> Currency:
-    d = self.dollars +
-        other.dollars
-    c = self.cents +
-        other.cents
-    return Currency(d + int (c / 100),
-                    c % 100)
-    
-c1 = Currency(1000, 0)   
+class Cash:
+  def __init__(self:Cash, d:Int, c:Int):
+    self.dollars = d
+    self.cents = c
+
+  def add_cash(self:Cash, other:Cash):
+    self.dollars += other.dollars
+    self.cents += other.cents
+
+c1 = Cash(1000, 0)
 }|
 
 
 By adding the following call to our code:
 
-@code{c1.add_currency(20)}
+@code{c1.add_cash(20)}
 
 Reticulated expectedly terminates with a static type error because
-@code{add_currency} is called with an argument of type @code{int},
-while it expects a @code{Currency}. However if we consider adding
+@code{add_cash} is called with an argument of type @code{int},
+while it expects a @code{Cash}. However if we consider adding
 @code{main} to our program and making a call to that function instead,
 
 @python|{
 
-def main(curr1:Dyn, curr2:Dyn):
-  return curr1.add_currency(curr2)
+def main(cash1:Dyn, cash2:Dyn):
+  cash1.add_cash(cash2)
 
 main(c1,20)
 }|
 
 we notice that the program is no longer fully typed. Furthermore, the
-call @code{main(c1, 20)} causes a violation the signature of @code{add_currency} by
-incorrectly passing it an @code{int} instead of a @code{Currency}. To
+call @code{main(c1, 20)} causes a violation the signature of @code{add_cash} by
+incorrectly passing it an @code{int} instead of a @code{Cash}. To
 prevent a runtime type error from occurring when calling @code{main},
 Reticulated inserts the following checks into the program:
-
-1- A check in @code{add_currency}, for each class field
+@itemlist[#:style 'ordered
+@item{
+A check in @code{add_cash}, for each class field
 invoked within the function body to verify its type, in case they were
 mutated at some point in the program.
-
-2- A check in @code{add_currency} that verifies that the function
+}
+@item{
+A check in @code{add_cash} that verifies that the function
 arguments are of the correct type.
-
-3- A check in @code{add_currency} to verify that the return value is a
-@code{currency}.
-
-4- A check at the call site (@code{main})that verifies that correctness of the
+}
+@item{
+A check in @code{add_cash} to verify that the return value is a
+@code{Cash}.
+}
+@item{
+A check at the call site (@code{main})that verifies that correctness of the
 output type of @code{main}.
+}]
 
-
-since @code{20} is a @code{Currency}, check #2 should fail
+since @code{20} is a @code{Cash}, check #2 should fail
 terminating the program before it can fail with a runtime type error.
 
-These checks are only related to @code{add_currency}. Further checks are
+These checks are only related to @code{add_cash}. Further checks are
 inserted when instantiating classes. A full list of sites where checks
-are inserted can be found at@~cite[vksb-dls-2014]. While Reticulated
-aims to achieve the soundness definition above (because the well-typed
-parts of the program do not terminate with a type error due to the
-presence of the runtime checks), section 5.x shows that there are
-still soundness gaps in the language.
+are inserted can be found at@~cite[vksb-dls-2014].
