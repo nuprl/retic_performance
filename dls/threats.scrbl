@@ -53,7 +53,7 @@ The types in this experiment may differ from types inferred by another Python
  programmer, and may lead to different performance overhead.
 
 @; TODO take5 is really an oversight on our part
-@(let ([missing-fields '(futen Evolution)]
+@(let ([missing-fields '(futen)]
        [retic-limited '(go pystone take5 stats)]
        [format-bm* (lambda (bm*) (authors* (map bm bm*)))]
        @; see also https://github.com/nuprl/retic_performance/issues/55
@@ -80,8 +80,8 @@ The types in this experiment may differ from types inferred by another Python
       ) @elem{
   Third, some benchmarks are either missing annotations or use the dynamic type.
   @Integer->word[(length missing-fields)]
-   benchmarks (@format-bm*[missing-fields]) have
-   classes with untyped fields due to an oversight on our part.
+   benchmark (@format-bm*[missing-fields]) has
+   a class with an untyped field due to an oversight on our part.
   @Integer->word[(length retic-limited)]
    benchmarks (@format-bm*[retic-limited]) use the
    dynamic type (@tt{Dyn}) to overcome limitations in Reticulated's type theory.
