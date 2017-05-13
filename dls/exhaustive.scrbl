@@ -371,9 +371,7 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
 The only exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
-This apparent improvement, however, is due to a bug in the implementation
- of Reticulated.
-@Section-ref{sec:pathologies} explains the issue in detail.
+@Section-ref{sec:experience} explains this anomaly.
 
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated only adds runtime checks to Python code.
@@ -462,7 +460,7 @@ The variations between individual plots fall into four overlapping categories:
     These speedups are due to one of two causes: either Reticulated
      added unnecessary checks to the less-typed configurations, or Reticulated
      unsoundly removed necessary checks based on the type annotations.
-    See @section-ref{sec:pathologies} for details.
+    @Section-ref{sec:experience} explains these speedups in detail.
 })]
 
 

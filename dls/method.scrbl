@@ -93,7 +93,7 @@ Fourth, infer fully-typed configurations for the experimental modules.
 When possible, use existing type annotations and comments to infer
  the fully-typed configuration of the benchmark.
 When necessary, use details of the driver module to infer types;
- for example, any polymorphic functions on lists must use monomorphic types
+ for example, any polymorphic functions must use monomorphic types
  because Reticulated does not support Python's syntax for generics.@note{@url{https://www.python.org/dev/peps/pep-0484/#generics}}
 
 
