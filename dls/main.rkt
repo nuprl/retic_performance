@@ -45,6 +45,10 @@
   ;; Usage: @|x-axis|
   ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
 
+  mypy
+  PEP-483
+  PEP-484
+
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
 
@@ -652,6 +656,15 @@
 
 (define (Integer->word i)
   (integer->word i #:title? #t))
+
+(define PEP-483
+  (hyperlink "https://www.python.org/dev/peps/pep-0483/" (emph "PEP 483: The Theory of Type Hints")))
+
+(define PEP-484
+  (hyperlink "https://www.python.org/dev/peps/pep-0484/" (emph "PEP 484: Type Hints")))
+
+(define mypy
+  (hyperlink "http://mypy-lang.org/" (emph "Mypy")))
 
 ;; =============================================================================
 

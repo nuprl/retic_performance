@@ -2017,3 +2017,25 @@
    #:author (authors "Michael M. Vitousek" "Jeremy Siek")
    #:location (techrpt-location #:institution "Indiana University" #:number "729")
    #:date 2016))
+
+(define ssm-esop-2014
+  (make-bib
+    #:title "An Array-Oriented Language with Static Rank Polymorphism"
+    #:author (authors "Justin R. Slepak" "Olin Shivers" "Panagiotis Manolios")
+    #:location (proceedings-location esop #:pages '(27 46))
+    #:date 2014))
+
+(define s-thesis-2015
+  (make-bib
+    #:title "How to generate actionable advice about performance problems"
+    #:author "Vincent St-Amour"
+    #:location (dissertation-location #:institution "Northeastern University"
+                                      #:degree "Ph.D.")
+    #:date 2015))
+
+(define f-keynote-2002
+  (make-bib
+    #:title "From POPL to the classroom and back"
+    #:author "Matthias Felleisen"
+    #:location (proceedings-location popl #:pages '(126 127))
+    #:date 2002))

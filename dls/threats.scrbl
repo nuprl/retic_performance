@@ -52,6 +52,7 @@ Second, the experiment considers one fully-typed configuration per benchmark;
 The types in this experiment may differ from types inferred by another Python
  programmer, and may lead to different performance overhead.
 
+@; TODO take5 is really an oversight on our part
 @(let ([missing-fields '(futen Evolution)]
        [retic-limited '(go pystone take5 stats)]
        [format-bm* (lambda (bm*) (authors* (map bm bm*)))]

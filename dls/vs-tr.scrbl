@@ -9,7 +9,7 @@
 Performance is one important aspect of a gradual type system.
 Two other, equally important aspects are (1) the system's ability to express common programming
  @; --- especially idioms of the host language but lets not get ahead of ourselves ---
- idioms and (2) the guarantees its types provide.
+ idioms and (2) the soundness guarantees that its types provide.
 @; All three combine to make a programming language useful.
 @; All three are in conflict.
 Language designers must strike a balance between

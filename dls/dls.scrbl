@@ -10,6 +10,7 @@
 @;title{Performance Evaluation of Reticulated Python}
 @;title{Linear Samples Suffice}
 @;title{You Get What you Pay For (Gradual Typing for Low, Low Prices)}
+@;title{The Cost of Transient}
 @title{Is Gradual Typing Alive?}
 
 @(define NEU
