@@ -78,7 +78,9 @@
 (defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
 (defparam *CONFIDENCE-LEVEL* 95 Percent)
 (defparam *INTERVAL-ALPHA* 1 Nonnegative-Real)
-
+(defparam *RATIO-DOT-SYM* 'plus point-sym/c)
+(defparam *RATIO-DOT-SIZE* 8 Natural)
+(defparam *RATIO-DOT-COLOR* "firebrick" Color)
 
 ;; -----------------------------------------------------------------------------
 
@@ -132,6 +134,7 @@
       (plot-pict
         (list
           (make-count-configurations-function pi)
+          (make-dot pi typed/python-ratio)
           (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
@@ -142,6 +145,17 @@
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (overhead-add-legend pi body))
+
+(define (make-dot pi get-x)
+  (define x-posn (get-x pi))
+  (define y-posn
+    (let ([num-configs (num-configurations pi)]
+          [num-deliv ((deliverable x-posn) pi)])
+      (pct num-deliv num-configs)))
+  (points (list (vector x-posn y-posn))
+    #:color (*RATIO-DOT-COLOR*)
+    #:sym (*RATIO-DOT-SYM*)
+    #:size (*RATIO-DOT-SIZE*)))
 
 (define (samples-plot pi)
   (define-values [sample-size sample*] (performance-info->sample-info pi))

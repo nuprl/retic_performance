@@ -61,7 +61,8 @@
 ;; -----------------------------------------------------------------------------
 
 (define (render-overhead-plot* bm*)
-  (render-benchmark* bm* "overhead" overhead-plot))
+  (parameterize ([*RATIO-DOT-SIZE* 5])
+    (render-benchmark* bm* "overhead" overhead-plot)))
 
 (define (render-exact-runtime-plot* bm*)
   (render-benchmark* bm* "exact-runtime" exact-runtime-plot #t))
