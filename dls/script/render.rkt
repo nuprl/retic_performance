@@ -127,30 +127,35 @@
       (+ (python-info->num-functions py) (python-info->num-methods py))
       (python-info->num-classes py)))))
 
-(define RATIOS-TITLE*
-  (map bold '("Benchmark" "untyped/python" "typed/untyped")))
+(define RATIOS-TITLE-TOP*
+  (map bold '("" "untyped /" "typed /" "  typed /")))
+
+(define RATIOS-TITLE-BOT*
+  (map bold '("Benchmark" "python" "untyped" "  python")))
 
 (define (render-ratios-table bm*)
   (define name* (map benchmark->name bm*))
   (tabular
     #:sep (hspace 2)
-    #:row-properties '(bottom-border 1)
-    #:column-properties '(left right right)
-    (cons RATIOS-TITLE*
-          (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
-                         [*current-cache-keys* (list (λ () name*))]
-                         [*with-cache-fasl?* #f])
-            (with-cache (cachefile "ratios-table.rktd")
-              (λ ()
-                (define pi* (map benchmark->performance-info bm*))
-                (append
-                  (map render-ratios-row pi*)
-                  #;(list (render-ratios-average-row pi*)))))))))
+    #:row-properties '(1 bottom-border 1)
+    #:column-properties '(left right right (left-border right))
+    (list* RATIOS-TITLE-TOP*
+           RATIOS-TITLE-BOT*
+           (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                          [*current-cache-keys* (list (λ () name*))]
+                          [*with-cache-fasl?* #f])
+             (with-cache (cachefile "ratios-table.rktd")
+               (λ ()
+                 (define pi* (map benchmark->performance-info bm*))
+                 (append
+                   (map render-ratios-row pi*)
+                   #;(list (render-ratios-average-row pi*)))))))))
 
 (define (render-ratios-row pi)
   (list (tt (symbol->string (performance-info->name pi)))
         (rnd (untyped/python-ratio pi))
-        (rnd (typed/retic-ratio pi))))
+        (rnd (typed/retic-ratio pi))
+        (rnd (typed/python-ratio pi))))
 
 ;; 2.32, 1.59 .... not too interesting, but also AVERAGE is a useless measure
 (define (render-ratios-average-row pi*)

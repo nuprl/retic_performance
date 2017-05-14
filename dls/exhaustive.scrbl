@@ -30,7 +30,7 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
    @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
    and the remaining @|num3| originate from open-source programs.
-  Every list of the benchmarks in this section is ordered first by the
+  Every listing of the benchmarks in this section is ordered first by the
    benchmarks' origin and second by the benchmark's names.
 })
 @; REMARK: original authors helpful with (code, test input, comments)
@@ -68,9 +68,9 @@ The following descriptions credit the benchmarks' original authors,
   @lib-desc["shlex"]{Split host names from an input string}
   @lib-desc["socket"]{Basic socket operations}
 ]]{
-  Generates an @hyperlink["https://www.ansible.com/"]{@tt{ansiable}} inventory
-  file from an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
-  file.
+  Converts an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
+  file to an inventory file for the
+  @hyperlink["https://www.ansible.com/"]{@emph{Ansiable}} framework.
   @; 1900 iterations
 }
 
@@ -256,10 +256,11 @@ The following descriptions credit the benchmarks' original authors,
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
-The table in @figure-ref{fig:ratio} lists data for two performance ratios.
+The table in @figure-ref{fig:ratio} lists three performance ratios.
 The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python.
 The @emph[t/u-ratio] reports the overhead of the fully-typed
  configuration relative to the untyped configuration.
+The product of these ratios is the @emph[t/p-ratio].
 
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
@@ -314,12 +315,8 @@ The @|x-axes| are log-scaled to focus on low overheads;
 
 The heading above the plot for a given benchmark lists the benchmark's name,
  @|t/p-ratio| (in parentheses), and number of configurations.
-Note that the @|t/p-ratio| is equal to the product of the @|u/p-ratio| and
- @|t/u-ratio| reported in @figure-ref{fig:ratio}.
-The number of configurations is equal to @$|{2^{F+C}}|,
- where @${F} and @${C} denote the corresponding values from
- @figure-ref{fig:static-benchmark}.
-@; TODO clarify "corresponding values"? Could say, "denote the number of functions (F) and number of classes (C) reported in ....
+Note that the number of configurations is equal to @$|{2^{F+C}}|,
+ with @${F} and @${C} from @figure-ref{fig:static-benchmark}.
 
 @parag{How to Read the Overhead Plots}
 @; HMMMM "are" is NOT correct, but it sticks.
@@ -377,7 +374,8 @@ The only exception is @bm{spectralnorm}, in which the fully-typed configuration
 @; @Section-ref{sec:experience} explains this anomaly.
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise, since Reticulated only adds runtime checks to Python code.
+This is no surprise, since Reticulated adds runtime checks to Python code for
+ each type annotation.
 
 Eleven benchmarks have smooth slopes.
 The plots for the other seven benchmarks have flat segments because those
@@ -399,8 +397,7 @@ Since adding type annotations to a Reticulated program can change its
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
-In @section-ref{sec:method} terms, the cost model is @${P(c) \propto @gnorm{c}_\tau}.
-@; TOO CUTE
+@;In @section-ref{sec:method} terms, the cost model is @${P(c) \propto @gnorm{c}_\tau}.
 
 @Figure-ref{fig:exact} contains one green point for every run of every
  configuration in the experiment.@note{Recall from @section-ref{sec:protocol},

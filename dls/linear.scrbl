@@ -11,13 +11,13 @@ Simple random sampling is a viable technique for approximating the number
  of @deliverable{D} configurations in a benchmark.
 In particular, a sampling protocol based on elementary
  statistics (@section-ref{sec:sampling:protocol})
- is able to reproduce the largest overhead plots in @figure-ref{fig:overhead}
+ is able to reproduce the overhead plots from @figure-ref{fig:overhead}
  with a fraction of the measurements (@section-ref{sec:sampling:overhead}).
 The protocol scales to significantly larger benchmarks than the exhaustive
  technique presented in @section-ref{sec:method} (@section-ref{sec:sampling:new}).
 Whereas exhaustive evaluation cannot feasibly be applied to programs containing
  tens of functions, the main bottleneck applying the sampling technique
- is the human cost of inferring fully-typed configurations.
+ remains the human cost of inferring fully-typed configurations.
 
 
 @section[#:tag "sec:sampling:protocol"]{Sampling Protocol}
@@ -36,8 +36,11 @@ Second, the proportion quantifies over the entire configuration space of a
 For an arbitrary configuration, the proportion of @deliverable{D} configurations
  @emph{is} the probability that this configuration is @deliverable{D}.
 
-There is, however, a natural way to approximate the same conclusion.
-Suppose a few developers independently apply gradual typing to a program.
+While computing the exact proportion of @deliverable{D} configurations requires
+ measuring an exponential number of configurations, a random sampling protocol
+ can accurately and quickly approximate it.
+To illustrate the protocol, suppose a few developers independently apply
+ gradual typing to a program.
 Each arrives at some configuration and observes some performance overhead.
 Therefore, for a given value of @${D} some proportion of the developers have
  @deliverable{D} configurations.
@@ -46,10 +49,10 @@ There is a remote chance that this proportion coincides with the true proportion
 Intuitively, the chance is less remote if the number of developers is very
  large.
 But even for a small number of developers, if they repeat this experiment
- multiple times then the average proportion of @deliverable{D} configurations
+ multiple times, then the average proportion of @deliverable{D} configurations
  should tend towards the true proportion.
 After all, if the true proportion of @deliverable{D} configurations is
- 10% then approximately 1 in 10 randomly sampled configurations will be
+ 10% then approximately 1 in 10 randomly sampled configurations is
  @deliverable{D}.
 
 The following definition capture the informal sampling protocol outlined above:
@@ -80,10 +83,10 @@ Consequently, the expected value of this random variable is @${p}.
 The law of large numbers therefore states that the average of infinitely
  many samples of @${X_d} converges to @${p}, the true proportion
  of deliverable configurations.
-Convergence suggests that the average of ``enough'' samples will be ``close to''
+Convergence suggests that the average of ``enough'' samples is ``close to''
  @${p}.
 The central limit theorem provides a similar guarantee---any sequence of
- such averages will be normally distributed around the true proportion.
+ such averages is normally distributed around the true proportion.
 Hence a 95% confidence interval generated from sample averages is likely
  to contain the true proportion.
 
@@ -111,7 +114,7 @@ Fortunately, the data from the exhaustive evaluation of @section-ref{sec:exhaust
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
 ]
 
-@Figure-ref{fig:sample:validate} demonstrates that linear samples
+@Figure-ref{fig:sample:validate} demonstrates that a linear number of samples
  suffice to approximate the performance overhead in the
  @integer->word[NUM-VALIDATE-SAMPLES] largest benchmarks from
  @section-ref{sec:exhaustive}.
@@ -139,10 +142,6 @@ The online supplement to this paper contains scripts for generating new samples
 
 @section[#:tag "sec:sampling:new"]{Approximate Evaluation}
 
-@figure["fig:sample:static-benchmark" "Static summary of benchmarks"
-  @(parameterize ([*CACHE-SUFFIX* "-linear"])
-    @render-static-information[SAMPLE-BENCHMARKS])]
-
 The simple random approximation method scales to large programs.
 Given any fully-typed program, a @approximation["r" "s" 95] can estimate its
  performance in reasonable time.
@@ -151,14 +150,20 @@ The exact amount of time, as well as the quality of the estimate, depends
 
 @; continues the evaluation started in section 4
 @(let* ([DLS '(aespython stats)]
-        [NEW '(Evolution sample_fsm)]) @elem{
+        [NEW '(Evolution sample_fsm)]) @list{
    This section presents the results of an @defn{approximate} performance
-    evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs.
+    evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs with
+    large configuration spaces.
+
+   @centered[
+     @(parameterize ([*CACHE-SUFFIX* "-linear"])
+       @render-static-information[SAMPLE-BENCHMARKS])]
+
    @string-titlecase[@integer->word[(length DLS)]] of these programs,
     @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
    The other @integer->word[(length NEW)], @bm*[NEW], originate from open-source
     programs.
-   @Figure-ref{fig:sample:static-benchmark} and the following descriptions
+   The following descriptions
     provide more information about the benchmarks' size and purpose.
 })
 
@@ -236,7 +241,7 @@ The exact amount of time, as well as the quality of the estimate, depends
 
 @Figure-ref{fig:sample:overhead} plots the results of applying the protocol
  in @section-ref{sec:protocol} to randomly sampled configurations.
-These results confirm many trends in earlier data; in particular,
+These results confirm many trends in earlier data:
 @itemlist[
 @item{
   No configurations run faster than the untyped Python program.
