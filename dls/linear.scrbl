@@ -155,9 +155,8 @@ The exact amount of time, as well as the quality of the estimate, depends
     evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs with
     large configuration spaces.
 
-   @centered[
-     @(parameterize ([*CACHE-SUFFIX* "-linear"])
-       @render-static-information[SAMPLE-BENCHMARKS])]
+   @(parameterize ([*CACHE-SUFFIX* "-linear"])
+     @render-static-information[SAMPLE-BENCHMARKS])
 
    @string-titlecase[@integer->word[(length DLS)]] of these programs,
     @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
