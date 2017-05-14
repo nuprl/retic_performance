@@ -120,7 +120,7 @@ For a benchmark containing @${F} functions and @${C} classes,
  @integer->word[NUM-SAMPLE-TRIALS] samples of @${@id[SAMPLE-RATE]*(F+C)}
  configurations selected at random @emph{with replacement}.@note{The theoretical
   justification in @section-ref{sec:sampling:protocol} assumes random sampling
-  without replacement, but (to paraphrase Knuth@~cite[k-cs-1974] out of context)
+  without replacement, but @; Knuth citation gratuitous
   the chance of drawing the same configuration twice is quite small, and removing
   this chance slightly increases the odds of drawing an extreme outlier.}
 These intervals are superimposed on the overhead plots from @figure-ref{fig:overhead}.

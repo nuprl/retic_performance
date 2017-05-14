@@ -1,25 +1,21 @@
 #lang gm-dls-2017
 @title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
-Reticulated Python is an experimental language that uses programmer-supplied
- type annotations to perform some static type checks, and furthermore compiles the
- annotations to first-order runtime assertions.
-The data in this paper suggests that the performance overhead imposed by the
- runtime assertions will not exceed 10x in typical Python programs, no
- matter how many functions and class definitions the programmer chooses to
- annotate with types.
+The application of Takikawa et al.'s method to Reticulated appears to
+ indicate that at least one sound, gradually typed language comes with a
+ performant implementation. In particular, the overhead plots for
+ Reticulated look an order of magnitude better than those for Typed
+ Racket. Appearances are deceiving, however.  Reticulated's type system is
+ far less expressive than Typed Racket's. Furthermore, its error messages,
+ especially for higher-order values, often fail the `` actionable''
+ test. Most importantly, though, Reticulated sacrifices soundness in favor
+ of performance; a program of type @tt{List(String)} may print a list of
+ integers---without signaling any violation.
 
-Reticulated is a research prototype.
-Its type system is able to express the types in basic Python programs
- and may catch some of the errors typically thought of as ``type errors'',
- but Reticulated is not an implementation of @|PEP-484|
- and does not guarantee type soundness in the SML, Haskell, or Typed Racket sense@~cite[tfffgksst-snapl-2017].
-For example, if a Reticulated function is declared with the return type @pythoninline{List(Int)},
- Reticulated inserts a tag check that ensures the function returns a @pythoninline{List} of some sort, but ignores the contents.@note{@citet[vss-popl-2017] give a similar example at the end of @hyperlink["http://homes.soic.indiana.edu/mvitouse/papers/popl17.pdf"]{section 2.2.2}. Their function @emph{avg} expects a list of floating-point numbers, but will not error if given a list of integers. If @emph{avg} is given a list of strings, the call will terminate in an error raised by the Python function @tt{sum}.}
-
-Nevertheless, Reticulated's integration with Python and its low performance
- overhead due to type annotations are promising.
- If the implementation can address the concerns raised in @section-ref{sec:vs-tr}
- (e.g., lack of polymorphism, cryptic error messages) while maintaining its
- current level of performance, then it will be interesting to see how developers
- react to its unique notion of type soundness.
+Our evaluation effort thus confirms a widely held conjecture and leaves us
+ with an open research problem. While the sacrifice of soundness improves
+ the performance of gradual typing systems, it remains unclear how
+ pervasive the problem is and whether programs accept such compromises if
+ they want to reason with types. Regardless, the research community must
+ continue to search for ways to improve the performance of sound, gradually
+ typed languages. 

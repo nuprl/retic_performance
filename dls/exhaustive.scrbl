@@ -232,7 +232,9 @@ The following descriptions credit the benchmarks' original authors,
 @list[
   @lib-desc["os"]{path join}
 ]]{
-  Implements the Ford-Fulkerson max flow algorithm@~cite[ff-cjm-1956].
+  Implements the Ford-Fulkerson max flow algorithm. 
+  @; no longer needs citation
+  @;@~cite[ff-cjm-1956].
   @; 1 iteration
 }
 
