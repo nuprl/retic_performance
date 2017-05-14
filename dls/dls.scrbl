@@ -11,7 +11,7 @@
 @;title{Linear Samples Suffice}
 @;title{You Get What you Pay For (Gradual Typing for Low, Low Prices)}
 @;title{The Cost of Transient}
-@title{Is Gradual Typing Alive?}
+@title{Is Sound Gradual Typing Alive?}
 
 @(define NEU
    @affiliation[
@@ -65,7 +65,7 @@
 @include-section{linear.scrbl}
 @include-section{threats.scrbl}
 @include-section{vs-tr.scrbl}
-@include-section{experience.scrbl}
+@;include-section{experience.scrbl}
 @include-section{conclusion.scrbl}
 
 @acks{

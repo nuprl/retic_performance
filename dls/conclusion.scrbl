@@ -19,7 +19,7 @@ For example, if a Reticulated function is declared with the return type @pythoni
 
 Nevertheless, Reticulated's integration with Python and its low performance
  overhead due to type annotations are promising.
-If the implementation can address the concerns raised in @section-ref{sec:experience}
+ If the implementation can address the concerns raised in @section-ref{sec:vs-tr}
  (e.g., lack of polymorphism, cryptic error messages) while maintaining its
  current level of performance, then it will be interesting to see how developers
  react to its unique notion of type soundness.
