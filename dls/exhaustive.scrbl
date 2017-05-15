@@ -293,7 +293,7 @@ This data suggests that migrating an arbitrary
 @; - but just running under retic should tell you what to expect
 
 
-@section{Overhead Plots}
+@section[#:tag "sec:overhead"]{Overhead Plots}
 @; these plots are the main event!
 @; - given "any program any configuration", what is probability of OK perf?
 @; - how does prob. change as "OK" changes?
@@ -370,8 +370,9 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
 The only exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
-
-@; @Section-ref{sec:experience} explains this anomaly.
+This speedup occurs because of an unsoundness in the implementation of Reticulated;
+ in short, the implementation does not check the contents of tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}.}
+@; better to say: "does not check _at runtime_" ?
 
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated adds runtime checks to Python code for
@@ -457,10 +458,12 @@ The variations between individual plots fall into four overlapping categories:
   (λ (num-in-category) @elem{
     In @|num-in-category| benchmarks, there are some configurations
      that run faster than similar configurations with fewer typed components.
-    These speedups are due to one of two causes: either Reticulated
-     added unnecessary checks to the less-typed configurations, or Reticulated
-     unsoundly removed necessary checks based on the type annotations.
-    @; @Section-ref{sec:experience} explains these speedups in detail.
+    These speedups happen for one of two reasons: either because of duplicate
+     checks on dynamically-typed receivers of method calls,
+     or because of omitted checks on values annotated with tuple types.
+    The former is due to an overlap between Reticulated's semantics and
+     Python's dynamic typing@~cite[vksb-dls-2014].
+    The latter is due to a bug in the implementation (see @section-ref{sec:overhead}).
 })]
 
 
