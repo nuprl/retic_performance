@@ -1,10 +1,5 @@
 #lang gm-dls-2017
 
-@(require (only-in scribble/core element style))
-@(define exact (style #f '(exact-chars)))
-@(define (paragraph t)
-  @list{@element[exact "\\smallskip"]@element[exact "\\noindent"]@bold{@t}})
-
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
 @; TODO
@@ -99,7 +94,7 @@ Four benchmarks use the dynamic type because Reticulated cannot express
  the Python community that a practical static type system must accomodate
  these idioms.
 
-@paragraph{Polymorphism}
+@parag{Polymorphism}
  The @bm{stats} benchmark contains polymorphic functions
  on lists, e.g., a function that extracts one column from a matrix.
  Reticulated has no syntax for polymorphism.
@@ -117,7 +112,7 @@ Four benchmarks use the dynamic type because Reticulated cannot express
         @; ```
         '(abut simpleabut colex linexand recode)]
 
-@paragraph{Untagged Unions}
+@parag{Untagged Unions}
   The @bm{pystone} and @bm{stats} benchmarks use the dynamic type to implement
    untagged union types.
   Specifically, @integer->word[(length pystone-union-fields)]
@@ -137,7 +132,7 @@ Four benchmarks use the dynamic type because Reticulated cannot express
 
 
 
-@@paragraph{Recursive Types}
+@parag{Recursive Types}
 The @bm{go} benchmark contains a class representing one square on a game board.
 This class declares a field that holds a list of neighboring squares.
 Reticulated's syntax allows this recursive field, but its static type checker
@@ -153,7 +148,7 @@ class Tree:
 }|
 
 
-@@paragraph{Variable-Arity Functions} Python functions may accept optional
+@parag{Variable-Arity Functions} Python functions may accept optional
 arguments, a variable number of positional arguments, and/or a variable
 number of keyword
 arguments.@note{@url{https://docs.python.org/dev/tutorial/controlflow.html#more-on-defining-functions}}
@@ -309,7 +304,7 @@ Naturally, this shallow and delayed type check is the secret to Reticulated's
  efficient gradual typing.
 
 
-@@paragraph{An Ounce of Sewage} Recall the @tt{Cash} class from
+@parag{Pitfalls} Recall the @tt{Cash} class from
 @section-ref{sec:reticulated}.  The class fields @tt{dollar} and @tt{cents}
 are type annotated, perhaps to guard against rounding errors due to
 floating-point arithmetic.  In a traditional statically typed language, the
