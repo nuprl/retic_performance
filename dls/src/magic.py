@@ -1,12 +1,10 @@
 
-def tail(xs:List(Int))->List(Int):
+def tail(xs:List(String))->List(String):
   return xs[1:]
 
-def magic(xs)->List(Int):
+def magic(xs)->List(String):
   return tail(xs)
 
-ints = magic(["5", 6, 7, "8"])
-print(ints[0] * ints[1])
-# 42
-print(ints)
-# [6, 7, "8"]
+strings = magic([1,2,3])
+print(strings)
+# [2, 3]
