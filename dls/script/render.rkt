@@ -36,6 +36,7 @@
   (only-in scribble/manual
     tt
     tabular
+    centered
     hspace
     bold)
   (only-in racket/list
@@ -105,17 +106,19 @@
 
 (define (render-static-information bm*)
   (define name* (map benchmark->name bm*))
-  (tabular
-    #:sep (hspace 2)
-    #:row-properties '(bottom-border 1)
-    #:column-properties (cons 'left (make-list (sub1 (length STATIC-INFO-TITLE*)) 'right))
-    (cons STATIC-INFO-TITLE*
-          (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
-                         [*current-cache-keys* (list (λ () name*))]
-                         [*with-cache-fasl?* #f])
-            (with-cache (cachefile (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
-              (λ ()
-                (map render-static-row bm*)))))))
+  (centered
+    (tabular
+      #:sep (hspace 2)
+      #:style 'block
+      #:row-properties '(bottom-border 1)
+      #:column-properties (cons 'left (make-list (sub1 (length STATIC-INFO-TITLE*)) 'right))
+      (cons STATIC-INFO-TITLE*
+            (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                           [*current-cache-keys* (list (λ () name*))]
+                           [*with-cache-fasl?* #f])
+              (with-cache (cachefile (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
+                (λ ()
+                  (map render-static-row bm*))))))))
 
 (define (render-static-row bm)
   (define py (benchmark-info->python-info bm))
@@ -135,21 +138,23 @@
 
 (define (render-ratios-table bm*)
   (define name* (map benchmark->name bm*))
-  (tabular
-    #:sep (hspace 2)
-    #:row-properties '(1 bottom-border 1)
-    #:column-properties '(left right right (left-border right))
-    (list* RATIOS-TITLE-TOP*
-           RATIOS-TITLE-BOT*
-           (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
-                          [*current-cache-keys* (list (λ () name*))]
-                          [*with-cache-fasl?* #f])
-             (with-cache (cachefile "ratios-table.rktd")
-               (λ ()
-                 (define pi* (map benchmark->performance-info bm*))
-                 (append
-                   (map render-ratios-row pi*)
-                   #;(list (render-ratios-average-row pi*)))))))))
+  (centered
+    (tabular
+      #:sep (hspace 2)
+      #:style 'block
+      #:row-properties '(1 bottom-border 1)
+      #:column-properties '(left right right (left-border right))
+      (list* RATIOS-TITLE-TOP*
+             RATIOS-TITLE-BOT*
+             (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                            [*current-cache-keys* (list (λ () name*))]
+                            [*with-cache-fasl?* #f])
+               (with-cache (cachefile "ratios-table.rktd")
+                 (λ ()
+                   (define pi* (map benchmark->performance-info bm*))
+                   (append
+                     (map render-ratios-row pi*)
+                     #;(list (render-ratios-average-row pi*))))))))))
 
 (define (render-ratios-row pi)
   (list (tt (symbol->string (performance-info->name pi)))

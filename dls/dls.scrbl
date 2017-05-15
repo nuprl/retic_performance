@@ -76,5 +76,4 @@
   Tony GJ for insisting that overhead plots are CDFs.
 }
 
-@include-section{fix-bigtabular.scrbl}
 @generate-bibliography[]
