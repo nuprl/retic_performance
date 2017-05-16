@@ -11,22 +11,22 @@ annotations without any unexpected impacts on their program.'' One
 unexpected impact would be the application of a function on integers to a
 string; similarly, when typed code hands an array of floats to untyped
 code, the programmer expects that the untyped code does not assign a
-boolean to one of the array's slots.  By contrast, a programmer might
+boolean to one of the array's slots. By contrast, a programmer might
 expect the addition of types to speed up the program execution because the
 compiler can exploit the type information.
 
 Gradual typing implements the sound combination of typed and untyped code
 with the insertion of run-time checks. At a high level, a gradual typing
-system uses the type annotations to determine whether and where a, say,
-typed function may flow into the function position of an application and
-adds a type there to ensure the argument value matches the expected
+system uses the type annotations to determine whether and where a
+typed expression may flow into the function position of an application and
+adds a check there to ensure the argument value matches the expected
 type. If not, the run-time check raises an exception. Clearly, the
 insertion of such run-time checks imposes a cost, and the question arises
 how significant this cost is.
 
-In 2016, @citet[takikawa-popl-2016] present the first proper method for
+@citet[takikawa-popl-2016] present the first proper method for
 evaluating the performance of gradual typing systems. Their method is to
-measure @emph{all} partial conversions from typed to untyped code. That is,
+measure @emph{all} partial conversions from untyped to typed code. That is,
 if there are @math{n} code components, Takikawa et al. propose to measure
 @math{2^n} configurations. Doing so mimics the process through which
 programmers may gradually equip all possible sites for type declarations
@@ -54,13 +54,12 @@ Takikawa et al.'s method (see @section-ref{sec:method}) for Reticulated
 Python's gradual typing system@~cite[vksb-dls-2014], which is relatively
 faithful to Siek and Taha's original proposal. Second, it reports on the
 results of applying the adapted method to Reticulated (see
-@section-ref{sec:exhaustive}).  While the performance of Reticulated seems to
+@section-ref{sec:exhaustive}). While the performance of Reticulated seems to
 be significantly better than Typed Racket's, we conjecture that this
 due to (1) a significant gap in Reticulated's soundness, (2)
 Reticulated's lack of expressiveness, and (3) low-quality error messages
-(see @section-ref{sec:vs-tr}).  Third, the paper confirms Greenman et
+(see @section-ref{sec:vs-tr}). Third, the paper confirms Greenman et
 al.'s insight that linear sampling is a sufficiently good approximation of
 the exponential set of measurements for the adapted method (see
-@section-ref{sec:linear}). The next couple of sections present the background
-for this paper.
+@section-ref{sec:linear}). The next section presents the background material.
 
