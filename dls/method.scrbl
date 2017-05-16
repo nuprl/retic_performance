@@ -75,18 +75,17 @@ section, we describe the adapted evaluation process in detail.
 
 @section[#:tag "sec:protocol"]{Protocol}
 
-Our performance evaluation adheres to the following protocols
+Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
+ performance of Reticulated at the granularity of function and class definitions.
+One type conversion step in this evaluation consists of annotating the
+ signature of a function (or method), or annotating all fields of one class.
+The evaluation furthermore adheres to the following protocols
  for @emph{benchmark creation} and @emph{data collection}.
-
-@; In this application of the Takikawa method, experimental _components_
-@;  are always modules so we will not say "component"
-@; Written as general "recipe to follow", except for details of Karst
 
 @parag{Benchmark Creation}
 Given a Python program, first build a driver module that performs some
  non-trivial computation using the program.
-Second, remove any non-determinism or unneccesary I/O actions@note{e.g. print
- statements and requests for user input} from the program.
+Second, remove any non-determinism or unneccesary I/O actions from the program.
 Third, define the experimental modules.
 Fourth, infer fully-typed configurations for the experimental modules.
 
@@ -107,11 +106,9 @@ Finally, run the main module of the untyped configuration using the standard
  Python interpreter.
 
 
-@parag{Details of the Evaluations}
-
-Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} present data
- from the @emph{Karst at Indiana University} high-throughput computing cluster.@note{@url{https://kb.iu.edu/d/bezu}}
-Each job that we scheduled on the cluster:
+@parag{Details of the Evaluation} All data in this paper was produced by jobs sent
+ to the @emph{Karst at Indiana University} high-throughput computing cluster.@note{@url{https://kb.iu.edu/d/bezu}}
+Each job:
 @itemlist[#:style 'ordered
 @item{
   reserved all processors on one node for 24 hours;
@@ -128,7 +125,6 @@ Each job that we scheduled on the cluster:
   and recorded the result of each run.
 }
 ]
-The data is the result of running such jobs in parallel.
 Cluster nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
  8-core processors, 32 GB of RAM, and 250 GB of local disk storage.@note{@url{https://kb.iu.edu/d/bezu#overview}}
 
