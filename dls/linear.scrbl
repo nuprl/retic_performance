@@ -30,8 +30,8 @@ First, the parameter @${D} addresses the fact that different software applicatio
 Second, the proportion quantifies over the entire configuration space of a
  program---because it is impossible to predict how developers will apply gradual
   typing.@note{ @; TODO: the note needs work, but it needs to be here.
-    The promise of gradual typing is @emph{any configuration}. At
-    present, there is no data to suggest that developers are more likely to
+    The promise of gradual typing is that developers can soundly run @emph{any configuration}.
+    At present, there is no data to suggest that developers are more likely to
     choose some configurations over others.}
 For an arbitrary configuration, the proportion of @deliverable{D} configurations
  @emph{is} the probability that this configuration is @deliverable{D}.
