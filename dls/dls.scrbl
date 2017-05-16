@@ -32,26 +32,25 @@
 @; -----------------------------------------------------------------------------
 @abstract{
   Gradual typing promises to combine the benefits of dynamic and static typing
-  disciplines in a single language, giving developers freedom to use type
+  in a single language, giving developers freedom to use type
   information only where it proves useful for catching bugs, documenting
   interfaces, or enabling optimizations.  Reticulated Python is one such
-  @emph{gradually typed} language; it gives Python programmers the ability to
-  incrementally add sound, optional type annotations to critical parts of their
-  programs.  Reticulated preserves type soundness by adding dynamic type tests
-  to a program.  These tests can arbitrarily degrade the performance of
+  @emph{gradually typed} language; it aims to give Python programmers the ability to
+  incrementally add sound type annotations to critical parts of their
+  programs. Reticulated enforces type annotations by adding dynamic checks
+  to a program. These tests can arbitrarily degrade the performance of
   programs, but their effect on partially-typed variations of realistic
   programs is unknown.
 
-  This paper studies the overhead of gradual typing in Reticulated Python.  We
+  This paper studies the overhead of gradual typing in Reticulated Python. We
   examine programs taken from a variety of areas including @; TODO give number?
-  Python libraries, implementations of common algorithms, and games.  For each
+  Python libraries, implementations of common algorithms, and games. For each
   program we systematically measure all partially-typed @emph{configurations}
   obtained by assigning full type signatures to a subset of functions in the
-  program.  For a program with @${n} functions we obtain  @${2^n} configurations.
-  We additionally sample random configurations in which any subset of class
+  program. We additionally sample random configurations in which any subset of class
   fields, function parameters, or function return types may be typed.  Finally
-  we attempt to explain which functions or types are responsible for the
-  greatest overhead and generalize common patterns.
+  we attempt to explain which functions and types are responsible for the
+  greatest overhead.
 }
 
 @terms{CS}
