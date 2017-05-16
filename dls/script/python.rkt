@@ -127,6 +127,7 @@
   with-cache
   (only-in racket/set
     list->set
+    set->list
     for/set
     for*/set
     set/c
@@ -138,6 +139,8 @@
   (only-in racket/path
     file-name-from-path
     path-get-extension)
+  (only-in racket/pretty
+    pretty-print)
   (only-in racket/list
     last)
   (only-in racket/string
@@ -252,7 +255,16 @@
     (python-info name (map path-string->module-info m*))))
 
 (define (path-string->python-info ps)
-  (python-info (file-name-from-path ps) (path-string->module-info ps)))
+  (python-info (file-name-from-path ps) (list (path-string->module-info ps))))
+
+(define (->python-info fd)
+  (cond
+   [(file-exists? fd)
+    (path-string->python-info fd)]
+   [(directory-exists? fd)
+    (directory->python-info fd)]
+   [else
+    (printf "WARNING: expected path to file or directory, given '~a'~n" fd)]))
 
 (define (path-string->module-info ps)
   (define py-json (path-string->exploded-module ps))
@@ -409,15 +421,10 @@
 
 (define (scan fd*)
   (for ((fd (in-list fd*)))
-    (define pi
-      (cond
-       [(file-exists? fd)
-        (path-string->python-info fd)]
-       [(directory-exists? fd)
-        (directory->python-info fd)]
-       [else
-        (printf "WARNING: expected path to file or directory, given '~a'~n" fd)]))
-    (and pi (print-python-info pi))))
+    (define pi (->python-info fd))
+    (if pi
+      (print-python-info pi)
+      (printf "WARNING: expected path to file or directory, given '~a'~n" fd))))
 
 (define (print-python-info pi)
   (printf "~a~n" (python-info-name pi))
@@ -427,19 +434,33 @@
   (printf "- ~a methods~n" (python-info->num-methods pi))
   (void))
 
+;; -----------------------------------------------------------------------------
+;; Types command
+
+(define (types fd*)
+  (for ((fd (in-list fd*)))
+    (define pi (->python-info fd))
+    (if pi
+      (pretty-print (set->list (python-info->all-types pi)))
+      (printf "WARNING: expected path to file or directory, given '~a'~n" fd))))
+
 ;; =============================================================================
 
 (module+ main
-  (require racket/cmdline racket/set racket/pretty)
+  (require racket/cmdline racket/set)
   (define scan-mode? (box #f))
+  (define types-mode? (box #f))
   (command-line
    #:program "rp-python"
    #:once-any
    [("-s" "--scan") "Scan a Python file (or flat directory of Python files)" (set-box! scan-mode? #t)]
+   [("-t" "--types") "Print a list of all types in the given file(s)" (set-box! types-mode? #t)]
    #:args ARG*
    (cond
     [(unbox scan-mode?)
      (scan ARG*)]
+    [(unbox types-mode?)
+     (types ARG*)]
     [else
      (raise-user-error 'die)])
    #;(pretty-print (benchmark-dir->python-info p))
