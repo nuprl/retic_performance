@@ -346,7 +346,7 @@
   (let ([bm* (all-benchmarks)])
     (define e* (filter benchmark->karst-data bm*))
     (define n* (map benchmark->name e*))
-    (define s* (filter benchmark->sample-data bm*))
+    (define s* (filter (λ (bm) (and (not (eq? (benchmark->name bm) 'take5)) (benchmark->sample-data bm) #t)) bm*))
     (define-values [v* r*] (partition (λ (bm) (memq (benchmark->name bm) n*)) s*))
     (values e* v* r*)))
 
@@ -715,11 +715,11 @@
       '(futen http2 slowSHA call_method call_method_slots call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
     (check set=?
       (map benchmark->name (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))
-      '(futen slowSHA chaos pystone Espionage PythonFlow take5 sample_fsm Evolution aespython stats)))
+      '(futen slowSHA chaos pystone Espionage PythonFlow sample_fsm Evolution aespython stats)))
 
   (test-case "partitioning benchmarks"
     (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 19)
-    (check-equal? NUM-VALIDATE-SAMPLES 7)
+    (check-equal? NUM-VALIDATE-SAMPLES 6)
     (check-equal? NUM-NEW-SAMPLES 4))
 
   (test-case "->benchmark"
