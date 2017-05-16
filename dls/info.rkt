@@ -8,6 +8,7 @@
   "pict-lib"
   "plot-lib"
   "scribble-lib"
+  "sxml"
   "with-cache"
 ))
 (define build-deps '(
