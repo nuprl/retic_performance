@@ -149,6 +149,10 @@
   ;; Number of configurations that run faster than some configuration with
   ;;  fewer typed components. (This is rare, and usually indicates a bug.)
 
+  BENCHMARKS-WITH-FIRST-CLASS-FUNCTIONS
+  ;; Number of benchmarks that use first-class function types
+  ;; (ignores object types)
+
   PYTHON
   ;; "Python 3.4.3",
   ;;  the proper name of the version of python that we used to collect data
@@ -376,6 +380,9 @@
 
 (define SNAPL-2015-URL
   "http://drops.dagstuhl.de/opus/volltexte/2015/5031/")
+
+(define BENCHMARKS-WITH-FIRST-CLASS-FUNCTIONS
+  '(spectralnorm))
 
 ;; -----------------------------------------------------------------------------
 
@@ -742,11 +749,13 @@
     (check-equal?
       (remove-prefix "a" (remove-prefix "b" "cba"))
       "cba"))
+
 )
 
 #;
 (module+ test ;; These tests are slow
   (require
+    racket/set
     (only-in gm-dls-2017/script/benchmark-info
       benchmark-info->python-info)
     (only-in gm-dls-2017/script/python
@@ -759,6 +768,14 @@
       typed/python-ratio
       unzip-karst-data
       fold/karst))
+
+  (test-case "num-first-class-functions"
+    (check-equal?
+      (for/list ([bm (in-list (all-benchmarks))]
+                 #:when (for/or ([t-str (in-set (python-info->all-types (benchmark-info->python-info bm)))])
+                          (and t-str (regexp-match? #rx"^Function" t-str))))
+        (benchmark->name bm))
+      BENCHMARKS-WITH-FIRST-CLASS-FUNCTIONS))
 
    ;; ------------------------------------------------------------------
 
