@@ -107,13 +107,11 @@ Typed Racket enforces the behavioral specification implied by @${\tau}
  the relevant boundary@~cite[tfffgksst-snapl-2017].
 
 @figure["fig:magic" "A well-typed Reticulated program"
-  @python|{
+@python|{
     def add_one(xs)->List(Int):
-      xs.append(1)
-      return xs
+      return xs + [1]
 
     print(add_one(["A", "B"]))
-    # ["A", "B", 1]
 }|]
 
 Reticulated takes a different approach, and guarantees only tag-level soundness.

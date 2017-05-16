@@ -1,5 +1,4 @@
 def add_one(xs)->List(Int):
-  xs.append(1)
-  return xs
+  return xs + [1]
 
 print(add_one(["A", "B"]))

@@ -498,8 +498,8 @@
 (define (pythoninline . x)
   (apply exact (append (list "\\pythoninline{") x (list "}"))))
 
-(define (pythonexternal a b)
-  (apply exact (format "\\pythonexternal{~a}{~a}" a b)))
+(define (pythonexternal a)
+  (exact (format "\\pythonexternal{~a}" a)))
 
 (define (gnorm var)
   (format "\\|~a\\|" var))
