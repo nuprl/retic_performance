@@ -74,16 +74,27 @@ The types in this experiment may differ from types ascribed by another Python
        @; - stats uses the Dyn type
        @;   - for polymorphism, "rank polymorphism", and union types
       ) @elem{
+  @; TODO can shorten this if the futen data ever finishes
+  @;  to bring across:
+  @;  - some use Dyn
+  @;  - using Dyn unfaithful to "fully-typed"
+  @;  - using Dyn changes the inserted checks
   Third, some benchmarks are either missing annotations or use the dynamic type.
   @Integer->word[(length missing-fields)]
    benchmark (@format-bm*[missing-fields]) has
    a class with an untyped field due to an oversight on our part.
   @Integer->word[(length retic-limited)]
    benchmarks (@format-bm*[retic-limited]) use the
-   dynamic type to overcome limitations in Reticulated's type theory.
+   dynamic type to overcome limitations in Reticulated's types.
 })
 
-Fourth, Reticulated supports a finer granularity of type annotations than the
+@(let ([use-io* '(aespython futen http2 slowSHA)]) @elem{
+  Fourth, the @(authors* (map bm use-io*)) benchmarks read from a file
+   within their main computation.
+  This is a failure on our part.
+})
+
+Fifth, Reticulated supports a finer granularity of type annotations than the
  experiment considers.
 Partially-typed functions and classes may come with entirely different performance.
 We leave this as an open question.
