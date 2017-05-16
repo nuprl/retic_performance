@@ -64,6 +64,7 @@
   mypy
   PEP-483
   PEP-484
+  TPPBS
 
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
@@ -677,6 +678,9 @@
 
 (define mypy
   (hyperlink "http://mypy-lang.org/" (emph "Mypy")))
+
+(define TPPBS
+  (hyperlink "http://pyperformance.readthedocs.io/" "The Python Performance Benchmark Suite"))
 
 ;; =============================================================================
 

@@ -66,8 +66,6 @@ The types in this experiment may differ from types ascribed by another Python
        @;   - to avoid circular reference
        @; - pystone uses the Dyn type
        @;   - union type, (U PSRecord None)
-       @; - Evolution is missing some type annotation(s)
-       @;   - none of classes have @fields
        @; - take5 is missing some type annotation(s)
        @;   - `create_deck`, argument 'deck_size' is unannotated
        @;   - same function has optional arguments, so the types ignored

@@ -28,7 +28,7 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
    @|num1| originate from case studies by @citet[vksb-dls-2014],
    @;@note{@|dls-names|.}
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
-   @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
+   @|TPPBS|,
    and the remaining @|num3| originate from open-source programs.
   Every listing of the benchmarks in this section is ordered first by the
    benchmarks' origin and second by the benchmark's names.
