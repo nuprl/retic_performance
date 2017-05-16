@@ -1,69 +1,137 @@
 #lang gm-dls-2017
-@title[#:tag "sec:vs-tr"]{Whence this Paper}
 
-@; TODO
-@; - safe typescript?
-@; - strongscript?
-@; these are micro systems with reasonable soundness
+@; TODO no future tense!
 
-Performance is one important aspect of a gradual type system.
-Two other, equally important aspects are (1) the system's ability to express common programming
- @; --- especially idioms of the host language but lets not get ahead of ourselves ---
- idioms and (2) the guarantees its types provide.
-@; All three combine to make a programming language useful.
-@; All three are in conflict.
-Language designers must strike a balance between
- performance, expressiveness, and soundness.
+@title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
-Prior work on Reticulated has focused on its expressiveness and soundness.
-@citet[vksb-dls-2014] introduce Reticulated Python and explore three
- semantics for enforcing type annotations: guarded, monotonic@~cite[vcgts-esop-2015], and transient.@note{Reticulated has some support for all three semantics. Support for transient is the most mature.}
-Regarding transient, the paper reports a performance ratio of 10x on the @tt{slowSHA}
- program@note{The @emph{performance ratio} is likely the @|t/p-ratio|. Our @tt{slowSHA} benchmark is adapted from their program.}
- and links to a proof of type safety for a core calculus.@note{The link is superceded by a technical report@~cite[vs-tr-2016].}
-The paper does not state a type safety guarantee for Reticulated,
- nor does it include data on the performance of partially typed programs.
+The worst slowdown we observe in Reticulated is one order of magnitude.
+By contrast, many partially typed Typed Racket programs are two order of
+ magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017].
+While implementation technology and the peculiarities of the benchmarks
+ affect performance, this huge gap suggests fundamental differences.
 
-@citet[svcb-snapl-2015] define a property that relates the runtime behavior of
- two programs along the same path in a configuration lattice (Theorem 5, the @emph{gradual guarantee}).@note{To be precise, the theorem relates programs @${e_0}, @${e_1} such that @${e_0 \rightarrow_k e_1} for some @${k}. @hyperlink[SNAPL-2015-URL]{Figure 6} of @citet[svcb-snapl-2015] defines a similar @emph{term precision relation}.}
-They claim that this property captures the essential benefit of gradual typing.
-They furthermore remark that proving this property for a language with mutable
- references and/or polymorphism is non-trivial.
+We have identified three factors that contribute to the relative
+ performance of Reticulated.
+First, Reticulated's type system lacks support for unions, recursive types,
+ and variable-arity functions.
+Second, Reticulated's error messages rarely provide actionable feedback.
+Third, Reticulated enforces a lax notion of type soundness compared to
+ Typed Racket.
+All three factors affect both programmers and performance.
 
-@citet[vss-popl-2017] formalize Reticulated's transient semantics in a monomorphic
- calculus with references, and prove safety properties including the above-mentioned gradual guarantee.
-The proof avoids the challenge with references via an alternative notion of
- type soundness: if @${\vdash\!e\!:\!\mathsf{ref}~\tau} and evaluates to @${v},
- then @${\vdash\!v\!:\!\mathsf{Ref}}.
-In other words, the semantics preserves top-level tags.
-Transient mitigates the shallow nature of these runtime checks by wrapping
- every dereference site in typed code.
-Whenever type-annotated code unboxes a value, a dynamic check ensures that the value is well-tagged.
-The authors measure the performance of Reticulated on @integer->word[13] programs from
- @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite}
- and report @|t/p-ratio|s that are similar to the ones we report here.
-The paper does include data on the performance of partially typed programs.
 
-@section{Performance Evaluation}
+@section{Missing Types}
+@(define pystone-union-fields
+        @; grep for 'PtrComp = ' to find assignments
+        @; It's initially `None`, and assigned away-from and back-to `None`
+        @;  in `Proc1`
+        '(PSRecord.PtrComp))
+@(define stats-union-functions
+        @; Most of these functions all have a dead-giveaway pair of lines:
+        @; ```
+        @;  if type(cols) not in [list,tuple]:
+        @;      cols = [cols]
+        @; ```
+        '(abut simpleabut colex linexand recode))
+@(define dyn* '(go pystone stats take5))
+@; TODO add better in-file evidence
 
-@citet[tfdffthf-ecoop-2015] present the first comparison between the performance of a
- fully-typed program and the performance of all its partially-typed configurations.
-@citet[takikawa-popl-2016] conduct a similar evalution on @integer->word[12] programs.
-They conclude that the cost of preserving type soundness @exact{na\"ively} through
- proxies is intolerable, and question whether the ideal of gradual typing
- is realizable in practice.
-@citet[greenman-jfp-2017] demonstrate how to compare multiple versions of a
- gradual type system and empirically validate the simple random approximation method.
+@Integer->word[(length dyn*)] of our benchmarks use type @tt{Dyn} because
+ Reticulated cannot express the desired type.
+The @bm{pystone} and @bm{stats} benchmarks use @tt{Dyn} to implement
+ untagged union types.
+The @bm{go} benchmark uses @tt{Dyn} to avoid creating a recursive class type.
+Lastly, one function in the @bm{take5} benchmark uses @tt{Dyn} because it accepts
+ optional arguments.
+@;@note{The implementation of Reticulated currently ignores
+@; the types on functions that use optional arguments, argument lists, and/or keyword arguments.
+@; Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
+These cases represent idiomatic Python code; indeed, @|PEP-484|
+ specifies syntax for generics, untagged union types, recursive types, optional
+ arguments, and keyword arguments.
 
-The results in this paper are not directly comparable to the results
- for Typed Racket@~cite[takikawa-popl-2016].
-Typed Racket and Reticulated have different type systems and provide
- different soundness guarantess; for example, Typed Racket supports
- polymorphism, does not support implicit downcasts, and dynamically prevents
- untyped code from writing an ill-typed value to a reference cell@~cite[tfffgksst-snapl-2017].
-@; Moreover, Typed Racket attributes any runtime type error to a mis-matched pair:
-@;  an untyped value and a static type annotation that the value failed to meet.
-But based on the data in this paper, our @emph{opinion} is that the cost of
- preserving type soundness is tolerable and that research on transient semantics
- in general and Reticulated in particular should continue.
+Enforcing a union types or (equi-)recursive types requires a disjunction of
+ type checks at runtime.
+Enforcing the signature of a variable-arity procedure requires a sequence
+ of type checks.
+In contrast, the types that Reticulated currently supports are all enforced by
+ unit-cost tag checks.
+
+
+@section{Localized Errors}
+@; Context-Free Errors
+@; Least-Knowledge Errors
+@(define vss-popl-2017-benchmarks
+   '(callsimple nqueens pidigits meteor fannkuch nbody callmethod
+     callmethodslots pystone float chaos go spectralnorm))
+@(define vss-2x-benchmarks
+   '(nqueens meteor fannkuch callmethod callmethodslots pystone float chaos go))
+
+Errors matter@~cite[f-keynote-2002].
+When systems work, everyone is happy, but when systems break, developers really
+ want to see high quality error messages.
+
+Reticulated currently produces simple error messages that supply (1) a value
+ that failed some check and (2) a stack trace.
+Improving these messages is important, but will add runtime overhead.
+@;The messages rarely communicate the static type that led to the failing check,
+@; or the boundary where a bad untyped entered typed code@~cite[tfffgksst-snapl-2017].
+For example, @citet[vss-popl-2017] built an extension to Reticulated that
+ augments check failures with a list of all the casts that may have led
+ to the fault.
+Their evaluation reports the @|t/p-ratio|s of
+ @integer->word[(length vss-popl-2017-benchmarks)]
+ programs from @|TPPBS|; in @integer->word[(length vss-2x-benchmarks)]
+ programs, blame tracking at least doubled the @|t/p-ratio|.
+
+
+@section{Alternative Soundness}
+
+Sound type systems are useful because they provide guarantees.
+If a static type system proves that a term has type @${\tau}, then @${\tau}
+ specifies the term's behavior.
+The type system can use this specification to find bugs throughout a program,
+ the compiler can rely on this specification to generate efficient code,
+ and the programmer can trust this specification as an API.
+
+Gradual type systems cannot provide exactly the same guarantees,
+ but Typed Racket's soundness is very similar to conventional soundness.
+In Typed Racket, typed code is sound in the conventional sense, for example, the
+ compiler may use the types to eliminate runtime tag-checks@~cite[sthff-padl-2012].
+Untyped code is quarantined.
+An untyped value @${v} can only cross the boundary into typed code by being
+ ascribed a type @${\tau}.
+Typed Racket enforces the behavioral specification implied by @${\tau}
+ by compiling the type to a contract; if @${v} does not meet the contract,
+ the programmer receives an error message containing @${v}, @${\tau}, and
+ the relevant boundary@~cite[tfffgksst-snapl-2017].
+
+@figure["fig:magic" "A well-typed Reticulated program"
+  @python|{
+    def add_one(xs)->List(Int):
+      xs.append(1)
+      return xs
+
+    print(add_one(["A", "B"]))
+    # ["A", "B", 1]
+}|]
+
+Reticulated takes a different approach, and guarantees only tag-level soundness.
+It is perfectly acceptable for a Reticulated term with type @tt{List(String)}
+ to evaluate to a value @${v} with a different type, so long as @${v} is some
+ kind of list (see @figure-ref{fig:magic}).
+When typed code reads from @${v} expecting a value with type @${\tau'},
+ tag-level soundness implies that Reticulated will check the unpacked value
+ against the tag of @${\tau'}.
+Note that @${\tau'} need not be @tt{String}, but it must match the unpacked
+ value.
+
+Reticulated's shallow, by-need runtime checks impose less performance overhead
+ than Typed Racket's behavioral contracts.
+The open question is whether developers find these checks sufficiently useful.
+On one hand, Reticulated types cannot enforce datatype invariants, e.g., to
+ to guarantee that all instances of the @tt{Cash} class in
+ @section-ref{sec:reticulated} have integer-valued fields.
+On the other hand, developers may value the increased flexibility and pay-as-you-annotate
+ cost model.
 

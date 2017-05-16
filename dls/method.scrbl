@@ -75,7 +75,7 @@ process in detail.
 
 @section[#:tag "sec:protocol"]{Protocol}
 
-The performance evaluations in this paper adhere to the following protocols
+Our performance evaluation adheres to the following protocols
  for @emph{benchmark creation} and @emph{data collection}.
 
 @; In this application of the Takikawa method, experimental _components_
@@ -93,14 +93,14 @@ Fourth, infer fully-typed configurations for the experimental modules.
 When possible, use existing type annotations and comments to infer
  the fully-typed configuration of the benchmark.
 When necessary, use details of the driver module to infer types;
- for example, any polymorphic functions on lists must use monomorphic types
+ for example, any polymorphic functions must use monomorphic types
  because Reticulated does not support Python's syntax for generics.@note{@url{https://www.python.org/dev/peps/pep-0484/#generics}}
 
 
 @parag{Data Collection}
 Enumerate the configuration space and choose a random permutation of the
  enumeration.
-Optionally divide the permutation across multiple processors or machines.
+Optionally divide the permutation across identical processors or machines.
 Run the main module of the configuration a fixed number of times and record
  each running time.
 Finally, run the main module of the untyped configuration using the standard
@@ -114,7 +114,7 @@ Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} present data
 Each job that we scheduled on the cluster:
 @itemlist[#:style 'ordered
 @item{
-  reserved all processors on an arbitrary cluster node for a 24-hour span;
+  reserved all processors on one node for 24 hours;
 }
 @item{
   downloaded fresh copies of @|PYTHON|@note{@url{https://www.python.org/download/releases/3.4.3/}}
@@ -146,5 +146,3 @@ Third, we wrapped the main computation of every benchmark in a
  to record execution time (via the Python function
  @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}).
 
-The online supplement to this paper contains scripts that implement the above
- protocol, both for the Karst cluster and for a typical workstation.

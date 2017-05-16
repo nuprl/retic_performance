@@ -8,10 +8,6 @@
 ;; (The file `lang/reader.rkt` sets up the actual reader.)
 
 ;; TODO
-;; - 4.3 : costly type annotations = type annotations on methods called many times
-;; - ??? : no FUTURE TENSE
-;; - also VALIDATE with go and meteor? They're the next biggest, and will
-;;   bring us to 9 figures
 ;; - formatting variables, $ vs emph
 
 (provide
@@ -21,8 +17,28 @@
     scribble/doclang
     scriblib/figure
     scribble/example
-    scriblib/autobib
-    scribble/manual)
+    scriblib/autobib)
+  (except-out (all-from-out scribble/manual) url)
+
+  (rename-out
+   [acmart:#%module-begin #%module-begin]
+
+   [render-benchmark-name bm]
+   ;; Usage: `@bm{name}`
+   ;; Given something that uniquely identifies a benchmark, render the
+   ;;  benchmark's canonical name.
+   ;; This is essentially `tt`, but it catches typos.
+
+   [render-benchmark-names* bm*]
+   ;; Usage: `@bm*{name1 name2 ...}
+   ;; Render multiple benchmark names.
+
+   [format-url url]
+   ;; Usage: @url{URL}
+   ;;  format a URL, removes the `http://` prefix if given
+
+  )
+
   generate-bibliography
   bm-desc
 
@@ -44,6 +60,11 @@
   x-axes y-axes
   ;; Usage: @|x-axis|
   ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
+
+  mypy
+  PEP-483
+  PEP-484
+  TPPBS
 
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
@@ -92,21 +113,6 @@
   u/p-ratio
   t/u-ratio
   t/p-ratio
-
-  (rename-out
-   [acmart:#%module-begin #%module-begin]
-
-   [render-benchmark-name bm]
-   ;; Usage: `@bm{name}`
-   ;; Given something that uniquely identifies a benchmark, render the
-   ;;  benchmark's canonical name.
-   ;; This is essentially `tt`, but it catches typos.
-
-   [render-benchmark-names* bm*]
-   ;; Usage: `@bm*{name1 name2 ...}
-   ;; Render multiple benchmark names.
-
-  )
 
   EXHAUSTIVE-BENCHMARKS
   VALIDATE-BENCHMARKS
@@ -311,6 +317,7 @@
     add-between
     partition)
   racket/format
+  racket/string
   scribble/acmart
   scribble/core
   scribble/example
@@ -362,7 +369,6 @@
   10)
 
 (define MAX-OVERHEAD
-  ;; TODO maybe MAX-OVERHEAD should be parameter?
   (*OVERHEAD-MAX*))
 
 (define EXACT-RUNTIME-XSPACE
@@ -526,13 +532,14 @@
                         (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "⊥"] [else (error 'get-number)]))])
      (λ (name pre-bm* make-descr)
        (define bm-name* (map render-benchmark-name pre-bm*))
-       (elem (bold (format "Type ~a " (get-number)))
+       (define perf-type (format "Type ~a " (get-number)))
+       (elem (bold perf-type)
              ~ ~
              (emph "(" name ")") ": "
              (make-descr (integer->word (length pre-bm*)))
              "\n"
              "\n"
-             (elem "Applies to " (authors* bm-name*) ".")))))
+             (list "The " (authors* bm-name*) " benchmarks are of " perf-type ".")))))
 
 (define (format-deps dep*)
   (if (null? dep*)
@@ -644,6 +651,16 @@
 (define y-axis
   (axis "y"))
 
+(define (format-url str)
+  (hyperlink str
+    (url
+      (remove-prefix "www."
+        (remove-prefix "http[^:]*://" str)))))
+
+(define (remove-prefix rx str)
+  (define m (regexp-match (string-append "^" rx "(.*)$") str))
+  (if m (cadr m) str))
+
 (define (percent-slower-than-typed pre-bm)
   (define pi (pi:benchmark->performance-info (->benchmark pre-bm)))
   (define total (pi:num-configurations pi))
@@ -653,6 +670,18 @@
 (define (Integer->word i)
   (integer->word i #:title? #t))
 
+(define PEP-483
+  (hyperlink "https://www.python.org/dev/peps/pep-0483/" (emph "PEP 483: The Theory of Type Hints")))
+
+(define PEP-484
+  (hyperlink "https://www.python.org/dev/peps/pep-0484/" (emph "PEP 484: Type Hints")))
+
+(define mypy
+  (hyperlink "http://mypy-lang.org/" (emph "Mypy")))
+
+(define TPPBS
+  (hyperlink "http://pyperformance.readthedocs.io/" "The Python Performance Benchmark Suite"))
+
 ;; =============================================================================
 
 (module+ test
@@ -661,42 +690,15 @@
 
   (require
     rackunit
-    racket/set
-    (only-in gm-dls-2017/script/benchmark-info
-      benchmark-info->python-info)
-    (only-in gm-dls-2017/script/python
-      python-info->all-types
-      python-info->num-types)
-    (only-in gm-dls-2017/script/performance-info
-      unzip-karst-data
-      fold/karst))
+    racket/set)
 
   ;; ------------------------------------------------------------------
 
-  ;; TODO really make this an error
+  ;; TODO make this an error
   (define (test-error msg . arg*)
     (display "WARNING: ")
     (apply printf msg arg*)
     (newline))
-
-  (define (count-lines fn)
-    (with-input-from-file fn
-      (λ () (for/sum ((ln (in-lines))) 1))))
-
-  (define (check-karst-iterations karst-file)
-    (fold/karst karst-file
-      #:init #true
-      #:f (λ (acc cfg num-types t*)
-            (unless (>= (length t*) NUM-ITERATIONS)
-              (test-error "configuration ~a has ~a iterations, expected at least ~a iterations (in file ~a)" cfg (length t*) NUM-ITERATIONS karst-file))
-            acc)))
-
-  (define (check-fully-annotated bm)
-    (define t* (python-info->all-types (benchmark-info->python-info bm)))
-    (when (set-member? t* #f)
-      (test-error "benchmark ~a is missing some type annotation(s)" (benchmark->name bm)))
-    (when (for/or ([t (in-set t*)]) (and t (regexp-match? #rx"Dyn" t)))
-      (test-error "benchmark ~a uses the Dyn type" (benchmark->name bm))))
 
   ;; ------------------------------------------------------------------
 
@@ -712,6 +714,74 @@
     (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 19)
     (check-equal? NUM-VALIDATE-SAMPLES 7)
     (check-equal? NUM-NEW-SAMPLES 4))
+
+  (test-case "->benchmark"
+    (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))
+    (check-exn #rx"the name of a benchmark"
+      (λ () (->benchmark 'zeina)))
+    (check-exn #rx"string?"
+      (λ () (->benchmark 8))))
+
+  (test-case "authors"
+    (check-exn exn:fail:contract?
+      (λ () (authors)))
+    (check-equal? (authors "john doe") "john doe")
+    (check-equal? (authors "a" "b") (list "a" " and " "b"))
+    (check-equal? (authors "a" "b" "c") (list "a" ", " "b" ", and " "c")))
+
+  (test-case "percent-slower-than-typed"
+    (check-equal? (percent-slower-than-typed "spectralnorm") 38))
+
+  (test-case "remove-prefix"
+    (check-equal?
+      (remove-prefix "hello" "hello world")
+      " world")
+    (check-equal?
+      (remove-prefix "b" (remove-prefix "a" "abc"))
+      "c")
+    (check-equal?
+      (remove-prefix "a" (remove-prefix "b" "cba"))
+      "cba"))
+)
+
+#;
+(module+ test ;; These tests are slow
+  (require
+    (only-in gm-dls-2017/script/benchmark-info
+      benchmark-info->python-info)
+    (only-in gm-dls-2017/script/python
+      python-info->all-types
+      python-info->num-types)
+    (only-in gm-dls-2017/script/performance-info
+      benchmark->performance-info
+      untyped/python-ratio
+      typed/retic-ratio
+      typed/python-ratio
+      unzip-karst-data
+      fold/karst))
+
+   ;; ------------------------------------------------------------------
+
+  (define (count-lines fn)
+    (with-input-from-file fn
+      (λ () (for/sum ((ln (in-lines))) 1))))
+
+  (define (check-karst-iterations karst-file)
+    (fold/karst karst-file
+      #:init #true
+      #:f (λ (acc cfg num-types t*)
+            (unless (>= (length t*) NUM-ITERATIONS)
+              (test-error "configuration ~a has ~a iterations, expected at least ~a iterations (in file ~a)" cfg (length t*) NUM-ITERATIONS karst-file))
+            acc)))
+
+  (define (check-fully-annotated bm)
+    (let ([t* (python-info->all-types (benchmark-info->python-info bm))])
+      (when (set-member? t* #f)
+        (test-error "benchmark ~a is missing some type annotation(s)" (benchmark->name bm)))
+      (when (for/or ([t (in-set t*)]) (and t (regexp-match? #rx"Dyn" t)))
+        (test-error "benchmark ~a uses the Dyn type" (benchmark->name bm)))))
+
+  ;; ------------------------------------------------------------------
 
   (test-case "num-iterations:exhaustive"
     (for/and ([bm (in-list EXHAUSTIVE-BENCHMARKS)])
@@ -748,22 +818,6 @@
 
     (for-each check-sample-trials (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS)))
 
-  (test-case "->benchmark"
-    (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))
-    (check-exn #rx"the name of a benchmark"
-      (λ () (->benchmark 'zeina)))
-    (check-exn #rx"string?"
-      (λ () (->benchmark 8))))
-
-  (test-case "authors"
-    (check-exn exn:fail:contract?
-      (λ () (authors)))
-    (check-equal? (authors "john doe") "john doe")
-    (check-equal? (authors "a" "b") (list "a" " and " "b"))
-    (check-equal? (authors "a" "b" "c") (list "a" ", " "b" ", and " "c")))
-
-  (test-case "percent-slower-than-typed"
-    (check-equal? (percent-slower-than-typed "spectralnorm") 38))
 
   (test-case "num-better-with-types"
     (check-equal?
@@ -772,4 +826,14 @@
 
   (test-case "fully-annotated"
     (for-each check-fully-annotated (all-benchmarks)))
+
+  (test-case "performance-ratios-product"
+    (define EPS 0.0001)
+    (for ((bm (in-list (all-benchmarks))))
+      (define pi (benchmark->performance-info bm))
+      (check-=
+        (* (typed/retic-ratio pi)
+           (untyped/python-ratio pi))
+        (typed/python-ratio pi)
+        EPS)))
 )

@@ -28,9 +28,9 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
    @|num1| originate from case studies by @citet[vksb-dls-2014],
    @;@note{@|dls-names|.}
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
-   @hyperlink["http://pyperformance.readthedocs.io/"]{The Python Performance Benchmark Suite},
+   @|TPPBS|,
    and the remaining @|num3| originate from open-source programs.
-  Every list of the benchmarks in this section is ordered first by the
+  Every listing of the benchmarks in this section is ordered first by the
    benchmarks' origin and second by the benchmark's names.
 })
 @; REMARK: original authors helpful with (code, test input, comments)
@@ -68,9 +68,9 @@ The following descriptions credit the benchmarks' original authors,
   @lib-desc["shlex"]{Split host names from an input string}
   @lib-desc["socket"]{Basic socket operations}
 ]]{
-  Generates an @hyperlink["https://www.ansible.com/"]{@tt{ansiable}} inventory
-  file from an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
-  file.
+  Converts an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
+  file to an inventory file for the
+  @hyperlink["https://www.ansible.com/"]{@emph{Ansiable}} framework.
   @; 1900 iterations
 }
 
@@ -232,7 +232,9 @@ The following descriptions credit the benchmarks' original authors,
 @list[
   @lib-desc["os"]{path join}
 ]]{
-  Implements the Ford-Fulkerson max flow algorithm@~cite[ff-cjm-1956].
+  Implements the Ford-Fulkerson max flow algorithm. 
+  @; no longer needs citation
+  @;@~cite[ff-cjm-1956].
   @; 1 iteration
 }
 
@@ -254,10 +256,11 @@ The following descriptions credit the benchmarks' original authors,
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
-The table in @figure-ref{fig:ratio} lists data for two performance ratios.
+The table in @figure-ref{fig:ratio} lists three performance ratios.
 The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python.
 The @emph[t/u-ratio] reports the overhead of the fully-typed
  configuration relative to the untyped configuration.
+The product of these ratios is the @emph[t/p-ratio].
 
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
@@ -290,7 +293,7 @@ This data suggests that migrating an arbitrary
 @; - but just running under retic should tell you what to expect
 
 
-@section{Overhead Plots}
+@section[#:tag "sec:overhead"]{Overhead Plots}
 @; these plots are the main event!
 @; - given "any program any configuration", what is probability of OK perf?
 @; - how does prob. change as "OK" changes?
@@ -312,12 +315,8 @@ The @|x-axes| are log-scaled to focus on low overheads;
 
 The heading above the plot for a given benchmark lists the benchmark's name,
  @|t/p-ratio| (in parentheses), and number of configurations.
-Note that the @|t/p-ratio| is equal to the product of the @|u/p-ratio| and
- @|t/u-ratio| reported in @figure-ref{fig:ratio}.
-The number of configurations is equal to @$|{2^{F+C}}|,
- where @${F} and @${C} denote the corresponding values from
- @figure-ref{fig:static-benchmark}.
-@; TODO clarify "corresponding values"? Could say, "denote the number of functions (F) and number of classes (C) reported in ....
+Note that the number of configurations is equal to @$|{2^{F+C}}|,
+ with @${F} and @${C} from @figure-ref{fig:static-benchmark}.
 
 @parag{How to Read the Overhead Plots}
 @; HMMMM "are" is NOT correct, but it sticks.
@@ -371,12 +370,13 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
 The only exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
-This apparent improvement, however, is due to a bug in the implementation
- of Reticulated.
-@Section-ref{sec:pathologies} explains the issue in detail.
+This speedup occurs because of an unsoundness in the implementation of Reticulated;
+ in short, the implementation does not check the contents of tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}.}
+@; better to say: "does not check _at runtime_" ?
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise, since Reticulated only adds runtime checks to Python code.
+This is no surprise, since Reticulated adds runtime checks to Python code for
+ each type annotation.
 
 Eleven benchmarks have smooth slopes.
 The plots for the other seven benchmarks have flat segments because those
@@ -398,8 +398,7 @@ Since adding type annotations to a Reticulated program can change its
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
-In @section-ref{sec:method} terms, the cost model is @${P(c) \propto @gnorm{c}_\tau}.
-@; TOO CUTE
+@;In @section-ref{sec:method} terms, the cost model is @${P(c) \propto @gnorm{c}_\tau}.
 
 @Figure-ref{fig:exact} contains one green point for every run of every
  configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
@@ -459,10 +458,12 @@ The variations between individual plots fall into four overlapping categories:
   (λ (num-in-category) @elem{
     In @|num-in-category| benchmarks, there are some configurations
      that run faster than similar configurations with fewer typed components.
-    These speedups are due to one of two causes: either Reticulated
-     added unnecessary checks to the less-typed configurations, or Reticulated
-     unsoundly removed necessary checks based on the type annotations.
-    See @section-ref{sec:pathologies} for details.
+    These speedups happen for one of two reasons: either because of duplicate
+     checks on dynamically-typed receivers of method calls,
+     or because of omitted checks on values annotated with tuple types.
+    The former is due to an overlap between Reticulated's semantics and
+     Python's dynamic typing@~cite[vksb-dls-2014].
+    The latter is due to a bug in the implementation (see @section-ref{sec:overhead}).
 })]
 
 
