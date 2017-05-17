@@ -78,7 +78,7 @@ Let @${d} be a predicate that checks whether a particular configuration of
  a fixed program is @deliverable{D}.
 This predicate defines a Bernoulli random variable @${X_d} with parameter
  @${p}, where @${p} is the true proportion of @deliverable{D} configurations.@note{
-  In particular, @${X_d = } @racket[(lambda () (if (d (random-config)) 1 0))]}
+  In particular, @${X_d = } @RACKET[(λ () (if ((UNSYNTAX @${d}) (random-config)) 1 0))].}
 Consequently, the expected value of this random variable is @${p}.
 The law of large numbers therefore states that the average of infinitely
  many samples of @${X_d} converges to @${p}, the true proportion
