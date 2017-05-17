@@ -134,7 +134,9 @@
       (plot-pict
         (list
           (make-count-configurations-function pi)
-          (make-dot pi typed/python-ratio)
+          (if #f ;(*OVERHEAD-SHOW-RATIO*)
+            (make-dot pi typed/python-ratio)
+            '())
           (tick-grid))
         #:x-min 1
         #:x-max (*OVERHEAD-MAX*)
@@ -232,7 +234,7 @@
 
 (define (maybe-freeze p)
   (if (*OVERHEAD-FREEZE-BODY*)
-    (freeze p)
+    (freeze p) ;; TODO higher-resolution
     p))
 
 (define (configuration-points p**)

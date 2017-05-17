@@ -82,7 +82,8 @@
   (define p*
     (parameterize ([*OVERHEAD-PLOT-WIDTH* (exact-floor (/ (- OVERHEADS-WIDTH OVERHEADS-HSPACE) NUM-COLUMNS))]
                    [*OVERHEAD-PLOT-HEIGHT* H]
-                   [*OVERHEAD-SHOW-RATIO* 'short]
+                   [*OVERHEAD-SHOW-RATIO* #f]
+                   [*OVERHEAD-SAMPLES* 200]
                    [*OVERHEAD-FREEZE-BODY* freeze?]
                    [*LEGEND-VSPACE* 2]
                    [*LEGEND-HSPACE* (if (string=? descr "samples") 1 4)]
