@@ -1,19 +1,33 @@
-#lang gm-dls-2017 @title[#:tag "sec:method"]{Adapting Takikawa et
-al.'s Method} @section{Takikawa et al.'s method}
+#lang gm-dls-2017
+
+@title[#:tag "sec:method"]{Adapting Takikawa et al.'s Method}
+@section{Takikawa et al.'s method}
+
+Takikawa @|etal| introduce a method for evaluating the performance of
+a gradual type system. The method is based on the premise that a
+performance evaluation cannot assume how developers will apply gradual
+typing nor can it assume the performance requirements the developers
+have.
+Therefore, the method considers all ways of adding types to a
+program and reports the proportion of these @emph{configurations} that meet some
+performance criterion.
+If a large proportion of the
+configurations meet the performance
+criterion, gradual typing may have
+a high chance of being performant.
+
+Concretely, Takikawa @|etal| applied the method to Typed Racket.
+Each module in a Typed Racket program may be typed or untyped,
+thus for a program with @${M} modules there are @${2^M} ways of
+choosing which modules to type. The performance criterion
+they use is the @emph{overhead} relative to Racket.
 
 
-Takikawa et al. introduce a method for measuring the
-performance of a gradual type system. A gradual type system for a language @${L} defines a syntax for adding
-annotations to certain types of expressions which are determined by the system for @${L}. This may result in partially typed programs.
-In such programs, gradual typing aims preserve
-soundness by checking the values that flow between the typed and
-untyped regions of the program.
+Reticulated Python allows fine-grained mixing of typed and untyped code,
+but the method generalizes.
+????
 
-To evaluate the performance of a gradual type system, Takikawa et
-al. consider a space of configurations obtained by taking a number of
-typable components at a given granularity and generating the set of all
-possible permutations obtained by adding or removing type annotations
-from these components.
+
 
 @definition["configuration"]{Let @${P} be a program written in @${L}
 and let @${P’} be a variant of @${P} with the possible addition of type
@@ -45,10 +59,24 @@ configurations are all programs that are at most @${20\%} slower than
 the original untyped programs.
 
 We also consider the performance of each configuration relative to its
-typed/untyped ratio. @definition["typed/untyped ratio"]{The
-typed/untyped ratio of a performance lattice is the time needed to run
-the top configuration divided by the time needed to run the bottom
-configuration.}
+typed/untyped ratio.
+
+@definition["typed/untyped Retic ratio"]{The
+typed/untyped Retic ratio of a configuration space is the time needed to run
+the fully typed configuration divided by the time needed to run the untyped Reticulated configuration.
+}
+
+@definition["typed/Python ratio"]{
+The typed/Python ratio of a configuration space is the time needed to run
+the fully typed configuration divided by the time needed to run the Python configuration.
+}
+
+@definition["untyped Retic/Python"]{
+The untyped Retic/Python ratio of a configuration space is the time needed to run
+the untyped Reticulated configuration divided by the time needed to run the Python configuration.
+}
+
+
 
 This method could not be applied Reticulated directly. Specifically,
 in Reticulated, we are allowed to type all components of a function
@@ -76,11 +104,11 @@ section, we describe the adapted evaluation process in detail.
 @section[#:tag "sec:protocol"]{Protocol}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
- performance of Reticulated at the granularity of function and class definitions.
-One type conversion step in this evaluation consists of annotating the
- signature of a function (or method), or annotating all fields of one class.
-The evaluation furthermore adheres to the following protocols
- for @emph{benchmark creation} and @emph{data collection}.
+ performance of Reticulated at the granularity of function and class
+ definitions; more precisely, one component in this experiment is
+ either one function (or method) or all fields of one class.  The
+ evaluation furthermore adheres to the following protocols for
+ @emph{benchmark creation} and @emph{data collection}.
 
 @parag{Benchmark Creation}
 Given a Python program, first build a driver module that performs some
