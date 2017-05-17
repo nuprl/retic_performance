@@ -61,11 +61,6 @@
   ;; Usage: @|x-axis|
   ;; Renders "x-axis", with or without italics on the `x` (depends what looks better)
 
-  mypy
-  PEP-483
-  PEP-484
-  TPPBS
-
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
 
@@ -303,6 +298,15 @@
   ;;  where `section-name` appears in a `@section[#:tag section-name]{...}` form
   ;; Renders as "section N", where `N` is the number assigned to the section
   ;;  labeled with `section-name`.
+
+  ;; --------------------------------------------------------------------------
+  ;; hyperlinks
+
+  mypy
+  PEP-483
+  PEP-484
+  TPPBS
+  time.process_time
 )
 
 (require
@@ -677,6 +681,9 @@
 (define (Integer->word i)
   (integer->word i #:title? #t))
 
+;; =============================================================================
+;; Hyperlinks (i.e. non-academic references
+
 (define PEP-483
   (hyperlink "https://www.python.org/dev/peps/pep-0483/" (emph "PEP 483: The Theory of Type Hints")))
 
@@ -688,6 +695,9 @@
 
 (define TPPBS
   (hyperlink "http://pyperformance.readthedocs.io/" "The Python Performance Benchmark Suite"))
+
+(define time.process_time
+  (hyperlink "https://docs.python.org/3/library/time.html#time.process_time" (tt "time.process_time()")))
 
 ;; =============================================================================
 

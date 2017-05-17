@@ -172,7 +172,7 @@ The following descriptions credit the benchmarks' original authors,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Solves the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html#meteor}}
+  Solves the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html}}
   @; 1 iterations (finds at most 6,000 solutions)
 }
 
@@ -371,7 +371,7 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
 The only exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
 This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not check the contents of tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}.}
+ in short, the implementation does not check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
 @; better to say: "does not check _at runtime_" ?
 
 None of the configurations in the experiment run faster than the Python baseline.

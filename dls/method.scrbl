@@ -93,7 +93,7 @@ When possible, use existing type annotations and comments to infer
  the fully-typed configuration of the benchmark.
 When necessary, use details of the driver module to infer types;
  for example, any polymorphic functions must use monomorphic types
- because Reticulated does not support Python's syntax for generics.@note{@url{https://www.python.org/dev/peps/pep-0484/#generics}}
+ because Reticulated does not support polymorphism.
 
 
 @parag{Data Collection}
@@ -126,7 +126,7 @@ Each job:
 }
 ]
 Cluster nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
- 8-core processors, 32 GB of RAM, and 250 GB of local disk storage.@note{@url{https://kb.iu.edu/d/bezu#overview}}
+ 8-core processors, 32 GB of RAM, and 250 GB of local disk storage.
 
 Three details of the Karst protocol warrant further attention.
 First, nodes selected a random configuration by reading from a
@@ -139,5 +139,4 @@ After a node selected a configuration to run, it copied the relevant files
  to private storage before running the main module.
 Third, we wrapped the main computation of every benchmark in a
  @tt{with} statement@note{@url{https://www.python.org/dev/peps/pep-0343/}}
- to record execution time (via the Python function
- @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}). 
+ to record execution time (via the Python function @|time.process_time|).

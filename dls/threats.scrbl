@@ -8,10 +8,9 @@ This section spells out the details.
 @section{Measurement Error}
 @; - did some preliminary measurements to see if different nodes or
 @;   different usage patterns
-@; - ran 40 iterations to control
 
 The data are timings recorded on the Karst at Indiana University cluster
- using the Python function @hyperlink["https://docs.python.org/3/library/time.html#time.process_time"]{@tt{time.process_time()}}.
+ using the Python function @|time.process_time|.
 Assuming @tt{process_time()} is accurate, the cluster infrastructure is prone
  to at least two sources of error.
 First, cluster nodes may have non-uniform performance despite being identical
