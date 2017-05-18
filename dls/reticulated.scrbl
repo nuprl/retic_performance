@@ -4,8 +4,8 @@
 Reticulated Python is a gradual typing system for
 Python@~cite[vksb-dls-2014].
 In Reticulated, programmers can express types using Python's syntax for
- @hyperlink["www.google.com"]{function annotations} and
- @hyperlink["www.google.com"]{decorators}.
+ @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
+ @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{decorators}.
 Reticulated statically checks the annotations and
  outputs a Python program containing casts and checks designed to enforce
  type soundness.
