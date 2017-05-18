@@ -147,7 +147,7 @@ The exact amount of time, as well as the quality of the estimate, depends
 
 @; continues the evaluation started in section 4
 @(let* ([DLS '(aespython stats)]
-        [NEW '(Evolution sample_fsm)]) @list{
+        [NEW '(sample_fsm)]) @list{
    This section presents the results of an @defn{approximate} performance
     evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs with
     large configuration spaces.
@@ -157,8 +157,6 @@ The exact amount of time, as well as the quality of the estimate, depends
 
    @string-titlecase[@integer->word[(length DLS)]] of these programs,
     @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
-   The other @integer->word[(length NEW)], @bm*[NEW], originate from open-source
-    programs.
    The following descriptions
     provide more information about the benchmarks' size and purpose.
 })
@@ -167,21 +165,6 @@ The exact amount of time, as well as the quality of the estimate, depends
 @; --- WARNING: the order of benchmarks matters!
 @; ---  Do not re-order without checking ALL PROSE in this file
 @; -----------------------------------------------------------------------------
-
-@bm-desc["Evolution"
-@authors["Maha Elkhairy" "Kevin McDonough" "Zeina Migeed"]
-""
-@list[
-  @(let ([num-python-files-in-both-dir 90] @;; ./find "../benchmarks/Evolution/both" -name "*.py" | wc -l
-         [num-test-files 21]) @;; ./find "../benchmarks/Evolution/both/evo_test" -name "*.py" | wc -l
-    @elem{@id[(- num-python-files-in-both-dir num-test-files)] untyped modules})
-]]{
-  Implements a card game.
-  The experimental modules represent the possible actions
-   that a player can take on each turn.
-  The control modules encode the players, cards, and game logic.
-  @; 20 iterations
-}
 
 @bm-desc["sample_fsm"
 @authors["Linh Chi Nguyen"]
