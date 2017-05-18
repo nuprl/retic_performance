@@ -57,7 +57,7 @@ These pervasive checks implement a tag-level notion of soundness that protects
 @python|{
 import math
 
-@fields({'dollars': Int, 'cents':Int})
+@fields({"dollars": Int, "cents":Int})
 class Cash:
   def __init__(self:Cash, d:Int, c:Int)->Void:
     self.dollars = d
