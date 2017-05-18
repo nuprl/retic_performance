@@ -50,7 +50,7 @@ In any event, there are two groups of modules:
 }
 
 The experimental modules and granularity of type annotations define the
- @emphconfigurations} of a fully-typed program.
+ @emph{configurations} of a fully-typed program.
 What remains is to measure the performance of these configurations and
  report their overhead relative to the performance a developer would get
  by opting out of gradual typing.
@@ -79,10 +79,11 @@ After measuring the performance ratio of each configuration, an
 @section[#:tag "sec:protocol"]{Protocol}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
- performance of Reticulated on the function and class level; more precisely, one component in this experiment is
- either one function (or method) or all fields of one class.  The
- evaluation furthermore adheres to the following protocols for
- @emph{benchmark creation} and @emph{data collection}.
+ performance of Reticulated on the function and @emph{class-fields} level;
+ more precisely, one syntactic unit is either one function, one method, or
+ the set of all fields for one class.
+The evaluation furthermore adheres to the following protocols for
+ benchmark creation and data collection.
 
 @parag{Benchmark Creation}
 Given a Python program, we first build a driver module that performs some
@@ -102,14 +103,14 @@ When necessary, we use details of the driver module to infer types;
 We enumerate the configuration space and choose a random permutation of the
  enumeration.
 Optionally, we divide the permutation across identical processors or machines.
-Run the main module of the configuration a fixed number of times and record
+We run the main module of the configuration a fixed number of times and record
  each running time.
-Finally, we run the main module of the untyped configuration using the standard
- Python interpreter.
+Finally, we run the main module of the untyped configuration using the
+ @|PYTHON| interpreter.
 
 
-@parag{Details of the Evaluation} All data in this paper was produced by jobs sent
- to the @emph{Karst at Indiana University} high-throughput computing cluster.@note{@url{https://kb.iu.edu/d/bezu}}
+@parag{Details of the Evaluation} All data in this paper was produced by jobs we sent
+ to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} high-throughput computing cluster.
 Each job:
 @itemlist[#:style 'ordered
 @item{
@@ -135,10 +136,9 @@ First, nodes selected a random configuration by reading from a
  text file that contained a permutation of the configuration space.
 This text file was stored on a dedicated machine.
 Second, the same dedicated machine that stored the text file also stored
- an explicit representation of the configuration space of each @emph{module}
- of each benchmark.
+ all configurations for each @emph{module} of each benchmark.
 After a node selected a configuration to run, it copied the relevant files
  to private storage before running the main module.
 Third, we wrapped the main computation of every benchmark in a
- @tt{with} statement@note{@url{https://www.python.org/dev/peps/pep-0343/}}
- to record execution time (via the Python function @|time.process_time|).
+ @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{@tt{with} statement}
+ that recorded execution time using the Python function @|time.process_time|.
