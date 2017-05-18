@@ -1,87 +1,72 @@
 #lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Gradual Typing}
 
-Reticulated Python is a gradual typing system by Vitousek et al. for
-Python 3. In Reticulated, programmers can express types according to
-PEP 484 @note{@url{https://www.python.org/dev/peps/pep-0484/}}.
-Reticulated outputs a Python program with checks and
-casts that aim to guarantee type soundness.
- In general, soundness means that if a program is well-typed, one of
-three outcomes occurs@~cite[tfffgksst-snapl-2017]: the program
-terminates with the expected type, fails to terminate, or throws an
-exception from a well-defined set. For partially typed programs,
-however, there is a fourth outcome addressing the interaction between
-the typed and untyped parts of the code. The program can throw an
-exception due to one of the boundaries between the typed and untyped
-code. Reticulated enforces the first three statements by statically
-checking the fully typed parts of the programs, and the fourth
-statement by inserting runtime checks into various parts of the
-program.
+Reticulated Python is a gradual typing system for
+Python@~cite[vksb-dls-2014].
+In Reticulated, programmers can express types using Python's syntax for
+ @hyperlink["www.google.com"]{function annotations} and
+ @hyperlink["www.google.com"]{decorators}.
+Reticulated statically checks the annotations and
+ outputs a Python program containing casts and checks designed to enforce
+ type soundness.
 
-Consider the following class definition in Reticulated:
+In a statically typed language, type soundness implies that if a program
+ is well-typed, running the program will result in one of three possible
+ outcomes:
+ the program (1) evaluates to a value of the expected type,
+ (2) diverges, or (3) throws an exception from a well-defined set.
+For partially-typed programs, in which typed and untyped code interact,
+ there is a fourth outcome: the program can (4) throw an exception
+ due to a boundary between typed and untyped code@~cite[tfffgksst-snapl-2017].
+Reticulated enforces the first three conditions by static type-checking,
+ and the fourth by runtime checks.
 
+@Figure-ref{fig:cash} presents a well-typed class definition.
+If we add the method call @pythoninline{c1.add_cash(20)} to the program,
+ then Reticulated raises a static type error because the integer @${20}
+ is not an instance of the @pythoninline{Cash} class.
+Contrast this to an ill-typed call that occurs in a dynamically-typed context:
+
+@python|{
+def dyn_add_cash(c):
+  c1.add_cash(c)
+
+dyn_add_cash(c1,20)
+}|
+
+The variable @pythoninline{c} does not have a type annotation, so Reticulated
+ cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
+ the assumptions of the @pythoninline{add_cash} method.
+To preserve type soundness, Reticulated rewrites the method to defensively
+ check its arguments; in particular, Reticulated adds one structural type checks
+ for each argument of @pythoninline{add_cash}.
+@; .... it's ovbious that both need to be checked? (receiver could be mutated, could also just call like `Cash.add_cash(0,0`)
+At runtime, the check for the @pythoninline{other} parameter will dynamically
+ halt the program before the call @pythoninline{dyn_add_cash(c1, 20)} causes
+ the program to go wrong.
+
+This example demonstrates how Reticulated rewrites function and method bodies
+ to enforce their domains.
+Reticulated inserts similar checks around
+  function calls, to enforce the declared return type, and
+  around reads from variables or data structures, to detect strong updates@~cite[vksb-dls-2014].
+These pervasive checks implement a tag-level notion of soundness that protects
+ typed code without inhibiting untyped code@~cite[vss-popl-2017].
+
+@figure["fig:cash" "Reticulated syntax"
 @python|{
 import math
 
 @fields({'dollars': Int, 'cents':Int})
 class Cash:
-  def __init__(self:Cash, d:Int, c:Int):
+  def __init__(self:Cash, d:Int, c:Int)->Void:
     self.dollars = d
     self.cents = c
 
-  def add_cash(self:Cash, other:Cash):
+  def add_cash(self:Cash, other:Cash)->Void:
     self.dollars += other.dollars
     self.cents += other.cents
 
 c1 = Cash(1000, 0)
-}|
+}|]
 
-
-If we add the following expression to our fully typed code:
-@code{c1.add_cash(20)}, Reticulated terminates with a static type
-error because @code{add_cash} is called with an argument of type
-@code{int}, while it expects an instance of @code{Cash}.Now
-contrast this situation with one where we add a @code{main} function:
-
-@python|{
-
-def main(cash1, cash2):
-  cash1.add_cash(cash2)
-
-main(c1,20)
-}|
-
-This program is no longer fully typed. Furthermore, the call
-@code{main(c1, 20)} does not match the signature of @code{add_cash}
-because @code{add_cash} expects @code{other} to be an instance of
-@code{Cash}. Normally in Python3, the program would terminate the program
-with an attribute error when we try to extract the field
-@code{dollars} from the argument of type @code{int}.
-Reticulated aims to catch such problems earlier. In particular,
-Reticulated inserts the following dynamic checks:
-@itemlist[#:style 'ordered
-@item{
-A check in @code{add_cash}, for each class field
-invoked within the function body to verify its type, in case they were
-mutated at some point in the program.
-}
-@item{
-A check in @code{add_cash} that verifies that the function
-arguments are of the correct type.
-}
-@item{
-A check in @code{add_cash} to verify that the return value is a
-@code{Cash}.
-}
-@item{
-A check at the call site @code{main(c1,20)} that verifies that correctness of the
-output type of @code{main}.
-}]
-
-since @code{20} is not an instance of @code{Cash}, check #2 should
-fail and should point the user to the call site
-@code{cash1.add_cash(cash2)}.
-
-These checks are only related to @code{add_cash}. Further checks are
-inserted for other cases. A full list of sites where checks are
-inserted can be found at@~cite[vksb-dls-2014].
