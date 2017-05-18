@@ -4,34 +4,27 @@
 
 Takikawa @|etal| introduce a method for evaluating the performance of
 a gradual type system.
-The method is based on two fundamental limitations: a performance evaluation cannot assume
+The method is based on the idea that a performance evaluation cannot assume
 how developers will apply gradual typing, nor can it assume that all developers
 have identical performance requirements.
 Therefore, the method considers all @emph{configurations} that a developer
-can obtain by adding types to a program in fixed-size increments.
-It reports the overhead of these configurations relative to the original,
- untyped program.
+can obtain by adding types to a program in increments and reports the overhead of these configurations relative to the original, untyped program.
 
-Concretely, Takikawa @|etal| apply the method to Typed Racket.
-Each module in a Typed Racket program may be typed or untyped,
- thus a @emph{fully-typed} program with @${M} modules defines a space
+Takikawa @|etal| apply the method to Typed Racket where
+each module in a Typed Racket program may be typed or untyped.
+Thus a @emph{fully-typed} program with @${M} modules defines a space
  of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
 Takikawa @|etal| measure the overhead of these configurations relative to
  the fully-untyped configuration and plot how the proportion of so-called
  @emph{@deliverable{D}} configurations varies as developers replace the
- parameter @${D} with the worst-case performance overhead they are able to tolerate.
+ parameter @${D} with the worst-case performance overhead they are willing to tolerate.
 
 @section{Adapting Takikawa et al.'s Method}
 
 Reticulated supports fine-grained combinations of typed and untyped code.
-In principle, one could apply the Takikawa method directly to Reticulated,
- but the results of such an evaluation may not be representative of developers'
- experience.
-The other extreme is for an evaluation to measure all configurations that a
+One may try to apply the Takikawa method directly to Reticulated. In that case, the evaluation should measure all configurations that a
  developer can obtain by typing a single function parameter, function return,
- or class field.
-Neither alternative is practical, thus a performance evaluation
- must define its @emph{granularity}:
+ or class field. This would result in a large number of configurations. We begin adapting the method to Reticulated by choosing the @emph{granularity} of our evaluation.
 
 @definition["granuarity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -64,17 +57,18 @@ What remains is to measure the performance of these configurations and
 In Typed Racket, this baseline is the performance of Racket running the
  untyped configuration.
 In Reticulated, untyped variables still require runtime checks, so the
- baseline is the performance of @emph{Python} running the untyped configuration.
+ baseline is the performance of Python running the untyped configuration.
 
 @definition["performance ratio"]{
   A @emph{performance ratio} is the running time of a program
-   divided by the running time of the same program in the absense of gradual typing.
+   divided by the running time of the same program in the absence of gradual typing.
 }
 
-After measuring the performance ratio of each configuration, an experimentor
- can classify configurations by their performance.
-Since different software projects will have different performance requirements,
- a useful classifier must be parameterized.
+After measuring the performance ratio of each configuration, an
+ experimentor can classify configurations by their performance. Since
+ different software projects will have different performance
+ requirements, we choose a metric to summirize the performance
+ evaluation.
 
 @definition[@deliverable{D}]{
   For any real-valued @${D}, the proportion of @deliverable{D} configurations
