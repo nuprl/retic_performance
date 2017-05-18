@@ -7,8 +7,8 @@ The application of Takikawa et al.'s method to Reticulated appears to
  Reticulated look an order of magnitude better than those for Typed
  Racket. Appearances are deceiving, however.  Reticulated's type system is
  far less expressive than Typed Racket's. Furthermore, its error messages,
- especially for higher-order values, often fail the `` actionable''
- test. Most importantly, though, Reticulated sacrifices soundness in favor
+ especially for higher-order values, are seldom actionable.
+ Most importantly, though, Reticulated sacrifices soundness in favor
  of performance; a program of type @tt{List(String)} may print a list of
  integers---without signaling any violation.
 

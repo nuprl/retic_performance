@@ -1,10 +1,5 @@
 #lang gm-dls-2017
 @title[#:tag "sec:linear"]{Scaling the Evaluation Method}
-
-@; TODO s,t is way way way too general,
-@;  should at least bring across we're doing LINEAR sampling,
-@;  and why can't you test whether constant-factor works?
-
 @; -----------------------------------------------------------------------------
 
 Simple random sampling is a viable technique for approximating the number
@@ -13,11 +8,11 @@ In particular, a sampling protocol based on elementary
  statistics (@section-ref{sec:sampling:protocol})
  is able to reproduce the overhead plots from @figure-ref{fig:overhead}
  with a fraction of the measurements (@section-ref{sec:sampling:overhead}).
-The protocol scales to significantly larger benchmarks than the exhaustive
- technique presented in @section-ref{sec:method} (@section-ref{sec:sampling:new}).
+Furthermore, @section-ref{sec:sampling:new} demonstrates that the sampling
+ method scales to large benchmarks.
 Whereas exhaustive evaluation cannot feasibly be applied to programs containing
  tens of functions, the main bottleneck applying the sampling technique
- remains the human cost of inferring fully-typed configurations.
+ remains the human cost of ascribing types to Python programs.
 
 
 @section[#:tag "sec:sampling:protocol"]{Sampling Protocol}

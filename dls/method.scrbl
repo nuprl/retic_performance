@@ -101,7 +101,7 @@ Given a Python program, we first build a driver module that performs some
  non-trivial computation using the program.
 Second, we remove any non-determinism or unneccesary I/O actions from the program.
 Third, we define the experimental modules.
-Fourth, we infer fully-typed configurations for the experimental modules.
+Fourth, we ascribe types to the experimental modules.
 
 When possible, we use existing type annotations and comments to infer
  the fully-typed configuration of the benchmark.

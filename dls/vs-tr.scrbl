@@ -36,16 +36,11 @@ All three factors affect both programmers and performance.
 @(define dyn* '(go pystone stats take5))
 @; TODO add better in-file evidence
 
-@Integer->word[(length dyn*)] of our benchmarks use type @tt{Dyn} because
+@Integer->word[(length dyn*)] of our benchmarks resort to dynamic typing because
  Reticulated cannot express the desired type.
-The @bm{pystone} and @bm{stats} benchmarks use @tt{Dyn} to implement
- untagged union types.
-The @bm{go} benchmark uses @tt{Dyn} to avoid creating a recursive class type.
-Lastly, one function in the @bm{take5} benchmark uses @tt{Dyn} because it accepts
- optional arguments.
-@;@note{The implementation of Reticulated currently ignores
-@; the types on functions that use optional arguments, argument lists, and/or keyword arguments.
-@; Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
+The @bm{pystone} and @bm{stats} benchmarks require union types.
+The @bm{go} benchmark contains a recursive class type.
+Lastly, one function in the @bm{take5} benchmark accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
 These cases represent idiomatic Python code; indeed, @|PEP-484|
  specifies syntax for generics, untagged union types, recursive types, optional
  arguments, and keyword arguments.
