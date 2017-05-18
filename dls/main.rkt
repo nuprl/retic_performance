@@ -518,10 +518,10 @@
 (define (definition term . defn*)
   (make-paragraph plain
     (list
-      (linebreak)
+      (exact "\\vspace{1ex}\n")
       (bold "Definition")
       (cons (element #f (list " (" (emph term) ") ")) defn*)
-      (linebreak))))
+      (exact "\\vspace{1ex}\n"))))
 
 (define (defn term)
   term)
