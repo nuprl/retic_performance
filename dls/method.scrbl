@@ -4,14 +4,14 @@
 
 Takikawa @|etal| introduce a method for evaluating the performance of
 a gradual type system.
-The method is based on the idea that a performance evaluation cannot assume
+The method is based on the premise that a performance evaluation cannot assume
 how developers will apply gradual typing, nor can it assume that all developers
 have identical performance requirements.
-Therefore, the method considers all @emph{configurations} that a developer
-can obtain by adding types to a program in increments and reports the overhead of these configurations relative to the original, untyped program.
+Therefore, the method considers all possible configurations that a developer
+can obtain by incrementally adding types and reports the overhead of these configurations relative to the original, untyped program.
 
-Takikawa @|etal| apply the method to Typed Racket where
-each module in a Typed Racket program may be typed or untyped.
+Takikawa @|etal| apply the method to Typed Racket.
+Each module in a Typed Racket program may be typed or untyped.
 Thus a @emph{fully-typed} program with @${M} modules defines a space
  of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
 Takikawa @|etal| measure the overhead of these configurations relative to
@@ -22,9 +22,9 @@ Takikawa @|etal| measure the overhead of these configurations relative to
 @section{Adapting Takikawa et al.'s Method}
 
 Reticulated supports fine-grained combinations of typed and untyped code.
-One may try to apply the Takikawa method directly to Reticulated. In that case, the evaluation should measure all configurations that a
- developer can obtain by typing a single function parameter, function return,
- or class field. This would result in a large number of configurations. We begin adapting the method to Reticulated by choosing the @emph{granularity} of our evaluation.
+If we try to apply the Takikawa method directly to Reticulated, we would take more time than the universe has left.
+Instead of taking all combinations resulting from typing single function parameters, function returns,
+or class fields, we choose a coarser @emph{granularity} for our evaluation.
 
 @definition["granuarity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -36,13 +36,13 @@ For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
 The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
 
-Once the granularity is fixed, a performance evaluation must define the programs
+Once the granularity is fixed, a performance evaluation defines the programs
  that it will ascribe types to and measure.
 Such programs may depend on libraries that a developer does not
  have access to.
 An evaluator may also wish to measure the effect of gradual typing on a subset
  of the modules in a large program.
-In any event, a performance evaluation must distinguish two groups of modules:
+In any event, there are two groups of modules:
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
@@ -50,7 +50,7 @@ In any event, a performance evaluation must distinguish two groups of modules:
 }
 
 The experimental modules and granularity of type annotations define the
- @emph{configurations} of a fully-typed program.
+ @emphconfigurations} of a fully-typed program.
 What remains is to measure the performance of these configurations and
  report their overhead relative to the performance a developer would get
  by opting out of gradual typing.
@@ -67,8 +67,7 @@ In Reticulated, untyped variables still require runtime checks, so the
 After measuring the performance ratio of each configuration, an
  experimentor can classify configurations by their performance. Since
  different software projects will have different performance
- requirements, we choose a metric to summirize the performance
- evaluation.
+ requirements, we summarize the overall performance with a parameterized metric. 
 
 @definition[@deliverable{D}]{
   For any real-valued @${D}, the proportion of @deliverable{D} configurations
@@ -80,33 +79,32 @@ After measuring the performance ratio of each configuration, an
 @section[#:tag "sec:protocol"]{Protocol}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
- performance of Reticulated at the granularity of function and class
- definitions; more precisely, one component in this experiment is
+ performance of Reticulated on the function and class level; more precisely, one component in this experiment is
  either one function (or method) or all fields of one class.  The
  evaluation furthermore adheres to the following protocols for
  @emph{benchmark creation} and @emph{data collection}.
 
 @parag{Benchmark Creation}
-Given a Python program, first build a driver module that performs some
+Given a Python program, we first build a driver module that performs some
  non-trivial computation using the program.
-Second, remove any non-determinism or unneccesary I/O actions from the program.
-Third, define the experimental modules.
-Fourth, infer fully-typed configurations for the experimental modules.
+Second, we remove any non-determinism or unneccesary I/O actions from the program.
+Third, we define the experimental modules.
+Fourth, we infer fully-typed configurations for the experimental modules.
 
-When possible, use existing type annotations and comments to infer
+When possible, we use existing type annotations and comments to infer
  the fully-typed configuration of the benchmark.
-When necessary, use details of the driver module to infer types;
+When necessary, we use details of the driver module to infer types;
  for example, any polymorphic functions must use monomorphic types
  because Reticulated does not support polymorphism.
 
 
 @parag{Data Collection}
-Enumerate the configuration space and choose a random permutation of the
+We enumerate the configuration space and choose a random permutation of the
  enumeration.
-Optionally divide the permutation across identical processors or machines.
+Optionally, we divide the permutation across identical processors or machines.
 Run the main module of the configuration a fixed number of times and record
  each running time.
-Finally, run the main module of the untyped configuration using the standard
+Finally, we run the main module of the untyped configuration using the standard
  Python interpreter.
 
 
