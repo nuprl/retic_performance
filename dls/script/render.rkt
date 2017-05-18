@@ -132,10 +132,10 @@
       (python-info->num-classes py)))))
 
 (define RATIOS-TITLE-TOP*
-  (map bold '("" "untyped /" "typed /" "  typed /")))
+  (map bold '("" "retic /" "typed /" "  typed /")))
 
 (define RATIOS-TITLE-BOT*
-  (map bold '("Benchmark" "python" "untyped" "  python")))
+  (map bold '("Benchmark" "python" "retic" "  python")))
 
 (define (render-ratios-table bm*)
   (define name* (map benchmark->name bm*))

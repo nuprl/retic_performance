@@ -599,10 +599,10 @@
         (lib name "https://www.google.com"))))
 
 (define u/p-ratio
-  "untyped/python ratio")
+  "retic/python ratio")
 
 (define t/u-ratio
-  "typed/untyped ratio")
+  "typed/retic ratio")
 
 (define t/p-ratio
   "typed/python ratio")
