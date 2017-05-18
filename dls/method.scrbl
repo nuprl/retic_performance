@@ -16,15 +16,19 @@ Thus a @emph{fully-typed} program with @${M} modules defines a space
  of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
 Takikawa @|etal| measure the overhead of these configurations relative to
  the fully-untyped configuration and plot how the proportion of so-called
- @emph{@deliverable{D}} configurations varies as developers replace the
- parameter @${D} with the worst-case performance overhead they are willing to tolerate.
+ @emph{@deliverable{D}} configurations varies as developers instantiate the
+ parameter @${D} with the highest performance overhead they can tolerate.
+
 
 @section{Adapting Takikawa et al.'s Method}
 
 Reticulated supports fine-grained combinations of typed and untyped code.
-If we try to apply the Takikawa method directly to Reticulated, we would take more time than the universe has left.
-Instead of taking all combinations resulting from typing single function parameters, function returns,
-or class fields, we choose a coarser @emph{granularity} for our evaluation.
+It would be impractical to directly apply the Takikawa method; measuring all
+configurations would take more time than the universe has left.
+It would also be impractical ignore the fine granularity of Reticulated and
+ apply the module-level protocol that @citet[takikawa-popl-2016] used for Typed Racket.
+The practical choice lies somewhere in between, and depends on the size of the
+ programs at hand and computing resources available.
 
 @definition["granuarity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -35,14 +39,12 @@ For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
  of modules.
 The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
+@Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity used in this paper.
 
-Once the granularity is fixed, a performance evaluation defines the programs
- that it will ascribe types to and measure.
-Such programs may depend on libraries that a developer does not
- have access to.
-An evaluator may also wish to measure the effect of gradual typing on a subset
- of the modules in a large program.
-In any event, there are two groups of modules:
+Once the granularity is fixed, the second step in applying the method is to
+ ascribe types to representative programs.
+A potential complication is that such programs may depend on external libraries
+ or other modules that lie outside the scope of the evalutation.
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
@@ -50,7 +52,16 @@ In any event, there are two groups of modules:
 }
 
 The experimental modules and granularity of type annotations define the
- @emph{configurations} of a fully-typed program.
+ configurations of a fully-typed program.
+
+@definition["configurations"]{
+  Let @${P_1 \rightarrow_1 P_2} if and only if @${P_2} can be obtained from
+   @${P_1} by annotating one syntactic unit in an experimental module.
+  Let @${P_1 \sqsubseteq P_2} be the reflexive, transitive closure of this relation.
+  The @emph{configurations} of a fully-typed program @${P^\tau} are all
+   programs @${P} such that @${P \sqsubseteq P^\tau}.
+}
+
 What remains is to measure the performance of these configurations and
  report their overhead relative to the performance a developer would get
  by opting out of gradual typing.
@@ -64,10 +75,10 @@ In Reticulated, untyped variables still require runtime checks, so the
    divided by the running time of the same program in the absence of gradual typing.
 }
 
-After measuring the performance ratio of each configuration, an
- experimentor can classify configurations by their performance. Since
- different software projects will have different performance
- requirements, we summarize the overall performance with a parameterized metric. 
+After measuring the performance ratio of each configuration, the final step
+ is to classify configurations by their performance.
+Since different applications have different performance requirements, the
+ only rational way to report performance is with a parameterized metric.
 
 @definition[@deliverable{D}]{
   For any real-valued @${D}, the proportion of @deliverable{D} configurations
@@ -79,7 +90,7 @@ After measuring the performance ratio of each configuration, an
 @section[#:tag "sec:protocol"]{Protocol}
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
- performance of Reticulated on the function and @emph{class-fields} level;
+ performance of Reticulated at a function and class-fields granularity;
  more precisely, one syntactic unit is either one function, one method, or
  the set of all fields for one class.
 The evaluation furthermore adheres to the following protocols for
