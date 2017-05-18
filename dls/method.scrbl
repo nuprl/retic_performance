@@ -1,104 +1,86 @@
 #lang gm-dls-2017
 
-@title[#:tag "sec:method"]{Adapting Takikawa et al.'s Method}
-@section{Takikawa et al.'s method}
+@title[#:tag "sec:method"]{Evaluation Method}
 
 Takikawa @|etal| introduce a method for evaluating the performance of
-a gradual type system. The method is based on the premise that a
-performance evaluation cannot assume how developers will apply gradual
-typing nor can it assume the performance requirements the developers
-have.
-Therefore, the method considers all ways of adding types to a
-program and reports the proportion of these @emph{configurations} that meet some
-performance criterion.
-If a large proportion of the
-configurations meet the performance
-criterion, gradual typing may have
-a high chance of being performant.
+a gradual type system.
+The method is based on two fundamental limitations: a performance evaluation cannot assume
+how developers will apply gradual typing, nor can it assume that all developers
+have identical performance requirements.
+Therefore, the method considers all @emph{configurations} that a developer
+can obtain by adding types to a program in fixed-size increments.
+It reports the overhead of these configurations relative to the original,
+ untyped program.
 
-Concretely, Takikawa @|etal| applied the method to Typed Racket.
+Concretely, Takikawa @|etal| apply the method to Typed Racket.
 Each module in a Typed Racket program may be typed or untyped,
-thus for a program with @${M} modules there are @${2^M} ways of
-choosing which modules to type. The performance criterion
-they use is the @emph{overhead} relative to Racket.
+ thus a @emph{fully-typed} program with @${M} modules defines a space
+ of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
+Takikawa @|etal| measure the overhead of these configurations relative to
+ the fully-untyped configuration and plot how the proportion of so-called
+ @emph{@deliverable{D}} configurations varies as developers replace the
+ parameter @${D} with the worst-case performance overhead they are able to tolerate.
 
+@section{Adapting Takikawa et al.'s Method}
 
-Reticulated Python allows fine-grained mixing of typed and untyped code,
-but the method generalizes.
-????
+Reticulated supports fine-grained combinations of typed and untyped code.
+In principle, one could apply the Takikawa method directly to Reticulated,
+ but the results of such an evaluation may not be representative of developers'
+ experience.
+The other extreme is for an evaluation to measure all configurations that a
+ developer can obtain by typing a single function parameter, function return,
+ or class field.
+Neither alternative is practical, thus a performance evaluation
+ must define its @emph{granularity}:
 
-
-
-@definition["configuration"]{Let @${P} be a program written in @${L}
-and let @${P’} be a variant of @${P} with the possible addition of type
-annotations. Let @${p^\tau} be a fully typed varient of @${P}.
-Then @${P' \sqsubseteq P^\tau} is a configuration of @${P}.}
-
-@definition["configuration space"]{A configuration space of a
-fully-typed configuration @${P^\tau} is the set @${\{P' \mid P'
-\sqsubseteq P^\tau\}}.  }
-
-The size of a given configuration space is
-bound by the number of locations in @${P} where the programmer may add
-a type annotation. Informally, we call this the @emph{granularity} of
-@${L^\tau}. For example, if the smallest component we can type is a
-module, then for a given program @${P} the size of the largest configuration space possible
-is @${2^m} where @${m} is the total number of modules in @${P}.
-
-Takikawa et al.'s method generates a configuration lattice, which is a way to
-visualize a configuration space @${C}. The idea is to measure all elements
-of @${C}. This step derives a performance lattice which labels
-configurations with their performance. The performance of the system
-is evaluated in a number of ways.
-
-Overhead plots show how many benchmarks are @${D}-deliverable.
-@definition["D-deliverable"]{ A configuration is @${D}-deliverable if its
-performance is no worse than a factor of @${D} slowdown compared to the
-untyped configuration.}  For example, the @${1.2}-deliverable
-configurations are all programs that are at most @${20\%} slower than
-the original untyped programs.
-
-We also consider the performance of each configuration relative to its
-typed/untyped ratio.
-
-@definition["typed/untyped Retic ratio"]{The
-typed/untyped Retic ratio of a configuration space is the time needed to run
-the fully typed configuration divided by the time needed to run the untyped Reticulated configuration.
+@definition["granuarity"]{
+  The @emph{granularity} of an evaluation is the syntactic unit at which
+   the evaluation will add or remove type annotations.
 }
 
-@definition["typed/Python ratio"]{
-The typed/Python ratio of a configuration space is the time needed to run
-the fully typed configuration divided by the time needed to run the Python configuration.
+For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
+ of modules.
+The evaluation in @citet[vss-popl-2017] is at the granularity
+ of whole programs.
+
+Once the granularity is fixed, a performance evaluation must define the programs
+ that it will ascribe types to and measure.
+Such programs may depend on libraries that a developer does not
+ have access to.
+An evaluator may also wish to measure the effect of gradual typing on a subset
+ of the modules in a large program.
+In any event, a performance evaluation must distinguish two groups of modules:
+
+@definition["experimental, control"]{
+  The @emph{experimental modules} in a program define its configurations.
+  The @emph{control modules} in a program are common across all configurations.
 }
 
-@definition["untyped Retic/Python"]{
-The untyped Retic/Python ratio of a configuration space is the time needed to run
-the untyped Reticulated configuration divided by the time needed to run the Python configuration.
+The experimental modules and granularity of type annotations define the
+ @emph{configurations} of a fully-typed program.
+What remains is to measure the performance of these configurations and
+ report their overhead relative to the performance a developer would get
+ by opting out of gradual typing.
+In Typed Racket, this baseline is the performance of Racket running the
+ untyped configuration.
+In Reticulated, untyped variables still require runtime checks, so the
+ baseline is the performance of @emph{Python} running the untyped configuration.
+
+@definition["performance ratio"]{
+  A @emph{performance ratio} is the running time of a program
+   divided by the running time of the same program in the absense of gradual typing.
 }
 
+After measuring the performance ratio of each configuration, an experimentor
+ can classify configurations by their performance.
+Since different software projects will have different performance requirements,
+ a useful classifier must be parameterized.
 
-
-This method could not be applied Reticulated directly. Specifically,
-in Reticulated, we are allowed to type all components of a function
-signature as well as class fields. Therefore, the upper bound of the
-number of elements in a configuration space for Reticulated is
-@${2^{c+a+f}} where @${c} is the number of class fields, @${a} is the
-arity for all functions and @${f} is the total number of
-functions. Exhaustively, such space could take more time than the
-universe has left. Therefore, we let the typable components generating
-our configuration space @${C} be function signatures and class
-fields. For any program @${P}, @${C} thus contains @${2^{f+c}}
-elements where @${c} is the number of classes and @${f} is the number
-of functions in @${P}.
-
-Additionally, our performance lattices for Reticulated look different
-from Typed Rackets's performance lattices. In Reticulated Python,
-there is an extra configuration to consider, namely the regular Python
-configuration. That also implies that we have two variations of the
-typed/untyped ratio. One that compares the fully typed Reticulated
-configuration to the untyped Reticulated configuration, and another
-that compares it to the untyped Python configuration. In the following
-section, we describe the adapted evaluation process in detail.
+@definition[@deliverable{D}]{
+  For any real-valued @${D}, the proportion of @deliverable{D} configurations
+   is the proportion of configurations with @emph{performance ratios} no greater
+   than @${D}.
+}
 
 
 @section[#:tag "sec:protocol"]{Protocol}
