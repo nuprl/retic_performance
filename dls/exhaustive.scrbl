@@ -239,7 +239,7 @@ The following descriptions credit the benchmarks' original authors,
 }
 
 @bm-desc["take5"
-@authors["Maha Elkhairy" "Zeina Migeed"]
+@authors["Maha Alkhairy" "Zeina Migeed"]
 ""
 @list[
   @lib-desc["random"]{randrange shuffle random seed}
@@ -256,11 +256,13 @@ The following descriptions credit the benchmarks' original authors,
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
+
+
 The table in @figure-ref{fig:ratio} lists three performance ratios.
-The @emph[u/p-ratio] reports the overhead of Reticulated relative to Python.
-The @emph[t/u-ratio] reports the overhead of the fully-typed
- configuration relative to the untyped configuration.
-The product of these ratios is the @emph[t/p-ratio].
+These ratios correspond to the extreme endpoints of gradual typing:
+ the baseline performance of Reticulated relative to Python (the @emph[u/p-ratio]),
+ the performance of the fully-typed configuration relative to Reticulated with no type annotations (the @emph[t/u-ratio]),
+ and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
 This means that the average time to run the untyped configuration of the
@@ -311,10 +313,10 @@ This data suggests that migrating an arbitrary
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
  for values of @${D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
 The @|x-axes| are log-scaled to focus on low overheads;
- vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x.
+ vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x overhead.
 
-The heading above the plot for a given benchmark lists the benchmark's name,
- @|t/p-ratio| (in parentheses), and number of configurations.
+The heading above the plot for a given benchmark lists the benchmark's name
+ and number of configurations.
 Note that the number of configurations is equal to @$|{2^{F+C}}|,
  with @${F} and @${C} from @figure-ref{fig:static-benchmark}.
 
@@ -337,9 +339,10 @@ And if a benchmark has many low-overhead configurations, a developer
        [d1 "d_1"]) @elem{
   After surveying the area under a curve, the second most important aspects of
    an overhead plot are the values of @${D} where the curve starts and ends.
-  More precisely, if @${f} is a function that counts the number of @deliverable{D}
-   configurations in a fixed benchmark, the critical points are the smallest
-   values @${@|d0|, @|d1|} such
+  More precisely, if @${h : \mathbb{R} \rightarrow \mathbb{N}} is a function
+   that counts the number of @deliverable{D}
+   configurations in a benchmark, the critical points are the smallest
+   overheads @${@|d0|, @|d1|} such
    that @${f(@|d0|) > 0} and @${f(@|d1|) = 100}.
   An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
    at least one configuration runs faster than the original Python code.
@@ -364,16 +367,6 @@ This value is always less than @id[MAX-OVERHEAD]; every configuration in the
 For many benchmarks, the maximum overhead is significantly lower.
 Indeed, six benchmarks are @deliverable{2}.
 
-@string-titlecase[@integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]]] benchmarks
- are roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed above each plot.
-In these benchmarks, the fully-typed configuration is one of the slowest-running
- configurations.
-The only exception is @bm{spectralnorm}, in which the fully-typed configuration
- runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
-This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
-@; better to say: "does not check _at runtime_" ?
-
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated adds runtime checks to Python code for
  each type annotation.
@@ -384,6 +377,15 @@ The plots for the other seven benchmarks have flat segments because those
 For example, if a benchmark creates many instances of a class @tt{C},
  adding a type annotation to the method @tt{C.__init__} will add significant
  performance overhead.
+
+@string-titlecase[@integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]]] benchmarks
+ are roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed in @figure-ref{fig:ratio}.
+In these benchmarks, the fully-typed configuration is one of the slowest-running
+ configurations.
+The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
+ runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
+This speedup occurs because of an unsoundness in the implementation of Reticulated;
+ in short, the implementation does not check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
