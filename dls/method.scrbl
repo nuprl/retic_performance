@@ -10,7 +10,7 @@ have identical performance requirements.
 Therefore, the method considers all possible configurations that a developer
 can obtain by incrementally adding types and reports the overhead of these configurations relative to the original, untyped program.
 
-Takikawa @|etal| apply the method to Typed Racket.
+Takikawa @|etal| apply this method to Typed Racket.
 Each module in a Typed Racket program may be typed or untyped.
 Thus a @emph{fully-typed} program with @${M} modules defines a space
  of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
