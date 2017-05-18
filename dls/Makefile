@@ -2,8 +2,7 @@ PAPER=dls
 PKG=gm-dls-2017
 
 pdf: compile texstyle.tex
-	scribble ++extra src/magic.py \
-           ++style texstyle.tex \
+	scribble ++style texstyle.tex \
            --pdf $(PAPER).scrbl
 
 all: pkg setup test pdf
