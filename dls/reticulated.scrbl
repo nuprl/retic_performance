@@ -18,8 +18,8 @@ In a statically typed language, type soundness implies that if a program
 For partially-typed programs, in which typed and untyped code interact,
  there is a fourth outcome: the program can (4) throw an exception
  due to a boundary between typed and untyped code@~cite[tfffgksst-snapl-2017].
-Reticulated enforces the first three conditions by static type-checking,
- and the fourth by runtime checks.
+Reticulated enforces the first three conditions by staticly type-checking,
+ and the fourth by dynamically type-checking.
 
 @Figure-ref{fig:cash} presents a well-typed class definition.
 If we add the method call @pythoninline{c1.add_cash(20)} to the program,
