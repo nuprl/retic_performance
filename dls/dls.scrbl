@@ -31,25 +31,24 @@
         #:affiliation NEU]
 
 @; -----------------------------------------------------------------------------
-@abstract{
-  Gradual typing promises to combine the benefits of dynamic and static typing
-  in a single language, giving developers freedom to use type
-  information only where it proves useful for catching bugs, documenting
-  interfaces, or enabling optimizations.  Reticulated Python is one such
-  @emph{gradually typed} language; it aims to give Python programmers the ability to
-  incrementally add sound type annotations to critical parts of their
-  programs. Reticulated enforces type annotations by adding dynamic checks
-  to a program. These tests can arbitrarily degrade the performance of
-  programs, but their effect on partially-typed variations of realistic
-  programs is unknown.
 
-  This paper studies the overhead of gradual typing in Reticulated Python. We
-  examine programs taken from a variety of areas including
-  Python libraries, implementations of common algorithms, and games. For each
-  program we systematically measure all partially-typed @emph{configurations}
-  obtained by assigning full type signatures to a subset of functions in the
-  program and report their overhead relative to Python.
-}
+@abstract{Gradual typing empowers developers to freely combine dynamically
+  and statically typed code in a single program. A sound gradual
+  typing system performs run-time checks to ensure the integrity of types
+  at the boundary between typed and untyped code. The question is how much
+  such checks affect the performance of gradually typed software systems.
+
+This paper presents a systematic performance evaluation of Reticulated,
+  which aims to equip Python with a sound gradual typing system. To
+  understand how partially typed code behaves, we report the results of
+  running all possible permutations of partially typed benchmarks. The
+  paper also shows that this exponentially expensive performance evaluation
+  method can be approximated with a linear sampling technique. In
+  comparison to the performance of Typed Racket, the first gradual typing
+  system to be evaluated in a comprehensive manner, the measurements look
+  encouraging but they seem to be due to Reticulated's impoverished
+  type system, miserable error messages, and an alternative notion of
+  soundness.  }
 
 @terms{CS}
 @keywords{CS}
