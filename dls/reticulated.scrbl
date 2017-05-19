@@ -1,5 +1,5 @@
 #lang gm-dls-2017
-@title[#:tag "sec:reticulated"]{Gradual Typing}
+@title[#:tag "sec:reticulated"]{Reticulated}
 
 Reticulated Python is a gradual typing system for
 Python@~cite[vksb-dls-2014].
@@ -7,8 +7,7 @@ In Reticulated, programmers can express types using Python's syntax for
  @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
  @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{decorators}.
 Reticulated statically checks the annotations and
- outputs a Python program containing casts and checks designed to enforce
- type soundness.
+ translates them to runtime type checks designed to enforce type soundness.
 
 In a statically typed language, type soundness implies that if a program
  is well-typed, running the program will result in one of three possible
@@ -28,21 +27,20 @@ If we add the method call @pythoninline{c1.add_cash(20)} to the program,
 Contrast this to an ill-typed call that occurs in a dynamically-typed context:
 
 @python|{
-def dyn_add_cash(c):
-  c1.add_cash(c)
+def dyn_add_cash(amount):
+  c1.add_cash(amount)
 
 dyn_add_cash(c1,20)
 }|
 
-The variable @pythoninline{c} does not have a type annotation, so Reticulated
+The variable @pythoninline{amount} does not have a type annotation, so Reticulated
  cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
  the assumptions of the @pythoninline{add_cash} method.
 To preserve type soundness, Reticulated rewrites the method to defensively
- check its arguments; in particular, Reticulated adds one structural type checks
+ check its arguments; in particular, Reticulated adds one structural type check
  for each argument of @pythoninline{add_cash}.
-@; .... it's ovbious that both need to be checked? (receiver could be mutated, could also just call like `Cash.add_cash(0,0`)
-At runtime, the check for the @pythoninline{other} parameter will dynamically
- halt the program before the call @pythoninline{dyn_add_cash(c1, 20)} causes
+At runtime, the check for the second argument throws an exception
+ before the call @pythoninline{dyn_add_cash(c1, 20)} causes
  the program to go wrong.
 
 This example demonstrates how Reticulated rewrites function and method bodies

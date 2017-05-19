@@ -12,7 +12,7 @@ can obtain by incrementally adding types and reports the overhead of these confi
 
 Takikawa @|etal| apply this method to Typed Racket.
 Each module in a Typed Racket program may be typed or untyped.
-Thus a @emph{fully-typed} program with @${M} modules defines a space
+Thus a fully-typed program with @${M} modules defines a space
  of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
 Takikawa @|etal| measure the overhead of these configurations relative to
  the fully-untyped configuration and plot how the proportion of so-called
@@ -55,9 +55,9 @@ The experimental modules and granularity of type annotations define the
  configurations of a fully-typed program.
 
 @definition["configurations"]{
-  Let @${P_1 \rightarrow_1 P_2} if and only if @${P_2} can be obtained from
-   @${P_1} by annotating one syntactic unit in an experimental module.
-  Let @${P_1 \sqsubseteq P_2} be the reflexive, transitive closure of this relation.
+  Let @${P \rightarrow_1 P'} if and only if program @${P'} can be obtained from
+   @${P} by annotating one syntactic unit in an experimental module.
+  Let @${\sqsubseteq} be the reflexive, transitive closure of the @${\rightarrow_1} relation.
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P \sqsubseteq P^\tau}.
 }
@@ -81,7 +81,7 @@ Since different applications have different performance requirements, the
  only rational way to report performance is with a parameterized metric.
 
 @definition[@deliverable{D}]{
-  For any real-valued @${D}, the proportion of @deliverable{D} configurations
+  For real-valued @${D}, the proportion of @deliverable{D} configurations
    is the proportion of configurations with @emph{performance ratios} no greater
    than @${D}.
 }

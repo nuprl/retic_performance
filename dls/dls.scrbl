@@ -44,14 +44,11 @@
   programs is unknown.
 
   This paper studies the overhead of gradual typing in Reticulated Python. We
-  examine programs taken from a variety of areas including @; TODO give number?
+  examine programs taken from a variety of areas including
   Python libraries, implementations of common algorithms, and games. For each
   program we systematically measure all partially-typed @emph{configurations}
   obtained by assigning full type signatures to a subset of functions in the
-  program. We additionally sample random configurations in which any subset of class
-  fields, function parameters, or function return types may be typed.  Finally
-  we attempt to explain which functions and types are responsible for the
-  greatest overhead.
+  program and report their overhead relative to Python.
 }
 
 @terms{CS}

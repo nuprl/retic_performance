@@ -7,8 +7,8 @@
 Siek and Taha's 2006 paper@~cite[st-sfp-2006] introduces the notion of
 gradual typing, a sound variant of Common Lisp's optional typing. Using
 gradual typing, ``programmers should be able to add or remove type
-annotations without any unexpected impacts on their program.'' One
-unexpected impact would be the application of a function on integers to a
+annotations without any unexpected impacts on their program''@~cite[svcb-snapl-2015].
+One unexpected impact would be the application of a function on integers to a
 string; similarly, when typed code hands an array of floats to untyped
 code, the programmer expects that the untyped code does not assign a
 boolean to one of the array's slots. By contrast, a programmer might
@@ -31,10 +31,10 @@ if there are @math{n} code components, Takikawa et al. propose to measure
 @math{2^n} configurations. Doing so mimics the process through which
 programmers may gradually equip all possible sites for type declarations
 with annotations. In order to evaluate these measurements, they propose a
-simple metric, @emph{the deliverable count up to @math{X}}, meaning the
-number of configurations whose performance slow-down is below
-@math{X}. Follow-up work by @citet[greenman-jfp-2017] confirms that a
-@emph{linear} amount of random sampling approximates the comprehensive but
+simple metric, the proportion of @emph{@deliverable{D}} configurations, meaning the
+number of configurations whose performance slow-down is at most
+@math{D}. Follow-up work by @citet[greenman-jfp-2017] confirms that a
+@emph{linear} amount of random sampling approximates the
 exponential measurements well in the case of Typed Racket.
 
 Simultaneously to Siek and Taha's original work, Tobin-Hochstadt and
@@ -45,7 +45,7 @@ proposal insists on annotating entire Racket modules with types. In 2016,
 with Typed Racket under development for 10 years, Takikawa et al.'s
 performance evaluation of Typed Racket indicates that the module-based form
 of gradual typing has disastrous performance characteristics. Only a small
-fraction of mixed-typed configurations is @math{3x}-deliverable; note that
+fraction of mixed-typed configurations is @deliverable{3}; note that
 @math{3x} is a rather generous measure considering that few developers
 would accept such a slow down.
 

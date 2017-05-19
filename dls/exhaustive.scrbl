@@ -260,8 +260,8 @@ The following descriptions credit the benchmarks' original authors,
 
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
- the baseline performance of Reticulated relative to Python (the @emph[u/p-ratio]),
- the performance of the fully-typed configuration relative to Reticulated with no type annotations (the @emph[t/u-ratio]),
+ the performance of Reticulated relative to Python on the untyped configuration (the @emph[u/p-ratio]),
+ the performance of the fully-typed configuration relative to the untyped configuration (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
@@ -330,20 +330,19 @@ The important question is how many configurations are @deliverable{D}
 The area under the curve is the answer; more is better.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
-And if a benchmark has many low-overhead configurations, a developer
+If many benchmarks have many low-overhead configurations, a developer
  that applies gradual typing has a higher chance of arriving at a configuration
- that is @deliverable{D} for a value of @${D} suited to their engineering
- requirements.
+ that is @deliverable{D} for a value of @${D} that meets their requirements.
 
 @(let ([d0 "d_0"]
        [d1 "d_1"]) @elem{
   After surveying the area under a curve, the second most important aspects of
    an overhead plot are the values of @${D} where the curve starts and ends.
-  More precisely, if @${h : \mathbb{R} \rightarrow \mathbb{N}} is a function
+  More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
    that counts the number of @deliverable{D}
    configurations in a benchmark, the critical points are the smallest
    overheads @${@|d0|, @|d1|} such
-   that @${f(@|d0|) > 0} and @${f(@|d1|) = 100}.
+   that @${h(@|d0|) > 0} and @${h(@|d1|) = 100}.
   An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
    at least one configuration runs faster than the original Python code.
   The end-value @${@|d1|} is the overhead of the slowest-running configuration

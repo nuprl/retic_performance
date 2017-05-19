@@ -51,7 +51,7 @@ Enforcing the signature of a variable-arity procedure requires a sequence
  of type checks.
 In contrast, the types that Reticulated currently supports are all enforced by
  unit-cost tag checks.
-
+@; TODO structural checks are not unit-cost
 
 @section{Localized Errors}
 @; Context-Free Errors
@@ -76,8 +76,10 @@ For example, @citet[vss-popl-2017] built an extension to Reticulated that
  to the fault.
 Their evaluation reports the @|t/p-ratio|s of
  @integer->word[(length vss-popl-2017-benchmarks)]
- programs from @|TPPBS|; in @integer->word[(length vss-2x-benchmarks)]
- programs, blame tracking at least doubled the @|t/p-ratio|.
+ programs from @|TPPBS|.
+In @integer->word[(length vss-2x-benchmarks)]
+ programs, adding blame tracking to the fully-typed configuration
+ at least doubled the @|t/p-ratio|.
 
 
 @section{Alternative Soundness}
@@ -94,8 +96,8 @@ Gradual type systems cannot provide exactly the same guarantees,
 In Typed Racket, typed code is sound in the conventional sense, for example, the
  compiler may use the types to eliminate runtime tag-checks@~cite[sthff-padl-2012].
 Untyped code is quarantined.
-An untyped value @${v} can only cross the boundary into typed code by being
- ascribed a type @${\tau}.
+An untyped value @${v} can only cross the boundary into typed code via
+ a type @${\tau}.
 Typed Racket enforces the behavioral specification implied by @${\tau}
  by compiling the type to a contract; if @${v} does not meet the contract,
  the programmer receives an error message containing @${v}, @${\tau}, and
@@ -113,7 +115,7 @@ Reticulated takes a different approach, and guarantees only tag-level soundness.
 It is perfectly acceptable for a Reticulated term with type @tt{List(String)}
  to evaluate to a value @${v} with a different type, so long as @${v} is some
  kind of list (see @figure-ref{fig:magic}).
-When typed code reads from @${v} expecting a value with type @${\tau'},
+When typed code reads from the list @${v} expecting a value with type @${\tau'},
  tag-level soundness implies that Reticulated will check the unpacked value
  against the tag of @${\tau'}.
 Note that @${\tau'} need not be @tt{String}, but it must match the unpacked
@@ -122,9 +124,9 @@ Note that @${\tau'} need not be @tt{String}, but it must match the unpacked
 Reticulated's shallow, by-need runtime checks impose less performance overhead
  than Typed Racket's behavioral contracts.
 The open question is whether developers find these checks sufficiently useful.
-On one hand, Reticulated types cannot enforce datatype invariants, e.g., to
- to guarantee that all instances of the @tt{Cash} class in
- @section-ref{sec:reticulated} have integer-valued fields.
+On one hand, Reticulated types cannot enforce datatype invariants, e.g.,
+ the class declaration in @section-ref{sec:reticulated} cannot guarantee that
+ all instances of the @tt{Cash} class have integer-valued fields.
 On the other hand, developers may value the increased flexibility and pay-as-you-annotate
  cost model.
 

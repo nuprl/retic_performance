@@ -79,9 +79,7 @@ The types in this experiment may differ from types ascribed by another Python
   @;  - using Dyn unfaithful to "fully-typed"
   @;  - using Dyn changes the inserted checks
   Third, some benchmarks are either missing annotations or use the dynamic type.
-  @Integer->word[(length missing-fields)]
-   benchmark (@format-bm*[missing-fields]) has
-   a class with an untyped field due to an oversight on our part.
+  The @format-bm*[missing-fields] benchmark contains a class with an untyped field due to an oversight on our part.
   @Integer->word[(length retic-limited)]
    benchmarks (@format-bm*[retic-limited]) use the
    dynamic type to overcome limitations in Reticulated's types.
@@ -89,7 +87,7 @@ The types in this experiment may differ from types ascribed by another Python
 
 @(let ([use-io* '(aespython futen http2 slowSHA)]) @elem{
   Fourth, the @(authors* (map bm use-io*)) benchmarks read from a file
-   within their main computation.
+   within their timed computation.
   This is a failure on our part.
 })
 
