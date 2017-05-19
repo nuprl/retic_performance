@@ -103,13 +103,28 @@ Typed Racket enforces the behavioral specification implied by @${\tau}
  the programmer receives an error message containing @${v}, @${\tau}, and
  the relevant boundary@~cite[tfffgksst-snapl-2017].
 
-@figure["fig:magic" "A well-typed Reticulated program"
+@; -------------------------------------------------------
+@; MF: we should put a visual marker here, like a line 
+@(define running 
+  @exact{\par \noindent \hrulefill \par \noindent Running this program yields:})
+
+@figure["fig:magic" 
+        #:style @left-figure-style
+        @list{A well-typed Reticulated program}]{
 @python|{
     def add_one(xs)->List(Int):
       return xs + [1]
 
     print(add_one(["A", "B"]))
-}|]
+}|
+
+
+@running 
+
+@python|{
+["A", "B", 1]
+}|
+}
 
 Reticulated takes a different approach, and guarantees only tag-level soundness.
 It is perfectly acceptable for a Reticulated term with type @tt{List(String)}
@@ -130,3 +145,29 @@ On one hand, Reticulated types cannot enforce datatype invariants, e.g.,
 On the other hand, developers may value the increased flexibility and pay-as-you-annotate
  cost model.
 
+
+@figure["fig:no-magic" 
+        #:style @left-figure-style
+	@list{An equivalent well-typed Typed Racket program}]{
+@; MF: I'd really like 2-space indentation in all code displays 
+@verbatim[#:indent 2]{
+#lang racket
+
+(module add-one-module typed/racket
+  (provide add-one)
+  (define (add-one {los : [Listof Integer]})
+    (append los (list 1))))
+
+(require 'add-one-module)
+
+(displayln (add-one '("a" "b")))
+}
+
+@running 
+
+@verbatim[#:indent 2]{
+add-one: contract violation
+  expected: Integer
+  given: "a"
+}
+}
