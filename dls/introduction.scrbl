@@ -62,4 +62,3 @@ Reticulated's lack of expressiveness, and (3) low-quality error messages
 al.'s insight that linear sampling is a sufficiently good approximation of
 the exponential set of measurements for the adapted method (see
 @section-ref{sec:linear}). The next section presents the background material.
-

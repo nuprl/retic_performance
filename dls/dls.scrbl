@@ -50,10 +50,11 @@ This paper presents a systematic performance evaluation of Reticulated,
   type system, miserable error messages, and an alternative notion of
   soundness.  }
 
-@terms{CS}
-@keywords{CS}
+@;terms{CS}
+@;keywords{CS}
 
 @include-section{introduction.scrbl}
+
 @include-section{reticulated.scrbl}
 @include-section{method.scrbl}
 @include-section{exhaustive.scrbl}
