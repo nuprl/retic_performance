@@ -38,21 +38,27 @@ All three factors affect not only performance, but also Reticulated programmers.
 First and second, the @bm{pystone} and @bm{stats} benchmarks require union types.
 Third, the @bm{go} benchmark contains a recursive class type.
 Fourth, one function in the @bm{take5} benchmark accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
-These cases represent idiomatic Python code; indeed, @|PEP-484|
- specifies syntax for generics, untagged union types, recursive types, optional
- arguments, and keyword arguments.
 
-@; TODO -- lisp interpreter, shallow rewrites, GUI libraries, N-ary tree?
-@; TODO -- the cost, please explain fully
+If Reticulated cannot express such types, Python programmers will frequently
+ need to rewrite their programs before they can try gradual typing.
+In our own experience, we rewrote several benchmarks that used @tt{None} as
+ a default value to use a well-typed sentinel value.
+We also attempted to rewrite a shallowly-embedded Lisp interpreter to use a
+ deep-embedding, but stopped for the lack of recursive types.
 
-Enforcing a union type or (equi-)recursive type requires a disjunction of
- type checks at run-time.
-Enforcing the signature of a variable-arity procedure requires a sequence
- of type checks.
-Compared to what Reticulated currently supports, these types are costly.
-If every type annotation @${T} in our benchmarks was instead a union of @${T} and
- @tt{Void}, then overall performance would be nearly 2x worse.
-DUMMY LINE HERE FOR SCRIBBEL BUG
+Such rewrites are both time-consuming and prone to introduce bugs.
+Developers would benefit if Reticulated added support for these types.
+Indeed, @|PEP-484| specifies syntax for generics, untagged union types,
+ recursive types, optional arguments, and keyword arguments.
+
+Enforcing these types at run-time, however, will impose a higher cost than
+ the single-test types that Reticulated programmers must currently use.
+A union type or (equi-)recursive type requires a disjunction of type tests, and
+ a variable-arity procedure requires a sequence of type checks.
+If, for example, every type annotation @${T} in our benchmarks was instead a
+ union type with @${T} and @tt{Void}, then overall performance would be nearly
+ 2x worse.
+
 
 @section{Uninformative Errors}
 @; Context-Free Errors
@@ -65,11 +71,18 @@ DUMMY LINE HERE FOR SCRIBBEL BUG
 
 Errors matter@~cite[f-keynote-2002].
 When systems work, everyone is happy, but when systems break, developers really
- want to see high quality error messages.
+ want error messages that pinpoint the source locations that triggered
+ the fault.
 
 Reticulated currently produces simple error messages that supply (1) a value
  that failed some check and (2) a stack trace.
-Improving these messages is important, but will add run-time overhead.
+For first-order programs, 
+
+@; TODO this info is useless to the programmer, add figure
+@;  -- noise in the stack trace
+@;  -- no type annotation
+
+Improving these messages is possible, but will add run-time overhead.
 @;The messages rarely communicate the static type that led to the failing check,
 @; or the boundary where a bad untyped entered typed code@~cite[tfffgksst-snapl-2017].
 For example, @citet[vss-popl-2017] built an extension to Reticulated that
