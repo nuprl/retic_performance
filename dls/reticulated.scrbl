@@ -26,13 +26,13 @@ If we add the method call @pythoninline{c1.add_cash(20)} to the program,
  is not an instance of the @pythoninline{Cash} class.
 Contrast this to an ill-typed call that occurs in a dynamically-typed context:
 
+@nested[
 @python|{
 def dyn_add_cash(amount):
   c1.add_cash(amount)
 
 dyn_add_cash(c1,20)
-}|
-
+}|]@;
 The variable @pythoninline{amount} does not have a type annotation, so Reticulated
  cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
  the assumptions of the @pythoninline{add_cash} method.
