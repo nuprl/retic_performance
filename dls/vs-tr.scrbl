@@ -8,7 +8,7 @@ By contrast, many partially typed Typed Racket programs are two orders of
 While implementation technology and the peculiarities of the benchmarks
  affect performance, this order-of-magnitude gap suggests fundamental differences.
 
-We have identified three factors that contribute to the seemingly-impressive
+We have identified three factors that contribute to the relative
  performance of Reticulated.
 First, Reticulated's type system lacks support for unions, recursive types,
  and variable-arity functions.
@@ -61,8 +61,6 @@ If, for example, every type annotation @${T} in our benchmarks was instead a
 
 
 @section{Uninformative Errors}
-@; Context-Free Errors
-@; Least-Knowledge Errors
 @(define vss-popl-2017-benchmarks
    '(callsimple nqueens pidigits meteor fannkuch nbody callmethod
      callmethodslots pystone float chaos go spectralnorm))
@@ -71,27 +69,57 @@ If, for example, every type annotation @${T} in our benchmarks was instead a
 
 Errors matter@~cite[f-keynote-2002].
 When systems work, everyone is happy, but when systems break, developers really
- want error messages that pinpoint the source locations that triggered
- the fault.
+ want error messages that pinpoint the source of the fault.
 
 Reticulated currently produces simple error messages that supply (1) a value
  that failed some check and (2) a stack trace.
-For first-order programs, 
+For flat types, these clues often suffice to deduce the type
+ check that halted the program.
+@;;;To illustrate, consider the following small program:
+@;;;
+@;;;@nested[@python|{
+@;;;def id(x)->Int:
+@;;;  return x
+@;;;id(None)
+@;;;}|]@;
+@;;;running this program produces the following error message:
+@;;;
+@;;;@nested[@exact|{{\footnotesize\begin{verbatim}
+@;;;Traceback (most recent call last):
+@;;;  File "/usr/local/bin/retic", line 6, in <module>
+@;;;    retic.main()
+@;;;  File ".../reticulated/retic/retic.py", line 155, in main
+@;;;    reticulate(program, prog_args=args.args.split(), flag_sets=args)
+@;;;  File ".../reticulated/retic/retic.py", line 104, in reticulate
+@;;;    utils.handle_runtime_error(exit=True)
+@;;;  File ".../reticulated/retic/retic.py", line 102, in reticulate
+@;;;    _exec(code, __main__.__dict__)
+@;;;  File ".../reticulated/retic/exec3/__init__.py", line 2, in _exec
+@;;;    exec (obj, globs, locs)
+@;;;  File "test.py", line 3, in <module>
+@;;;    id(None)
+@;;;  File "test.py", line 2, in id
+@;;;    return x
+@;;;  File ".../reticulated/retic/runtime.py", line 91, in check_type_int
+@;;;    return val if isinstance(val, int) else (check_type_bool(val) if not flags.FLAT_PRIMITIVES else rse(val))
+@;;;  File ".../reticulated/retic/runtime.py", line 100, in check_type_bool
+@;;;    return val if isinstance(val, bool) else rse(val)
+@;;;  File ".../reticulated/retic/runtime.py", line 88, in rse
+@;;;    raise Exception(x)
+@;;;Exception: None
+@;;;\end{verbatim}}}|]@;
+For function types and parameterized types, the relevant annotation is
+ slightly harder to find, but still possible via the stack trace.
+Unfortunately, such annotations are useless if they are correct.
+If the fault is due to a bad value, the programmer must manually find where
+ it came from.
 
-@; TODO this info is useless to the programmer, add figure
-@;  -- noise in the stack trace
-@;  -- no type annotation
-
-Improving these messages is possible, but will add run-time overhead.
-@;The messages rarely communicate the static type that led to the failing check,
-@; or the boundary where a bad untyped entered typed code@~cite[tfffgksst-snapl-2017].
-For example, @citet[vss-popl-2017] built an extension to Reticulated that
- augments check failures with a list of all the casts that may have led
- to the fault.
+@citet[vss-popl-2017] built an extension to Reticulated that improves these
+ error messages by reporting all casts that may have led to the dynamic type error.
+Naturally, this extension adds run-time overhead.
 Their evaluation reports the @|t/p-ratio|s of
  @integer->word[(length vss-popl-2017-benchmarks)]
- programs from @|TPPBS|.
-In @integer->word[(length vss-2x-benchmarks)]
+ programs from @|TPPBS|; in @integer->word[(length vss-2x-benchmarks)]
  programs, adding blame tracking to the fully-typed configuration
  at least doubled the @|t/p-ratio|.
 
