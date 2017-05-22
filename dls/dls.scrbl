@@ -32,22 +32,25 @@
 
 @; -----------------------------------------------------------------------------
 
-@abstract{Gradual typing lets developers combine dynamically
+@abstract{Gradual typing empowers developers to freely combine dynamically
   and statically typed code in a single program. A sound gradual
   typing system performs run-time checks to ensure the integrity of types
   at the boundary between typed and untyped code. The question is how much
   such checks affect the performance of gradually typed software systems.
 
 This paper presents a systematic performance evaluation of Reticulated,
-  a gradual typing system for Python.  To
-  understand how partially typed code behaves, we report the results of
-  running all combinations of partially typed benchmarks. The
-  paper also shows that this exponentially expensive performance evaluation
+  a gradual typing system for Python.  Since Reticulated allows fine-grained
+  mixing of typed and untyped code, our method is to establish a fixed-size
+  unit for adding type annotations and measure the performance of all
+  possible combinations of typed and untyped code.
+  The paper also shows that this exponentially expensive performance evaluation
   method can be approximated with a linear sampling technique. In
-  comparison to the performance of Typed Racket, the first gradual typing
-  system to be evaluated in a comprehensive manner, the measurements look
+  comparison to the performance of Typed Racket---the first gradual typing
+  system to be evaluated in a comprehensive manner---the measurements look
   encouraging. On closer inspection, the low cost of run-time checks
-  seem to be due to Reticulated's shallow type system, coarse error messages,
+  seem to be due to Reticulated's inexpressive type system,
+  miserable error messages,
+  @; ??? unhelpful coarse spartan
   and alternative notion of type soundness. }
 
 @;terms{CS}
