@@ -367,7 +367,7 @@ For many benchmarks, the maximum overhead is significantly lower.
 Indeed, six benchmarks are @deliverable{2}.
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise, since Reticulated adds runtime checks to Python code for
+This is no surprise, since Reticulated adds run-time checks to Python code for
  each type annotation.
 
 Eleven benchmarks have smooth slopes.
@@ -440,7 +440,7 @@ The variations between individual plots fall into four overlapping categories:
     @string-titlecase[num-in-category] plots have visible gaps between
      clusters of configurations with the same number of types.
     Configurations below the gap contain type annotations that impose little
-     runtime cost.
+     run-time cost.
     Configurations above the gap have some common type annotations that
      add significant overhead.
     Each such gap corresponds to a flat slope in @figure-ref{fig:overhead}.

@@ -67,7 +67,7 @@ What remains is to measure the performance of these configurations and
  by opting out of gradual typing.
 In Typed Racket, this baseline is the performance of Racket running the
  untyped configuration.
-In Reticulated, untyped variables still require runtime checks, so the
+In Reticulated, untyped variables still require run-time checks, so the
  baseline is the performance of Python running the untyped configuration.
 
 @definition["performance ratio"]{

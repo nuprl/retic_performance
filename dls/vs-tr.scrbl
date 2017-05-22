@@ -46,7 +46,7 @@ These cases represent idiomatic Python code; indeed, @|PEP-484|
  arguments, and keyword arguments.
 
 Enforcing a union types or (equi-)recursive types requires a disjunction of
- type checks at runtime.
+ type checks at run-time.
 Enforcing the signature of a variable-arity procedure requires a sequence
  of type checks.
 In contrast, the types that Reticulated currently supports are all enforced by
@@ -68,7 +68,7 @@ When systems work, everyone is happy, but when systems break, developers really
 
 Reticulated currently produces simple error messages that supply (1) a value
  that failed some check and (2) a stack trace.
-Improving these messages is important, but will add runtime overhead.
+Improving these messages is important, but will add run-time overhead.
 @;The messages rarely communicate the static type that led to the failing check,
 @; or the boundary where a bad untyped entered typed code@~cite[tfffgksst-snapl-2017].
 For example, @citet[vss-popl-2017] built an extension to Reticulated that
@@ -94,7 +94,7 @@ The type system can use this specification to find bugs throughout a program,
 Gradual type systems cannot provide exactly the same guarantees,
  but Typed Racket's soundness is very similar to conventional soundness.
 In Typed Racket, typed code is sound in the conventional sense, for example, the
- compiler may use the types to eliminate runtime tag-checks@~cite[sthff-padl-2012].
+ compiler may use the types to eliminate run-time tag-checks@~cite[sthff-padl-2012].
 Untyped code is quarantined.
 An untyped value @${v} can only cross the boundary into typed code via
  a type @${\tau}.
@@ -136,7 +136,7 @@ When typed code reads from the list @${v} expecting a value with type @${\tau'},
 Note that @${\tau'} need not be @tt{String}, but it must match the unpacked
  value.
 
-Reticulated's shallow, by-need runtime checks impose less performance overhead
+Reticulated's shallow, by-need run-time checks impose less performance overhead
  than Typed Racket's behavioral contracts.
 The open question is whether developers find these checks sufficiently useful.
 On one hand, Reticulated types cannot enforce datatype invariants, e.g.,

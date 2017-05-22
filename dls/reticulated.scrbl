@@ -7,7 +7,7 @@ In Reticulated, programmers can express types using Python's syntax for
  @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
  @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{decorators}.
 Reticulated statically checks the annotations and
- translates them to runtime type checks designed to enforce type soundness.
+ translates them to run-time type checks designed to enforce type soundness.
 
 In a statically typed language, type soundness implies that if a program
  is well-typed, running the program will result in one of three possible
@@ -39,7 +39,7 @@ The variable @pythoninline{amount} does not have a type annotation, so Reticulat
 To preserve type soundness, Reticulated rewrites the method to defensively
  check its arguments; in particular, Reticulated adds one structural type check
  for each argument of @pythoninline{add_cash}.
-At runtime, the check for the second argument throws an exception
+At run-time, the check for the second argument throws an exception
  before the call @pythoninline{dyn_add_cash(c1, 20)} causes
  the program to go wrong.
 
