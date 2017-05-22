@@ -113,7 +113,7 @@
   (if (string? ps) ps (path->string ps)))
 
 (define (rnd n)
-  (~r n #:precision 2))
+  (~r n #:precision '(= 2)))
 
 (define (ensure-directory d)
   (unless (path-string? d)
