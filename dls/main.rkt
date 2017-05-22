@@ -540,7 +540,7 @@
    (let* ([cat-num (box 0)]
           [get-number (λ ()
                         (set-box! cat-num (+ (unbox cat-num) 1))
-                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "⊥"] [else (error 'get-number)]))])
+                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
      (λ (name pre-bm* make-descr)
        (define bm-name* (map render-benchmark-name pre-bm*))
        (define perf-type (format "Type ~a " (get-number)))
