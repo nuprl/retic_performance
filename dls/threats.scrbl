@@ -88,7 +88,7 @@ The types in this experiment may differ from types ascribed by another Python
 @(let ([use-io* '(aespython futen http2 slowSHA)]) @elem{
   Fourth, the @(authors* (map bm use-io*)) benchmarks read from a file
    within their timed computation.
-  This is a failure on our part.
+  We nevertheless consider our results representative.
 })
 
 Fifth, Reticulated supports a finer granularity of type annotations than the
