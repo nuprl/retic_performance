@@ -71,8 +71,7 @@ The theoretical justification for why this protocol should yield a useful
 Let @${d} be a predicate that checks whether a particular configuration of
  a fixed program is @deliverable{D}.
 This predicate defines a Bernoulli random variable @${X_d} with parameter
- @${p}, where @${p} is the true proportion of @deliverable{D} configurations.@note{
-  In particular, @${X_d = } @RACKET[(λ () (if ((UNSYNTAX @${d}) (random-config)) 1 0))].}
+ @${p}, where @${p} is the true proportion of @deliverable{D} configurations.
 Consequently, the expected value of this random variable is @${p}.
 The law of large numbers therefore states that the average of infinitely
  many samples of @${X_d} converges to @${p}, the true proportion
@@ -132,12 +131,6 @@ The intervals are futhermore small, and thus practical substitutes for the overh
 
 
 @section[#:tag "sec:sampling:new"]{Approximate Evaluation}
-
-The simple random approximation method scales to large programs.
-Given any fully-typed program, a @approximation["r" "s" 95] can estimate its
- performance in reasonable time.
-The exact amount of time, as well as the quality of the estimate, depends
- on the chosen values of @${r} (number of repetitions) and @${s} (sample size).
 
 @; continues the evaluation started in section 4
 @(let* ([DLS '(aespython stats)]
@@ -213,22 +206,25 @@ The exact amount of time, as well as the quality of the estimate, depends
     @render-samples-plot*[SAMPLE-BENCHMARKS])]
 
 @Figure-ref{fig:sample:overhead} plots the results of applying the protocol
- in @section-ref{sec:protocol} to randomly sampled configurations.
+ in @section-ref{sec:protocol} to random configurations.
+Specifically, the data for a benchmark with @${F} functions and @${C} classes
+ consists of @integer->word[NUM-SAMPLE-TRIALS] samples of
+ @${@id[SAMPLE-RATE]*(F+C)} configurations selected without replacement.
 These results confirm many trends in earlier data:
 @itemlist[
 @item{
   No configurations run faster than the untyped Python program.
-  The lowest overheads range between 1.1x and 4.x
+  The lowest overheads range between 1.1x and 4x.
 }
 @item{
   All configurations are @deliverable[MAX-OVERHEAD].
 }
 @item{
   Most configurations are @deliverable{T}, where @${T} is the benchmark's
-   @|t/p-ratio|.
+   @|t/p-ratio| (marked on each plot's @|x-axis|).
 }
 @item{
-  The curves typically have smooth slopes, implying the cost of annotating
+  The curves have smooth slopes, implying the cost of annotating
    a single function or class is low.
 }
 @item{
