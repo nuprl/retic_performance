@@ -28,10 +28,10 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
    @|num1| originate from case studies by @citet[vksb-dls-2014],
    @;@note{@|dls-names|.}
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
-   @|TPPBS|,
+   the Python Performance Benchmark Suite,
    and the remaining @|num3| originate from open-source programs.
   Every listing of the benchmarks in this section is ordered first by the
-   benchmarks' origin and second by the benchmark's names.
+   benchmark's origin and second by the benchmark's name.
 })
 @; REMARK: original authors helpful with (code, test input, comments)
 
@@ -48,9 +48,9 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
   The @|num-col| columns report the @|column-descr*|
 })
 
-The following descriptions credit the benchmarks' original authors,
- state whether the benchmarks depend on any @defn{control} modules,
- and briefly summarize the purpose of the @defn{experimental} modules.
+The following descriptions credit each benchmark's original author,
+ state whether it depends on any @defn{control} modules,
+ and briefly summarize its purpose.
 
 
 @; -----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ The @|t/u-ratio|s are typically lower:
 In particular, fourteen of the benchmarks
  have larger @|u/p-ratio|s than @|t/u-ratio|s.
 This data suggests that migrating an arbitrary
- Python program to Reticulated will add a relatively larger overhead
+ Python program to Reticulated adds a relatively larger overhead
  than migrating the same program to a fully-typed configuration.
 
 @; For developers:
@@ -353,7 +353,7 @@ If many benchmarks have many low-overhead configurations, a developer
 Lastly, the slope of a curve corresponds to the likelihood that
  accepting a small increase in performance overhead makes a given configuration
  deliverable.
-A flat curve (zero slope) indicates that the performance of a group of
+A flat curve (zero slope) suggests that the performance of a group of
  configurations is dominated by a common set of type annotations.
 
 
@@ -374,7 +374,7 @@ Eleven benchmarks have smooth slopes.
 The plots for the other seven benchmarks have flat segments because those
  benchmarks contain at least one function or method that is called frequently.
 For example, if a benchmark creates many instances of a class @tt{C},
- adding a type annotation to the method @tt{C.__init__} will add significant
+ adding a type annotation to the method @tt{C.__init__} adds significant
  performance overhead.
 
 @string-titlecase[@integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]]] benchmarks
@@ -393,7 +393,7 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
-Since adding type annotations to a Reticulated program can change its
+Since adding type annotations to a Reticulated program changes its
  performance, the language should provide a cost model so that developers
  can predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic

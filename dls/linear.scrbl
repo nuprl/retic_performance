@@ -10,9 +10,9 @@ In particular, a sampling protocol based on elementary
  with a fraction of the measurements (@section-ref{sec:sampling:overhead}).
 Furthermore, @section-ref{sec:sampling:new} demonstrates that the sampling
  method scales to large benchmarks.
-Whereas exhaustive evaluation cannot feasibly be applied to programs containing
- tens of functions, the main bottleneck applying the sampling technique
- remains the human cost of ascribing types to Python programs.
+While exhaustive evaluation cannot feasibly be applied to programs containing
+ tens of functions, the main bottleneck of the sampling technique
+ is the cost of ascribing types to Python programs.
 
 
 @section[#:tag "sec:sampling:protocol"]{Sampling Protocol}
@@ -37,12 +37,11 @@ While computing the exact proportion of @deliverable{D} configurations requires
 To illustrate the protocol, suppose a few developers independently apply
  gradual typing to a program.
 Each arrives at some configuration and observes some performance overhead.
-Therefore, for a given value of @${D} some proportion of the developers have
+For a given value of @${D} some proportion of the developers have
  @deliverable{D} configurations.
 There is a remote chance that this proportion coincides with the true proportion
  of @deliverable{D} configurations.
-Intuitively, the chance is less remote if the number of developers is very
- large.
+Intuitively, the chance is less remote if the number of developers is large.
 But even for a small number of developers, if they repeat this experiment
  multiple times, then the average proportion of @deliverable{D} configurations
  should tend towards the true proportion.
@@ -153,7 +152,7 @@ The exact amount of time, as well as the quality of the estimate, depends
    @string-titlecase[@integer->word[(length DLS)]] of these programs,
     @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
    The following descriptions
-    provide more information about the benchmarks' size and purpose.
+    provide more information about each benchmark's size and purpose.
 })
 
 @; -----------------------------------------------------------------------------
