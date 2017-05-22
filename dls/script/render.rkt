@@ -69,7 +69,8 @@
   (render-benchmark* bm* "exact-runtime" exact-runtime-plot #t))
 
 (define (render-samples-plot* bm*)
-  (render-benchmark* bm* "samples" samples-plot))
+  (parameterize ([*TYPED/PYTHON-RATIO-XTICK?* #t])
+    (render-benchmark* bm* "samples" samples-plot)))
 
 (define (render-validate-samples-plot* bm*)
   (render-benchmark* bm* "validate" validate-samples-plot))

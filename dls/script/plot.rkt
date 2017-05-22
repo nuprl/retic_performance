@@ -81,6 +81,7 @@
 (defparam *RATIO-DOT-SYM* 'plus point-sym/c)
 (defparam *RATIO-DOT-SIZE* 8 Natural)
 (defparam *RATIO-DOT-COLOR* "firebrick" Color)
+(defparam *TYPED/PYTHON-RATIO-XTICK?* #f Boolean)
 
 ;; -----------------------------------------------------------------------------
 
@@ -167,8 +168,12 @@
              (make-simple-deliverable-counter (performance-info%sample pi s)))])
       (λ (r)
         (mean (for/list ([dc (in-list dc*)]) (dc r))))))
+  (define exact-ticks
+    (if (*TYPED/PYTHON-RATIO-XTICK?*)
+      (list (string->number (rnd (typed/python-ratio pi))))
+      '()))
   (define body (maybe-freeze
-    (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
+    (parameterize ([plot-x-ticks (make-overhead-x-ticks exact-ticks)]
                    [plot-x-transform log-transform]
                    [plot-y-ticks (make-overhead-y-ticks)]
                    [plot-x-far-ticks no-ticks]
@@ -345,8 +350,9 @@
      [else (error 'error-bounds "Unknown confidence level '~a'" (*CONFIDENCE-LEVEL*))]))
   (confidence-interval n* #:cv cv))
 
-(define (make-overhead-x-ticks)
-  (define MAJOR-TICKS (list 1 2 (*OVERHEAD-MAX*)))
+(define (make-overhead-x-ticks [extra-xticks '()])
+  (define MAJOR-TICKS
+    (sort (append extra-xticks (list 1 2 (*OVERHEAD-MAX*))) <))
   (define MINOR-TICKS
     (append (for/list ([i (in-range 12 20 2)]) (/ i 10))
             (for/list ([i (in-range 4 20 2)]) i)))
