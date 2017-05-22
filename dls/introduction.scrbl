@@ -2,7 +2,7 @@
 
 @require{bib.rkt}
 
-@title[#:tag "sec:introduction"]{Introduction}
+@title[#:tag "sec:introduction"]{Measuring Reticulated}
 
 Siek and Taha's 2006 paper@~cite[st-sfp-2006] introduces the notion of
 gradual typing, a sound variant of Common Lisp's optional typing. Using
