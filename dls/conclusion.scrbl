@@ -8,14 +8,15 @@ The application of Takikawa et al.'s method to Reticulated appears to
  Racket. Appearances are deceiving, however.  Reticulated's type system is
  far less expressive than Typed Racket's. Furthermore, its error messages,
  especially for higher-order values, are seldom actionable.
- Most importantly, though, Reticulated sacrifices soundness in favor
- of performance; a program of type @tt{List(String)} may print a list of
- integers---without signaling any violation.
+ Most importantly, though, Reticulated guarantees an alternative soundness.
+ A program of type @tt{List(Int)} may print a list of
+ strings---without signaling any violation.
 
 Our evaluation effort thus confirms a widely held conjecture and leaves us
  with an open research problem. While the sacrifice of soundness improves
  the performance of gradual typing systems, it remains unclear how
- pervasive the problem is and whether programs accept such compromises if
- they want to reason with types. Regardless, the research community must
+ pervasive the problem is and whether programmers accept such compromises if
+ they want to reason with types.
+ Finally, the research community must
  continue to search for ways to improve the performance of sound, gradually
- typed languages. 
+ typed languages.
