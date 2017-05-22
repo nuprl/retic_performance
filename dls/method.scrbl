@@ -8,7 +8,7 @@ The method is based on the premise that a performance evaluation cannot assume
 how developers will apply gradual typing, nor can it assume that all developers
 have identical performance requirements.
 Therefore, the method considers all possible configurations that a developer
-can obtain by incrementally adding types and reports the overhead of these configurations relative to the original, untyped program.
+may obtain by incrementally adding types and reports the overhead of all configurations relative to the original, untyped program.
 
 Takikawa @|etal| apply this method to Typed Racket.
 Each module in a Typed Racket program may be typed or untyped.
@@ -25,14 +25,14 @@ Takikawa @|etal| measure the overhead of these configurations relative to
 Reticulated supports fine-grained combinations of typed and untyped code.
 It would be impractical to directly apply the Takikawa method; measuring all
 configurations would take more time than the universe has left.
-It would also be impractical ignore the fine granularity of Reticulated and
+It would also be impractical to ignore the fine granularity of Reticulated and
  apply the module-level protocol that @citet[takikawa-popl-2016] used for Typed Racket.
-The practical choice lies somewhere in between, and depends on the size of the
+The practical choice lies somewhere in between, and it depends on the size of the
  programs at hand and computing resources available.
 
 @definition["granuarity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
-   the evaluation will add or remove type annotations.
+   the evaluation adds or removes type annotations.
 }
 
 For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
@@ -48,7 +48,7 @@ A potential complication is that such programs may depend on external libraries
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
-  The @emph{control modules} in a program are common across all configurations.
+  The @emph{control modules} in a program are common across all configurations; they are always typed or untyped.
 }
 
 The experimental modules and granularity of type annotations define the
@@ -92,14 +92,14 @@ Since different applications have different performance requirements, the
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
  performance of Reticulated at a function and class-fields granularity;
  more precisely, one syntactic unit is either one function, one method, or
- the set of all fields for one class.
+ the collection of all fields for one class.
 The evaluation furthermore adheres to the following protocols for
  benchmark creation and data collection.
 
 @parag{Benchmark Creation}
 Given a Python program, we first build a driver module that performs some
  non-trivial computation using the program.
-Second, we remove any non-determinism or unneccesary I/O actions from the program.
+Second, we remove any non-determinism or I/O actions from the program.
 Third, we define the experimental modules.
 Fourth, we ascribe types to the experimental modules.
 
