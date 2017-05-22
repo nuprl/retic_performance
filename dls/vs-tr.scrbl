@@ -1,23 +1,20 @@
 #lang gm-dls-2017
 
-@; TODO no future tense!
-
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
 The worst slowdown we observe in Reticulated is one order of magnitude.
-By contrast, many partially typed Typed Racket programs are two order of
+By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017].
 While implementation technology and the peculiarities of the benchmarks
- affect performance, this huge gap suggests fundamental differences.
+ affect performance, this order-of-magnitude gap suggests fundamental differences.
 
-We have identified three factors that contribute to the relative
+We have identified three factors that contribute to the seemingly-impressive
  performance of Reticulated.
 First, Reticulated's type system lacks support for unions, recursive types,
  and variable-arity functions.
 Second, Reticulated's error messages rarely provide actionable feedback.
-Third, Reticulated enforces a lax notion of type soundness compared to
- Typed Racket.
-All three factors affect both programmers and performance.
+Third, Reticulated guarantees an alternative notion of type soundness.
+All three factors affect not only performance, but also Reticulated programmers.
 
 
 @section{Missing Types}
@@ -36,24 +33,28 @@ All three factors affect both programmers and performance.
 @(define dyn* '(go pystone stats take5))
 @; TODO add better in-file evidence
 
-@Integer->word[(length dyn*)] of our benchmarks resort to dynamic typing because
- Reticulated cannot express the desired type.
-The @bm{pystone} and @bm{stats} benchmarks require union types.
-The @bm{go} benchmark contains a recursive class type.
-Lastly, one function in the @bm{take5} benchmark accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
+@Integer->word[(length dyn*)] of our benchmarks must resort to dynamic typing
+ because Reticulated cannot express the desired type.
+First and second, the @bm{pystone} and @bm{stats} benchmarks require union types.
+Third, the @bm{go} benchmark contains a recursive class type.
+Fourth, one function in the @bm{take5} benchmark accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
 These cases represent idiomatic Python code; indeed, @|PEP-484|
  specifies syntax for generics, untagged union types, recursive types, optional
  arguments, and keyword arguments.
 
-Enforcing a union types or (equi-)recursive types requires a disjunction of
+@; TODO -- lisp interpreter, shallow rewrites, GUI libraries, N-ary tree?
+@; TODO -- the cost, please explain fully
+
+Enforcing a union type or (equi-)recursive type requires a disjunction of
  type checks at run-time.
 Enforcing the signature of a variable-arity procedure requires a sequence
  of type checks.
-In contrast, the types that Reticulated currently supports are all enforced by
- unit-cost tag checks.
-@; TODO structural checks are not unit-cost
+Compared to what Reticulated currently supports, these types are costly.
+If every type annotation @${T} in our benchmarks was instead a union of @${T} and
+ @tt{Void}, then overall performance would be nearly 2x worse.
+DUMMY LINE HERE FOR SCRIBBEL BUG
 
-@section{Localized Errors}
+@section{Uninformative Errors}
 @; Context-Free Errors
 @; Least-Knowledge Errors
 @(define vss-popl-2017-benchmarks
