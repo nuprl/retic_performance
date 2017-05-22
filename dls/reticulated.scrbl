@@ -1,7 +1,7 @@
 #lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Reticulated}
 
-Reticulated Python is a gradual typing system for
+Reticulated Python is a gradual type system for
 Python@~cite[vksb-dls-2014].
 In Reticulated, programmers can express types using Python's syntax for
  @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
@@ -10,14 +10,14 @@ Reticulated statically checks the annotations and
  translates them to run-time type checks designed to enforce type soundness.
 
 In a statically typed language, type soundness implies that if a program
- is well-typed, running the program will result in one of three possible
+ is well-typed, running the program results in one of three possible
  outcomes:
  the program (1) evaluates to a value of the expected type,
  (2) diverges, or (3) throws an exception from a well-defined set.
 For partially-typed programs, in which typed and untyped code interact,
  there is a fourth outcome: the program can (4) throw an exception
  due to a boundary between typed and untyped code@~cite[tfffgksst-snapl-2017].
-Reticulated enforces the first three conditions by static type-checking,
+Reticulated aims to enforce the first three conditions by static type-checking,
  and the fourth by dynamic type-checking.
 
 @Figure-ref{fig:cash} presents a well-typed class definition.
@@ -41,11 +41,9 @@ To preserve type soundness, Reticulated rewrites the method to defensively
  for each argument of @pythoninline{add_cash}.
 At run-time, the check for the second argument throws an exception
  before the call @pythoninline{dyn_add_cash(c1, 20)} causes
- the program to go wrong.
+ the program to fail.
 
-This example demonstrates how Reticulated rewrites function and method bodies
- to enforce their domains.
-Reticulated inserts similar checks around
+In addition to rewriting, Reticulated inserts similar checks around
   function calls, to enforce the declared return type, and
   around reads from variables or data structures, to detect strong updates@~cite[vksb-dls-2014].
 These pervasive checks implement a tag-level notion of soundness that protects
