@@ -170,7 +170,7 @@
         (mean (for/list ([dc (in-list dc*)]) (dc r))))))
   (define exact-ticks
     (if (*TYPED/PYTHON-RATIO-XTICK?*)
-      (list (string->number (rnd (typed/python-ratio pi))))
+      (list (typed/python-ratio pi))
       '()))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks exact-ticks)]
@@ -377,7 +377,7 @@
   (ticks (real*->ticks-layout x*)
          (λ (ax-min ax-max pre-ticks)
            (for/list ([pt (in-list pre-ticks)])
-             (number->string (pre-tick-value pt))))))
+             (rnd+ (pre-tick-value pt))))))
 
 (define (make-exact-runtime-yticks max-runtime)
   (define x* (list 0 (exact->inexact (/ max-runtime 2)) max-runtime))
@@ -399,8 +399,8 @@
   (for/list ([pt (in-list pre-ticks)])
     (define v (pre-tick-value pt))
     (if (= v ax-max)
-      (format "~a~a" (number->string v) units)
-      (number->string v))))
+      (format "~a~a" (rnd+ v) units)
+      (rnd+ v))))
 
 (define (overhead-add-legend pi pict)
   (define name (render-benchmark-name (performance-info->name pi)))
@@ -446,10 +446,15 @@
 (define (render-typed/python-ratio r)
   (define text
     (case (*OVERHEAD-SHOW-RATIO*)
-     ['short (format "(~ax)" (rnd r))]
-     [else (format "typed/python ratio: ~ax" (rnd r))]))
+     ['short (format "(~ax)" (rnd+ r))]
+     [else (format "typed/python ratio: ~ax" (rnd+ r))]))
   (parameterize ([*FONT-SIZE* (sub1 (*FONT-SIZE*))])
     (title-text text)))
+
+(define (rnd+ n)
+  (if (exact-integer? n)
+    (number->string n)
+    (rnd n)))
 
 (define (render-count n descr)
   (title-text (format "~a ~a" (add-commas n) descr)))
