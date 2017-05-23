@@ -2,7 +2,7 @@
 
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
-The worst slowdown we observe in Reticulated is one order of magnitude.
+The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017].
 While implementation technology and the peculiarities of the benchmarks
@@ -111,12 +111,12 @@ For flat types, these clues often suffice to deduce the type
 For function types and parameterized types, the relevant annotation is
  slightly harder to find, but still possible via the stack trace.
 Unfortunately, such annotations are useless if they are correct.
-If the fault is due to a bad value, the programmer must manually find where
- it came from.
+If the fault is due to a bad value, the programmer must inspect the program to
+ find where it came from.
 
-@citet[vss-popl-2017] built an extension to Reticulated that improves these
+Improving the error messages will add performance overhead.
+For example, @citet[vss-popl-2017] built an extension to Reticulated that improves these
  error messages by reporting all casts that may have led to the dynamic type error.
-Naturally, this extension adds run-time overhead.
 Their evaluation reports the @|t/p-ratio|s of
  @integer->word[(length vss-popl-2017-benchmarks)]
  programs from @|TPPBS|; in @integer->word[(length vss-2x-benchmarks)]
@@ -129,19 +129,19 @@ Their evaluation reports the @|t/p-ratio|s of
 Sound type systems are useful because they provide guarantees.
 If a static type system proves that a term has type @${\tau}, then @${\tau}
  specifies the term's behavior.
-The type system can use this specification to find bugs throughout a program,
+The type system can use this specification to find small logical errors throughout a program,
  the compiler can rely on this specification to generate efficient code,
  and the programmer can trust this specification as an API.
 
 Gradual type systems cannot provide exactly the same guarantees,
- but Typed Racket's soundness is very similar to conventional soundness.
-In Typed Racket, typed code is sound in the conventional sense, for example, the
+ but Typed Racket's soundness is quite similar to conventional soundness.
+In Typed Racket, typed code is sound in the conventional sense; for example, the
  compiler may use the types to eliminate run-time tag-checks@~cite[sthff-padl-2012].
 Untyped code is quarantined.
 An untyped value @${v} can only cross the boundary into typed code via
  a type @${\tau}.
 Typed Racket enforces the behavioral specification implied by @${\tau}
- by compiling the type to a contract; if @${v} does not meet the contract,
+ by compiling the type to a contract; if @${v} does not satisfy the contract,
  the programmer receives an error message containing @${v}, @${\tau}, and
  the relevant boundary@~cite[tfffgksst-snapl-2017].
 
@@ -150,66 +150,72 @@ Typed Racket enforces the behavioral specification implied by @${\tau}
 @(define running 
   @exact{\par \noindent \hrulefill \par \noindent Running this program yields:})
 
-@figure["fig:magic" 
-        #:style @left-figure-style
+@figure["fig:magic"
         @list{A well-typed Reticulated program}]{
 @python|{
-    def add_one(xs)->List(Int):
-      return xs + [1]
+    def make_strings()->List(String):
+      xs = []
+      for i in range(3):
+        if   i == 0: xs.append(i)
+        elif i == 1: xs.append(True)
+        else       : xs.append(make_strings)
+      return xs
 
-    print(add_one(["A", "B"]))
-}|
+    make_strings()
+}|}
 
-
-@running 
-
-@python|{
-["A", "B", 1]
-}|
+Reticulated takes an alternative approach.
+It guarantees tag-level soundness.
+As @figure-ref{fig:magic} demonstrates, a Reticulated term with type @tt{List(String)} may evaluate to a list containing any kind of data.
+On one hand, this fact is harmless since tag soundness implies that any read from a variable with type @tt{List(String)} is tag-checked.
+On the other hand, Reticulated does not guard values that exit typed regions.
+Thus, two interesting scenarios can arise:
+@itemlist[#:style 'ordered
+@item{
+  (the @emph{typhoid mary} scenario) Typed code can create an ill-typed value,
+  pass it to untyped code, and trigger an error by violating an implicit
+  assumption in the untyped code.
+  The source of such ``disguised'' type errors may be difficult to track down.
 }
-
-Reticulated takes a different approach, and guarantees only tag-level soundness.
-It is perfectly acceptable for a Reticulated term with type @tt{List(String)}
- to evaluate to a value @${v} with a different type, so long as @${v} is some
- kind of list (see @figure-ref{fig:magic}).
-When typed code reads from the list @${v} expecting a value with type @${\tau'},
- tag-level soundness implies that Reticulated will check the unpacked value
- against the tag of @${\tau'}.
-Note that @${\tau'} need not be @tt{String}, but it must match the unpacked
- value.
-
-Reticulated's shallow, by-need run-time checks impose less performance overhead
- than Typed Racket's behavioral contracts.
-The open question is whether developers find these checks sufficiently useful.
-On one hand, Reticulated types cannot enforce datatype invariants, e.g.,
- the class declaration in @section-ref{sec:reticulated} cannot guarantee that
- all instances of the @tt{Cash} class have integer-valued fields.
-On the other hand, developers may value the increased flexibility and pay-as-you-annotate
- cost model.
-
-
-@figure["fig:no-magic" 
-        #:style @left-figure-style
-	@list{An equivalent well-typed Typed Racket program}]{
-@; MF: I'd really like 2-space indentation in all code displays 
-@verbatim[#:indent 2]{
-#lang racket
-
-(module add-one-module typed/racket
-  (provide add-one)
-  (define (add-one {los : [Listof Integer]})
-    (append los (list 1))))
-
-(require 'add-one-module)
-
-(displayln (add-one '("a" "b")))
+@item{
+  (the @emph{sybil} scenario) Two typed contexts can safely reference the same value at incompatible types.
 }
+]@;
+It remains to be seen whether these potential scenarios cause practical issues.
+Developers may embrace the flexibility of tag-soundness and use Reticulated
+ in combination with unit tests.
+At the moment, the only conclusion our data supports is that Reticulated's
+ alternative soundness imposes significantly less performance overhead than
+ Typed Racket's behavioral contracts.
+@;On one hand, Reticulated types cannot enforce datatype invariants, e.g.,
+@; the class declaration in @section-ref{sec:reticulated} cannot guarantee that
+@; all instances of the @tt{Cash} class have integer-valued fields.
+@;On the other hand, developers may value the increased flexibility and pay-as-you-annotate
+@; cost model.
 
-@running 
 
-@verbatim[#:indent 2]{
-add-one: contract violation
-  expected: Integer
-  given: "a"
-}
-}
+@;@figure["fig:no-magic" 
+@;        #:style @left-figure-style
+@;	@list{An equivalent well-typed Typed Racket program}]{
+@;@; MF: I'd really like 2-space indentation in all code displays 
+@;@verbatim[#:indent 2]{
+@;#lang racket
+@;
+@;(module add-one-module typed/racket
+@;  (provide add-one)
+@;  (define (add-one {los : [Listof Integer]})
+@;    (append los (list 1))))
+@;
+@;(require 'add-one-module)
+@;
+@;(displayln (add-one '("a" "b")))
+@;}
+@;
+@;@running 
+@;
+@;@verbatim[#:indent 2]{
+@;add-one: contract violation
+@;  expected: Integer
+@;  given: "a"
+@;}
+@;}
