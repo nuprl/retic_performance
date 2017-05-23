@@ -133,7 +133,7 @@ The type system can use this specification to find small logical errors througho
  the compiler can rely on this specification to generate efficient code,
  and the programmer can trust this specification as an API.
 
-Gradual type systems cannot provide exactly the same guarantees,
+Gradual typing systems cannot provide exactly the same guarantees,
  but Typed Racket's soundness is quite similar to conventional soundness.
 In Typed Racket, typed code is sound in the conventional sense; for example, the
  compiler may use the types to eliminate run-time tag-checks@~cite[sthff-padl-2012].

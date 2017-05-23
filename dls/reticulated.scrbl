@@ -1,7 +1,7 @@
 #lang gm-dls-2017
 @title[#:tag "sec:reticulated"]{Reticulated}
 
-Reticulated Python is a gradual type system for
+Reticulated Python is a gradual typing system for
 Python@~cite[vksb-dls-2014].
 In Reticulated, programmers can express types using Python's syntax for
  @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and

@@ -3,7 +3,7 @@
 @title[#:tag "sec:method"]{Evaluation Method}
 
 Takikawa @|etal| introduce a method for evaluating the performance of
-a gradual type system.
+a gradual typing system.
 The method is based on the premise that a performance evaluation cannot assume
 how developers will apply gradual typing, nor can it assume that all developers
 have identical performance requirements.
