@@ -37,7 +37,7 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
 
 @(let* ([column-descr*
          (list
-           @elem{lines of code (@bold{SLOC}),@note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.} }
+           @elem{lines of code (@bold{SLOC}), }
            @elem{number of modules (@bold{M}), }
            @elem{number of function and method definitions (@bold{F}), }
            @elem{and number of class definitions (@bold{C}).})]
@@ -63,7 +63,7 @@ The following descriptions credit each benchmark's original author,
 @url{https://github.com/momijiame/futen}
 @list[
   @lib-desc["fnmatch"]{Filename matching}
-  @lib-desc["os"]{Path split, path join, path expand, getenv}
+  @lib-desc["os.path"]{Path split, path join, path expand, getenv}
   @lib-desc["re"]{One regular expression match}
   @lib-desc["shlex"]{Split host names from an input string}
   @lib-desc["socket"]{Basic socket operations}
@@ -92,7 +92,7 @@ The following descriptions credit each benchmark's original author,
 @list[
   @lib-desc["os"]{path split}
 ]]{
-  Computes SHA-1 and SHA-512 digests for a sequence of English words.
+  Applies SHA-1 and SHA-512 to English words.
   @; 1 iteration
 }
 
@@ -172,7 +172,8 @@ The following descriptions credit each benchmark's original author,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Solves the Shootout benchmarks meteor puzzle.@note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html}}
+  Solves the Shootout benchmarks meteor puzzle.
+  @note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html}}
   @; 1 iterations (finds at most 6,000 solutions)
 }
 
@@ -204,7 +205,8 @@ The following descriptions credit each benchmark's original author,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Implements Weicker's @emph{Dhrystone} benchmark.@note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
+  Implements Weicker's @emph{Dhrystone} benchmark.
+  @note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
   @; 50,000 iterations
 }
 
@@ -261,7 +263,7 @@ The following descriptions credit each benchmark's original author,
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
  the performance of Reticulated relative to Python on the untyped configuration (the @emph[u/p-ratio]),
- the performance of the fully-typed configuration relative to the untyped configuration (the @emph[t/u-ratio]),
+ the performance of the fully-typed configuration relative to the untyped configuration in Reticulated (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
 For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
@@ -279,10 +281,10 @@ Regarding the @|u/p-ratio|s: ten are below 2x,
  five are between 2x and 3x, and
  the remaining four are below 4.5x.
 The @|t/u-ratio|s are typically lower:
-  sixteen are below 2x,
+  fifteen are below 2x,
   one is between 2x and 3x,
-  and the final two are below 3.5x.
-In particular, fourteen of the benchmarks
+  and the final three are below 3.5x.
+In particular, twelve of the benchmarks
  have larger @|u/p-ratio|s than @|t/u-ratio|s.
 This data suggests that migrating an arbitrary
  Python program to Reticulated adds a relatively larger overhead
@@ -364,20 +366,24 @@ Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
 This value is always less than @id[MAX-OVERHEAD]; every configuration in the
  experiment is @deliverable[MAX-OVERHEAD].
 For many benchmarks, the maximum overhead is significantly lower.
-Indeed, six benchmarks are @deliverable{2}.
+Indeed, seven benchmarks are @deliverable{2}.
 
 None of the configurations in the experiment run faster than the Python baseline.
 This is no surprise, since Reticulated adds run-time checks to Python code for
  each type annotation.
 
-Eleven benchmarks have smooth slopes.
-The plots for the other seven benchmarks have flat segments because those
- benchmarks contain at least one function or method that is called frequently.
-For example, if a benchmark creates many instances of a class @tt{C},
- adding a type annotation to the method @tt{C.__init__} adds significant
- performance overhead.
+@(let ([smooth '(futen http2 slowSHA chaos fannkuch float nbody pidigits pystone PythonFlow take5)])
+  @elem{
+    @Integer->word[(length smooth)] benchmarks have relatively smooth slopes.
+    The plots for the other @integer->word[(- NUM-EXHAUSTIVE-BENCHMARKS (length smooth))]
+     benchmarks have wide, flat segments because those
+     benchmarks contain at least one function or method that is called frequently.
+    For example, if a benchmark creates many instances of a class @tt{C},
+     adding a type annotation to the method @tt{C.__init__} adds significant
+     overhead.
+})
 
-@string-titlecase[@integer->word[@sub1[NUM-EXHAUSTIVE-BENCHMARKS]]] benchmarks
+@string-titlecase[@integer->word[(- NUM-EXHAUSTIVE-BENCHMARKS 3)]] benchmarks
  are roughly @deliverable{T}, where @${T} is the @|t/p-ratio| listed in @figure-ref{fig:ratio}.
 In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
@@ -393,7 +399,7 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
 ]
 
-Since adding type annotations to a Reticulated program changes its
+Since changing the type annotations in a Reticulated program changes its
  performance, the language should provide a cost model so that developers
  can predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
@@ -427,7 +433,7 @@ Overall, there is a clear trend that adding type annotations adds performance
 The variations between individual plots fall into four overlapping categories:
 
 @exact-runtime-category["types make things slow"
-  '(futen slowSHA chaos float pystone take5)
+  '(futen slowSHA chaos float pystone PythonFlow take5)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
      performance as the number of typed components increases.

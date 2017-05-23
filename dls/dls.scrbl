@@ -72,6 +72,7 @@ This paper presents a systematic performance evaluation of Reticulated,
   Sam for access to IU cluster.
   Spenser Bauman for advice about cluster.
   Tony GJ for insisting that overhead plots are CDFs.
+  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
 }
 
 @generate-bibliography[]

@@ -583,6 +583,7 @@
         (lib "math" "https://docs.python.org/3/library/math.html")
         (lib "operator" "https://docs.python.org/3/library/operator.html")
         (lib "os" "https://docs.python.org/3/library/os.html")
+        (lib "os.path" "https://docs.python.org/3/library/os.html#module-os.path")
         (lib "random" "https://docs.python.org/3/library/random.html")
         (lib "re" "https://docs.python.org/3/library/re.html")
         (lib "shlex" "https://docs.python.org/3/library/shlex.html")
