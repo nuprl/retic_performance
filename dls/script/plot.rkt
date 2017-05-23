@@ -237,10 +237,12 @@
   (let ([a+b (performance-info->sample* pi)])
     (values (car a+b) (cdr a+b))))
 
-(define (maybe-freeze p)
-  (if (*OVERHEAD-FREEZE-BODY*)
-    (freeze p) ;; TODO higher-resolution
-    p))
+(define maybe-freeze
+  (let ([SCALE-FACTOR 4])
+    (λ (p)
+      (if (*OVERHEAD-FREEZE-BODY*)
+        (scale (freeze (scale p SCALE-FACTOR)) (/ 1 SCALE-FACTOR))
+        p))))
 
 (define (configuration-points p**)
   (define i 2)
