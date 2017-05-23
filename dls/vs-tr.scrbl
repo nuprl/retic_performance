@@ -186,37 +186,5 @@ It remains to be seen whether these potential scenarios cause practical issues.
 Developers may embrace the flexibility of tag-soundness and use Reticulated
  in combination with unit tests.
 At the moment, the only conclusion our data supports is that Reticulated's
- alternative soundness imposes significantly less performance overhead than
- Typed Racket's behavioral contracts.
-@;On one hand, Reticulated types cannot enforce datatype invariants, e.g.,
-@; the class declaration in @section-ref{sec:reticulated} cannot guarantee that
-@; all instances of the @tt{Cash} class have integer-valued fields.
-@;On the other hand, developers may value the increased flexibility and pay-as-you-annotate
-@; cost model.
+ tag checks impose less performance overhead than Typed Racket's behavioral contracts.
 
-
-@;@figure["fig:no-magic" 
-@;        #:style @left-figure-style
-@;	@list{An equivalent well-typed Typed Racket program}]{
-@;@; MF: I'd really like 2-space indentation in all code displays 
-@;@verbatim[#:indent 2]{
-@;#lang racket
-@;
-@;(module add-one-module typed/racket
-@;  (provide add-one)
-@;  (define (add-one {los : [Listof Integer]})
-@;    (append los (list 1))))
-@;
-@;(require 'add-one-module)
-@;
-@;(displayln (add-one '("a" "b")))
-@;}
-@;
-@;@running 
-@;
-@;@verbatim[#:indent 2]{
-@;add-one: contract violation
-@;  expected: Integer
-@;  given: "a"
-@;}
-@;}
