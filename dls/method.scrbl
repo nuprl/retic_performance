@@ -91,7 +91,7 @@ Since different applications have different performance requirements, the
 
 Sections@|~|@secref{sec:exhaustive} and @secref{sec:linear} report the
  performance of Reticulated at a function and class-fields granularity;
- more precisely, one syntactic unit is either one function, one method, or
+ more precisely, one syntactic unit in the experiment is either one function, one method, or
  the collection of all fields for one class.
 The evaluation furthermore adheres to the following protocols for
  benchmark creation and data collection.

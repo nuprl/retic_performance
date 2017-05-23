@@ -427,7 +427,7 @@ Overall, there is a clear trend that adding type annotations adds performance
 The variations between individual plots fall into four overlapping categories:
 
 @exact-runtime-category["types make things slow"
-  '(futen http2 slowSHA chaos float pystone take5)
+  '(futen slowSHA chaos float pystone take5)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
      performance as the number of typed components increases.
@@ -435,7 +435,7 @@ The variations between individual plots fall into four overlapping categories:
 })]
 
 @exact-runtime-category[@elem{types make things very slow}
-  '(call_method call_method_slots call_simple go meteor nqueens spectralnorm Espionage PythonFlow)
+  '(call_method call_method_slots call_simple go http2 meteor nqueens spectralnorm Espionage PythonFlow)
   (λ (num-in-category) @elem{
     @string-titlecase[num-in-category] plots have visible gaps between
      clusters of configurations with the same number of types.
@@ -469,7 +469,7 @@ The variations between individual plots fall into four overlapping categories:
 
 
 @(let* ([outliers (map bm '(futen float go meteor Espionage))]) @elem{
-  @emph{Note:} the data for @authors*[outliers] contain a small number of outliers.
+  @bold{Note}: the data for @authors*[outliers] contain a small number of outliers.
   @Section-ref{sec:threats} addresses these and other threats to validity.
   @; TODO really not much of an address at the moment
 })
