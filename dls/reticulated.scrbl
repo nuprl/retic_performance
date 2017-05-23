@@ -33,7 +33,7 @@ def dyn_add_cash(amount):
 
 dyn_add_cash(c1,20)
 }|]@;
-The variable @pythoninline{amount} does not have a type annotation, so Reticulated
+The variable @pythoninline{amount} is not annotated, so Reticulated
  cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
  the assumptions of the @pythoninline{add_cash} method.
 To preserve type soundness, Reticulated rewrites the method to defensively

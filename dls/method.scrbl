@@ -41,8 +41,7 @@ The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
 @Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity used in this paper.
 
-Once the granularity is fixed, the second step in applying the method is to
- ascribe types to representative programs.
+Once the granularity is fixed, the second step is to ascribe types to representative programs.
 A potential complication is that such programs may depend on external libraries
  or other modules that lie outside the scope of the evalutation.
 
@@ -103,7 +102,7 @@ Second, we remove any non-determinism or I/O actions from the program.
 Third, we define the experimental modules.
 Fourth, we ascribe types to the experimental modules.
 
-When possible, we use existing type annotations and comments to infer
+Generally, we use type annotations or comments to infer
  the fully-typed configuration of the benchmark.
 When necessary, we use details of the driver module to infer types;
  for example, any polymorphic functions must use monomorphic types

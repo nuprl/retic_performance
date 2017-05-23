@@ -55,7 +55,7 @@ The following definition capture the informal sampling protocol outlined above:
   A @approximation["r" "s" "95"] of the proportion of @deliverable{D} configurations is
    a 95% confidence interval generated from @${r} samples, each made of @${s}
    configurations.
-  (Informally: a @emph{simple random approximation}.)
+  (a @emph{simple random approximation}.)
   @; ^^^ to disambiguate from other approximations
 }
 
@@ -213,7 +213,7 @@ Specifically, the data for a benchmark with @${F} functions and @${C} classes
 These results confirm many trends in earlier data:
 @itemlist[
 @item{
-  No configurations run faster than the untyped Python program.
+  No configurations run faster than the Python program.
   The lowest overheads range between 1.1x and 4x.
 }
 @item{

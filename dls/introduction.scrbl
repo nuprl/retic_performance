@@ -8,10 +8,10 @@ Siek and Taha's 2006 paper@~cite[st-sfp-2006] introduces the notion of
 gradual typing, a sound variant of Common Lisp's optional typing. Using
 gradual typing, ``programmers should be able to add or remove type
 annotations without any unexpected impacts on their program''@~cite[svcb-snapl-2015].
-One unexpected impact would be the application of a function on integers to a
-string; similarly, when typed code hands an array of floats to untyped
+One unexpected impact is the application of a function on integers to a
+string; similarly, when typed code passes an array of floats to untyped
 code, the programmer expects that the untyped code does not assign a
-boolean to one of the array's slots. By contrast, a programmer might
+boolean to one of the array's slots. By contrast, a programmer may
 expect the addition of types to speed up the program execution because the
 compiler can exploit the type information.
 

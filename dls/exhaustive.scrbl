@@ -262,7 +262,7 @@ The following descriptions credit each benchmark's original author,
 
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
- the performance of Reticulated relative to Python on the untyped configuration (the @emph[u/p-ratio]),
+ the performance of Reticulated relative to Python (the @emph[u/p-ratio]),
  the performance of the fully-typed configuration relative to the untyped configuration in Reticulated (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
@@ -273,10 +273,10 @@ This means that the average time to run the untyped configuration of the
 Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
  is 1.04 times slower than the untyped configuration.
 
-On one hand, these ratios demonstrate that migrating a benchmark to
+These ratios demonstrate that migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
-On the other hand, the overhead is always within an order-of-magnitude.
+However, the overhead is always within an order-of-magnitude.
 Regarding the @|u/p-ratio|s: ten are below 2x,
  five are between 2x and 3x, and
  the remaining four are below 4.5x.
@@ -320,7 +320,7 @@ The @|x-axes| are log-scaled to focus on low overheads;
 The heading above the plot for a given benchmark lists the benchmark's name
  and number of configurations.
 Note that the number of configurations is equal to @$|{2^{F+C}}|,
- with @${F} and @${C} from @figure-ref{fig:static-benchmark}.
+ with @${F} and @${C} being the same as @figure-ref{fig:static-benchmark}.
 
 @parag{How to Read the Overhead Plots}
 @; HMMMM "are" is NOT correct, but it sticks.

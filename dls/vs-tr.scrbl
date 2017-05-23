@@ -6,7 +6,8 @@ The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017].
 While implementation technology and the peculiarities of the benchmarks
- affect performance, this order-of-magnitude gap suggests fundamental differences.
+ affect performance, this order-of-magnitude gap suggests fundamental differences
+ between Typed Racket and Reticulated.
 
 We have identified three factors that contribute to the relative
  performance of Reticulated.
