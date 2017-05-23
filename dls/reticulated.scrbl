@@ -1,7 +1,7 @@
 #lang gm-dls-2017
-@title[#:tag "sec:reticulated"]{Reticulated}
+@title[#:tag "sec:reticulated"]{Reticulated Python}
 
-Reticulated Python is a gradual typing system for
+Reticulated is a gradual typing system for
 Python@~cite[vksb-dls-2014].
 In Reticulated, programmers can express types using Python's syntax for
  @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
@@ -28,10 +28,10 @@ Contrast this to an ill-typed call that occurs in a dynamically-typed context:
 
 @nested[
 @python|{
-def dyn_add_cash(amount):
-  c1.add_cash(amount)
+    def dyn_add_cash(amount):
+      c1.add_cash(amount)
 
-dyn_add_cash(c1,20)
+    dyn_add_cash(20)
 }|]@;
 The variable @pythoninline{amount} is not annotated, so Reticulated
  cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
@@ -46,7 +46,7 @@ At run-time, the check for the second argument throws an exception
 In addition to rewriting, Reticulated inserts similar checks around
   function calls, to enforce the declared return type, and
   around reads from variables or data structures, to detect strong updates@~cite[vksb-dls-2014].
-These pervasive checks implement a tag-level notion of soundness that protects
+These pervasive checks implement a notion of soundness that protects
  typed code without inhibiting untyped code@~cite[vss-popl-2017].
 
 @figure["fig:cash" "Reticulated syntax"

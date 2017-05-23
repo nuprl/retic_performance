@@ -92,7 +92,7 @@ The following descriptions credit each benchmark's original author,
 @list[
   @lib-desc["os"]{path split}
 ]]{
-  Applies SHA-1 and SHA-512 to English words.
+  Applies the SHA-1 and SHA-512 algorithms to English words.
   @; 1 iteration
 }
 
@@ -224,7 +224,7 @@ The following descriptions credit each benchmark's original author,
 @list[
   @lib-desc["operator"]{itemgetter}
 ]]{
-  Implements Kruskal's spanning-tree algorithm@~cite[k-ams-1956].
+  Implements Kruskal's spanning-tree algorithm.
   @; 1 iteration
 }
 
@@ -262,7 +262,7 @@ The following descriptions credit each benchmark's original author,
 
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
- the performance of Reticulated relative to Python (the @emph[u/p-ratio]),
+ the performance of untyped Reticulated relative to Python (the @emph[u/p-ratio]),
  the performance of the fully-typed configuration relative to the untyped configuration in Reticulated (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
@@ -273,6 +273,7 @@ This means that the average time to run the untyped configuration of the
 Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
  is 1.04 times slower than the untyped configuration.
 
+@; TODO one hand,other hand
 These ratios demonstrate that migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
@@ -321,6 +322,7 @@ The heading above the plot for a given benchmark lists the benchmark's name
  and number of configurations.
 Note that the number of configurations is equal to @$|{2^{F+C}}|,
  with @${F} and @${C} being the same as @figure-ref{fig:static-benchmark}.
+@; TODO being the same
 
 @parag{How to Read the Overhead Plots}
 @; HMMMM "are" is NOT correct, but it sticks.
@@ -336,8 +338,8 @@ If many benchmarks have many low-overhead configurations, a developer
  that applies gradual typing has a higher chance of arriving at a configuration
  that is @deliverable{D} for a value of @${D} that meets their requirements.
 
-@(let ([d0 "d_0"]
-       [d1 "d_1"]) @elem{
+@(let ([d0 "a"]
+       [d1 "b"]) @elem{
   After surveying the area under a curve, the second most important aspects of
    an overhead plot are the values of @${D} where the curve starts and ends.
   More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
@@ -353,8 +355,8 @@ If many benchmarks have many low-overhead configurations, a developer
 @; given the choice of type annotations
 
 Lastly, the slope of a curve corresponds to the likelihood that
- accepting a small increase in performance overhead makes a given configuration
- deliverable.
+ accepting a small increase in performance overhead increases the number
+ of deliverable configurations.
 A flat curve (zero slope) suggests that the performance of a group of
  configurations is dominated by a common set of type annotations.
 
@@ -363,7 +365,8 @@ A flat curve (zero slope) suggests that the performance of a group of
 
 Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
-This value is always less than @id[MAX-OVERHEAD]; every configuration in the
+This value is always less than @id[MAX-OVERHEAD].
+In other words, every configuration in the
  experiment is @deliverable[MAX-OVERHEAD].
 For many benchmarks, the maximum overhead is significantly lower.
 Indeed, seven benchmarks are @deliverable{2}.
@@ -390,7 +393,8 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
 This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
+ in short, the implementation does not dynamically type-check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
+@; TODO bad linebreak
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
@@ -400,8 +404,8 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
 ]
 
 Since changing the type annotations in a Reticulated program changes its
- performance, the language should provide a cost model so that developers
- can predict the performance of a given configuration.
+ performance, the language should provide a cost model to help developers
+ predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
@@ -416,9 +420,9 @@ Each point compares the number of typed functions, methods, and classes in a
 
 The plots contain many points with both the same number of typed components
  and similar performance.
-To reduce the visual overlap between such points, the data for a given
+To reduce the visual overlap between such points, the points for a given
  configuration are spread across the @|x-axis|.
-In particular, the @id[NUM-ITERATIONS] points for a configuration with @math{N}
+The @id[NUM-ITERATIONS] points for a configuration with @math{N}
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
 For example, the @bm{fannkuch} benchmark has two configurations: one untyped

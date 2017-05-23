@@ -2,7 +2,7 @@
 
 @title[#:tag "sec:method"]{Evaluation Method}
 
-Takikawa @|etal| introduce a method for evaluating the performance of
+@citet[takikawa-popl-2016] introduce a method for evaluating the performance of
 a gradual typing system.
 The method is based on the premise that a performance evaluation cannot assume
 how developers will apply gradual typing, nor can it assume that all developers
@@ -10,10 +10,11 @@ have identical performance requirements.
 Therefore, the method considers all possible configurations that a developer
 may obtain by incrementally adding types and reports the overhead of all configurations relative to the original, untyped program.
 
-Takikawa @|etal| apply this method to Typed Racket.
-Each module in a Typed Racket program may be typed or untyped.
+Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
+ that permits typed and untyped modules.
 Thus a fully-typed program with @${M} modules defines a space
- of @${2^M} configurations.@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
+ of @${2^M} configurations.
+@;@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
 Takikawa @|etal| measure the overhead of these configurations relative to
  the fully-untyped configuration and plot how the proportion of so-called
  @emph{@deliverable{D}} configurations varies as developers instantiate the
@@ -47,16 +48,17 @@ A potential complication is that such programs may depend on external libraries
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
-  The @emph{control modules} in a program are common across all configurations; they are always typed or untyped.
+  The @emph{control modules} in a program are common across all configurations.
 }
 
 The experimental modules and granularity of type annotations define the
  configurations of a fully-typed program.
 
 @definition["configurations"]{
-  Let @${P \rightarrow_1 P'} if and only if program @${P'} can be obtained from
+  Let @${P \rightarrow_1 P'}
+   if and only if program @${P'} can be obtained from
    @${P} by annotating one syntactic unit in an experimental module.
-  Let @${\sqsubseteq} be the reflexive, transitive closure of the @${\rightarrow_1} relation.
+  Let @${\sqsubseteq} be the reflexive, transitive closure of the @${\rightarrow_1} relation.@note{The @${\rightarrow_1} relation expresses the notion of a @emph{type conversion step}@~cite[takikawa-popl-2016]. The @${\sqsubseteq} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P \sqsubseteq P^\tau}.
 }
@@ -102,8 +104,8 @@ Second, we remove any non-determinism or I/O actions from the program.
 Third, we define the experimental modules.
 Fourth, we ascribe types to the experimental modules.
 
-Generally, we use type annotations or comments to infer
- the fully-typed configuration of the benchmark.
+When possible, we use existing type annotations or comments to infer
+ the fully-typed configuration.
 When necessary, we use details of the driver module to infer types;
  for example, any polymorphic functions must use monomorphic types
  because Reticulated does not support polymorphism.
