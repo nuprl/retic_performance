@@ -40,7 +40,7 @@
 
 This paper presents a systematic performance evaluation of Reticulated,
   a gradual typing system for Python.  Since Reticulated allows fine-grained
-  mixing of typed and untyped code, our method is to establish a fixed-size
+  mixing of typed and untyped code, our evaluation method is to establish a fixed-size
   unit for adding type annotations and measure the performance of all
   possible combinations of typed and untyped code.
   The paper also shows that this exponentially expensive performance evaluation
@@ -49,9 +49,7 @@ This paper presents a systematic performance evaluation of Reticulated,
   system to be evaluated in a comprehensive manner---the measurements look
   encouraging. On closer inspection, the low cost of run-time checks
   seem to be due to Reticulated's inexpressive type system,
-  miserable error messages,
-  @; ??? unhelpful coarse spartan
-  and alternative notion of type soundness. }
+  spartan error messages, and alternative notion of type soundness. }
 
 @;terms{CS}
 @;keywords{CS}

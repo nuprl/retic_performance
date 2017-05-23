@@ -20,6 +20,6 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
  @; NOTE from matthias: "may wish to investigate how each weakening of Reticulated
  @;  affects the performance profile of gradual typing; our method of linear
  @;  sampling provides a thorough evaluation framework.
- Finally, the research community must
- continue to search for ways to improve the performance of sound, gradually
- typed languages.
+ @;Finally, the research community must
+ @;continue to search for ways to improve the performance of sound, gradually
+ @;typed languages.

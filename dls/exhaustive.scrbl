@@ -92,7 +92,7 @@ The following descriptions credit each benchmark's original author,
 @list[
   @lib-desc["os"]{path split}
 ]]{
-  Applies SHA-1 and SHA-512 to English words.
+  Applies the SHA-1 and SHA-512 algorithms to English words.
   @; 1 iteration
 }
 
@@ -224,7 +224,7 @@ The following descriptions credit each benchmark's original author,
 @list[
   @lib-desc["operator"]{itemgetter}
 ]]{
-  Implements Kruskal's spanning-tree algorithm@~cite[k-ams-1956].
+  Implements Kruskal's spanning-tree algorithm.
   @; 1 iteration
 }
 
@@ -336,8 +336,8 @@ If many benchmarks have many low-overhead configurations, a developer
  that applies gradual typing has a higher chance of arriving at a configuration
  that is @deliverable{D} for a value of @${D} that meets their requirements.
 
-@(let ([d0 "d_0"]
-       [d1 "d_1"]) @elem{
+@(let ([d0 "a"]
+       [d1 "b"]) @elem{
   After surveying the area under a curve, the second most important aspects of
    an overhead plot are the values of @${D} where the curve starts and ends.
   More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
@@ -353,8 +353,8 @@ If many benchmarks have many low-overhead configurations, a developer
 @; given the choice of type annotations
 
 Lastly, the slope of a curve corresponds to the likelihood that
- accepting a small increase in performance overhead makes a given configuration
- deliverable.
+ accepting a small increase in performance overhead increases the number
+ of deliverable configurations.
 A flat curve (zero slope) suggests that the performance of a group of
  configurations is dominated by a common set of type annotations.
 
@@ -363,7 +363,8 @@ A flat curve (zero slope) suggests that the performance of a group of
 
 Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
-This value is always less than @id[MAX-OVERHEAD]; every configuration in the
+This value is always less than @id[MAX-OVERHEAD].
+In other words, every configuration in the
  experiment is @deliverable[MAX-OVERHEAD].
 For many benchmarks, the maximum overhead is significantly lower.
 Indeed, seven benchmarks are @deliverable{2}.
@@ -390,7 +391,7 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
 This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
+ in short, the implementation does not dynamically type-check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
@@ -400,8 +401,8 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
 ]
 
 Since changing the type annotations in a Reticulated program changes its
- performance, the language should provide a cost model so that developers
- can predict the performance of a given configuration.
+ performance, the language should provide a cost model to help developers
+ predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  works well for these benchmarks: @emph{the performance of a configuration is
  proportional to the number of typed components in the configuration}.
@@ -416,9 +417,9 @@ Each point compares the number of typed functions, methods, and classes in a
 
 The plots contain many points with both the same number of typed components
  and similar performance.
-To reduce the visual overlap between such points, the data for a given
+To reduce the visual overlap between such points, the points for a given
  configuration are spread across the @|x-axis|.
-In particular, the @id[NUM-ITERATIONS] points for a configuration with @math{N}
+The @id[NUM-ITERATIONS] points for a configuration with @math{N}
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
 For example, the @bm{fannkuch} benchmark has two configurations: one untyped
