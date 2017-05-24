@@ -625,10 +625,10 @@
       (elem ($ (~a pct)) "%-")
       (elem)))
   (define r-elem
-    (if (real? r) (id r) r))
+    (if (real? r) (~a r) r))
   (define s-elem
-    (if (real? s) (id s) s))
-  (elem pct-elem r-elem "," s-elem "-approximation"))
+    (if (real? s) (~a s) s))
+  (elem pct-elem ($ r-elem ", " s-elem) "-approximation"))
 
 (define sra
   "simple random approximation")

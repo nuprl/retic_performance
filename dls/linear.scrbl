@@ -53,8 +53,8 @@ The following definition capture the informal sampling protocol outlined above:
 
 @definition[@approximation["r" "s" "95"]]{
    A 95% confidence interval generated from @${r} samples, each made of @${s}
-   @deliverable{D} configurations.
-  (a @emph{formally simple random approximation}.)
+   @deliverable{D} configurations is an @approximation["r" "s" "95"]
+  (informally, a @emph{simple random approximation}.)
   @; ^^^ to disambiguate from other approximations
 }
 
@@ -120,7 +120,7 @@ For a benchmark containing @${F} functions and @${C} classes,
   this chance slightly increases the odds of drawing an extreme outlier.}
 These intervals are superimposed on the overhead plots from @figure-ref{fig:overhead}.
 
-These particular @approximation[NUM-SAMPLE-TRIALS @smaller{@${[@id[SAMPLE-RATE](F+C)]}} "95"]s
+These particular @approximation[NUM-SAMPLE-TRIALS (format "~a(F+C)" SAMPLE-RATE) "95"]s
  @; ... could just say "simple random approximation"
  all contain the the true number of @deliverable{D} configurations for values of
  @${D} between 1 and @id[MAX-OVERHEAD].
