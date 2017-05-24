@@ -2,13 +2,13 @@
 
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
-Reticulated lacks support for unions, recursive types and variable-arity functions.
-Additionally, Reticulated's error messages rarely provide actionable feedback. Finally, Reticulated guarantees an alternative notion of type soundness.
-These factors contribute to the seemingly-improved relative performance of Reticulated.
 The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017]. While implementation technology and the peculiarities of the programs
- affect performance, this order-of-magnitude gap suggests fundamental differences. 
+ affect performance, this order-of-magnitude gap suggests fundamental differences between Typed Racket and Reticulated.
+
+We have identified three factors that contribute to the seemingly-impressive performance of Reticulated. First, Reticulated's type system lacks support for common Python idioms. Second, Reticulated's error messages rarely provide actionable feedback. 
+Third, Reticulated guarantees an alternative notion of type soundness.
 
 @section{Missing Types}
 @(define pystone-union-fields
@@ -26,21 +26,15 @@ By contrast, many partially typed Typed Racket programs are two orders of
 @(define dyn* '(go pystone stats take5))
 @; TODO add better in-file evidence
 
-@Integer->word[(length dyn*)] of our benchmarks must resort to dynamic typing
- because Reticulated cannot express the desired type.
-The @bm{pystone} and @bm{stats} benchmarks require union types.
-The @bm{go} benchmark contains a recursive class type.
-Fourth, one function in the @bm{take5} benchmark accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
-
-If Reticulated cannot express such types, Python programmers will frequently
- need to rewrite their programs before they can try gradual typing.
-We rewrote several benchmarks that used @tt{None} as
- a default value to use a well-typed sentinel value.
-
-Such rewrites are both time-consuming and prone to introduce bugs.
-Developers would benefit if Reticulated added support for these types.
-Indeed, @|PEP-484| specifies syntax for generics, untagged union types,
+Reticulated currently lacks union types, recursive types, and types for variable-arity functions.
+These types are essential for expressing common Python idioms; in fact @|PEP-484| specifies syntax for generics, untagged union types,
  recursive types, optional arguments, and keyword arguments.
+We rewrote several programs that used optional arguments and union types. 
+Four of the benchmarks continue to use dynamic typing because Reticulated cannot express the desired type:
+the @bm{pystone} and @bm{stats} programs require union types;
+the @bm{go} program contains a recursive class type;
+and one function in @bm{take5} accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
+Such rewrites are both time-consuming and prone to introduce bugs.
 
 Enforcing these types at run-time, however, will impose a higher cost than
  the single-test types that Reticulated programmers must currently use.
