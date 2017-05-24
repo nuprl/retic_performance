@@ -617,7 +617,7 @@
       (number->string D)]
      [else
       (raise-argument-error 'deliverable "(or/c positive-real? string?)" D)]))
-  (elem (emph d-str) "-deliverable"))
+  (elem ($ d-str) "-deliverable"))
 
 (define (approximation r s [pct #f])
   (define pct-elem

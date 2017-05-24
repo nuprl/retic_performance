@@ -7,10 +7,8 @@ Additionally, Reticulated's error messages rarely provide actionable feedback. F
 These factors contribute to the seemingly-improved relative performance of Reticulated.
 The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
- magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017].
-While implementation technology and the peculiarities of the programs
- affect performance, this order-of-magnitude gap suggests fundamental differences
- between Typed Racket and Reticulated. 
+ magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017]. While implementation technology and the peculiarities of the programs
+ affect performance, this order-of-magnitude gap suggests fundamental differences. 
 
 @section{Missing Types}
 @(define pystone-union-fields
@@ -66,35 +64,8 @@ Two kinds of "faults" can occur in Reticulated. Static type errors and dynamic t
 While Reticulated produces decent error messages for static type errors, it fails to produce quality error messages for dynamic type errors.
 For dynamic type errors the developer wants to know the value which caused the error, the type information related to the error and the type boundary where the code went wrong.
 
-Consider the following error message obtained by calling @code{dyn_add_cash(20)} from section 2.
-
-@python{
-Traceback (most recent call last): File "Currency.py", line 4, in
-  check0 self.dollars = d AttributeError: 'int' object has no
-  attribute 'dollars'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last): File
-  "/Library/Frameworks/Python.framework/Versions/3.4/bin/retic", line
-  9, in <module> load_entry_point('retic==0.1.0', 'console_scripts',
-  'retic')() File
-  "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages/retic-0.1.0-py3.4.egg/retic/retic.py",
-  line 155, in main reticulate(program, prog_args=args.args.split(),
-  flag_sets=args) File
-  "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages/retic-0.1.0-py3.4.egg/retic/retic.py",
-  line 107, in reticulate utils.handle_runtime_error(exit=True) File
-  "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages/retic-0.1.0-py3.4.egg/retic/retic.py",
-  line 102, in reticulate _exec(code, __main__.__dict__) File
-  "/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages/retic-0.1.0-py3.4.egg/retic/exec3/__init__.py",
-  line 2, in _exec exec (obj, globs, locs) File "Currency.py", line
-  272, in <module> File "Currency.py", line 14, in dyn_add_cash
-  c1.add_cash(amount) File "Currency.py", line 10, in check0
-    
-retic.transient.CheckError: 20
-}
-
-In this case, Reticulated does not give type information about the wrong
+We inspect the error message that Reticulated generates when we call
+@code{dyn_add_cash(20)} from section 2 (see appendix). Reticulated does not give type information about the wrong
 argument @code{20} or the expected value of @code{add_cash}, nor does
 it point to the location of the error.  Instead, it supplies a stack
 trace and a value that fails some check, leaving the programmar to

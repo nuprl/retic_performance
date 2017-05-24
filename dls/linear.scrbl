@@ -52,10 +52,9 @@ After all, if the true proportion of @deliverable{D} configurations is
 The following definition capture the informal sampling protocol outlined above:
 
 @definition[@approximation["r" "s" "95"]]{
-  A @approximation["r" "s" "95"] of the proportion of @deliverable{D} configurations is
-   a 95% confidence interval generated from @${r} samples, each made of @${s}
-   configurations.
-  (a @emph{simple random approximation}.)
+   A 95% confidence interval generated from @${r} samples, each made of @${s}
+   @deliverable{D} configurations.
+  (a @emph{formally simple random approximation}.)
   @; ^^^ to disambiguate from other approximations
 }
 

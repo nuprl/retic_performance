@@ -425,7 +425,7 @@ To reduce the visual overlap between such points, the points for a given
 The @id[NUM-ITERATIONS] points for a configuration with @math{N}
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
-For example, the @bm{fannkuch} benchmark has two configurations: one untyped
+For example, @bm{fannkuch} has two configurations: one untyped
  configuration with zero typed components and one fully-typed configuration
   with one typed component.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents

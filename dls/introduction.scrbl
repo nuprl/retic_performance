@@ -31,7 +31,7 @@ If a program consists of @${n} components, Takikawa et al. propose to measure
 @math{2^n} configurations. Doing so mimics the process through which
 programmers may gradually equip all possible sites for type declarations
 with annotations. In order to evaluate these measurements, they propose a
-simple metric, the proportion of @emph{@deliverable{D}} configurations, meaning the
+simple metric, the proportion of @emph{D-deliverable} configurations, meaning the
 number of configurations whose running time is at most
 @math{D}x slower than the untyped configuration.
 Follow-up work by @citet[greenman-jfp-2017] confirms that a
