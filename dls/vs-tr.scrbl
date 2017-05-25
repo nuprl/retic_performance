@@ -54,94 +54,61 @@ If, for example, every type annotation @${T} in our benchmarks was instead a
 
 Errors matter@~cite[f-keynote-2002].
 When systems work, everyone is happy, but when systems break, developers want error messages that pinpoint the source of the fault.
-Two kinds of "faults" can occur in Reticulated. Static type errors and dynamic type errors.
-While Reticulated produces decent error messages for static type errors, it fails to produce quality error messages for dynamic type errors.
-For dynamic type errors the developer wants to know the value which caused the error, the type information related to the error and the type boundary where the code went wrong.
 
-We inspect the error message that Reticulated generates when we call
-@code{dyn_add_cash(20)} from section 2 (see appendix). Reticulated does not give type information about the wrong
-argument @code{20} or the expected value of @code{add_cash}, nor does
-it point to the location of the error.  Instead, it supplies a stack
-trace and a value that fails some check, leaving the programmar to
-deduce the error without much aid from error message.
+Two kinds of faults can occur in Reticulated: static type errors and dynamic type errors.
+A static type error is a mismatch between two types.
+A dynamic type error is the result of a mismatch between a type annotation and an untyped value;
+ typically, a dynamic type error occurs long after the mis-matched value entered typed code.
 
-For flat types, these clues may suffice to deduce the type
- check that halted the program.
-@;;;To illustrate, consider the following small program:
-@;;;
-@;;;@nested[@python|{
-@;;;def id(x)->Int:
-@;;;  return x
-@;;;id(None)
-@;;;}|]@;
-@;;;running this program produces the following error message:
-@;;;
-@;;;@nested[@exact|{{\footnotesize\begin{verbatim}
-@;;;Traceback (most recent call last):
-@;;;  File "/usr/local/bin/retic", line 6, in <module>
-@;;;    retic.main()
-@;;;  File ".../reticulated/retic/retic.py", line 155, in main
-@;;;    reticulate(program, prog_args=args.args.split(), flag_sets=args)
-@;;;  File ".../reticulated/retic/retic.py", line 104, in reticulate
-@;;;    utils.handle_runtime_error(exit=True)
-@;;;  File ".../reticulated/retic/retic.py", line 102, in reticulate
-@;;;    _exec(code, __main__.__dict__)
-@;;;  File ".../reticulated/retic/exec3/__init__.py", line 2, in _exec
-@;;;    exec (obj, globs, locs)
-@;;;  File "test.py", line 3, in <module>
-@;;;    id(None)
-@;;;  File "test.py", line 2, in id
-@;;;    return x
-@;;;  File ".../reticulated/retic/runtime.py", line 91, in check_type_int
-@;;;    return val if isinstance(val, int) else (check_type_bool(val) if not flags.FLAT_PRIMITIVES else rse(val))
-@;;;  File ".../reticulated/retic/runtime.py", line 100, in check_type_bool
-@;;;    return val if isinstance(val, bool) else rse(val)
-@;;;  File ".../reticulated/retic/runtime.py", line 88, in rse
-@;;;    raise Exception(x)
-@;;;Exception: None
-@;;;\end{verbatim}}}|]@;
-For function types and parameterized types, the relevant annotation is
- slightly harder to find, but still possible via the stack trace.
-Unfortunately, such annotations are useless if they are correct.
-If the fault is due to a bad value, the programmer must inspect the program to
- find where it came from.
+When Reticulated discovers a static type error, it reports the current line number and the conflicting types.
+To its credit, this information often pinpoints the source of the fault.
 
-Refining the error messages will add performance overhead.
-For example, @citet[vss-popl-2017] built an extension to Reticulated that improves these
- error messages by reporting all casts that may have led to the dynamic type error.
-Their evaluation reports that @|t/p-ratio| may double"
+When Reticulated discovers a dynamic type error, it prints a value that failed some check (e.g., @pythoninline|{ retic.transient.CheckError: 20 }|) and a stack trace.
+This information does little to help the programmer to discover what went wrong.
+
+Refining the dynamic error messages will add performance overhead.
+For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
+Their evaluation reports that tracking these casts may double a program's @|t/p-ratio|.
 
 @section{Alternative Soundness}
 
 Sound type systems are useful because they provide guarantees.
-If a static type system proves that a term has type @${\tau}, then @${\tau}
- specifies the term's behavior.
-The type system can use this specification to find small logical errors throughout a program;
- the compiler can rely on this specification to generate efficient code;
- the programmer can trust this specification as an API.
+A sound @emph{static} type system guarantees that evaluating a well-typed program can result in one of three possible outcomes:
+ evaluation terminates with a value of the same type; evaluation diverges; or evaluation raises an error from a well-defined set.
+A sound gradual type system cannot provide the same guarantee because it admits untyped code.
+Thus, a gradual type system must redefine soundness.
 
-Consider the following notion of soundness:
-
-If a program type-checks, running it can result in one of the following outcomes:
-
+One approach is to generalize traditional type soundness with a fourth clause to cover interactions between typed and untyped code.
+Typed Racket takes this approach@~cite[tfffgksst-snapl-2017].
+In particular, if the program @${e} is well typed at type @${\tau}, then either:
 @itemlist[#:style 'ordered
 @item{
-Execution terminates, returning and printing values of the predicted type.
+ @${e} reduces to a value @${v} with type @${\tau};
 }
 @item{
-Execution diverges.
+  @${e} diverges
 }
 @item{
-Execution ends in one of a number of well-specified exception states.
+  @${e} raises an error from a well-defined set;
 }
 @item{
-Execution ends in an exceptional state and points to one of the boundaries between typed and untyped code.
+  @${e} raises an exceptional error that points to one boundary between typed and untyped code.
 }
 ]
 
-The first three outcomes are from the soundness theorem, and apply to fully typed code. The four outcomes together are a generalization of the soundness theorem to include partially typed code.
+A second approach is to modify the traditional notion of soundness.
+Reticulated takes this approach@~cite[vss-popl-2017], and modifies the first clause:@note{Reticulated also modifies the fourth clause. The version of Reticulated that we evaluated }
+@itemlist[#:style 'ordered
+@item{
+  @${e} reduces to a value @${v} with tag @$|{\lfloor\tau\rfloor}|
+}]@;
+, where @$|{\lfloor\tau\rfloor}| is the top-level tag of @${\tau}.
+For example, @$|{\lfloor\mathsf{List(Int)}\rfloor}| is @$|{\mathsf{List}}|.
 
-Reticulated defines gradual typing soundness is to modify the first clause to only guarantee tag-level soundness. Reticulated also modifies the fourth clause so that it points to a number of boundaries between typed and untyped code.
+ @; (and technically, the fourth clause@note{Reticulated with blame-tracking reports
+ @;      multiple boundaries between typed and untyped code@~cite[vss-popl-2017].
+ @;      We have not evaluated that version of Reticulated because it was not implemented when we started our experiment.}):
+
 
 @; -------------------------------------------------------
 @; MF: we should put a visual marker here, like a line 
