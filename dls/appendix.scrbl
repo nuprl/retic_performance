@@ -1,8 +1,5 @@
 #lang gm-dls-2017
-@exact|{\appendix }|
-@title[#:style "appendices"]{Appendix}
-
-
+@title[#:style 'unnumbered]{Appendix}
 
 @figure-here["fig:badcode" @elem{Reticulated program @tt{my_file.py}.}
 @python|{
