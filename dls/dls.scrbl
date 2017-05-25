@@ -18,12 +18,12 @@
      #:country "USA"])
 
 @author["Ben Greenman"
-        #:email "types@ccs.neu.edu"
+        #:email "benjaminlgreenman@gmail.com"
         #:orcid "0000-0001-7078-9287"
         #:affiliation NEU]
 
 @author["Zeina Migeed"
-        #:email "abdelmigeed.z@husky.neu.edu"
+        #:email "migeed.z@outlook.com"
         #:affiliation NEU]
 
 @; -----------------------------------------------------------------------------
