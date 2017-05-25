@@ -7,10 +7,6 @@
 @; cocktails are.  Look how clean you keep your bar.  Why, man, you actually
 @; take pride in your work. --- Cocktail, 1988
 
-@;title{Performance Evaluation of Reticulated Python}
-@;title{Linear Samples Suffice}
-@;title{You Get What you Pay For (Gradual Typing for Low, Low Prices)}
-@;title{The Cost of Transient}
 @title{Is Sound Gradual Typing Alive?}
 
 @(define NEU
