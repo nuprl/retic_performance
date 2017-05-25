@@ -57,14 +57,24 @@ When systems work, everyone is happy, but when systems break, developers want er
 
 Two kinds of faults can occur in Reticulated: static type errors and dynamic type errors.
 A static type error is a mismatch between two types.
-A dynamic type error is the result of a mismatch between a type annotation and an untyped value;
- typically, a dynamic type error occurs long after the mis-matched value entered typed code.
+A dynamic type error is the result of a mismatch between a type annotation and an untyped value.
+Typically, a dynamic type error occurs long after the value entered typed code.
 
 When Reticulated discovers a static type error, it reports the current line number and the conflicting types.
 To its credit, this information often pinpoints the source of the fault.
 
-When Reticulated discovers a dynamic type error, it prints a value that failed some check (e.g., @pythoninline|{ retic.transient.CheckError: 20 }|) and a stack trace.
-This information does little to help the programmer to discover what went wrong.
+When Reticulated discovers a dynamic type error, it prints a value,
+ the name of the check that failed, and a stack trace.
+This information does little to diagnose the problem.
+For one, the relevant type annotation is not reported.
+A programmer must scan the stack trace for line numbers and consider the type
+ annotations that are in scope.
+Second, the value in the error message may be derived from the value that
+ is incompatible with its type annotation.
+For instance, the reported value may be an element of an ill-typed data structure
+ or a return value of an ill-typed function.
+Third, the relevant boundary is rarely on the stack trace when the program
+ raises the check error.
 
 Refining the dynamic error messages will add performance overhead.
 For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
