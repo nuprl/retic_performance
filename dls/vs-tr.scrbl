@@ -114,23 +114,21 @@ In particular, if a program @${e} is well typed at type @${\tau}, then either:
 }
 ]
 
-A second approach is to @emph{modify} the traditional notion of soundness.
-Reticulated takes this approach@~cite[vss-popl-2017], and changes the first
- clause:@note{As for the other clauses, the version of Reticulated that we
-  evaluated will either diverge, raise an error due to an inserted check (see
-  @section-ref{sec:vs-tr:errors}), or raise a Python error. Reticulated with
-  blame@~cite[vss-popl-2017] will either diverge, raise an error that blames one
-  or more type boundaries, or raise a Python error.}
+A second approach is to @emph{modify} soundness.
+Reticulated@~cite[vss-popl-2017] takes this approach, and weakens the first and fourth clauses:
 @exact|{
 \begin{itemize}
 \item[$1'$.]
-  $e$ reduces to a value ${v}$ with type tag ${\lfloor\tau\rfloor}$.
+  $e$ reduces to a value ${v}$ with type tag ${\lfloor\tau\rfloor}$;
+\item[$4'$.]
+  $e$ signals an exception that points to a set of potentially guilty boundaries between typed and untyped code.
 \end{itemize}
-The type tag of ${\tau}$ is its outermost constructor. For example,
- the type tag of ${\mathsf{List(Int)}}$ is ${\mathsf{List}}$.
-}|
+The type tag of ${\tau}$ is its outermost constructor.
+For example, the type tag of ${\mathsf{List(Int)}}$ is ${\mathsf{List}}$.}|
+The set of boundaries is always empty in the version of Reticulated that was public when we began our evaluation@~cite[vksb-dls-2014];
+ @section-ref{sec:vs-tr:errors} addresses the performance implications of @${4'}.
 
-As @figure-ref{fig:magic} demonstrates, this alternative soundness implies that a Reticulated term with
+As @figure-ref{fig:magic} demonstrates, the modified clause @${1'} implies that a Reticulated term with
  type @tt{List(String)} may evaluate to a list containing any kind of data.
 On one hand, this fact is harmless because type-tag soundness implies that any
  read from a variable with type @tt{List(String)} in typed code is tag-checked.
@@ -148,9 +146,13 @@ Thus, two interesting scenarios can arise:
 It remains to be seen whether these potential scenarios cause serious issues in practice.
 Developers may embrace the flexibility of alternative soundness and use
  Reticulated in combination with unit tests.
-The only conclusion our data supports is that Reticulated's type-tag checks
- impose far less performance overhead than Typed Racket's behavioral contracts.
 }|
+
+The performance implications of @${1'} are substantial.
+A gradual type system that enforces traditional soundness must exhaustively traverse
+ data structures before they leave typed code, and must monitor functional values
+ to ensure their future applications are well-typed.
+Enforcing @${1'} requires a tag check, nothing more.
 
 @figure["fig:magic"
         @list{A well-typed Reticulated program}]{
