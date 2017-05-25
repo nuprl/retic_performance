@@ -34,7 +34,7 @@ These measurement biases@~cite[mdhs-asplos-2009] may explain the outliers eviden
                       @elem{
                         @(if long-style? "The" "the")
                         @hyperlink[(caddr ld)]{@tt[@symbol->string[(car ld)]]}
-                        library contains over @id[(cadr ld)]@;
+                        library contains over @${@id[(cadr ld)]}@;
                         @(if long-style? " functions and methods" "")}))]
        ) @elem{
   First, the experiment consists of a small suite of benchmarks, and these

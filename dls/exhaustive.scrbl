@@ -266,36 +266,29 @@ These ratios correspond to the extreme endpoints of gradual typing:
  the performance of the fully-typed configuration relative to the untyped configuration in Reticulated (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
-For example, the row for @bm{futen} reports a @|u/p-ratio| of 1.61.
+For example, the row for @bm{futen} reports a @|u/p-ratio| of @${1.61}.
 This means that the average time to run the untyped configuration of the
- @bm{futen} benchmark using Reticulated was 1.61 times slower than the
+ @bm{futen} benchmark using Reticulated was @${1.61} times slower than the
  average time of running the same code using @|PYTHON|.
 Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
- is 1.04 times slower than the untyped configuration.
+ is @${1.04} times slower than the untyped configuration.
 
-@; TODO one hand,other hand
-These ratios demonstrate that migrating a benchmark to
+On one hand, these ratios demonstrate that migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
-However, the overhead is always within an order-of-magnitude.
-Regarding the @|u/p-ratio|s: ten are below 2x,
- five are between 2x and 3x, and
- the remaining four are below 4.5x.
+On the other hand, the overhead is always within an order-of-magnitude.
+Regarding the @|u/p-ratio|s: ten are below @${2}x,
+ five are between @${2}x and @${3}x, and
+ the remaining four are below @${4.5}x.
 The @|t/u-ratio|s are typically lower:
-  fifteen are below 2x,
-  one is between 2x and 3x,
-  and the final three are below 3.5x.
+  fifteen are below @${2}x,
+  one is between @${2}x and @${3}x,
+  and the final three are below @${3.5}x.
 In particular, twelve of the benchmarks
  have larger @|u/p-ratio|s than @|t/u-ratio|s.
 This data suggests that migrating an arbitrary
  Python program to Reticulated adds a relatively larger overhead
  than migrating the same program to a fully-typed configuration.
-
-@; For developers:
-@; - the PERFORMANCE pain of choosing retic
-@; - should be LESS than the PERFORMANCE pain of adding type annotations
-@; - I mean, the overall pain will be their PRODUCT
-@; - but just running under retic should tell you what to expect
 
 
 @section[#:tag "sec:overhead"]{Overhead Plots}
@@ -314,9 +307,9 @@ This data suggests that migrating an arbitrary
  Reticulated @emph{relative to Python} across all
  configurations of the @integer->word[NUM-EXHAUSTIVE-BENCHMARKS] benchmarks.
 Each overhead plot reports the percent of @deliverable[] configurations (@|y-axis|)
- for values of @${D} between 1 and @id[MAX-OVERHEAD] (@|x-axis|).
+ for values of @${D} between @${1} and @${@id[MAX-OVERHEAD]} (@|x-axis|).
 The @|x-axes| are log-scaled to focus on low overheads;
- vertical tick marks appear at 1.2x, 1.4x, 1.6x, 1.8x, 4x, 6x, and 8x overhead.
+ vertical tick marks appear at @${1.2}x, @${1.4}x, @${1.6}x, @${1.8}x, @${4}x, @${6}x, and @${8}x overhead.
 
 The heading above the plot for a given benchmark lists the benchmark's name
  and number of configurations.
@@ -325,7 +318,6 @@ Note that the number of configurations is equal to @$|{2^{F+C}}|,
 @; TODO being the same
 
 @parag{How to Read the Overhead Plots}
-@; HMMMM "are" is NOT correct, but it sticks.
 Overhead plots are cumulative distribution functions.
 As the value of @${D} increases along the @|x-axis|, the number of
  @deliverable{D} configurations can only increase or stay the same.
@@ -365,7 +357,7 @@ A flat curve (zero slope) suggests that the performance of a group of
 
 Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
-This value is always less than @id[MAX-OVERHEAD].
+This value is always less than @${@id[MAX-OVERHEAD]}.
 In other words, every configuration in the
  experiment is @deliverable[MAX-OVERHEAD].
 For many benchmarks, the maximum overhead is significantly lower.
@@ -391,7 +383,7 @@ This is no surprise, since Reticulated adds run-time checks to Python code for
 In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
- runs faster than @id[@percent-slower-than-typed{spectralnorm}]% of the configurations.
+ runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of the configurations.
 This speedup occurs because of an unsoundness in the implementation of Reticulated;
  in short, the implementation does not dynamically type-check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
 @; TODO bad linebreak

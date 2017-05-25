@@ -22,7 +22,7 @@ Reticulated aims to enforce the first three conditions by static type-checking,
 
 @Figure-ref{fig:cash} presents a well-typed class definition.
 If we add the method call @pythoninline{c1.add_cash(20)} to the program,
- then Reticulated raises a static type error because the integer @${20}
+ then Reticulated raises a static type error because the integer @pythoninline{20}
  is not an instance of the @pythoninline{Cash} class.
 Contrast this to an ill-typed call that occurs in a dynamically-typed context:
 

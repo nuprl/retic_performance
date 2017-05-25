@@ -5,7 +5,7 @@
 The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017]. While implementation technology and the peculiarities of the programs
- affect performance, this 10x gap suggests fundamental differences.
+ affect performance, this @${10}x gap suggests fundamental differences.
 
 We have identified three factors that contribute to the extraodinary performance of Reticulated.
 First, Reticulated's type system lacks support for common Python idioms.
@@ -49,7 +49,7 @@ A union type or (equi-)recursive type requires a disjunction of type tests, and
  a variable-arity procedure requires a sequence of type checks.
 If, for example, every type annotation @${T} in our benchmarks was instead a
  union type with @${T} and @tt{Void}, then overall performance would be nearly
- 2x worse.
+ @${2}x worse.
 
 
 @section[#:tag "sec:vs-tr:errors"]{Uninformative Errors}

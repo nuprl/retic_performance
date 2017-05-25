@@ -31,7 +31,7 @@ First, the parameter @${D} addresses the fact that different software applicatio
 Second, the proportion quantifies over the entire configuration space of a
  program---because it is impossible to predict how developers will apply gradual
   typing.@note{
-    The promise of gradual typing is that developers can soundly run @emph{any configuration}.
+    The promise of gradual typing is that developers can run @emph{any configuration}.
     At present, there is no data to suggest that developers are more likely to
     choose some configurations over others.}
 For an arbitrary configuration, the proportion of @deliverable{D} configurations
@@ -203,7 +203,7 @@ The intervals are futhermore small, and thus practical substitutes for the overh
  in @section-ref{sec:protocol} to random configurations.
 Specifically, the data for a benchmark with @${F} functions and @${C} classes
  consists of @integer->word[NUM-SAMPLE-TRIALS] samples of
- @${@id[SAMPLE-RATE]*(F+C)} configurations selected without replacement.
+ @${@id[SAMPLE-RATE](F+C)} configurations selected without replacement.
 These results confirm many trends in earlier data:
 @itemlist[
 @item{

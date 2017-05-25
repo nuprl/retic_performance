@@ -28,7 +28,7 @@ how significant this cost is.
 @citet[takikawa-popl-2016] present the first comprehensive method for
 evaluating the performance of gradual typing systems.
 If a program consists of @${n} components, Takikawa et al. propose to measure
-@math{2^n} configurations. Doing so mimics the process through which
+@${2^n} configurations. Doing so mimics the process through which
 programmers may gradually equip all possible sites for type declarations
 with annotations. In order to evaluate these measurements, they propose a
 simple metric, the proportion of @emph{D-deliverable} configurations, meaning the
