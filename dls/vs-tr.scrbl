@@ -10,7 +10,7 @@ By contrast, many partially typed Typed Racket programs are two orders of
 We have identified three factors that contribute to the seemingly-impressive performance of Reticulated. First, Reticulated's type system lacks support for common Python idioms. Second, Reticulated's error messages rarely provide actionable feedback. 
 Third, Reticulated guarantees an alternative notion of type soundness.
 
-@section{Missing Types}
+@section[#:tag "sec:vs-tr:types"]{Missing Types}
 @(define pystone-union-fields
         @; grep for 'PtrComp = ' to find assignments
         @; It's initially `None`, and assigned away-from and back-to `None`
@@ -45,7 +45,7 @@ If, for example, every type annotation @${T} in our benchmarks was instead a
  2x worse.
 
 
-@section{Uninformative Errors}
+@section[#:tag "sec:vs-tr:errors"]{Uninformative Errors}
 @(define vss-popl-2017-benchmarks
    '(callsimple nqueens pidigits meteor fannkuch nbody callmethod
      callmethodslots pystone float chaos go spectralnorm))
@@ -70,26 +70,26 @@ Refining the dynamic error messages will add performance overhead.
 For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
 Their evaluation reports that tracking these casts may double a program's @|t/p-ratio|.
 
-@section{Alternative Soundness}
+@section[#:tag "sec:vs-tr:soundness"]{Alternative Soundness}
 
 Sound type systems are useful because they provide guarantees.
 A sound @emph{static} type system guarantees that evaluating a well-typed program can result in one of three possible outcomes:
  evaluation terminates with a value of the same type; evaluation diverges; or evaluation raises an error from a well-defined set.
-A sound gradual type system cannot provide the same guarantee because it admits untyped code.
+A sound @emph{gradual} type system cannot provide the same guarantee because it admits untyped code.
 Thus, a gradual type system must redefine soundness.
 
 One approach is to generalize traditional type soundness with a fourth clause to cover interactions between typed and untyped code.
 Typed Racket takes this approach@~cite[tfffgksst-snapl-2017].
-In particular, if the program @${e} is well typed at type @${\tau}, then either:
+In particular, if a program @${e} is well typed at type @${\tau}, then either:
 @itemlist[#:style 'ordered
 @item{
  @${e} reduces to a value @${v} with type @${\tau};
 }
 @item{
-  @${e} diverges
+  @${e} diverges;
 }
 @item{
-  @${e} raises an error from a well-defined set;
+  @${e} raises an error from a well-defined set; or
 }
 @item{
   @${e} raises an exceptional error that points to one boundary between typed and untyped code.
@@ -97,25 +97,44 @@ In particular, if the program @${e} is well typed at type @${\tau}, then either:
 ]
 
 A second approach is to modify the traditional notion of soundness.
-Reticulated takes this approach@~cite[vss-popl-2017], and modifies the first clause:@note{Reticulated also modifies the fourth clause. The version of Reticulated that we evaluated }
+Reticulated takes this approach@~cite[vss-popl-2017], and changes the first
+ clause:@note{As for the other clauses, the version of Reticulated that we
+  evaluated will either diverge, raise an error due to an inserted check (see
+  @section-ref{sec:vs-tr:errors}), or raise a Python error. Reticulated with
+  blame@~cite[vss-popl-2017] will either diverge, raise an error that blames one
+  or more type boundaries, or raise a Python error.}
+@exact|{
+\begin{itemize}
+\item[1.']
+  $e$ reduces to a value ${v}$ with type tag ${\lfloor\tau\rfloor}$.
+\end{itemize}
+The type tag of ${\tau}$ is its outermost constructor. For example,
+ the type tag of ${\mathsf{List(Int)}}$ is ${\mathsf{List}}$.
+}|
+
+As @figure-ref{fig:magic} demonstrates, this alternative soundness implies that a Reticulated term with
+ type @tt{List(String)} may evaluate to a list containing any kind of data.
+On one hand, this fact is harmless since type-tag soundness implies that any
+ read from a variable with type @tt{List(String)} is tag-checked.
+On the other hand, Reticulated does not monitor values that leave a typed region.
+Thus, two interesting scenarios can arise:
 @itemlist[#:style 'ordered
 @item{
-  @${e} reduces to a value @${v} with tag @$|{\lfloor\tau\rfloor}|
-}]@;
-, where @$|{\lfloor\tau\rfloor}| is the top-level tag of @${\tau}.
-For example, @$|{\lfloor\mathsf{List(Int)}\rfloor}| is @$|{\mathsf{List}}|.
+  (the @emph{typhoid mary} scenario) Typed code can create an ill-typed value,
+  pass it to untyped code, and trigger an error by violating an implicit
+  assumption in the untyped code.
+  The source of such ``disguised'' type errors may be impossible to pinpoint.
+}
+@item{
+  (the @emph{sybil} scenario) Two typed contexts can safely reference the same value at incompatible types.
+}
+]@;
+It remains to be seen whether these potential scenarios cause serious issues in practice.
+Developers may embrace the flexibility of the alternative soundness and use
+ Reticulated in combination with unit tests.
+The only conclusion our data supports is that Reticulated's type-tag checks
+ impose less performance overhead than Typed Racket's behavioral contracts.
 
- @; (and technically, the fourth clause@note{Reticulated with blame-tracking reports
- @;      multiple boundaries between typed and untyped code@~cite[vss-popl-2017].
- @;      We have not evaluated that version of Reticulated because it was not implemented when we started our experiment.}):
-
-
-@; -------------------------------------------------------
-@; MF: we should put a visual marker here, like a line 
-@(define running 
-  @exact{\par \noindent \hrulefill \par \noindent Running this program yields:})
-
-@;;;; maybe make one of these cases a nested list
 @figure["fig:magic"
         @list{A well-typed Reticulated program}]{
 @python|{
@@ -129,26 +148,4 @@ For example, @$|{\lfloor\mathsf{List(Int)}\rfloor}| is @$|{\mathsf{List}}|.
 
     make_strings()
 }|}
-
-
-As @figure-ref{fig:magic} demonstrates, a Reticulated term with type @tt{List(String)} may evaluate to a list containing any kind of data.
-On one hand, this fact is harmless since tag soundness implies that any read from a variable with type @tt{List(String)} is tag-checked.
-On the other hand, Reticulated does not guard values that exit typed regions.
-Thus, two interesting scenarios can arise:
-@itemlist[#:style 'ordered
-@item{
-  (the @emph{typhoid mary} scenario) Typed code can create an ill-typed value,
-  pass it to untyped code, and trigger an error by violating an implicit
-  assumption in the untyped code.
-  The source of such ``disguised'' type errors is difficult to track down.
-}
-@item{
-  (the @emph{sybil} scenario) Two typed contexts can safely reference the same value at incompatible types.
-}
-]@;
-It remains to be seen whether these potential scenarios cause problems in practice.
-Developers may embrace the flexibility of tag-soundness and use Reticulated
- in combination with unit tests.
-At the moment, the only conclusion our data supports is that Reticulated's
- tag checks impose less performance overhead than Typed Racket's behavioral contracts.
 
