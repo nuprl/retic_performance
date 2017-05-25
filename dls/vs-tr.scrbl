@@ -5,9 +5,12 @@
 The worst slowdown we observe in Reticulated is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
  magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017]. While implementation technology and the peculiarities of the programs
- affect performance, this order-of-magnitude gap suggests fundamental differences between Typed Racket and Reticulated.
+ affect performance, this 10x gap suggests fundamental differences.
 
-We have identified three factors that contribute to the seemingly-impressive performance of Reticulated. First, Reticulated's type system lacks support for common Python idioms. Second, Reticulated's error messages rarely provide actionable feedback. 
+We have identified three factors that contribute to the extraodinary performance of Reticulated.
+First, Reticulated's type system lacks support for common Python idioms.
+Second, Reticulated's error messages rarely provide actionable feedback.
+@; transcendent incredible
 Third, Reticulated guarantees an alternative notion of type soundness.
 
 @section[#:tag "sec:vs-tr:types"]{Missing Types}
@@ -23,18 +26,22 @@ Third, Reticulated guarantees an alternative notion of type soundness.
         @;      cols = [cols]
         @; ```
         '(abut simpleabut colex linexand recode))
-@(define dyn* '(go pystone stats take5))
+@(define dyn* '(go pystone stats take5 lisp))
 @; TODO add better in-file evidence
 
 Reticulated currently lacks union types, recursive types, and types for variable-arity functions.
-These types are essential for expressing common Python idioms; in fact @|PEP-484| specifies syntax for generics, untagged union types,
- recursive types, optional arguments, and keyword arguments.
-We rewrote several programs that used optional arguments and union types. 
-Four of the benchmarks continue to use dynamic typing because Reticulated cannot express the desired type:
-the @bm{pystone} and @bm{stats} programs require union types;
-the @bm{go} program contains a recursive class type;
-and one function in @bm{take5} accepts optional arguments.@note{@url{https://github.com/mvitousek/reticulated/issues/32}}
-Such rewrites are both time-consuming and prone to introduce bugs.
+Consequently, Reticulated could not fully-type some programs in our experiment.
+One common issue was code that used @tt{None} as a default value.
+We edited such code to use a well-typed default instead.
+Other programs required dynamic typing.
+Both @bm{pystone} and @bm{stats} need union types,
+ and @bm{go} contains a recursive class type.
+Lastly, we tried typing a Lisp interpreter, but the program made too-heavy use of union and recursive types.
+
+Rewrites are time-consuming and prone to introduce bugs; mandatory dynamic typing
+ contradicts the goals of gradual typing.
+Thus, it would benefit developers if Reticulated followed @|PEP-484| and added
+ support for unions, recursive types, and functions with optional, variable, and keyword arguments.
 
 Enforcing these types at run-time, however, will impose a higher cost than
  the single-test types that Reticulated programmers must currently use.
@@ -69,8 +76,7 @@ This information does little to diagnose the problem.
 For one, the relevant type annotation is not reported.
 A programmer must scan the stack trace for line numbers and consider the type
  annotations that are in scope.
-Second, the value in the error message may be derived from the value that
- is incompatible with its type annotation.
+Second, the value in the error message may be derived from the original incompatible value.
 For instance, the reported value may be an element of an ill-typed data structure
  or a return value of an ill-typed function.
 Third, the relevant boundary is rarely on the stack trace when the program
@@ -128,22 +134,21 @@ On one hand, this fact is harmless since type-tag soundness implies that any
  read from a variable with type @tt{List(String)} is tag-checked.
 On the other hand, Reticulated does not monitor values that leave a typed region.
 Thus, two interesting scenarios can arise:
-@itemlist[#:style 'ordered
-@item{
-  (the @emph{typhoid mary} scenario) Typed code can create an ill-typed value,
+@exact|{\begin{description}
+\item[The \href{"https://en.wikipedia.org/wiki/Mary_Mallon"}{\emph{typhoid mary}} scenario]
+  Typed code can create an ill-typed value,
   pass it to untyped code, and trigger an error by violating an implicit
   assumption in the untyped code.
   The source of such ``disguised'' type errors may be impossible to pinpoint.
-}
-@item{
-  (the @emph{sybil} scenario) Two typed contexts can safely reference the same value at incompatible types.
-}
-]@;
+\item[The \href{"https://en.wikipedia.org/wiki/Sybil_(Schreiber_book)"}{\emph{sybil}} scenario]
+  Two typed contexts can safely reference the same value at incompatible types.
+\end{description}%
 It remains to be seen whether these potential scenarios cause serious issues in practice.
 Developers may embrace the flexibility of the alternative soundness and use
  Reticulated in combination with unit tests.
 The only conclusion our data supports is that Reticulated's type-tag checks
  impose less performance overhead than Typed Racket's behavioral contracts.
+}|
 
 @figure["fig:magic"
         @list{A well-typed Reticulated program}]{
@@ -152,7 +157,7 @@ The only conclusion our data supports is that Reticulated's type-tag checks
       xs = []
       for i in range(3):
         if   i == 0: xs.append(i)
-        elif i == 1: xs.append(True)
+        elif i == 1: xs.append([True])
         else       : xs.append(make_strings)
       return xs
 
