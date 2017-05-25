@@ -68,6 +68,10 @@
   ;; (Parameterof String)
   ;; Optional tag to distinguish different cachefiles that would have the same name.
 
+  *SINGLE-COLUMN?*
+  ;; (Parameterof Boolean)
+  ;; When true, put all plots in 1 column
+
   TODO
   ;; Usage: @TODO{message}
   ;;  where `message` is an element.

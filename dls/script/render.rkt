@@ -16,6 +16,8 @@
 
   *PLOT-HEIGHT*
 
+  *SINGLE-COLUMN?*
+
   *CACHE-SUFFIX*
   ;; (Parameterof String)
   ;; Sometimes used to distinguish caches.
@@ -56,6 +58,7 @@
 (define OVERHEADS-VSPACE 10)
 (define NUM-COLUMNS 3)
 
+(define *SINGLE-COLUMN?* (make-parameter #f))
 (define *PLOT-HEIGHT* (make-parameter #f))
 (define *CACHE-SUFFIX* (make-parameter ""))
 
@@ -100,7 +103,7 @@
               (render-one (benchmark->performance-info bm))))))))
   (define col*
     (map (λ (p*) (apply vl-append OVERHEADS-VSPACE p*))
-         (columnize p* NUM-COLUMNS)))
+         (columnize p* (if (*SINGLE-COLUMN?*) 1 NUM-COLUMNS))))
   (apply ht-append OVERHEADS-HSPACE col*))
 
 (define STATIC-INFO-TITLE*
