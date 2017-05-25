@@ -74,3 +74,5 @@ This paper presents a systematic performance evaluation of Reticulated,
 }
 
 @generate-bibliography[]
+@include-section{appendix.scrbl}
+

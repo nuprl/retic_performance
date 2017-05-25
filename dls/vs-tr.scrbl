@@ -34,8 +34,8 @@ Consequently, Reticulated could not fully-type some programs in our experiment.
 One common issue was code that used @tt{None} as a default value.
 We edited such code to use a well-typed default instead.
 Other programs required dynamic typing.
-Both @bm{pystone} and @bm{stats} need union types,
- and @bm{go} contains a recursive class type.
+Both @bm{pystone} and @bm{stats} needed union types,
+ and @bm{go} contained a recursive class type.
 Lastly, we tried typing a Lisp interpreter, but the program made too-heavy use of union and recursive types.
 
 Rewrites are time-consuming and prone to introduce bugs; mandatory dynamic typing
@@ -47,8 +47,8 @@ Enforcing these types at run-time, however, will impose a higher cost than
  the single-test types that Reticulated programmers must currently use.
 A union type or (equi-)recursive type requires a disjunction of type tests, and
  a variable-arity procedure requires a sequence of type checks.
-If, for example, every type annotation @${T} in our benchmarks was instead a
- union type with @${T} and @tt{Void}, then overall performance would be nearly
+If, for example, every type annotation @${\tau} in our benchmarks was instead a
+ union type with @${\tau} and @tt{Void}, then overall performance would be nearly
  @${2}x worse.
 
 
@@ -76,15 +76,15 @@ This information does little to diagnose the problem.
 For one, the relevant type annotation is not reported.
 A programmer must scan the stack trace for line numbers and consider the type
  annotations that are in scope.
-Second, the value in the error message may be derived from the original incompatible value.
+Second, the value in the error message may not be the value that caused the error.
 For instance, the reported value may be an element of an ill-typed data structure
  or a return value of an ill-typed function.
 Third, the relevant boundary is rarely on the stack trace when the program
- raises the check error.
+ raises the check error. The stack may contain only well-typed code (see the appendix for an example).
 
 Refining the dynamic error messages will add performance overhead.
 For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
-Their evaluation reports that tracking these casts may double a program's @|t/p-ratio|.
+They report that tracking these casts may double a program's @|t/p-ratio|.
 
 @section[#:tag "sec:vs-tr:soundness"]{Alternative Soundness}
 
