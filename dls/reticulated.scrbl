@@ -43,7 +43,7 @@ At run-time, the check for the second argument throws an exception
  before the call @pythoninline{dyn_add_cash(c1, 20)} causes
  the program to fail.
 
-In addition to rewriting, Reticulated inserts similar checks around
+Reticulated inserts similar checks around
   function calls, to enforce the declared return type, and
   around reads from variables or data structures, to detect strong updates@~cite[vksb-dls-2014].
 These pervasive checks implement a notion of soundness that protects

@@ -121,7 +121,7 @@ Reticulated takes this approach@~cite[vss-popl-2017], and changes the first
   or more type boundaries, or raise a Python error.}
 @exact|{
 \begin{itemize}
-\item[1.']
+\item[$1'$.]
   $e$ reduces to a value ${v}$ with type tag ${\lfloor\tau\rfloor}$.
 \end{itemize}
 The type tag of ${\tau}$ is its outermost constructor. For example,

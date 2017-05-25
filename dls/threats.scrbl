@@ -50,7 +50,7 @@ The types in this experiment may differ from types ascribed by another Python
  programmer, which, in turn, may lead to different performance overhead.
 
 @; TODO take5 is really an oversight on our part
-@(let ([missing-fields '(futen)]
+@(let ([missing-types '(futen take5)]
        [retic-limited '(go pystone stats)]
        [format-bm* (lambda (bm*) (authors* (map bm bm*)))]
        @; see also https://github.com/nuprl/retic_performance/issues/55
@@ -78,7 +78,8 @@ The types in this experiment may differ from types ascribed by another Python
   @;  - some use Dyn
   @;  - using Dyn unfaithful to "fully-typed"
   @;  - using Dyn changes the inserted checks
-  Third, some benchmarks are either missing annotations or use the dynamic type.
+  Third, @integer->word[(length (append missing-types retic-limited))]
+  benchmarks are either missing annotations or use the dynamic type.
   The @bm{futen} benchmark contains a class with an untyped field
    and the @bm{take5} benchmark contains a function that accepts an optional argument.@note{Reticulated currently ignores the type signatures of functions with optional arguments, see @url{https://github.com/mvitousek/reticulated/issues/32}.}
   These are mistakes on our part, but random sampling with and without the errors

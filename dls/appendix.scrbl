@@ -1,7 +1,7 @@
 #lang gm-dls-2017
 @title[#:style 'unnumbered]{Appendix}
 
-@figure-here["fig:badcode" @elem{Reticulated program @tt{my_file.py}.}
+@figure-here["fig:badcode" @elem{Reticulated program @tt{myfile.py}}
 @python|{
 def make_strings()->List(String):
     xs = []

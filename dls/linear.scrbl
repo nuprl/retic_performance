@@ -111,7 +111,7 @@ For a benchmark containing @${F} functions and @${C} classes,
   without replacement, but @; Knuth citation gratuitous
   the chance of drawing the same configuration twice is quite small, and removing
   this chance slightly increases the odds of drawing an extreme outlier.}
-These intervals are superimposed on the overhead plots from @figure-ref{fig:overhead}.
+Each interval is superimposed on the matching overhead plot from @figure-ref{fig:overhead}.
 
 These particular @approximation[NUM-SAMPLE-TRIALS (format "~a(F+C)" SAMPLE-RATE) "95"]s
  @; ... could just say "simple random approximation"
@@ -135,12 +135,12 @@ The intervals are futhermore small, and thus practical substitutes for the overh
         [NEW '(sample_fsm)]) @list{
    This section presents the results of an @defn{approximate} performance
     evaluation of @integer->word[NUM-NEW-SAMPLES] benchmark programs with
-    large configuration spaces.
+    large configuration spaces:
 
    @(parameterize ([*CACHE-SUFFIX* "-linear"])
      @render-static-information[SAMPLE-BENCHMARKS])
 
-   @string-titlecase[@integer->word[(length DLS)]] of these programs,
+   @exact{\noindent}@string-titlecase[@integer->word[(length DLS)]] of these programs,
     @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
    The following descriptions
     provide more information about each benchmark's size and purpose.
@@ -204,7 +204,7 @@ The intervals are futhermore small, and thus practical substitutes for the overh
 Specifically, the data for a benchmark with @${F} functions and @${C} classes
  consists of @integer->word[NUM-SAMPLE-TRIALS] samples of
  @${@id[SAMPLE-RATE](F+C)} configurations selected without replacement.
-These results confirm many trends in earlier data:
+These results confirm many trends from @section-ref{sec:overhead}:
 @itemlist[
 @item{
   No configurations run faster than the Python program.

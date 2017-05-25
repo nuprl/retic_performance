@@ -27,7 +27,7 @@ Reticulated supports fine-grained combinations of typed and untyped code.
 It would be impractical to directly apply the Takikawa method; measuring all
 configurations would take more time than the universe has left.
 It would also be impractical to ignore the fine granularity of Reticulated and
- apply the module-level protocol that @citet[takikawa-popl-2016] used for Typed Racket.
+ apply the module-level protocol that Takikawa @|etal| used for Typed Racket.
 The practical choice lies somewhere in between, and it depends on the size of the
  programs at hand and computing resources available.
 
@@ -63,7 +63,7 @@ The experimental modules and granularity of type annotations define the
    programs @${P} such that @${P \sqsubseteq P^\tau}.
 }
 
-What remains is to measure the performance of these configurations and
+The next step is to measure the performance of these configurations and
  report their overhead relative to the performance a developer would get
  by opting out of gradual typing.
 In Typed Racket, this baseline is the performance of Racket running the
@@ -83,7 +83,7 @@ Since different applications have different performance requirements, the
 
 @definition[@deliverable{D}]{
   For real-valued @${D}, the proportion of @deliverable{D} configurations
-   is the proportion of configurations with @emph{performance ratios} no greater
+   is the proportion of configurations with performance ratios no greater
    than @${D}.
 }
 
@@ -118,7 +118,7 @@ Optionally, we divide the permutation across identical processors or machines.
 We run the main module of the configuration a fixed number of times and record
  each running time.
 Finally, we run the main module of the untyped configuration using the
- @|PYTHON| interpreter.
+ @|PYTHON| interpreter.@note{@url{https://www.python.org/download/releases/3.4.3/}}
 
 
 @parag{Details of the Evaluation} All data in this paper was produced by jobs we sent
@@ -129,7 +129,7 @@ Each job:
   reserved all processors on one node for 24 hours;
 }
 @item{
-  downloaded fresh copies of @|PYTHON|@note{@url{https://www.python.org/download/releases/3.4.3/}}
+  downloaded fresh copies of @|PYTHON|
   and Reticulated (commit @hyperlink["https://github.com/mvitousek/reticulated/commit/e478343ce7c0f2bc50d897b0ad38055e8fd9487d"]{@tt{e478343}}
   on the @hyperlink["https://github.com/mvitousek/reticulated"]{@tt{master}} branch);
 }

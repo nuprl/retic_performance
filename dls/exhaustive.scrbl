@@ -11,7 +11,7 @@ The benchmarks are small Python programs whose @defn{implicit} types are
  expressible in Reticulated.
 The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
  @defn["overhead plots"] (@figure-ref{fig:overhead}), and a series
- of graphs comparing the @emph{number} of typed components in a configuration
+ of graphs comparing the number of typed components in a configuration
  against the configuration's performance (@figure-ref{fig:exact}).
 
 
@@ -284,7 +284,7 @@ The @|t/u-ratio|s are typically lower:
   fifteen are below @${2}x,
   one is between @${2}x and @${3}x,
   and the final three are below @${3.5}x.
-In particular, twelve of the benchmarks
+In particular, twelve benchmarks
  have larger @|u/p-ratio|s than @|t/u-ratio|s.
 This data suggests that migrating an arbitrary
  Python program to Reticulated adds a relatively larger overhead
@@ -314,7 +314,7 @@ The @|x-axes| are log-scaled to focus on low overheads;
 The heading above the plot for a given benchmark lists the benchmark's name
  and number of configurations.
 Note that the number of configurations is equal to @$|{2^{F+C}}|,
- with @${F} and @${C} being the same as @figure-ref{fig:static-benchmark}.
+ with @${F} and @${C} from @figure-ref{fig:static-benchmark}.
 @; TODO being the same
 
 @parag{How to Read the Overhead Plots}
@@ -421,8 +421,7 @@ For example, @bm{fannkuch} has two configurations: one untyped
  configuration with zero typed components and one fully-typed configuration
   with one typed component.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
- the untyped or fully-typed configuration, round the point's
- @${x}-component to the nearest integer.
+ the untyped or fully-typed configuration, round @${x} to the nearest integer.
 
 Overall, there is a clear trend that adding type annotations adds performance
  overhead.
@@ -441,7 +440,7 @@ The variations between individual plots fall into four overlapping categories:
   (λ (num-in-category) @elem{
     @string-titlecase[num-in-category] plots have visible gaps between
      clusters of configurations with the same number of types.
-    Configurations below the gap contain type annotations that impose little
+    Configurations below the gap contain type annotations that impose relatively little
      run-time cost.
     Configurations above the gap have some common type annotations that
      add significant overhead.

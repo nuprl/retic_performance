@@ -9,7 +9,7 @@ The application of Takikawa et al.'s method to Reticulated appears to
  far less expressive than Typed Racket's. Furthermore, its error messages,
  especially for higher-order values, are seldom actionable.
  Most importantly, though, Reticulated guarantees an alternative soundness.
- A program of type @tt{List(String)} may print a list of
+ A program of type @tt{List(String)} may evaluate to a list of
  integers---without signaling any violation.
 
 Our evaluation effort thus confirms a widely held conjecture and leaves us

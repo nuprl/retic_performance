@@ -475,7 +475,7 @@
 	      "Max S. New"
 	      "Jan Vitek"
 	      "Matthias Felleisen")
-   #:title "Is sound gradual typing dead?"
+   #:title "Is Sound Gradual Typing Dead?"
    #:location (proceedings-location popl #:pages '(456 468))
    #:date 2016))
 
@@ -489,8 +489,8 @@
 	      "Robert Bruce Findler"
 	      "Jan Vitek"
 	      "Matthias Felleisen")
-   #:title "How to evaluate the performance of gradual type systems"
-   #:location "submitted for publication"
+   #:title "How to Evaluate the Performance of Gradual Type Systems"
+   #:location "Submitted for publication"
    #:date 2017))
 
 (define rnv-ecoop-2015
