@@ -54,4 +54,7 @@ Traceback (most recent call last):
 Exception: None
 \end{verbatim}}|]
 
-@Figure-ref{fig:badcode} is a small Reticulated program that commits a dynamic type error. This program produces the error message in @figure-ref{fig:errmsg}. The message consists of a stack trace and the name of a failing check, as described in @section-ref{sec:vs-tr:errors}.
+@Figure-ref{fig:badcode} is a small Reticulated program that signals a type error at run-time.
+The error message is reproduced in @figure-ref{fig:errmsg}.
+It consists of a stack trace and the name of a failing check, as described in @section-ref{sec:vs-tr:errors}.
+Notice, in particular, how the stack frames for @tt{myfile.py} guide developers to typed code.

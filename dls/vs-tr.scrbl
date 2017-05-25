@@ -2,12 +2,14 @@
 
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 
-The worst slowdown we observe in Reticulated is within one order of magnitude.
+The worst observed slowdown of Reticulated over Python is within one order of magnitude.
 By contrast, many partially typed Typed Racket programs are two orders of
- magnitude slower than their untyped counterparts@~cite[takikawa-popl-2016 greenman-jfp-2017]. While implementation technology and the peculiarities of the programs
- affect performance, this @${10}x gap suggests fundamental differences.
+ magnitude slower than Racket@~cite[takikawa-popl-2016 greenman-jfp-2017].
+While implementation technology and the peculiarities of the programs
+ affect performance, this order-of-magnitude gap suggests fundamental differences.
 
-We have identified three factors that contribute to the extraodinary performance of Reticulated.
+We have identified three factors that reduce the overhead of Reticulated
+ relative to Python.
 First, Reticulated's type system lacks support for common Python idioms.
 Second, Reticulated's error messages rarely provide actionable feedback.
 @; transcendent incredible
@@ -30,12 +32,12 @@ Third, Reticulated guarantees an alternative notion of type soundness.
 @; TODO add better in-file evidence
 
 Reticulated currently lacks union types, recursive types, and types for variable-arity functions.
-Consequently, Reticulated could not fully-type some programs in our experiment.
-One common issue was code that used @tt{None} as a default value.
-We edited such code to use a well-typed default instead.
-Other programs required dynamic typing.
-Both @bm{pystone} and @bm{stats} needed union types,
- and @bm{go} contained a recursive class type.
+Consequently, Reticulated cannot fully-type some programs in our experiment.
+One common issue is Python code that uses @tt{None} as a default value.
+The benchmark versions of such code use well-typed defaults instead.
+Other benchmark versions resort to dynamic typing.
+Both @bm{pystone} and @bm{stats} suffer from the lack of union types,
+ and @bm{go} contains a recursive class type.
 Lastly, we tried typing a Lisp interpreter, but the program made too-heavy use of union and recursive types.
 
 Rewrites are time-consuming and prone to introduce bugs; mandatory dynamic typing
@@ -47,9 +49,9 @@ Enforcing these types at run-time, however, will impose a higher cost than
  the single-test types that Reticulated programmers must currently use.
 A union type or (equi-)recursive type requires a disjunction of type tests, and
  a variable-arity procedure requires a sequence of type checks.
-If, for example, every type annotation @${\tau} in our benchmarks was instead a
+If, for example, every type annotation @${\tau} in our benchmarks were a
  union type with @${\tau} and @tt{Void}, then overall performance would be nearly
- @${2}x worse.
+ twice as worse as it currently is.
 
 
 @section[#:tag "sec:vs-tr:errors"]{Uninformative Errors}
@@ -65,14 +67,14 @@ When systems work, everyone is happy, but when systems break, developers want er
 Two kinds of faults can occur in Reticulated: static type errors and dynamic type errors.
 A static type error is a mismatch between two types.
 A dynamic type error is the result of a mismatch between a type annotation and an untyped value.
-Typically, a dynamic type error occurs long after the value entered typed code.
+Typically, a dynamic type error occurs long after the value enters typed code.
 
 When Reticulated discovers a static type error, it reports the current line number and the conflicting types.
 To its credit, this information often pinpoints the source of the fault.
 
 When Reticulated discovers a dynamic type error, it prints a value,
  the name of the check that failed, and a stack trace.
-This information does little to diagnose the problem.
+This information does little to help diagnose the problem.
 For one, the relevant type annotation is not reported.
 A programmer must scan the stack trace for line numbers and consider the type
  annotations that are in scope.
@@ -84,7 +86,7 @@ Third, the relevant boundary is rarely on the stack trace when the program
 
 Refining the dynamic error messages will add performance overhead.
 For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
-They report that tracking these casts may double a program's @|t/p-ratio|.
+They report that tracking these casts can double a program's @|t/p-ratio|.
 
 @section[#:tag "sec:vs-tr:soundness"]{Alternative Soundness}
 
@@ -94,7 +96,7 @@ A sound @emph{static} type system guarantees that evaluating a well-typed progra
 A sound @emph{gradual} type system cannot provide the same guarantee because it admits untyped code.
 Thus, a gradual type system must redefine soundness.
 
-One approach is to generalize traditional type soundness with a fourth clause to cover interactions between typed and untyped code.
+One approach is to @emph{generalize} traditional type soundness with a fourth clause to cover interactions between typed and untyped code.
 Typed Racket takes this approach@~cite[tfffgksst-snapl-2017].
 In particular, if a program @${e} is well typed at type @${\tau}, then either:
 @itemlist[#:style 'ordered
@@ -105,14 +107,14 @@ In particular, if a program @${e} is well typed at type @${\tau}, then either:
   @${e} diverges;
 }
 @item{
-  @${e} raises an error from a well-defined set; or
+  @${e} signals an error due to a partial primitive operation; or
 }
 @item{
-  @${e} raises an exceptional error that points to one boundary between typed and untyped code.
+  @${e} raises an exception that points to the guilty boundary@~cite[dthf-esop-2012] between typed and untyped code.
 }
 ]
 
-A second approach is to modify the traditional notion of soundness.
+A second approach is to @emph{modify} the traditional notion of soundness.
 Reticulated takes this approach@~cite[vss-popl-2017], and changes the first
  clause:@note{As for the other clauses, the version of Reticulated that we
   evaluated will either diverge, raise an error due to an inserted check (see
@@ -130,8 +132,8 @@ The type tag of ${\tau}$ is its outermost constructor. For example,
 
 As @figure-ref{fig:magic} demonstrates, this alternative soundness implies that a Reticulated term with
  type @tt{List(String)} may evaluate to a list containing any kind of data.
-On one hand, this fact is harmless since type-tag soundness implies that any
- read from a variable with type @tt{List(String)} is tag-checked.
+On one hand, this fact is harmless because type-tag soundness implies that any
+ read from a variable with type @tt{List(String)} in typed code is tag-checked.
 On the other hand, Reticulated does not monitor values that leave a typed region.
 Thus, two interesting scenarios can arise:
 @exact|{\begin{description}
@@ -144,10 +146,10 @@ Thus, two interesting scenarios can arise:
   Two typed contexts can safely reference the same value at incompatible types.
 \end{description}%
 It remains to be seen whether these potential scenarios cause serious issues in practice.
-Developers may embrace the flexibility of the alternative soundness and use
+Developers may embrace the flexibility of alternative soundness and use
  Reticulated in combination with unit tests.
 The only conclusion our data supports is that Reticulated's type-tag checks
- impose less performance overhead than Typed Racket's behavioral contracts.
+ impose far less performance overhead than Typed Racket's behavioral contracts.
 }|
 
 @figure["fig:magic"

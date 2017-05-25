@@ -364,7 +364,7 @@ For many benchmarks, the maximum overhead is significantly lower.
 Indeed, seven benchmarks are @deliverable{2}.
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise, since Reticulated adds run-time checks to Python code for
+This is no surprise, because Reticulated adds run-time checks to Python code for
  each type annotation.
 
 @(let ([smooth '(futen http2 slowSHA chaos fannkuch float nbody pidigits pystone PythonFlow take5)])
