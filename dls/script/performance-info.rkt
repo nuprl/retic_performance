@@ -466,8 +466,12 @@
 ;; Doesn't really belong here, oh well
 (define (fix-num-types sample-file)
   (printf "fixing types in '~a'...~n" sample-file)
-  (define bm-name (infer-benchmark-name sample-file))
-  (define bm (->benchmark-info bm-name))
+  (define bm
+    (or
+      (for/or ([possible-benchmark-name (in-list (infer-benchmark-name sample-file))])
+        (with-handlers ([exn:fail:contract? (λ (e) #f)])
+          (->benchmark-info possible-benchmark-name)))
+      (raise-user-error 'fix-num-types "failed to infer benchmark name from file '~a'" sample-file)))
   (define mc (benchmark->max-configuration bm))
   (define tmp (path-add-extension sample-file #".tmp"))
   (with-output-to-file tmp #:exists 'replace
@@ -478,6 +482,9 @@
             (define str* (parse-line ln))
             (define cfg (string->configuration (car str*)))
             (define new-num-types (count-types cfg mc))
+            (define old-num-types (string->number (cadr str*)))
+            (when (not (= new-num-types old-num-types))
+              (printf "Configuration ~a : ~a ==> ~a~n" cfg old-num-types new-num-types))
             (displayln (tab-join (list (car str*) (number->string new-num-types) (caddr str*))))
             (void))))))
   (copy-file tmp sample-file #t)
@@ -493,10 +500,11 @@
 
 (define (infer-benchmark-name sample-file)
   (define dir (or (path-only sample-file) (current-directory)))
-  (define-values [base name must-be-dir] (split-path dir))
-  (if (path? name)
-    (path->string name)
-    (raise-user-error 'fix-num-types "could not infer benchmark name from file '~a'" sample-file)))
+  (define-values [dir-base dir-name dir-mbd] (split-path dir))
+  (define-values [file-base file-name file-mbd] (split-path sample-file))
+  (for/list ([candidate (in-list (list dir-name (path-replace-extension file-name #"")))]
+             #:when (path? candidate))
+    (path->string candidate)))
 
 (define (performance-info%sample pi new-src)
   (performance-info (performance-info-name pi)
