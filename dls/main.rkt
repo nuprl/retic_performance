@@ -311,6 +311,15 @@
   PEP-484
   TPPBS
   time.process_time
+
+  ;; -----------------------------------------------------------------------------
+  ;; performance ratio utils
+
+  get-ratios-table
+  ratios-table-row
+  ratios-row-retic/python
+  ratios-row-typed/retic
+  ratios-row-typed/python
 )
 
 (require

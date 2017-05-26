@@ -258,7 +258,7 @@ The following descriptions credit each benchmark's original author,
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
 ]
 
-
+@(define RT (get-ratios-table EXHAUSTIVE-BENCHMARKS))
 
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
@@ -266,30 +266,52 @@ These ratios correspond to the extreme endpoints of gradual typing:
  the performance of the fully-typed configuration relative to the untyped configuration in Reticulated (the @emph[t/u-ratio]),
  and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
 
-For example, the row for @bm{futen} reports a @|u/p-ratio| of @${1.61}.
-This means that the average time to run the untyped configuration of the
- @bm{futen} benchmark using Reticulated was @${1.61} times slower than the
- average time of running the same code using @|PYTHON|.
-Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
- is @${1.04} times slower than the untyped configuration.
+@(let* ([futen-row (ratios-table-row RT 'futen)]
+        [futen-u/p (ratios-row-retic/python futen-row)]
+        [futen-t/u (ratios-row-typed/retic futen-row)]) @elem{
+  For example, the row for @bm{futen} reports a @|u/p-ratio| of @${@|futen-u/p|}.
+  This means that the average time to run the untyped configuration of the
+   @bm{futen} benchmark using Reticulated was @${@|futen-u/p|} times slower than the
+   average time of running the same code using @|PYTHON|.
+  Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
+   is @${@|futen-t/u|} times slower than the untyped configuration.
+})
 
 On one hand, these ratios demonstrate that migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
 On the other hand, the overhead is always within an order-of-magnitude.
-Regarding the @|u/p-ratio|s: ten are below @${2}x,
- five are between @${2}x and @${3}x, and
- the remaining four are below @${4.5}x.
-The @|t/u-ratio|s are typically lower:
-  fifteen are below @${2}x,
-  one is between @${2}x and @${3}x,
-  and the final three are below @${3.5}x.
-In particular, twelve benchmarks
- have larger @|u/p-ratio|s than @|t/u-ratio|s.
-This data suggests that migrating an arbitrary
- Python program to Reticulated adds a relatively larger overhead
- than migrating the same program to a fully-typed configuration.
-
+@(let* ([rp* (map ratios-row-retic/python RT)]
+        [tr* (map ratios-row-typed/retic RT)]
+        [count-< (λ (x* n) (length (filter (λ (str) (< (string->number str) n)) x*)))]
+        [rp-<2 (count-< rp* 2)]
+        [rp-<3 (count-< rp* 3)]
+        [rp-<4.5 (count-< rp* 4.5)]
+        [tr-<2 (count-< tr* 2)]
+        [tr-<3 (count-< tr* 3)]
+        [tr-<3.5 (count-< tr* 3.5)]
+        [num-> (for/sum ([rp (in-list rp*)]
+                         [tr (in-list tr*)]
+                         #:when (> (string->number rp) (string->number tr)))
+                 1)])
+  (unless (= (length rp*) rp-<4.5)
+    (raise-user-error 'performance-ratios
+      "expected all retic/python ratios to be < 4.5, but only ~a of ~a are" rp-<4.5 (length rp*)))
+  @elem{
+    Regarding the @|u/p-ratio|s:
+     @integer->word[rp-<2] are below @${2}x,
+     @integer->word[(- rp-<3 rp-<2)] are between @${2}x and @${3}x, and
+     the remaining @integer->word[(- rp-<4.5 rp-<3)] are below @${4.5}x.
+    The @|t/u-ratio|s are typically lower:
+      @integer->word[tr-<2] are below @${2}x,
+      @integer->word[(- tr-<3 tr-<2)] is between @${2}x and @${3}x,
+      and the final @integer->word[(- tr-<3.5 tr-<3)] are below @${3.5}x.
+    In particular, @integer->word[num->] benchmarks
+     have larger @|u/p-ratio|s than @|t/u-ratio|s.
+    This data suggests that migrating an arbitrary
+     Python program to Reticulated adds a relatively larger overhead
+     than migrating the same program to a fully-typed configuration.
+})
 
 @section[#:tag "sec:overhead"]{Overhead Plots}
 @; these plots are the main event!

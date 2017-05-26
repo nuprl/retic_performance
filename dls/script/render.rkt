@@ -23,6 +23,12 @@
   ;; Sometimes used to distinguish caches.
   ;; As client, should set this if calling the same rendering function in
   ;;  two different places in the same document.
+
+  get-ratios-table
+  ratios-table-row
+  ratios-row-retic/python
+  ratios-row-typed/retic
+  ratios-row-typed/python
 )
 
 (require
@@ -135,6 +141,10 @@
       (+ (python-info->num-functions py) (python-info->num-methods py))
       (python-info->num-classes py)))))
 
+;; -----------------------------------------------------------------------------
+;; -- performance ratios
+;;    a little abstraction, a little API
+
 (define RATIOS-TITLE-TOP*
   (map bold '("" "retic /" "typed /" "  typed /")))
 
@@ -142,7 +152,6 @@
   (map bold '("Benchmark" "python" "retic" "  python")))
 
 (define (render-ratios-table bm*)
-  (define name* (map benchmark->name bm*))
   (centered
     (tabular
       #:sep (hspace 2)
@@ -151,18 +160,38 @@
       #:column-properties '(left right right (left-border right))
       (list* RATIOS-TITLE-TOP*
              RATIOS-TITLE-BOT*
-             (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
-                            [*current-cache-keys* (list (λ () name*))]
-                            [*with-cache-fasl?* #f])
-               (with-cache (cachefile "ratios-table.rktd")
-                 (λ ()
-                   (define pi* (map benchmark->performance-info bm*))
-                   (append
-                     (map render-ratios-row pi*)
-                     #;(list (render-ratios-average-row pi*))))))))))
+             (map cdr (get-ratios-table bm*))))))
+
+(define (get-ratios-table bm*)
+  (define name* (map benchmark->name bm*))
+  (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                 [*current-cache-keys* (list (λ () name*))]
+                 [*with-cache-fasl?* #f])
+    (with-cache (cachefile "ratios-table.rktd")
+      (λ ()
+        (for/list ([bm (in-list bm*)])
+          (render-ratios-row (benchmark->performance-info bm)))))))
+
+(define (ratios-table-row r* sym)
+  (or
+    (for/or ([r (in-list r*)]
+             #:when (eq? (car r) sym))
+      r)
+    (raise-argument-error 'ratios-table-row "benchmark name" 1 r* sym)))
+
+(define (ratios-row-retic/python r)
+  (caddr r))
+
+(define (ratios-row-typed/retic r)
+  (cadddr r))
+
+(define (ratios-row-typed/python r)
+  (cadddr (cdr r)))
 
 (define (render-ratios-row pi)
-  (list (tt (symbol->string (performance-info->name pi)))
+  (define n (performance-info->name pi))
+  (list n
+        (symbol->string n)
         (rnd (untyped/python-ratio pi))
         (rnd (typed/retic-ratio pi))
         (rnd (typed/python-ratio pi))))
