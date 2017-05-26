@@ -261,7 +261,7 @@
                 (raise-user-error 'read-karst-file/suffixe"corrupted data file '~a', please fix" data-path)))))))))
 
 (define (benchmark->python-data bm)
-  (read-karst-file/suffix bm "_untyped.tab"))
+  (read-karst-file/suffix bm "_python.tab"))
 
 (define (benchmark->karst-retic-untyped bm)
   (read-karst-file/suffix bm "_retic-untyped.tab"))
