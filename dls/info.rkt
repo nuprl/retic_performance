@@ -25,3 +25,4 @@
   ("rp-python" (submod gm-dls-2017/script/python main) "Parse and query Python programs" #f)
   ("rp-sample" (submod gm-dls-2017/script/sample main) "Generate samples for a benchmark" #f)
 ))
+(define scribblings '(("docs/gm-dls-2017.scrbl" () (omit-start))))
