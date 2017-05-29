@@ -1,60 +1,69 @@
-Is Sound GT Alive?
+Measuring Reticulated Python
 ===
 
-Let's talk about gradual typing
-- promise --- as you know --- what static typing and dynamic typing, design system that supports both, moreover smooth integration between static and dynamic
-- what does that mean? informallly "no unexpected consequences" formall "no new behaviors" `\sqle`
-- examples: 2 modules, at least 4 ways to type
-  - depending on the gradual type system may be finer granularity but that's not a super important distinction
-- back to informal promise of GT, "no enexpected" says I can pick anything and get roughly the same program.
- And this, it's implied , is useful foundation for developers
-- SNAPL'15 does not talk about performance except in passing, but if I'm a working programmer then I care very much about performance.
-  If I move from A to B and my program is 5x slower then I will be very upset
-- whether or not 5x is "unexpected" isn't important. If GT going to be more than theoretical artifact neesd to deliver performance
+stages of grief
+I am acceptance
+most of you aren't even on "grief" so lets fix that right away
 
-the word of the day is performance
-- how to express performance of a type system?
-  - how can types possibly affect performance?
-- if t/u contexts share values, the t needs to check some types on the u at runtime
-  - t : int -> int, called in u context, need to check domain
-  - u : int -> listof int called in t context, need to check codomain
-- GT systems insert checks automatically, these have cost, the affect on performance is what we mean by the performance impact of GT
-- so
-  - we have exponentially many configurations mixing t/u contexts in a unique way, each with performance
-  - overall performance, is performance of each
-  - ok but does not scale past like 6 things
-  - if you have 10 things hard to judge performance
-- idea from takikawa etal is how to present,
-  paper with flash title, the important contribution is the evaluation method
-  - plots are "what % is fast" as I relax definition of "fast" think CDF
-- by example, project with 2 boxes, suppose absolute perfs are .... TODO ....
-  - example graph, to summarize
-  - lessno, if programmers can tolerate 2x can see what % are 2x to estimate whether GT will perform for you
-  that is the idea of the method
+example well-typed programs
+Retic is a sound gradual typing system
 
-experimetal setup
-- no comprehensive eval of reticulated (hey Ben are you going to show the eval of TR?)
-- sent zeina to IU, got programs, started measuing, long time,
-- here is results
-- N0 benchmarks, N1 sources, frange from N2 to N3 configurations
-  - more details in paper
-- foreach benchmark ran all configs UP TO CF granularity
-- observations
-  - 10x worst case
-  - N4 at 100% by 2x
-  - pretty god
+oakay lets backtrack
 
-conclusions
-- small benchmarks significant overhead
-- compare to TR unbelievably slow
-- difference in first-order vs. higher-order
-- other usability concerns
 
-one more thing: sampling
-- graph presentation scales but collecting does not
-- paper confirms a SRS technique
-- one example 
+I. type soundness
+- have PL, have eval, have proof system, check if its sound
+- theorem has 3 clauses
+- lets say you prove this, are successful. Who cares?
+  why should Ron-programmer pick your sound language over an untyped language?
+  - especially since, are real costs for doing so (annotations, reject good programs)
+- conventional wisdom, three killer apps
+  1. catch errors, eliminate class of bugs
+  2. documentation
+  3. speed, you and your compiler can trust the types
+- this is type soundness you know and love,
+  if you're not interested in typed languages then hope you can see how
+   another programmer might want these properties
+  (maybe you want them yourself just not at the price)
+  the focus
+  1. protect against errors
+  2. compositional reasoning
+   (once I understand f at top-level, I understand how it could be re-used)
 
-questsions
-- add t/p ratios
-- show exact runtimes
+2. gradual typing
+origins depend who you ask
+A. we live in multi-language world, fine-grained interop, type system for that interop
+B. have untyped application, want to add benefits of static typing incrementally, software always evolving unexpectedly
+
+3. gradual typing and type soundness, Part I
+- cannot re=use standard soundness
+- option I: generalize
+  - add case for untyped code, everything else the same
+  - typed code safe if typed code flows in,
+    possibly-unsafe if untyped code flows in but that boundary is held accountable
+  - untyped code just cannot mess with typed code
+- nice properties
+- heavy implementation, need proxies all the way down
+
+3. GT and TS, Part II
+- change conventional soundness
+- v : \floor{t}
+
+- hope you are enjoying grief, time for denial
+- check the paper its really there, that's the soundness they write about
+
+anger? depression? bargaining?
+now is a good time for questions if you have any
+
+4. why would anyone want this?
+- easier to implement
+- less to check dynamically
+- performance numbers, compare 20-deliverable and 10-deliverable, and maybe max's
+
+5. so wats' next? four questions
+  1. retic useful
+  2. TR fast
+  3. TR portable
+  4. gradual typing soundness, Part III
+
+maybe you will be the one to propose Part III
