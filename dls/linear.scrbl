@@ -124,9 +124,9 @@ The intervals are futhermore small, and thus practical substitutes for the overh
 
 @section[#:tag "sec:sampling:new"]{Approximate Evaluation}
 
-@figure["fig:sample:overhead" "Simple random approximation plots"
+@figure*["fig:sample:overhead" "Simple random approximation plots"
   (parameterize ([*PLOT-HEIGHT* 100]
-                 [*SINGLE-COLUMN?* #t])
+                 #;[*SINGLE-COLUMN?* #t])
     @render-samples-plot*[SAMPLE-BENCHMARKS])]
 
 

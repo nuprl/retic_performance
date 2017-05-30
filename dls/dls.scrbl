@@ -1,4 +1,4 @@
-#lang gm-dls-2017 @anonymous @sigplan @10pt
+#lang gm-dls-2017 @sigplan @10pt
 
 @; You see, there are two kinds of people in this world: the workers and the
 @; hustlers.  The hustlers never work and the workers never hustle.  And you,
@@ -12,10 +12,11 @@
 @(define NEU
    @affiliation[
      #:institution "Northeastern University"
-     #:city "Boston"
-     #:state "Massachusetts"
-     #:postcode "02115"
-     #:country "USA"])
+     @;#:city "Boston"
+     @;#:state "Massachusetts"
+     @;#:postcode "02115"
+     @;#:country "USA"
+   ])
 
 @author["Ben Greenman"
         #:email "benjaminlgreenman@gmail.com"
@@ -61,12 +62,13 @@ This paper presents a systematic performance evaluation of Reticulated,
 @include-section{conclusion.scrbl}
 
 @acks{
-  Matthias for all things.
-  Mike for Reticulated, bugfixes.
-  Sam for access to IU cluster.
-  Spenser Bauman for advice about cluster.
-  Tony GJ for insisting that overhead plots are CDFs.
-  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
+  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant SHF 1518844}.
+@;  Matthias for all things.
+@;  Mike for Reticulated, bugfixes.
+@;  Sam for access to IU cluster.
+@;  Spenser Bauman for advice about cluster.
+@;  Tony GJ for insisting that overhead plots are CDFs.
+@;  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
 }
 
 @generate-bibliography[]

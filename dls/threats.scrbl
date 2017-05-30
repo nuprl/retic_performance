@@ -17,7 +17,8 @@ First, cluster nodes may have non-uniform performance despite being identical
  servers.
 Second, the load on other nodes in the cluster may affect the latency of
  system calls.
-These measurement biases@~cite[mdhs-asplos-2009] may explain the outliers evident in @figure-ref{fig:exact}.
+These measurement biases may explain the outliers evident in @figure-ref{fig:exact}.
+@;@~cite[mdhs-asplos-2009]
 
 
 @section{Systematic Bias}
