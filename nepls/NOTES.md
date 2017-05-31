@@ -67,3 +67,21 @@ now is a good time for questions if you have any
   4. gradual typing soundness, Part III
 
 maybe you will be the one to propose Part III
+
+
+# Outstanding Issues / Questions
+
+- [ ] more examples of type-driven optimizations
+  - besides tagging optimization
+- [ ] other soundness
+  - SFP
+    - ?
+  - DLS
+    - relation between untyped & partially typed program
+    - not just a "type soundness (!)
+- [ ] what exactly is a sybil?
+  - t1 t2 such that:
+    - t1 <:/ t2
+    - t2 <:/ t1
+    - no sigma such that t1 <S sigma and t2 <S sigma
+    ???
