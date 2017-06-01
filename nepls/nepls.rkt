@@ -21,11 +21,12 @@
 
 (define (do-show)
   (title)
-  ;(intro)
-  ;(grief-stage)
-  ;(denial-stage)
-  ;(anger-stage)
+  (intro)
+  (grief-stage)
+  (denial-stage)
+  (anger-stage)
   (acceptance-stage)
+  (moving-on-stage)
   (void))
 
 ;; -----------------------------------------------------------------------------
@@ -34,11 +35,13 @@
 
 (define NUM-EXHAUSTIVE 19)
 
+(define NUM-TR 20)
+
 (define BLANK
   (blank 0 0))
 
 (define PYTHON-KEYWORDS
-  (map symbol->string '(def class return for in if elif else)))
+  (map symbol->string '(def class return for if in is elif else)))
 
 (define GRIEF
   (pict->pre-render-pict
@@ -238,20 +241,20 @@
     'next
     @pythonline{
 
-      get_numbers(4)
+      x = get_numbers(4)
     }
     @pythonline{
       def apply_first(funs):
         return funs[0](42)
 
-      apply_first(nums)
+      apply_first(x)
     }
     @comment{
       okay this is funny,
 
       lets take our partially typed program and add a type-O
 
-      oh dear not a list of ints any more 
+      oh dear not a list of ints any more
       but wait it still type checks
 
       it also runs, and you can apply the functions in the list,
@@ -278,7 +281,7 @@
         c.add_dollars(3.14159)
         return c
 
-      print(get_cash())
+      get_cash()
     }
     @comment{
       another strange thing,
@@ -468,15 +471,17 @@
 (define (acceptance-stage:practice)
   (slide
     #:title "Measuring Reticulated"
-    @item{@~a[NUM-EXHAUSTIVE] benchmarks @cite[vksb-dls-2014] @cite[vss-popl-2017] (+more)}
+    @item{@~a[NUM-EXHAUSTIVE] benchmarks @cite[vksb-dls-2014] @cite[vss-popl-2017] (+ more)}
     @item{Ran all configurations at a @it{function and class fields} granularity}
+    'next
     'alts~
     (list
       (list
         @python|{
           @fields({"x": Int, "y": Int})
           class Point:
-            x = 0; y = 0
+            x = 0
+            y = 0
 
             def get_x(self:Point)->Int:
               return self.x
@@ -486,6 +491,55 @@
     @item{10-deliverable? 100%}
     @comment{
       TODO use bar charts
+      TODO append random sampling bars
+    })
+  (slide
+    #:title "Worst-Case Overhead"
+    'alts
+    (list
+      (list
+        @item{worst-case for each benchmark})
+      (list
+        (titlet "``Within an order of magnitude''")))
+    @comment{
+      TODO make a table
+
+      these range between TODO and TODO
+
+      bottom-line / high-level-summary,
+       these are within an order of magnitude
+    })
+  (slide
+    #:title (hc-append 0 (t "vs. Typed Racket ")) ;; @cite[tfgnvf-popl-2016])
+    'alts
+    (list
+      (list
+        'alts
+        (list
+          (list
+            @item{@~a[NUM-TR] @bt{different} benchmarks}
+            @item{20-deliverable? TODO (much fewer)})
+          (list
+            @item{TODO table})))
+      (list
+        (titlet @~a{``Frequently worse than an order of magnitude''})))
+    @comment{
+      cannot directly compare these numbers
+    })
+  (void))
+
+(define (moving-on-stage)
+  (stage-slide "Moving On"
+    @comment{
+    })
+  (slide
+    #:title "Moving On" ;; Life After Transient
+    @item{Is Reticulated's soundness practical?}
+    @item{Can Typed Racket soundness be performant?}
+    @item{Is Typed Racket soundness portable?}
+    @item{Soundness 3.0}
+    @comment{
+      where do we go from here?
     })
   (void))
 

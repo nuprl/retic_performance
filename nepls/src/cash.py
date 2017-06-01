@@ -1,18 +1,14 @@
 @fields({"dollars": Int, "cents": Int})
 class Cash:
-  def __init__(self, d, c):
-    self.dollars = d
-    self.cents = c
-
-  def __str__(self):
-    return "Cash(%s, %s)" % (self.dollars, self.cents)
+  dollars = 0
+  cents = 0
 
   def add_dollars(self, dollars):
     self.dollars += dollars
 
-def main()->Cash:
-  c = Cash(5, 0)
+def get_cash()->Cash:
+  c = Cash()
   c.add_dollars(3.14159)
   return c
 
-print(main())
+get_cash()

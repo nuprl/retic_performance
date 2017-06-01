@@ -41,3 +41,15 @@
     #:location (proceedings-location popl #:pages '(762 774))
     #:date 2017))
 
+(define tfgnvf-popl-2016
+  (make-bib
+   #:author (authors
+        "Asumu Takikawa"
+        "Daniel Feltey"
+        "Ben Greenman"
+        "Max S. New"
+        "Jan Vitek"
+        "Matthias Felleisen")
+   #:title "Is Sound Gradual Typing Dead?"
+   #:location (proceedings-location popl #:pages '(456 468))
+   #:date 2016))
