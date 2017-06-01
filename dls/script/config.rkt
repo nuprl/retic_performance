@@ -45,7 +45,8 @@
 
 (require
   "system.rkt"
-  file/glob)
+  file/glob
+  racket/runtime-path)
 
 ;; =============================================================================
 
@@ -56,8 +57,11 @@
 (define TYPED "typed")
 (define SAMPLE "sample")
 
+(define-runtime-path PWD ".")
+
 (define (retic-performance-home-dir)
-  (shell "git" '("rev-parse" "--show-toplevel")))
+  (parameterize ([current-directory PWD])
+    (shell "git" '("rev-parse" "--show-toplevel"))))
 
 (define (retic-performance-benchmarks-dir home-dir)
   (build-path home-dir BENCHMARKS))
