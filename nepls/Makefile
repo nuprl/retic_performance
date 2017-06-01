@@ -5,3 +5,6 @@ compile:
 
 preview: compile
 	slideshow --right-half-screen ${TALK}
+
+test: compile
+	raco test nepls.rkt

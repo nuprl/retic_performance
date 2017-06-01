@@ -8,6 +8,7 @@
 ;; - vertically align "logically similar" picts
 ;; - horizontally align equations
 ;; - use same bib file for talk and paper
+;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
 
 (require
@@ -22,13 +23,16 @@
   (title)
   ;(intro)
   ;(grief-stage)
-  (denial-stage)
-  (anger-stage)
+  ;(denial-stage)
+  ;(anger-stage)
+  (acceptance-stage)
   (void))
 
 ;; -----------------------------------------------------------------------------
 
 (define-runtime-path PWD ".")
+
+(define NUM-EXHAUSTIVE 19)
 
 (define BLANK
   (blank 0 0))
@@ -376,7 +380,127 @@
     @comment{
       ... silence ...
     })
+  (acceptance-stage:theory)
+  (acceptance-stage:practice)
   (void))
+
+(define (acceptance-stage:theory)
+  (slide
+    #:title "Two Good Reasons"
+    @item{Interoperability}
+    @item{Performance}
+    @comment{
+    })
+  (slide
+    #:title "Interoperability"
+    'alts~
+    (list
+      (list
+        @python{
+          def get_numbers(how_many)->List(Int):
+            ....
+            return nums
+        }
+        @item{@code[List] is mutable, `classic' approach is to proxy})
+      (list
+        @python{
+          def get_numbers(how_many)->List(Int):
+            ....
+            return proxy(nums, List(Int))
+        }
+        @item{@code[List] is mutable, `classic' approach is to proxy}
+        @item{The proxy must be compatible with existing code}))
+    'next
+    @pythonline{nums.append(....)}
+    @pythonline{len(nums)}
+    @pythonline{nums is nums}
+    @comment{
+      since List is a mutable data structure,
+       conventional wisdom is to proxy it and check future reads and writes.
+
+      if you do that, need to be backwards-compatible
+
+      Racket has chaperones, most languages don't
+      (could they? at least it's "a thing")
+
+      interop is trivial if you don't interpose!
+    })
+  (slide
+    #:title "Performance"
+    @python{
+      def get_numbers(how_many)->List(Int):
+        ....
+        return proxy(nums, List(Int))
+    }
+    @eitem{}
+    @item{Proxy has allocation cost}
+    @item{Proxy adds overhead to future operations}
+    @item{In general, need to recursively proxy @code[List] elements}
+    @comment{
+      (insert text here)
+
+      without proxy, everything is unit-cost
+
+    })
+  (slide  ;; TODO really need this slide?
+    #:title "Performance"
+    'alts~
+    (list
+      (list
+        @python{
+          def get_numbers(how_many)->List(Int):
+            ....
+            return proxy(nums, List(Int))
+        })
+      (list
+        @python{
+          def get_numbers(how_many)->List(Int):
+            ....
+            return check(nums, List(Int))
+        }))
+    @item{Checking @code[List(Int)] is O(@code[how_many])}
+    @item{Checking infinite objects is not possible (e.g., @code[Int -> Int])}
+    @comment{
+      okay proxy is expensive, suppose we just check
+    })
+  (void))
+
+(define (acceptance-stage:practice)
+  (slide
+    #:title "Measuring Reticulated"
+    @item{@~a[NUM-EXHAUSTIVE] benchmarks @cite[vksb-dls-2014] @cite[vss-popl-2017] (+more)}
+    @item{Ran all configurations at a @it{function and class fields} granularity}
+    'alts~
+    (list
+      (list
+        @python|{
+          @fields({"x": Int, "y": Int})
+          class Point:
+            x = 0; y = 0
+
+            def get_x(self:Point)->Int:
+              return self.x
+        }|)
+      (list))
+    @item{20-deliverable? 100%}
+    @item{10-deliverable? 100%}
+    @comment{
+      TODO use bar charts
+    })
+  (void))
+
+;; =============================================================================
+
+(module+ test
+  (require
+    rackunit
+    (prefix-in dls:
+      (only-in gm-dls-2017
+        NUM-EXHAUSTIVE-BENCHMARKS)))
+
+  (test-case "constants"
+    (check-equal? NUM-EXHAUSTIVE dls:NUM-EXHAUSTIVE-BENCHMARKS))
+)
 
 ;; =============================================================================
 
