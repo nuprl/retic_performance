@@ -10,6 +10,7 @@
 ;; - use same bib file for talk and paper
 ;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
+;; - O(how_many)
 
 (require
   "bib.rkt"
@@ -81,10 +82,23 @@
 (define-syntax-rule (eitem arg* ...)
   (item #:bullet BLANK arg* ...))
 
-(define (stage-slide str . arg*)
-  (apply slide
-    (titlet str)
-    arg*))
+(define stage-slide
+  (let* ([stage-counter (box 0)]
+         [stage-counter++ (λ ()
+                            (set-box! stage-counter (+ 1 (unbox stage-counter)))
+                            (unbox stage-counter))]
+         [rm (λ (i)
+               (case i
+                [(1) "I"]
+                [(2) "II"]
+                [(3) "III"]
+                [(4) "IV"]
+                [(5) "V"]
+                [else "VI"]))])
+    (λ (str . arg*)
+      (apply slide
+        (titlet (format "Stage ~a:  ~a" (rm (stage-counter++)) str))
+        arg*))))
 
 ;; =============================================================================
 
@@ -117,7 +131,7 @@
     @item{Gradual typing for Python @cite[vksb-dls-2014]}
     @item{Static type checking}
     @item{Dynamic type enforcement}
-    @item{Type system is sound @cite[vss-popl-2017]} ;; Corollary 5.5.1
+    @item{Formal model is type is sound @cite[vss-popl-2017]} ;; Corollary 5.5.1
     @comment{
       This is reticulated
 
@@ -151,6 +165,8 @@
         for i in range(1, 1 + how_many):
           nums.append(f(i))
         return nums
+
+      get_numbers(4)
     }
     @comment{
       valid Retic, fully annotated
@@ -169,20 +185,17 @@
         for i in range(1, 1 + how_many):
           nums.append(f(i))
         return nums
-    }
-    'next
-    ;; TODO show output?
-    @pythonline{
 
       get_numbers(4)
     }
     'next
     @pythonline{
-      get_numbers("not a number")
+
+      get_numbers("not an integer")
     }
     'next
     @pythonline{
-      f("not a number")
+      f("not an integer")
     }
     @comment{
       anywhere you can have a type annotation, can also remove it. Anywhere.
@@ -197,7 +210,7 @@
     @item{Gradual typing for Python @cite[vksb-dls-2014]}
     @item{Static type checking}
     @item{Dynamic type enforcement}
-    @faded[@item{Type system is sound @cite[vss-popl-2017]}]
+    @faded[@item{Formal model is type is sound @cite[vss-popl-2017]}]
     @comment{
       okay so you see, we've checkced the 3 boxes via
       - gradual typing syntax
@@ -240,14 +253,14 @@
         }))
     'next
     @pythonline{
-
-      x = get_numbers(4)
+      get_numbers(4)
     }
     @pythonline{
+
       def apply_first(funs):
         return funs[0](42)
 
-      apply_first(x)
+      apply_first(get_numbers(4))
     }
     @comment{
       okay this is funny,
@@ -436,7 +449,8 @@
         return proxy(nums, List(Int))
     }
     @eitem{}
-    @item{Proxy has allocation cost}
+    (parameterize ([code-scripts-enabled #f])
+      @item{Proxy has allocation cost}) ; (@code[O(how_many)])})
     @item{Proxy adds overhead to future operations}
     @item{In general, need to recursively proxy @code[List] elements}
     @comment{
@@ -445,7 +459,7 @@
       without proxy, everything is unit-cost
 
     })
-  (slide  ;; TODO really need this slide?
+  #;(slide
     #:title "Performance"
     'alts~
     (list
@@ -472,7 +486,7 @@
   (slide
     #:title "Measuring Reticulated"
     @item{@~a[NUM-EXHAUSTIVE] benchmarks @cite[vksb-dls-2014] @cite[vss-popl-2017] (+ more)}
-    @item{Ran all configurations at a @it{function and class fields} granularity}
+    @item{Ran all configurations at a@it{function and class fields} granularity}
     'next
     'alts~
     (list
@@ -537,7 +551,7 @@
     @item{Is Reticulated's soundness practical?}
     @item{Can Typed Racket soundness be performant?}
     @item{Is Typed Racket soundness portable?}
-    @item{Soundness 3.0}
+    @item{Soundness 3.0 ?}
     @comment{
       where do we go from here?
     })
