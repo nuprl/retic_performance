@@ -11,12 +11,18 @@
 ;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
 ;; - O(how_many)
+;; - only 2 performance slides
 
 (require
   "bib.rkt"
-  racket/runtime-path
+  file/glob
+  (only-in math/statistics
+    mean)
+  (only-in racket/runtime-path
+    define-runtime-path)
   slideshow/code
-  slideshow/text)
+  slideshow/text
+  with-cache)
 
 ;; =============================================================================
 
@@ -99,6 +105,93 @@
       (apply slide
         (titlet (format "Stage ~a:  ~a" (rm (stage-counter++)) str))
         arg*))))
+
+(define (tr-data->name filename)
+  (define-values [_base pre-name _d] (split-path filename))
+  (define name (if (string? pre-name) pre-name (path->string pre-name)))
+  (define pre-hyphen (car (string-split name "-")))
+  (define pre-dot (car (string-split pre-hyphen ".")))
+  pre-dot)
+
+(define (rnd n)
+  (string->number (~r n #:precision '(= 2))))
+
+(define (tr-overhead-fold f init fn)
+  (define v (file->value fn))
+  (define overhead
+    (let ([u (mean (vector-ref v 0))])
+      (λ (t*)
+        (rnd (/ (mean t*) u)))))
+  (for/fold ([acc init])
+            ([t* (in-vector v)])
+    (f acc (overhead t*))))
+
+(define-syntax-rule (define-symbol* s ...)
+  (begin (define s (quote s)) ...))
+
+(define-symbol*
+  retic-20-deliverable
+  retic-10-deliverable
+  retic-worst-case
+  tr-20-deliverable
+  tr-worst-case)
+
+(define performance-data
+  (with-cache (build-path PWD "with-cache" "performance.rktd")
+    #:fasl? #f
+    #:keys #f
+    (λ () (error 'die))
+    #;(λ ()
+      (define RETIC-PI
+        (map benchmark->performance-info
+             (filter benchmark->karst-data (all-benchmarks))))
+      (define (retic-count-deliverable D)
+        (for/list ([pi (in-list RETIC-PI)])
+          (cons (performance-info->name pi)
+                ((deliverable D) pi))))
+      (define (retic-count-worst-case)
+        (for/list ([pi (in-list RETIC-PI)])
+          (cons (performance-info->name pi)
+                (max-overhead pi))))
+      (define TR-DATA (glob (build-path PWD "src" "tr-data" "*.rktd")))
+      (define (tr-count-deliverable D)
+        (define (add-if-good? acc o)
+          (if (<= o 20) (+ acc 1) acc))
+        (for/list ([fn (in-list TR-DATA)])
+          (cons (tr-data->name fn)
+                (tr-overhead-fold add-if-good? 0 fn))))
+      (define (tr-count-worst-case)
+        (for/list ([fn (in-list TR-DATA)])
+          (cons (tr-data->name fn)
+                (tr-overhead-fold max 0 fn))))
+      (make-immutable-hash
+        (list
+          (cons retic-20-deliverable (retic-count-deliverable 20))
+          (cons retic-10-deliverable (retic-count-deliverable 10))
+          (cons retic-worst-case (retic-count-worst-case))
+          (cons tr-20-deliverable (tr-count-deliverable 20))
+          (cons tr-worst-case (tr-count-worst-case)))))))
+
+(define (render-retic-20-deliverable)
+  (render-deliverable 20 (hash-ref performance-data retic-20-deliverable)))
+
+(define (render-retic-10-deliverable)
+  (render-deliverable 10 (hash-ref performance-data retic-10-deliverable)))
+
+(define (render-retic-worst-case)
+  (render-worst-case (hash-ref performance-data retic-worst-case)))
+
+(define (render-tr-20-deliverable)
+  (render-deliverable 20 (hash-ref performance-data tr-20-deliverable)))
+
+(define (render-tr-worst-case)
+  (render-worst-case (hash-ref performance-data tr-worst-case)))
+
+(define (render-deliverable D bv*)
+  BLANK)
+
+(define (render-worst-case bv*)
+  BLANK)
 
 ;; =============================================================================
 
@@ -501,8 +594,9 @@
               return self.x
         }|)
       (list))
-    @item{20-deliverable? 100%}
-    @item{10-deliverable? 100%}
+    @render-retic-20-deliverable[]
+    'next
+    @render-retic-10-deliverable[]
     @comment{
       TODO use bar charts
       TODO append random sampling bars
@@ -512,7 +606,7 @@
     'alts
     (list
       (list
-        @item{worst-case for each benchmark})
+        @render-retic-worst-case[])
       (list
         (titlet "``Within an order of magnitude''")))
     @comment{
@@ -524,7 +618,7 @@
        these are within an order of magnitude
     })
   (slide
-    #:title (hc-append 0 (t "vs. Typed Racket ")) ;; @cite[tfgnvf-popl-2016])
+    #:title (hc-append 0 (t "vs. Typed Racket ")) ;; @cite[tfgnvf-popl-2016]
     'alts
     (list
       (list
@@ -532,9 +626,9 @@
         (list
           (list
             @item{@~a[NUM-TR] @bt{different} benchmarks}
-            @item{20-deliverable? TODO (much fewer)})
+            @render-tr-20-deliverable[])
           (list
-            @item{TODO table})))
+            @render-tr-worst-case[])))
       (list
         (titlet @~a{``Frequently worse than an order of magnitude''})))
     @comment{
