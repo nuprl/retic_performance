@@ -10,8 +10,6 @@
 ;; - use same bib file for talk and paper
 ;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
-;; - O(how_many)
-;; - only 2 performance slides
 
 (require
   "bib.rkt"
@@ -28,12 +26,13 @@
 
 (define (do-show)
   (title)
-  (intro)
-  (grief-stage)
-  (denial-stage)
-  (anger-stage)
+  #;(intro)
+  #;(grief-stage)
+  #;(denial-stage)
+  #;(anger-stage)
   (acceptance-stage)
-  (moving-on-stage)
+  #;(moving-on-stage)
+  #;(back-that-slides-up)
   (void))
 
 ;; -----------------------------------------------------------------------------
@@ -315,7 +314,8 @@
 (define (grief-stage)
   (stage-slide "Grief"
     @comment{
-      nice warmup now time for grief
+      Now you've got an idea of the syntax and semantics.
+      Let's do a more interesting example.
     })
   (slide
     #:title "Something Weird"
@@ -356,15 +356,19 @@
       apply_first(get_numbers(4))
     }
     @comment{
-      okay this is funny,
+      lets start with the same partially-typed program as before
+      and add a typo
+      instead of calling `f` inside the loop, we just put `f`.
 
-      lets take our partially typed program and add a type-O
+      This is the sort of thing that I would call a "type error".
+      Reticulated disagrees. This program type checks.
+      So we can run it, any guesses to what happens if we run this program?
+      ....
+      Right we get a list of functions. Of course.
+      Nothing goes wrong.
 
-      oh dear not a list of ints any more
-      but wait it still type checks
-
-      it also runs, and you can apply the functions in the list,
-      here's example doing so in untyped code
+      We can even take one of the functions and apply it.
+      Hey man, nothing goes wrong.
     })
   (slide
     #:title "Another Something Weird"
@@ -391,22 +395,26 @@
     }
     @comment{
       another strange thing,
-      suppose we have a class,
-      suppose we also type its fields.
-      Maybe representing currency and want to make sure fields are integers,
-       and defininitely not integers mixed with floats.
+      suppose we have a class to represent money, US currency.
 
-      lo and behold you can write AND READ bad values to the field,
-       doesn't even have to be floats
-       retic doesn't care
+      and we want to make sure its fields are integer-valued,
+      so we add a type annotation.
+
+      The annotation doesn't stop a program from writing a float to the
+       field. Or reading a float for that matter.
+      The function `get_cash` claims to return a Cash object, but
+       really what you get is some nonsense object that superficially looks
+       like an instance of Cash.
+      You get a forgery.
     })
   (void))
 
 (define (denial-stage)
   (stage-slide "Denial"
     @comment{
-      first time I saw this, thought it was very very strange
-      thats not the soundness as I know and love
+      clearly theres some kind of misunderstanding
+      I said Retic was based on a type-sound model, but this is not your
+      typical type soundness.
     })
   (slide
     #:title "`Classic' Type Soundness"
@@ -415,9 +423,11 @@
     @item{@code[e] raises an error due to a partial primitive}
     @item{@code[e] diverges}
     @comment{
-      useful in particular because the type works as an API
-      if function returns list(int) that's money in the bank,
-      guaranteed it will give list of ints no matter how composed in larger program
+      a classic "strong" type soundness theorem would guarantee that
+      if a well-typed term reduces to a value, the value has the predicted type
+
+      clearly not what's happening in Reticulated.
+      Maybe the implementation has a bug?
     })
   (slide
     #:title "Reticulated Type Soundness"
@@ -433,61 +443,55 @@
     @eitem{@code[⌊List(Int)⌋ = List]}
     @eitem{@code[⌊Int -> Int⌋ = ->]}
     @comment{
-      first claim is the important one
-
-      some examples of the floor operation,
-       it just gets the top-most constructor
-
-      soundness is skin-deep
+      no, there's no bug
+      Reticulated's type soundness guarantees that if a well-typed term
+       reduces to a value, the value has the expected TAG.
+      Not type, it's a shallow soundness.
     })
   (slide POPL-1)
   (slide POPL-2)
   (slide POPL-3
     @comment{
-      and there we have it, type soundness
+      of course you don't have to take my word for it,
+      can open the paper from POPL, this year,
+      and Corollary 5.5.1 spells it out. Type Soudness.
+      If a well-typed term reduces to a value, that value has the right tag.
+
+      and here's the definition of the ``floor'' operation, from Figure 3
+      ...
     })
   (void))
 
 (define (anger-stage)
   (stage-slide "Anger? Bargaining? Depression?"
     @comment{
-      at this point you too may be feeling some complex emotions
+      *shrug*
     })
   (slide
-    @python{
-      def get_numbers(how_many)->List(Int):
-        ....
-        return nums
-    }
-    'next
-    @item{Cannot guarantee return type}
-    @comment{
-    })
-  (slide
-    @python|{
-      @fields({"dollars": Int, "cents": Int})
-      class Cash:
-        ....
-    }|
-    'next
-    @item{Cannot protect datatype invariants}
-    @comment{
-    })
-  (slide
-    #:title "Reticulated's `transient' types"
-    @item{Cannot guarantee return type}
-    @item{Cannot protect datatype invariants}
-    @eitem{}
+    #:title "What are Reticulated Types Good For?"
+    @item{Protect invariants?}
+    @item{Reliable documentation?}
+    @item{Enable optimizations?}
+    (t "Nope!")
     @titlet{Any untyped code => No compositional reasoning!}
     @comment{
-      ALL BETS ARE OFF
+      compared to a normal type system, this is pretty useless.
+      Retic types don't protect invariants,
+       don't work as trustworthy documentation,
+       and can't be used for standard type-based optimizations
+      As soon as you mix in untyped code, all bets are off
+
+      certainly, this is not a "real" type system as you know and love,
+       not going to keep you from going wrong, just going to tell you there's
+       a "possiblity" of going right.
+      So then what, if anything, are retic types good for???!
     })
   (void))
 
 (define (acceptance-stage)
   (stage-slide "Acceptance"
     @comment{
-      ... silence ...
+      *short silence*
     })
   (acceptance-stage:theory)
   (acceptance-stage:practice)
@@ -496,9 +500,11 @@
 (define (acceptance-stage:theory)
   (slide
     #:title "Two Good Reasons"
-    @item{Interoperability}
-    @item{Performance}
+    @titlet{Interoperability}
+    @titlet{Performance}
     @comment{
+      They're good for two things.
+      Interoperability and performance.
     })
   (slide
     #:title "Interoperability"
@@ -517,22 +523,26 @@
             ....
             return proxy(nums, List(Int))
         }
-        @item{@code[List] is mutable, `classic' approach is to proxy}
+        'next
         @item{The proxy must be compatible with existing code}))
     'next
     @pythonline{nums.append(....)}
     @pythonline{len(nums)}
     @pythonline{nums is nums}
     @comment{
-      since List is a mutable data structure,
-       conventional wisdom is to proxy it and check future reads and writes.
+      lets go back to the list example.
+      a Python list is a mutable data structure,
+      so the conventional wisdom is to proxy a typed list before leaves a
+       typed function, to protect against bad writes from untyped contexts
 
-      if you do that, need to be backwards-compatible
+      If you do so, add the proxy, the proxy needs to be observationally
+       equivalent to the original list
+      same methods, same functions, same object identity
 
-      Racket has chaperones, most languages don't
-      (could they? at least it's "a thing")
+      I know exactly one language that attempts to do this, Typed Racket,
+       its a lot of work to get right.
 
-      interop is trivial if you don't interpose!
+      If you don't add the proxy ... interop is trivial if you don't interpose
     })
   (slide
     #:title "Performance"
@@ -542,97 +552,91 @@
         return proxy(nums, List(Int))
     }
     @eitem{}
-    (parameterize ([code-scripts-enabled #f])
-      @item{Proxy has allocation cost}) ; (@code[O(how_many)])})
-    @item{Proxy adds overhead to future operations}
-    @item{In general, need to recursively proxy @code[List] elements}
+    @item{Allocation cost}
+    @item{Traverse, recursively proxy}
+    @item{Interpose on future operations}
     @comment{
-      (insert text here)
+      the other aspect is that proxies are not free
+      need to allocate,
+      traverse and recursively proxy components,
+      and once installed a proxy affects future operations,
+      may also defeat JIT optimizations
 
-      without proxy, everything is unit-cost
-
-    })
-  #;(slide
-    #:title "Performance"
-    'alts~
-    (list
-      (list
-        @python{
-          def get_numbers(how_many)->List(Int):
-            ....
-            return proxy(nums, List(Int))
-        })
-      (list
-        @python{
-          def get_numbers(how_many)->List(Int):
-            ....
-            return check(nums, List(Int))
-        }))
-    @item{Checking @code[List(Int)] is O(@code[how_many])}
-    @item{Checking infinite objects is not possible (e.g., @code[Int -> Int])}
-    @comment{
-      okay proxy is expensive, suppose we just check
+      cost may seem small, but it adds up ...
     })
   (void))
 
 (define (acceptance-stage:practice)
   (slide
-    #:title "Measuring Reticulated"
-    @item{@~a[NUM-EXHAUSTIVE] benchmarks @cite[vksb-dls-2014] @cite[vss-popl-2017] (+ more)}
-    @item{Ran all configurations at a@it{function and class fields} granularity}
-    'next
-    'alts~
-    (list
-      (list
-        @python|{
-          @fields({"x": Int, "y": Int})
-          class Point:
-            x = 0
-            y = 0
-
-            def get_x(self:Point)->Int:
-              return self.x
-        }|)
-      (list))
-    @render-retic-20-deliverable[]
-    'next
-    @render-retic-10-deliverable[]
-    @comment{
-      TODO use bar charts
-      TODO append random sampling bars
-    })
-  (slide
-    #:title "Worst-Case Overhead"
-    'alts
-    (list
-      (list
-        @render-retic-worst-case[])
-      (list
-        (titlet "``Within an order of magnitude''")))
-    @comment{
-      TODO make a table
-
-      these range between TODO and TODO
-
-      bottom-line / high-level-summary,
-       these are within an order of magnitude
-    })
-  (slide
-    #:title (hc-append 0 (t "vs. Typed Racket ")) ;; @cite[tfgnvf-popl-2016]
+    #:title "Measuring Typed Racket"
     'alts
     (list
       (list
         'alts
         (list
           (list
-            @item{@~a[NUM-TR] @bt{different} benchmarks}
+            @item{20 programs}
+            @item{Measured all gradually-typed configurations}
+            @item{How many 20-deliverable?}
+            'next
             @render-tr-20-deliverable[])
           (list
             @render-tr-worst-case[])))
       (list
-        (titlet @~a{``Frequently worse than an order of magnitude''})))
+        (titlet "Frequently an order-of-magnitude slowdown")))
     @comment{
-      cannot directly compare these numbers
+      ... to give you an idea, we can do a high level comparison between
+      Retic and typed racket
+
+      in 2016 we published some numbers on the performance of typed racket.
+      One of the things reported was number of 20-deliverable configurations
+      --- if you try all ways of gradually typing some programs, how many
+      ways have less than 20x overhead relative to untyped?
+
+      turns out, many of the benchmarks have configurations with MORE THAN 20x
+      overhead. 20x is a lot.
+
+      if you look at the worst-case overheads,
+      there are triple-digit numbers in there
+    })
+  (slide
+    #:title "Measuring Reticulated"
+    'alts
+    (list
+      (list
+        @item{@~a[NUM-EXHAUSTIVE] @bt{different} programs @cite[vksb-dls-2014] @cite[vss-popl-2017] (+ more)}
+        @item{Measured all@it{function-level} configurations}
+        'alts
+        (list
+          (list
+            @item{How many 20-deliverable?}
+            'next
+            @render-retic-20-deliverable[]
+            @item{All of them})
+          (list
+            @item{How many 10-deliverable?}
+            'next
+            @render-retic-10-deliverable[]
+            @item{All of them})))
+      (list
+        'alts
+        (list
+          (list
+            @render-retic-worst-case[])
+          (list
+            (titlet "Never an order-of-magnitude slowdown")))))
+    @comment{
+      Apply same method to retic,
+      using very different benchmarks
+
+      Again asked how many 20-deliverable. Answer: all of them.
+
+      Also asked, how many 10-deliverable. All of them.
+
+      worst-case slowdown we observed was TODOx
+
+      Clearly there's some secret sauce involved.
+      I believe most of this gap is due to Reticulated's alternative soundness.
     })
   (void))
 
@@ -642,12 +646,37 @@
     })
   (slide
     #:title "Moving On" ;; Life After Transient
-    @item{Is Reticulated's soundness practical?}
-    @item{Can Typed Racket soundness be performant?}
-    @item{Is Typed Racket soundness portable?}
-    @item{Soundness 3.0 ?}
+    @item[#:bullet (t "Q1.")]{Is Reticulated's soundness practical?}
+    @item[#:bullet (t "Q2.")]{Can Typed Racket soundness be performant?}
+    @item[#:bullet (t "Q3.")]{Is Typed Racket soundness portable?}
+    @item[#:bullet (t "Q4.")]{Is there a useful, ``efficient'' Soundness 3.0?}
     @comment{
       where do we go from here?
+      In my mind there are four important, open questions.
+
+      The fourth is the important question for you all,
+       is there possibly a third notion of soundness, in between
+       Typed Racket and Reticulated, that has strong guarantees
+       and yields an efficient implementation.
+
+      That's my talk.
+    })
+  (slide)
+  (void))
+
+(define (back-that-slides-up)
+  (slide
+    #:title "Granularity"
+    @python|{
+      @fields({"x": Int, "y": Int})
+      class Point:
+        x = 0
+        y = 0
+
+        def get_x(self:Point)->Int:
+          return self.x
+    }|
+    @comment{
     })
   (void))
 
