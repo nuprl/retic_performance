@@ -32,15 +32,16 @@
 ;; =============================================================================
 
 (define (do-show)
-  (title)
-  (intro)
-  (grief-stage)
-  (denial-stage)
-  (anger-stage)
-  (acceptance-stage)
-  (moving-on-stage)
-  (back-that-slides-up)
-  (void))
+  (parameterize ([current-main-font "Roboto"])
+    (title)
+    (intro)
+    (grief-stage)
+    (denial-stage)
+    (anger-stage)
+    (acceptance-stage)
+    (moving-on-stage)
+    (back-that-slides-up)
+    (void)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -112,12 +113,16 @@
                 [(5) "V"]
                 [else "VI"]))])
     (λ (str comment)
-      (parameterize ([current-titlet (λ (str) (text str (current-main-font) 50))])
-        (slide
-          (cc-superimpose
-            BLACK
-            (colorize (text (format "Stage ~a:  ~a" (rm (stage-counter++)) str) '() 50) "white"))
-          comment)))))
+      (slide
+        (cc-superimpose
+          BLACK
+          (colorize
+            (bebas-bold (format "Stage ~a:  ~a" (rm (stage-counter++)) str))
+            "white"))
+        comment))))
+
+(define (bebas-bold str)
+  (text str "Bebas Neue, Bold" 72))
 
 (define (tr-data->name filename)
   (define-values [_base pre-name _d] (split-path filename))
@@ -253,24 +258,24 @@
 
 (define (title)
   (slide
-    @titlet{Measuring Reticulated Python}
+    (bebas-bold "Measuring Reticulated Python")
     @closer[
-      @small{@t{Ben Greenman, Northeastern University}}
-      @small{@t{with Zeina Migeed}}]
+      @t{Ben Greenman, Northeastern University}
+      @t{with Zeina Migeed}]
     @comment{
       ok good morning
     })
   (slide
     GRIEF
     @comment{
-      Any here heard of the five stages of grief?
-      Ok
-      They're 5 five complex emotions that people often experience after the
-       death of a loved one.
-      ...
-      I've been experiencing similar emotions in the context of this research,
-       measuring Reticulated Python.
-      My goal today is to share that journey with you.
+      has anyone heard of the 5 stages of grief?
+      These are stages that people often go through when coping with a
+       traumatic incident.
+
+      I've been coping with reticulated python and having similar experiences.
+      My goal today is to share that journey with you
+
+      (this is my outline slide)
     })
   (void))
 
