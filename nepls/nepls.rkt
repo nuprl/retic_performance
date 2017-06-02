@@ -19,6 +19,7 @@
   (only-in racket/runtime-path
     define-runtime-path)
   plot/no-gui
+  plot/utils
   slideshow/code
   slideshow/text
   with-cache)
@@ -29,7 +30,7 @@
   #;(title)
   #;(intro)
   #;(grief-stage)
-  (denial-stage)
+  #;(denial-stage)
   #;(anger-stage)
   (acceptance-stage)
   #;(moving-on-stage)
@@ -143,15 +144,16 @@
   (with-cache (build-path PWD "with-cache" "performance.rktd")
     #:fasl? #f
     #:keys #f
-    (λ () (error 'die))
+    (lambda () (error 'die))
     #;(λ ()
       (define RETIC-PI
         (map benchmark->performance-info
              (filter benchmark->karst-data (all-benchmarks))))
       (define (retic-count-deliverable D)
         (for/list ([pi (in-list RETIC-PI)])
-          (cons (performance-info->name pi)
-                ((deliverable D) pi))))
+          (list (performance-info->name pi)
+                ((deliverable D) pi)
+                (num-configurations pi))))
       (define (retic-count-worst-case)
         (for/list ([pi (in-list RETIC-PI)])
           (cons (performance-info->name pi)
@@ -161,8 +163,9 @@
         (define (add-if-good? acc o)
           (if (<= o 20) (+ acc 1) acc))
         (for/list ([fn (in-list TR-DATA)])
-          (cons (tr-data->name fn)
-                (tr-overhead-fold add-if-good? 0 fn))))
+          (list (tr-data->name fn)
+                (tr-overhead-fold add-if-good? 0 fn)
+                (tr-overhead-fold add1 0 fn))))
       (define (tr-count-worst-case)
         (for/list ([fn (in-list TR-DATA)])
           (cons (tr-data->name fn)
@@ -176,27 +179,66 @@
           (cons tr-worst-case (tr-count-worst-case)))))))
 
 (define (render-retic-20-deliverable)
-  (render-deliverable 20 (hash-ref performance-data retic-20-deliverable)))
+  (render-deliverable 20 (hash-ref performance-data retic-20-deliverable) #:tag "retic"))
 
 (define (render-retic-10-deliverable)
-  (render-deliverable 10 (hash-ref performance-data retic-10-deliverable)))
+  (render-deliverable 10 (hash-ref performance-data retic-10-deliverable) #:tag "retic"))
 
 (define (render-retic-worst-case)
   (render-worst-case (hash-ref performance-data retic-worst-case)))
 
 (define (render-tr-20-deliverable)
-  (render-deliverable 20 (hash-ref performance-data tr-20-deliverable)))
+  (render-deliverable 20 (hash-ref performance-data tr-20-deliverable) #:tag "tr"))
 
 (define (render-tr-worst-case)
   (render-worst-case (hash-ref performance-data tr-worst-case)))
 
-(define (render-deliverable D bv*)
-  ;(plot-pict
-  ;  #:width (current-para-width))
-  BLANK)
+(define (render-deliverable D bv* #:tag tag)
+  (parameterize ([plot-font-size (- (current-font-size) 8)]
+                 [plot-y-ticks (make-overhead-y-ticks)])
+    (plot-pict
+      (discrete-histogram
+        (for/vector #:length (length bv*)
+                    ([bv (in-list bv*)]
+                     [i (in-naturals)])
+          (vector "" (* 100 (/ (cadr bv) (caddr bv))))))
+      #:x-label ""
+      #:y-label ""
+      #:x-min 0
+      #:x-max 100
+      #:height (inexact->exact (round (* 0.6 (current-para-width))))
+      #:width (current-para-width))))
+
+(define (make-overhead-y-ticks)
+  (define NUM-TICKS 3)
+  (define UNITS "%")
+  (ticks (λ (ax-min ax-max)
+           (for/list ([y (in-list (linear-seq ax-min ax-max NUM-TICKS #:end? #t))])
+             (pre-tick (exact-floor y) #t)))
+         (ticks-format/units UNITS)))
+
+(define ((ticks-format/units units) ax-min ax-max pre-ticks)
+  (for/list ([pt (in-list pre-ticks)])
+    (define v (pre-tick-value pt))
+    (if (= v ax-max)
+      (format "~a~a" (rnd v) units)
+      (format "~a" (rnd v)))))
 
 (define (render-worst-case bv*)
-  BLANK)
+  (parameterize ([current-font-size (- (current-font-size) 4)])
+    (define-values [hd tl] (split-at bv* 10))
+    (vc-append 10
+      (bt "Max Overhead")
+      (ht-append 80 (overhead-table hd) (overhead-table tl)))))
+
+(define (overhead-table bv*)
+  (table 2
+    (append*
+      (for/list ([bv (in-list bv*)])
+        (list (t (~a(car bv))) (t (~a (inexact->exact (floor (rnd (cdr bv)))))))))
+    (list lc-superimpose rc-superimpose)
+    cc-superimpose
+    30 10))
 
 ;; =============================================================================
 
@@ -610,7 +652,7 @@
     'alts
     (list
       (list
-        @item{@~a[NUM-EXHAUSTIVE] @bt{different} programs @cite[vksb-dls-2014] @cite[vss-popl-2017] (+ more)}
+        @item{@~a[NUM-EXHAUSTIVE] @bt{different} programs @cite[vksb-dls-2014]@cite[vss-popl-2017]}
         @item{Measured all@it{function-level} configurations}
         'alts
         (list
