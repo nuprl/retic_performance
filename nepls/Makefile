@@ -8,3 +8,9 @@ preview: compile
 
 test: compile
 	raco test nepls.rkt
+
+show: compile
+	slideshow ${TALK}
+
+pdf: compile
+	slideshow --pdf ${TALK}
