@@ -3,12 +3,8 @@
 ;; Source for NEPLS 2017 talk
 
 ;; TODO
-;; - highlight types
-;; - highlight typ-os
-;; - show running outputs
-
+;; - resize "GRIEF", is not centered
 ;; - vertically align "logically similar" picts
-;; - horizontally align equations
 ;; - use same bib file for talk and paper
 ;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
@@ -74,18 +70,23 @@
     (scale-to-fit (bitmap (build-path PWD "src" "popl-p10.png")) GRIEF)))
 
 (define POPL-3
-  (pict->pre-render-pict
-    (scale-to-fit (bitmap (build-path PWD "src" "popl-p5.png")) GRIEF)))
+  (let ([b (scale-to-fit (bitmap (build-path PWD "src" "popl-p5.png")) GRIEF)])
+    (pict->pre-render-pict
+      (pin-over b
+        0 (/ (pict-height b) 4)
+        (cellophane (filled-rectangle (pict-width b) (inexact->exact (floor (* 0.55 (pict-height b)))) #:draw-border? #f #:color "white") 0.6)))))
 
 (define (cite b)
   (t @~a{[@bib->venue[b] @bib->year[b]]}))
 
-(define (python . arg*)
+(define (python #:min-width [w 0] . arg*)
   (python* arg*))
 
-(define (python* arg*)
+(define (python* #:min-width [w 0] arg*)
+  (vl-append
+    (blank w 0)
     (codeblock-pict #:keep-lang-line? #f
-      (string-append "#lang python\n" (string-join arg* ""))))
+      (string-append "#lang python\n" (string-join arg* "")))))
 
 (define (pythonline . arg*)
   @item[#:align 'left #:bullet BLANK]{@python*[arg*]})
@@ -242,7 +243,7 @@
   (parameterize ([current-font-size (- (current-font-size) 4)])
     (define-values [hd tl] (split-at bv* 10))
     (vc-append 10
-      (bt "Max Overhead")
+      (bt "Worst-Case Overhead")
       (ht-append 80 (overhead-table hd) (overhead-table tl)))))
 
 (define (overhead-table bv*)
@@ -294,13 +295,13 @@
   (slide
     #:title "Example Program"
     #:layout 'top
-    @python{
+    @pythonline{
       def f(n):
         return n*(n+1) // 2
 
-      def get_numbers(how_many):
+      def get_numbers(count):
         nums = []
-        for i in range(1, 1 + how_many):
+        for i in range(1, 1+count):
           nums.append(f(i))
         return nums
 
@@ -313,13 +314,13 @@
   (slide
     #:title "Example Program, Fully-Typed"
     #:layout 'top
-    @python{
+    @pythonline{
       def f(n:Int)->Int:
         return n*(n+1) // 2
 
-      def get_numbers(how_many:Int)->List(Int):
+      def get_numbers(count:Int)->List(Int):
         nums = []
-        for i in range(1, 1 + how_many):
+        for i in range(1, 1+count):
           nums.append(f(i))
         return nums
 
@@ -334,13 +335,13 @@
   (slide
     #:title "Example Program, Partially Typed"
     #:layout 'top
-    @python{
+    @pythonline{
       def f(n:Int):
         return n*(n+1) // 2
 
-      def get_numbers(how_many)->List(Int):
+      def get_numbers(count)->List(Int):
         nums = []
-        for i in range(1, 1 + how_many):
+        for i in range(1, 1+count):
           nums.append(f(i))
         return nums
 
@@ -349,12 +350,12 @@
     }
     'next
     @pythonline{
-      f(f)
+      f("not a number")
       # Static type error
     }
     'next
     @pythonline{
-      get_numbers(f)
+      get_numbers("not a number")
       # Dynamic type error
     }
     @comment{
@@ -391,27 +392,27 @@
     'alts~
     (list
       (list
-        @python{
+        @pythonline{
           def f(n:Int):
             return n*(n+1) // 2
 
-          def get_numbers(how_many)->List(Int):
+          def get_numbers(count)->List(Int):
             nums = []
-            for i in range(1, 1 + how_many):
+            for i in range(1, 1+count):
               nums.append(f(i))
             return nums
 
           get_numbers(4)
         })
       (list
-        @python{
+        @pythonline{
           def f(n:Int):
             return n*(n+1) // 2
 
-          def get_numbers(how_many)->List(Int):
+          def get_numbers(count)->List(Int):
             nums = []
-            for i in range(1, 1 + how_many):
-              nums.append(f)
+            for i in range(1, 1+count):
+              nums.append(f)  # typo!
             return nums
 
           get_numbers(4)
@@ -423,10 +424,9 @@
     'next
     @pythonline{
       def apply_first(funs):
-        return funs[0](42)
-
+        return funs[0](10)
       apply_first(get_numbers(4))
-      # 1
+      # 55
     }
     @comment{
       lets start with the same partially-typed program as before
@@ -446,7 +446,7 @@
   (slide
     #:title "Another Something Weird"
     #:layout 'top
-    @python|{
+    @pythonline|{
       @fields({"dollars": Int
               ,"cents": Int})
       class Cash:
@@ -491,7 +491,7 @@
       typical type soundness.
     })
   (slide
-    #:title "`Classic' Type Soundness"
+    #:title "Type Soundness"
     @item[#:bullet BLANK]{If @code[e] has type @code[T], then either:}
     @item{@code[e] reduces to a value @code[v] with type @code[T]}
     @item{@code[e] raises an error due to a partial primitive}
@@ -538,11 +538,17 @@
     })
   (slide
     #:title "What are Reticulated Types Good For?"
+    'next
     @item{Protect invariants?}
+    'next
     @item{Reliable documentation?}
+    'next
     @item{Enable optimizations?}
+    'next
     @eitem{}
-    (t "Any untyped code => No compositional reasoning!")
+    (t "Any untyped code")
+    (t "=>")
+    (t "No compositional reasoning!")
     @comment{
       compared to a normal type system, this is pretty useless.
       Retic types don't protect invariants,
@@ -575,27 +581,33 @@
     })
   (slide
     #:title "Interoperability"
+    #:layout 'top
     'alts~
     (list
       (list
         @python{
-          def get_numbers(how_many)->List(Int):
+          def get_numbers(count)->List(Int):
             ....
             return nums
         }
-        @item{@code[List] is mutable, `classic' approach is to proxy})
+        @item{@code[List] is mutable, standard approach is to proxy})
       (list
         @python{
-          def get_numbers(how_many)->List(Int):
+          def get_numbers(count)->List(Int):
             ....
             return proxy(nums, List(Int))
         }
         'next
+        @eitem{}
         @item{The proxy must be compatible with existing code}))
     'next
-    @pythonline{nums.append(....)}
-    @pythonline{len(nums)}
-    @pythonline{nums is nums}
+    @python|{
+      nums.append(....)
+
+      len(nums)
+
+      nums is nums
+    }|
     @comment{
       lets go back to the list example.
       a Python list is a mutable data structure,
@@ -613,14 +625,18 @@
     })
   (slide
     #:title "Performance"
+    #:layout 'top
     @python{
-      def get_numbers(how_many)->List(Int):
+      def get_numbers(count)->List(Int):
         ....
         return proxy(nums, List(Int))
     }
+    'next
     @eitem{}
     @item{Allocation cost}
+    'next
     @item{Traverse, recursively proxy}
+    'next
     @item{Interpose on future operations}
     @comment{
       the other aspect is that proxies are not free
@@ -669,7 +685,7 @@
     'alts
     (list
       (list
-        @item{@~a[NUM-EXHAUSTIVE] @bt{different} programs @cite[vksb-dls-2014]@cite[vss-popl-2017]}
+        @item{@~a[NUM-EXHAUSTIVE] @bt{different} programs}  ; @cite[vksb-dls-2014] @cite[vss-popl-2017]
         @item{Measured all@it{function-level} configurations}
         'alts
         (list
