@@ -5,6 +5,8 @@
 ;; TODO
 ;; - highlight types
 ;; - highlight typ-os
+;; - show running outputs
+
 ;; - vertically align "logically similar" picts
 ;; - horizontally align equations
 ;; - use same bib file for talk and paper
@@ -23,18 +25,21 @@
   slideshow/code
   slideshow/text
   with-cache)
+#;(require ; for the cache
+  gm-dls-2017/script/benchmark-info
+  gm-dls-2017/script/performance-info)
 
 ;; =============================================================================
 
 (define (do-show)
-  #;(title)
-  #;(intro)
-  #;(grief-stage)
-  #;(denial-stage)
-  #;(anger-stage)
+  (title)
+  (intro)
+  (grief-stage)
+  (denial-stage)
+  (anger-stage)
   (acceptance-stage)
-  #;(moving-on-stage)
-  #;(back-that-slides-up)
+  (moving-on-stage)
+  (back-that-slides-up)
   (void))
 
 ;; -----------------------------------------------------------------------------
@@ -55,6 +60,10 @@
   (pict->pre-render-pict
     (scale (bitmap (build-path PWD "src" "grief.jpg")) 1/4)))
 
+(define BLACK
+  (pict->pre-render-pict
+    (filled-rectangle (pict-width GRIEF) (pict-height GRIEF) #:color "black" #:draw-border? #f)))
+
 (define POPL-1
   (pict->pre-render-pict
     (scale-to-fit (bitmap (build-path PWD "src" "popl-p1.png")) GRIEF)))
@@ -74,11 +83,8 @@
   (python* arg*))
 
 (define (python* arg*)
-  (parameterize ([current-keyword-list PYTHON-KEYWORDS]
-                 [current-const-list PYTHON-KEYWORDS]
-                 [code-colorize-quote-enabled #f]
-                 [current-literal-color (current-id-color)])
-    (codeblock-pict (string-join arg* ""))))
+    (codeblock-pict #:keep-lang-line? #f
+      (string-append "#lang python\n" (string-join arg* ""))))
 
 (define (pythonline . arg*)
   @item[#:align 'left #:bullet BLANK]{@python*[arg*]})
@@ -105,10 +111,13 @@
                 [(4) "IV"]
                 [(5) "V"]
                 [else "VI"]))])
-    (λ (str . arg*)
-      (apply slide
-        (titlet (format "Stage ~a:  ~a" (rm (stage-counter++)) str))
-        arg*))))
+    (λ (str comment)
+      (parameterize ([current-titlet (λ (str) (text str (current-main-font) 50))])
+        (slide
+          (cc-superimpose
+            BLACK
+            (colorize (text (format "Stage ~a:  ~a" (rm (stage-counter++)) str) '() 50) "white"))
+          comment)))))
 
 (define (tr-data->name filename)
   (define-values [_base pre-name _d] (split-path filename))
@@ -165,7 +174,7 @@
         (for/list ([fn (in-list TR-DATA)])
           (list (tr-data->name fn)
                 (tr-overhead-fold add-if-good? 0 fn)
-                (tr-overhead-fold add1 0 fn))))
+                (tr-overhead-fold (λ (acc t) (+ 1 acc)) 0 fn))))
       (define (tr-count-worst-case)
         (for/list ([fn (in-list TR-DATA)])
           (cons (tr-data->name fn)
@@ -204,8 +213,8 @@
           (vector "" (* 100 (/ (cadr bv) (caddr bv))))))
       #:x-label ""
       #:y-label ""
-      #:x-min 0
-      #:x-max 100
+      #:y-min 0
+      #:y-max 100
       #:height (inexact->exact (round (* 0.6 (current-para-width))))
       #:width (current-para-width))))
 
@@ -289,6 +298,9 @@
         for i in range(1, 1 + how_many):
           nums.append(f(i))
         return nums
+
+      get_numbers(4)
+      # [1, 3, 6, 10]
     }
     @comment{
       is a valid python program, also a valid retic program
@@ -307,6 +319,7 @@
         return nums
 
       get_numbers(4)
+      # [1, 3, 6, 10]
     }
     @comment{
       valid Retic, fully annotated
@@ -327,15 +340,17 @@
         return nums
 
       get_numbers(4)
+      # [1, 3, 6, 10]
     }
     'next
     @pythonline{
-
-      get_numbers("not an integer")
+      f(f)
+      # Static type error
     }
     'next
     @pythonline{
-      f("not an integer")
+      get_numbers(f)
+      # Dynamic type error
     }
     @comment{
       anywhere you can have a type annotation, can also remove it. Anywhere.
@@ -380,6 +395,8 @@
             for i in range(1, 1 + how_many):
               nums.append(f(i))
             return nums
+
+          get_numbers(4)
         })
       (list
         @python{
@@ -391,17 +408,20 @@
             for i in range(1, 1 + how_many):
               nums.append(f)
             return nums
+
+          get_numbers(4)
         }))
     'next
     @pythonline{
-      get_numbers(4)
+      # [<fun>, <fun>, <fun>, <fun>]
     }
+    'next
     @pythonline{
-
       def apply_first(funs):
         return funs[0](42)
 
       apply_first(get_numbers(4))
+      # 1
     }
     @comment{
       lets start with the same partially-typed program as before
@@ -440,6 +460,7 @@
         return c
 
       get_cash()
+      # Cash(3.14159, 0)
     }
     @comment{
       another strange thing,
@@ -481,15 +502,10 @@
     #:title "Reticulated Type Soundness"
     @item[#:bullet BLANK]{If @code[e] has type @code[T], then either:}
     @item{@code[e] reduces to a value @code[v] with type @code[⌊T⌋]}
+    @subitem{e.g. @code[⌊Int->Int⌋ = ->]}
+    ;;@subitem{@code[⌊Int -> Int⌋ = ->]}
     @item{@code[e] raises a blame error}
     @item{@code[e] diverges}
-    'next
-    @eitem{}
-    ;; floor operation
-    @eitem{@code[⌊Int⌋ = Int]}
-    'next
-    @eitem{@code[⌊List(Int)⌋ = List]}
-    @eitem{@code[⌊Int -> Int⌋ = ->]}
     @comment{
       no, there's no bug
       Reticulated's type soundness guarantees that if a well-typed term
@@ -511,7 +527,7 @@
   (void))
 
 (define (anger-stage)
-  (stage-slide "Anger? Bargaining? Depression?"
+  (stage-slide "Anger, Bargaining, Depression"
     @comment{
       *shrug*
     })
@@ -520,8 +536,8 @@
     @item{Protect invariants?}
     @item{Reliable documentation?}
     @item{Enable optimizations?}
-    (t "Nope!")
-    @titlet{Any untyped code => No compositional reasoning!}
+    @eitem{}
+    (t "Any untyped code => No compositional reasoning!")
     @comment{
       compared to a normal type system, this is pretty useless.
       Retic types don't protect invariants,
@@ -547,9 +563,7 @@
 
 (define (acceptance-stage:theory)
   (slide
-    #:title "Two Good Reasons"
-    @titlet{Interoperability}
-    @titlet{Performance}
+    (titlet "Interoperability & Performance")
     @comment{
       They're good for two things.
       Interoperability and performance.
@@ -620,18 +634,13 @@
     'alts
     (list
       (list
-        'alts
-        (list
-          (list
-            @item{20 programs}
-            @item{Measured all gradually-typed configurations}
-            @item{How many 20-deliverable?}
-            'next
-            @render-tr-20-deliverable[])
-          (list
-            @render-tr-worst-case[])))
+        @item{20 programs}
+        @item{Measured all gradually-typed configurations}
+        @item{How many 20-deliverable?}
+        'next
+        @render-tr-20-deliverable[])
       (list
-        (titlet "Frequently an order-of-magnitude slowdown")))
+        @render-tr-worst-case[]))
     @comment{
       ... to give you an idea, we can do a high level comparison between
       Retic and typed racket
@@ -648,6 +657,9 @@
       there are triple-digit numbers in there
     })
   (slide
+    #:title "Measuring Typed Racket"
+    (titlet "Frequently an order-of-magnitude slowdown"))
+  (slide
     #:title "Measuring Reticulated"
     'alts
     (list
@@ -659,20 +671,13 @@
           (list
             @item{How many 20-deliverable?}
             'next
-            @render-retic-20-deliverable[]
-            @item{All of them})
+            @render-retic-20-deliverable[])
           (list
             @item{How many 10-deliverable?}
             'next
-            @render-retic-10-deliverable[]
-            @item{All of them})))
+            @render-retic-10-deliverable[])))
       (list
-        'alts
-        (list
-          (list
-            @render-retic-worst-case[])
-          (list
-            (titlet "Never an order-of-magnitude slowdown")))))
+        @render-retic-worst-case[]))
     @comment{
       Apply same method to retic,
       using very different benchmarks
@@ -686,6 +691,9 @@
       Clearly there's some secret sauce involved.
       I believe most of this gap is due to Reticulated's alternative soundness.
     })
+  (slide
+    #:title "Measuring Reticulated"
+    (titlet "Never an order-of-magnitude slowdown"))
   (void))
 
 (define (moving-on-stage)
