@@ -7,8 +7,9 @@ def get_numbers(how_many:Int)->List(Int):
     nums.append(f)
   return nums
 
+print(get_numbers(4))
+
 def apply_first(funs, n):
   return funs[0](n)
 
-nums = get_numbers(4)
-print(apply_first(nums, 10))
+print(apply_first(get_numbers(4), 10))
