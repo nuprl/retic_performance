@@ -18,6 +18,7 @@
     mean)
   (only-in racket/runtime-path
     define-runtime-path)
+  plot/no-gui
   slideshow/code
   slideshow/text
   with-cache)
@@ -25,10 +26,10 @@
 ;; =============================================================================
 
 (define (do-show)
-  (title)
+  #;(title)
   #;(intro)
   #;(grief-stage)
-  #;(denial-stage)
+  (denial-stage)
   #;(anger-stage)
   (acceptance-stage)
   #;(moving-on-stage)
@@ -54,13 +55,16 @@
     (scale (bitmap (build-path PWD "src" "grief.jpg")) 1/4)))
 
 (define POPL-1
-  (pict->pre-render-pict (bitmap (build-path PWD "src" "popl-p1.png"))))
+  (pict->pre-render-pict
+    (scale-to-fit (bitmap (build-path PWD "src" "popl-p1.png")) GRIEF)))
 
 (define POPL-2
-  (pict->pre-render-pict (bitmap (build-path PWD "src" "popl-p10.png"))))
+  (pict->pre-render-pict
+    (scale-to-fit (bitmap (build-path PWD "src" "popl-p10.png")) GRIEF)))
 
 (define POPL-3
-  (pict->pre-render-pict (bitmap (build-path PWD "src" "popl-p5.png"))))
+  (pict->pre-render-pict
+    (scale-to-fit (bitmap (build-path PWD "src" "popl-p5.png")) GRIEF)))
 
 (define (cite b)
   (t @~a{[@bib->venue[b] @bib->year[b]]}))
@@ -187,6 +191,8 @@
   (render-worst-case (hash-ref performance-data tr-worst-case)))
 
 (define (render-deliverable D bv*)
+  ;(plot-pict
+  ;  #:width (current-para-width))
   BLANK)
 
 (define (render-worst-case bv*)
