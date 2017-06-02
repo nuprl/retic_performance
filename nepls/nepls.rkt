@@ -55,7 +55,7 @@
 
 (define GRIEF
   (pict->pre-render-pict
-    (scale (bitmap (build-path PWD "src" "grief.jpg")) 1/4)))
+    (scale-to-fit (bitmap (build-path PWD "src" "grief.jpg")) full-page)))
 
 (define BLACK
   (pict->pre-render-pict
