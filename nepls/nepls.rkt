@@ -264,8 +264,9 @@
       (list
         (bebas-bold "Measuring Reticulated Python")
         @closer[
-          @t{Ben Greenman, Northeastern University}
-          @t{with Zeina Migeed}]))
+          @t{Ben Greenman}
+          @t{with Zeina Migeed}
+          @t{at Northeastern University}]))
     @comment{
       ok good morning
     })
