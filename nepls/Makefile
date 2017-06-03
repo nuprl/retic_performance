@@ -13,4 +13,4 @@ show: compile
 	slideshow ${TALK}
 
 pdf: compile
-	slideshow --pdf ${TALK}
+	slideshow --condense --pdf ${TALK}

@@ -36,7 +36,7 @@
     (anger-stage)
     (acceptance-stage)
     (moving-on-stage)
-    (back-that-slides-up)
+    #;(back-that-slides-up)
     (void)))
 
 ;; -----------------------------------------------------------------------------
@@ -217,7 +217,7 @@
                     ([bv (in-list bv*)]
                      [i (in-naturals)])
           (vector "" (* 100 (/ (cadr bv) (caddr bv))))))
-      #:x-label ""
+      #:x-label "Benchmark"
       #:y-label ""
       #:y-min 0
       #:y-max 100
@@ -259,10 +259,14 @@
 
 (define (title)
   (slide
-    (bebas-bold "Measuring Reticulated Python")
-    @closer[
-      @t{Ben Greenman, Northeastern University}
-      @t{with Zeina Migeed}]
+    'alts~
+    (list
+      (list)
+      (list
+        (bebas-bold "Measuring Reticulated Python")
+        @closer[
+          @t{Ben Greenman, Northeastern University}
+          @t{with Zeina Migeed}]))
     @comment{
       ok good morning
     })
@@ -539,11 +543,11 @@
   (slide
     #:title "What are Reticulated Types Good For?"
     'next
-    @item{Protect invariants?}
+    @item{Protect invariants?  No}
     'next
-    @item{Reliable documentation?}
+    @item{Reliable documentation?  No}
     'next
-    @item{Enable optimizations?}
+    @item{Enable optimizations?  No}
     'next
     @eitem{}
     (t "Any untyped code")
