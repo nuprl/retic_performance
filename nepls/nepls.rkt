@@ -3,11 +3,10 @@
 ;; Source for NEPLS 2017 talk
 
 ;; TODO
-;; - resize "GRIEF", is not centered
-;; - vertically align "logically similar" picts
 ;; - use same bib file for talk and paper
 ;;   - may be possible with `(define-cite #:style ....)`
 ;; - keep checksum for python files, re-run and check Python 3.4 and retic
+;; - uncomment the extra `require`
 
 (require
   "bib.rkt"

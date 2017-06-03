@@ -1,5 +1,7 @@
 TALK=nepls.rkt
 
+all: show
+
 compile:
 	raco make -v nepls.rkt
 
