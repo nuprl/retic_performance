@@ -462,7 +462,7 @@
     [(unbox types-mode?)
      (types ARG*)]
     [else
-     (raise-user-error 'die)])
+     (raise-user-error 'rp-python "unrecognized arguments, run `raco rp-python --help`")])
    #;(pretty-print (benchmark-dir->python-info p))
    #;(for ((PAT (in-list PAT*)))
      (when (set-member? (python-info->all-types (benchmark-dir->python-info PAT)) #f)
