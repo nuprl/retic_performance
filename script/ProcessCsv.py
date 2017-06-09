@@ -1,5 +1,14 @@
 from ProcessText import *
 
+# Usage:
+#   python ProcessCsv.py FILE.csv BENCHMARK-DIR I
+# where:
+# - `FILE.csv` is the name of a file output by `ProcessText.py`
+# - `BENCHMARK-DIR` is a directory for a benchmark
+# - `I` is a natural number
+#
+# Prints all configurations where the I-th component is typed
+
 
 def main(file, dir, pos):
     """
