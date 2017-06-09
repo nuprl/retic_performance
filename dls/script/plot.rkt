@@ -504,7 +504,9 @@
      (define p*
        (parameterize ([*FONT-SIZE* 14])
          (map render-one pi*)))
-     (save-pict "rp-plot.png" (apply vl-append 50 p*))])))
+     (define OUT-FILE "rp-plot.png")
+     (and (save-pict OUT-FILE (apply vl-append 50 p*))
+          (printf "Saved output to '~a'~n" OUT-FILE))])))
 
 ;; =============================================================================
 
