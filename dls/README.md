@@ -12,16 +12,16 @@ Begin every `.scrbl` file with the language:
 #lang gm-dls-2017
 ```
 
-This language _should_ import every library you need to start writing a Scribble
-document using our flavor of `scribble/acmart`.
+This language imports every library you need to start writing a Scribble
+ document using our flavor of `scribble/acmart`.
 
-If you want a new import, edit `main.rkt` to provide it.
+If you want more, edit `main.rkt` to provide it.
 
 
 #### How to build the paper
 
-- _For the first time_ : `make`
-- _After the first time, for a faster build_: `make pdf`
+- _For the first time_ : `make all`
+- _After the first time, for a faster build_: `make`
 - _Just the LaTeX_ : `make tex`
 
 
