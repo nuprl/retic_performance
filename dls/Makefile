@@ -5,7 +5,7 @@ pdf: compile texstyle.tex
 	scribble ++style texstyle.tex \
            --pdf $(PAPER).scrbl
 
-all: pkg setup test pdf
+all: pkg setup pdf
 
 tex: compile texstyle.tex
 	scribble ++style texstyle.tex --latex $(PAPER).scrbl
