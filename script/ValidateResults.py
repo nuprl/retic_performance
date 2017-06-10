@@ -111,7 +111,7 @@ def fix_duplicates(data_file, dup, dne):
       if not bool(valss):
         print("No data for %s" % cfg)
       elif close_enough(valss):
-        print("    ".join((str(y) for y in line_for_dups[cfg] + [valss[0]])), file=g)
+        print(SEP.join((str(y) for y in line_for_dups[cfg] + [valss[0]])), file=g)
       else:
         print("Trouble with %s:\n    %s" % (cfg, valss))
   print("Saved de-duplicated outputs to '%s'" % fix_file)
