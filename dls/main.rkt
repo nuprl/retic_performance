@@ -7,9 +7,6 @@
 ;; Basically, extends `scribble/acmart` with project-specific options.
 ;; (The file `lang/reader.rkt` sets up the actual reader.)
 
-;; TODO
-;; - formatting variables, $ vs emph
-
 (provide
   (all-from-out
     "bib.rkt"
@@ -71,11 +68,6 @@
   *SINGLE-COLUMN?*
   ;; (Parameterof Boolean)
   ;; When true, put all plots in 1 column
-
-  TODO
-  ;; Usage: @TODO{message}
-  ;;  where `message` is an element.
-  ;; Renders a bold-style "TODO" message.
 
   SNAPL-2015-URL
   ;; URL to the SNAPL paper by Siek et.al
@@ -645,9 +637,6 @@
 
 (define sra
   "simple random approximation")
-
-(define (TODO . msg)
-  (apply bold "TODO: " msg))
 
 (define (cspace [letter "C"])
   (bold letter))

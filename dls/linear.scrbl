@@ -118,8 +118,6 @@ These particular @approximation[NUM-SAMPLE-TRIALS (format "~a(F+C)" SAMPLE-RATE)
  all contain the the true number of @deliverable{D} configurations for values of
  @${D} between @${1} and @${@id[MAX-OVERHEAD]}.
 The intervals are futhermore small, and thus practical substitutes for the overhead plots.
-@; TODO I mean, the message they give to USERS is the same, more-or-less.
-@;      the added benefit of collecting all the data is small
 
 
 @section[#:tag "sec:sampling:new"]{Approximate Evaluation}
@@ -225,26 +223,4 @@ These results confirm many trends from @section-ref{sec:overhead}:
   The intervals are tight.
 }
 ]
-
-@; -----------------------------------------------------------------------------
-
-@; @; This belongs in one of three places:
-@; @; 1. Intro
-@; @; 2. Conclusion
-@; @; 3. Trash
-@; @section{Motivation}
-@; 
-@; The benchmark programs in @section-ref{sec:exhaustive} are rather small.
-@; Any experienced Python programmer could infer type annotations for these
-@;  programs in a matter of hours.
-@; Widely-used Python programs are typically much larger.
-@; For example @TODO{examples}.
-@; @; "jumping" to fully-typed makes even less sense for reticualted,
-@; @;  since number-of-types is a decent predictor of performance
-@; In theory, gradual typing offers important engineering benefits to such projects;
-@;  designers can choose the precise amount of typing that best suits the project
-@;  and developers can run end-to-end tests on the program at each stage of the
-@;  migration.
-@; It is not clear, however, that the resuts of @section-ref{sec:exhaustive} will hold
-@;  for significantly larger programs.
 
