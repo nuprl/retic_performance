@@ -8,12 +8,16 @@
   "pict-lib"
   "plot-lib"
   "scribble-lib"
+  "slideshow-lib"
   "sxml"
   "with-cache"
 ))
 (define build-deps '(
+  "pict-doc"
+  "racket-doc"
   "rackunit-abbrevs"
   "rackunit-lib"
+  "scribble-doc"
 ))
 (define pkg-desc "A performance evaluation of Reticulated Python")
 (define version "0.2")
