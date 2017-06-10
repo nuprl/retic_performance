@@ -7,9 +7,10 @@
     with-cache
     (only-in gm-dls-2017/script/benchmark-info benchmark-info?)
     (only-in gm-dls-2017/script/performance-info performance-info?)
+    (only-in racket/string string-split string-join)
     (only-in racket/math natural?)
     (only-in racket/set set/c)
-    (only-in racket/base path-string? string? symbol? real?)
+    (only-in racket/base time-apply path-string? string? symbol? real?)
     (only-in racket/contract cons/c any/c listof or/c)
     (only-in scribble/decode pre-content?)
     (only-in scribble/core element? paragraph? table?)
@@ -210,13 +211,8 @@ The modules are documented in the sections below.
   Same as @racket[~a].
 }
 
-@deftogether[(
-  @defproc[(integer->word [n integer?]) string?]
-  @defproc[(Integer->word [n integer?]) string?]
-)]{
-  Format the given integer as a word in English.
-  The function @racket[integer->word] returns lowercase words; the function
-   @racket[Integer->word] returns uppercase words.
+@defproc[(Integer->word [n integer?]) string?]{
+  Format the given integer as a capitalized word in English.
 }
 
 @defproc[(parag [title string?]) element?]{
@@ -532,9 +528,91 @@ The Python script @filepath{gm-dls-2017/script/explode_module.py} extracts infor
   Fold (left) over Karst data.
 }
 
-@;script/sample.rkt
-@;script/util.rkt
-@;script/config.rkt
+@; TODO
 @;script/plot.rkt
 @;script/render.rkt
-@;script/system.rkt
+
+@section{System Calls}
+
+@defmodule[gm-dls-2017/script/system]{
+  System calls TODO
+}
+
+@section{Utility Functions}
+
+@defmodule[gm-dls-2017/script/util]{
+  Miscellaneous utilities
+}
+
+@defproc[(tab-split [str string?]) (listof string?)]{
+  Split a string by tab characters.
+  See also @racket[string-split].
+}
+
+@defproc[(tab-join [str* (listof string?)]) string?]{
+  Join a list of strings using tab characters.
+  See also @racket[string-join].
+}
+
+@defproc[(path-string->string [ps path-string?]) string?]{
+  Convert a path or string to a string.
+
+  This function is surprisingly useful in untyped code, and extremely useful in typed code.
+}
+
+@defproc[(ensure-directory [d path-string?]) void?]{
+  Create the directory @racket[d], unless it already exists.
+}
+
+@defproc[(rnd [r real?]) string?]{
+  Round a number to 2 decimal places.
+}
+
+@defproc[(pct [numerator real?] [denominator real?]) real?]{
+  Return @racket[(* 100 (/ numerator denominator))].
+}
+
+@defproc[(log2 [n natural?]) natural?]{
+  Return the log base 2 of a power of 2.
+}
+
+@defproc[(file-remove-extension [ps path-string?]) path-string?]{
+  Remove the extension from a filename.
+}
+
+@defproc[(add-commas [r real?]) string?]{
+  Format a real number to a string with commas in the normal places (between every 3 digits).
+}
+
+@defproc[(save-pict [ps path-string?] [p pict?]) boolean?]{
+  Save the given pict to the given path string.
+}
+
+@defproc[(columnize [vals list?] [n natural?]) (listof list?)]{
+  Arrange the given values into @racket[n] lists of almost-equal length.
+}
+
+
+@defproc[(force/cpu-time [thunk (-> any/c)]) (values any/c natural?)]{
+  Execute the given thunk.
+  Return the result and the elapsed CPU time.
+  See also @racket[time-apply].
+}
+
+@deftogether[(
+  @defproc[(natural->bitstring [n natural?] [#:pad k natural?]) string?]
+  @defproc[(bitstring->natural [s string?]) natural?]
+)]{
+  A bijection between natural numbers and @racket[k]-bit strings of @racket{1} and @racket{0}.
+}
+
+@defproc[(count-zero-bits [s string?]) natural?]{
+  Count the number of @litchar{0} characters in a string.
+}
+
+@defproc[(integer->word [n integer?] [#:title? title? any/c #f]) string?]{
+  Convert a small integer to an English word.
+  When @racket[title?] is non-@racket[#f], return a capitalized word.
+}
+
+
