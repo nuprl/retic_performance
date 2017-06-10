@@ -16,7 +16,7 @@
   "rackunit-lib"
 ))
 (define pkg-desc "A performance evaluation of Reticulated Python")
-(define version "0.1")
+(define version "0.2")
 (define pkg-authors '(ben zeina))
 (define raco-commands '(
   ("rp-info" (submod gm-dls-2017/script/benchmark-info main) "Print static benchmark info" #f)
@@ -26,3 +26,5 @@
   ("rp-sample" (submod gm-dls-2017/script/sample main) "Generate samples for a benchmark" #f)
 ))
 (define scribblings '(("docs/gm-dls-2017.scrbl" () (omit-start))))
+(define compile-omit-paths '("src"))
+(define test-omit-paths '("src"))

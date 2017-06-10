@@ -1,17 +1,17 @@
 #lang scribble/manual
 
-;; TODO organize id / param / proc
 @require[
   (for-label
     gm-dls-2017
     with-cache
+    openssl/md5
     (only-in gm-dls-2017/script/benchmark-info benchmark-info?)
     (only-in gm-dls-2017/script/performance-info performance-info?)
     (only-in racket/string string-split string-join)
     (only-in racket/math natural?)
     (only-in racket/set set/c)
     (only-in racket/base time-apply path-string? string? symbol? real?)
-    (only-in racket/contract cons/c any/c listof or/c)
+    (only-in racket/contract and/c >=/c between/c cons/c any/c listof or/c)
     (only-in scribble/decode pre-content?)
     (only-in scribble/core element? paragraph? table?)
     (only-in pict pict?)
@@ -101,25 +101,6 @@ The modules are documented in the sections below.
 
 @defidform[etal]{
   Format @emph{et al.} with proper spacing.
-}
-
-@; -----------------------------------------------------------------------------
-@; --- defparams
-
-@defparam[*PLOT-HEIGHT* h exact-integer?]{
-  Determines the height of plots.
-}
-
-@defparam[*CACHE-SUFFIX* s string?]{
-  Determines the suffix of cache files.
-  See @racketmodname[with-cache].
-}
-
-@defparam[*SINGLE-COLUMN?* single? boolean?]{
-  When @racket[#true], render plots in single-column format.
-  (You will want to manually change the enclosing @racket[figure*] to a
-   @racket[figure]. If you don't know what I mean, then just don't change
-   this parameter.)
 }
 
 @; -----------------------------------------------------------------------------
@@ -232,18 +213,6 @@ The modules are documented in the sections below.
 }
 
 @deftogether[(
-  @defproc[(render-overhead-plot* [bm* (listof benchmark-info?)]) pict?]
-  @defproc[(render-exact-runtime-plot* [bm* (listof benchmark-info?)]) pict?]
-  @defproc[(render-static-information [bm* (listof benchmark-info?)]) table?]
-  @defproc[(render-ratios-table [bm* (listof benchmark-info?)]) table?]
-  @defproc[(render-samples-plot* [bm* (listof benchmark-info?)]) pict?]
-  @defproc[(render-validate-samples-plot* [bm* (listof benchmark-info?)]) pict?]
-)]{
-  Render figures for the given benchmarks.
-  These procedures yield plots and tables similar to those in the paper.
-}
-
-@deftogether[(
   @defproc[(sc [str string?] ...) element?]
   @defproc[(sf [str string?] ...) element?]
 )]{
@@ -255,17 +224,6 @@ The modules are documented in the sections below.
   @defproc[(section-ref [tag string?]) element?]
 )]{
   Format a reference to a section.
-}
-
-@deftogether[(
-  @defproc[(get-ratios-table [bm* (listof benchmark-info?)]) list?]
-  @defproc[(ratios-table-row [rt list?]) list?]
-  @defproc[(ratios-row-retic/python [rr list?]) string?]
-  @defproc[(ratios-row-typed/retic [rr list?]) string?]
-  @defproc[(ratios-row-typed/python [rr list?]) string?]
-)]{
-  Helpers for reading performance ratios.
-  The idea is, build the table once and read it many times for data.
 }
 
 
@@ -528,14 +486,111 @@ The Python script @filepath{gm-dls-2017/script/explode_module.py} extracts infor
   Fold (left) over Karst data.
 }
 
-@; TODO
-@;script/plot.rkt
-@;script/render.rkt
+
+@section{Generating Plots}
+
+@defmodule[gm-dls-2017/script/plot]{
+  for building plots
+}
+
+@deftogether[(
+  @defproc[(overhead-plot [pi performance-info?]) pict?]
+  @defproc[(exact-runtime-plot [pi performance-info?]) pict?]
+  @defproc[(validate-samples-plot [pi performance-info?]) pict?]
+  @defproc[(samples-plot [pi performance-info?]) pict?]
+)]{
+  Plot performance data.
+}
+
+@deftogether[(
+  @defparam[*LEGEND-VSPACE* n natural? #:value 10]
+  @defparam[*LEGEND-HSPACE* n natural? #:value 20]
+  @defparam[*OVERHEAD-PLOT-WIDTH* n natural? #:value 600]
+  @defparam[*OVERHEAD-PLOT-HEIGHT* n natural? #:value 300]
+  @defparam[*OVERHEAD-FONT-FACE* f string? #:value "bold"]
+  @defparam[*OVERHEAD-FONT-SCALE* n (>=/c 0) #:value 0.03]
+  @defparam[*OVERHEAD-LABEL?* lbl? boolean? #:value #f]
+  @defparam[*OVERHEAD-LINE-COLOR* c plot-color/c #:value 3]
+  @defparam[*OVERHEAD-LINE-STYLE* s plot-pen-style/c #:value 'solid]
+  @defparam[*OVERHEAD-LINE-WIDTH* lw (>=/c 0) #:value 1]
+  @defparam[*OVERHEAD-MAX* om natural? #:value 10]
+  @defparam[*OVERHEAD-SHOW-RATIO* sr (or/c boolean? symbol?) #:value #t]
+  @defparam[*OVERHEAD-SAMPLES* os natural? #:value 20]
+  @defparam[*FONT-SIZE* fs natural? #:value 10]
+  @defparam[*CACHE-SIZE* cs natural? #:value (expt 2 16)]
+  @defparam[*POINT-SIZE* ps natural? #:value 3]
+  @defparam[*POINT-ALPHA* a (>=/c 0) #:value 0.4]
+  @defparam[*CONFIGURATION-X-JITTER* j real? #:value 0.4]
+  @defparam[*OVERHEAD-FREEZE-BODY* f? boolean? #:value #f]
+  @defparam[*CONFIDENCE-LEVEL* c (between/c 0 100) #:value 95]
+  @defparam[*INTERVAL-ALPHA* r (>=/c 0) #:value 1]
+  @defparam[*RATIO-DOT-SYM* s point-sym/c #:value 'plus]
+  @defparam[*RATIO-DOT-SIZE* n natural? #:value 8]
+  @defparam[*RATIO-DOT-COLOR* c string? #:value "firebrick"]
+  @defparam[*TYPED/PYTHON-RATIO-XTICK?* t? boolean? #:value #f]
+)]{
+  Parameters to control ANY aspect of your plots.
+  Ha Ha Ha.
+}
+
+
+@section{Rendering Figures}
+
+@defmodule[gm-dls-2017/script/render]{}
+
+@deftogether[(
+  @defproc[(render-overhead-plot* [bm* (listof benchmark-info?)]) pict?]
+  @defproc[(render-exact-runtime-plot* [bm* (listof benchmark-info?)]) pict?]
+  @defproc[(render-static-information [bm* (listof benchmark-info?)]) table?]
+  @defproc[(render-ratios-table [bm* (listof benchmark-info?)]) table?]
+  @defproc[(render-samples-plot* [bm* (listof benchmark-info?)]) pict?]
+  @defproc[(render-validate-samples-plot* [bm* (listof benchmark-info?)]) pict?]
+)]{
+  Render figures for the given benchmarks.
+  These procedures yield plots and tables similar to those in the paper.
+}
+
+@defparam[*PLOT-HEIGHT* h exact-integer?]{
+  Determines the height of plots.
+}
+
+@defparam[*CACHE-SUFFIX* s string?]{
+  Determines the suffix of cache files.
+  See @racketmodname[with-cache].
+}
+
+@defparam[*SINGLE-COLUMN?* single? boolean?]{
+  When @racket[#true], render plots in single-column format.
+  (You will want to manually change the enclosing @racket[figure*] to a
+   @racket[figure]. If you don't know what I mean, then just don't change
+   this parameter.)
+}
+
+@deftogether[(
+  @defproc[(get-ratios-table [bm* (listof benchmark-info?)]) list?]
+  @defproc[(ratios-table-row [rt list?]) list?]
+  @defproc[(ratios-row-retic/python [rr list?]) string?]
+  @defproc[(ratios-row-typed/retic [rr list?]) string?]
+  @defproc[(ratios-row-typed/python [rr list?]) string?]
+)]{
+  Helpers for reading performance ratios.
+  The idea is, build the table once and read it many times for data.
+}
+
 
 @section{System Calls}
 
 @defmodule[gm-dls-2017/script/system]{
-  System calls TODO
+  A system call interface
+}
+
+@defproc[(shell [program path-string?] [args (or/c path-string? (listof path-string?))]) string?]{
+  Invoke the given program with the given command-line arguemnts, return the program's standard output.
+}
+
+@defproc[(md5sum [ps path-string?]) string?]{
+  Compute an MD5 hash for the given file.
+  See also @racketmodname[openssl/md5].
 }
 
 @section{Utility Functions}
