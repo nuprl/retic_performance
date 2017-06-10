@@ -27,11 +27,12 @@
      [name symbol?]
      [dom* (listof field-info?)]
      [cod (or/c string? #f)])]
+   ;; Type information for a Python function
 
    [struct field-info (
      [name symbol?]
      [type string?])]
-   ;; Type information for a Python function
+   ;; Type information for a Python field
 
    [python-path?
     (-> any/c boolean?)]

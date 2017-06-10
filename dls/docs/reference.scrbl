@@ -5,9 +5,15 @@
   (for-label
     gm-dls-2017
     with-cache
-    (only-in racket/contract any/c listof or/c)
-    (only-in scribble/base pre-content? element? paragraph? table?)
-    (only-in racket/pict pict?)
+    (only-in gm-dls-2017/script/benchmark-info benchmark-info?)
+    (only-in gm-dls-2017/script/performance-info performance-info?)
+    (only-in racket/math natural?)
+    (only-in racket/set set/c)
+    (only-in racket/base path-string? string? symbol? real?)
+    (only-in racket/contract cons/c any/c listof or/c)
+    (only-in scribble/decode pre-content?)
+    (only-in scribble/core element? paragraph? table?)
+    (only-in pict pict?)
     (only-in racket/format ~a)
     (only-in scriblib/figure figure figure*))]
 @title{Reference}
@@ -177,10 +183,6 @@ The modules are documented in the sections below.
    was used.
 }
 
-@defproc[(benchmark->name [bm benchmark-info?]) string?]{
-  Get the name from a benchmark.
-}
-
 @defproc[($ [str string?] ...) element?]{
   Pass the given content to LaTeX math mode.
 }
@@ -273,18 +275,263 @@ The modules are documented in the sections below.
 
 @section{Static Benchmark Information}
 
+A benchmark program consists of:
+@itemlist[
+@item{
+  a set of fully-typed Python modules;
+}
+@item{
+  other Python modules and data files.
+}
+]
+
+The "other modules" may be typed or untyped;
+ the point is that all configurations use identical copies of these modules.
+
 @defmodule[gm-dls-2017/script/benchmark-info]{
+  API to the benchmark programs
+}
+
+@defproc[(benchmark-info? [v any/c]) boolean?]{
+  Predicate for benchmark information.
+}
+
+@defproc[(benchmark->name [bm benchmark-info?]) string?]{
+  Get the name from a benchmark.
+}
+
+@defproc[(benchmark->module* [bm benchmark-info?]) (listof string?)]{
+  Get the names of the Python modules in the benchmark.
+}
+
+@defproc[(benchmark->src [bm benchmark-info?]) path-string?]{
+  Return a path to the directory that contains the benchmark.
+}
+
+@defproc[(benchmark->num-modules [bm benchmark-info?]) natural?]{
+  Count the number of modules in the benchmark.
+}
+
+@defproc[(benchmark->num-configurations [bm benchmark-info?]) natural?]{
+  Count the number of configurations in the benchmark.
+}
+
+@defproc[(benchmark->max-configuration [bm benchmark-info?]) configuration?]{
+  Return a configuration that is larger than any configuration in the benchmark, i.e. "max plus one".
+}
+
+@defproc[(benchmark->sloc [bm benchmark-info?]) natural?]{
+  Count the source-lines-of-code in the benchmark.
+  Uses David A. Wheeler's @tt{sloccount}.
+}
+
+@deftogether[(
+  @defproc[(benchmark->karst-data [bm benchmark-info?]) (or/c #f path-string?)]
+  @defproc[(benchmark->sample-data [bm benchmark-info?]) (or/c #f path-string?)]
+)]
+  Return a path to the benchmark's Karst data, if such data exists.
+  The function @racket[benchmark->karst-data] finds the exhaustive data;
+   the function @racket[benchmark->sample-data] finds data for randomly-sampled configurations.
+}
+
+@deftogether[(
+  @defproc[(benchmark->python-data [bm benchmark-info?]) (listof real?)]
+  @defproc[(benchmark->karst-retic-untyped [bm benchmark-info?]) (listof real?)]
+  @defproc[(benchmark->karst-retic-typed [bm benchmark-info?]) (listof real?)]
+)]{
+  Return a list of Python, fully-untyped, or fully-typed runtimes.
+  If such data does not exist, return an arbitary list.
+
+  The idea with the "arbitrary" list is to return data that suffices to build
+   an "obviously wrong" plot.
+  Now that the paper is finished, we could error if the data does not exist.
+}
+
+@defproc[(all-benchmarks) (listof benchmark-info?)]{
+  Return a list of all known benchmarks.
+}
+
+@defproc[(configuration? [v any/c]) boolean?]{
+  A @deftech{configuration} is one way of mixing typed and untyped code in a benchmark.
+  This predicate returns @racket[#true] when given an identifier for a configuration.
+}
+
+@deftogether[(
+  @defproc[(configuration->natural [bm benchmark-info?] [cfg configuration?]) natural?]
+  @defproc[(natural->configuration [bm benchmark-info?] [n natural?]) configuration?]
+  @defproc[(configuration<? [cfg0 configuration?] [cfg1 configuration?]) boolean?]
+)]{
+  These functions define a bijection between @tech{configurations} and natural numbers,
+   and consequently a total order.
+}
+
+@deftogether[(
+  @defproc[(string->configuration [str string?]) configuration?]
+  @defproc[(configuration->string [cfg configuration?]) string?]
+)]{
+  Map between @tech{configurations} and strings.
+}
+
+@defproc[(benchmark-info->python-info? [bm benchmark-info?]) python-info?]{
+  Return low-level data about the Python modules in a benchmark.
+}
+
+
+@section{Python Data}
+
+The Python script @filepath{gm-dls-2017/script/explode_module.py} extracts information
+ about the structure of a Python module (e.g., number of classes).
+
+@defmodule[gm-dls-2017/script/python]{
+  API to Python syntax trees
+}
+
+@deftogether[(
+  @defstruct*[python-info ([name symbol?] [module? (listof module-info?)])]
+  @defstruct*[module-info ([name symbol?] [function? (listof function-info?)])]
+  @defstruct*[class-info ([name symbol?] [field* (listof field-info?)] [method* (listof function-info?)])]
+  @defstruct*[function-info ([name symbol?] [dom* (listof field-info?)] [cod (or/c string? #f)])]
+  @defstruct*[field-info ([name symbol?] [type string?])]
+)]{
+  Structs for Python syntax.
+  Note that nested classes and nested functions are not supported.
+}
+
+@defproc[(python-path? [v any/c]) boolean?]{
+  Return @racket[#true] for path strings that end with the suffix @filepath{.py}.
+}
+
+@defproc[(python-sloc [ps python-path?]) natural?]{
+  Count the source-lines-of-code in a Python module.
+}
+
+@defproc[(python-info->max-configuration [py python-info?]) configuration?]{
+  Return the max-plus-one configuration for a Python program.
+}
+
+@defproc[(benchmark-dir->python-info [d is-benchmark-directory?]) python-info?]{
+  Parse the Python files in a directory.
+}
+
+@deftogether[(
+  @defproc[(python-info->module* [py python-info?]) (listof string?)]
+  @defproc[(python-info->num-modules [py python-info?]) natural?]
+  @defproc[(python-info->function* [py python-info?]) (listof string?)]
+  @defproc[(python-info->num-functions [py python-info?]) natural?]
+  @defproc[(python-info->class* [py python-info?]) (listof string?)]
+  @defproc[(python-info->num-classes [py python-info?]) natural?]
+  @defproc[(python-info->method* [py python-info?]) (listof string?)]
+  @defproc[(python-info->num-methods [py python-info?]) natural?]
+  @defproc[(python-info->domain* [py python-info?]) (listof (listof field-info?))]
+  @defproc[(python-info->num-parameters [py python-info?]) natural?]
+  @defproc[(python-info->return* [py python-info?]) (listof string?)]
+  @defproc[(python-info->num-returns [py python-info?]) natural?]
+  @defproc[(python-info->field* [py python-info?]) (listof field-info?)]
+  @defproc[(python-info->num-fields [py python-info?]) natural?]
+  @defproc[(python-info->all-types [py python-info?]) (set/c (or/c #f string?))]
+  @defproc[(python-info->num-types [py python-info?]) natural?]
+)]{
+  For querying a Python AST.
 }
 
 
 @section{Reticulated Performance Data}
 
 @defmodule[gm-dls-2017/script/performance-info]{
+  API to performance data
 }
 
-@;script/benchmark-info.rkt
-@;script/performance-info.rkt
-@;script/python.rkt
+@defproc[(performance-info? [v any/c]) boolean?]{
+  Predicate for performance information.
+}
+
+@defproc[(performance-info->name [pi performance-info?]) symbol?]{
+  Return the name of the underlying benchmark.
+}
+
+@defproc[(benchmark->performance-info [bm benchmark-info?]) performance-info?]{
+  Collect performance information for the given benchmark.
+}
+
+@deftogether[(
+  @defproc[(python-runtime [pi performance-info?]) real?]
+  @defproc[(untyped-runtime [pi performance-info?]) real?]
+  @defproc[(typed-runtime [pi performance-info?]) real?]
+)]{
+  Get extreme running times.
+}
+
+@defproc[(num-configurations [pi performance-info?]) natural?]{
+  Count the number of configurations in the underlying benchmark.
+}
+
+@defproc[(num-types [pi performance-info?]) natural?]{
+  Count the maximum number of type annotations in the underlying benchmark.
+}
+
+@defproc[(overhead [pi performance-info?] [r real?]) real?]{
+  Compute the overhead of the given number @racket[r] relative to the Python
+   running time.
+}
+
+@deftogether[(
+  @defproc[(min-overhead [pi performance-info?]) real?]
+  @defproc[(max-overhead [pi performance-info?]) real?]
+  @defproc[(mean-overhead [pi performance-info?]) real?]
+)]{
+  Find the minumum / maximum / mean performance overheads, across all configurations.
+}
+
+@defproc[(deliverable [D real?]) (-> performance-info? natural?)]{
+  Return a function that counts the number of @emph{D-deliverable} configurations.
+}
+
+@deftogether[(
+  @defproc[(typed/python-ratio [pi performance-info?]) real?]
+  @defproc[(typed/retic-ratio [pi performance-info?]) real?]
+  @defproc[(untyped/python-ratio [pi performance-info?]) real?]
+)]{
+  Compute performance ratios.
+}
+
+@defproc[(make-D-deliverable [D real?] [pi performance-info?]) (-> real? boolean?)]{
+  Return a predicate on running times; the predicate returns @racket[#true] for
+   running times that are at most @racket[D] times slower than the Python
+   running time.
+}
+
+@defproc[(count-configurations [pi performance-info?] [good? (-> real? boolean?)]) natural?]{
+  Count the number of configurations that satisfy the predicate @racket[good?].
+}
+
+@defproc[(filter-time* [pi performance-info?] [good? (-> real? boolean?)]) (listof real?)]{
+  Return the mean running times for configurations whose mean running time satisfies the given predicate.
+}
+
+@defproc[(performance-info->sample* [pi performance-info?]) (cons/c natural? (listof path-string?))]{
+  Return a pair with (1) sample size and (2) paths to sample data.
+}
+
+@defproc[(performance-info%sample [pi performance-info?] [ps path-string?]) performance-info?]{
+  Return performance information about the given file of sampled data.
+}
+
+@defproc[(unzip-karst-data [ps path-string?]) (or/c #f path-string?)]{
+  Unzip the Karst data at the given @tt{gzip}'d file.
+}
+
+@defproc[(performance-info-src [pi performance-info?]) path-string?]{
+  Return a path to (exhaustive) Karst data.
+}
+
+@defproc[(line->configuration-string [ln string?]) string?]{
+  Parse a line of Karst data to a string representing a configuration.
+}
+
+@defproc[(fold/karst [input (or/c path-string? performance-info?)] [#:f f (-> A configuration? natural? (listof real?) A)] [#:init init A]) A]{
+  Fold (left) over Karst data.
+}
+
 @;script/sample.rkt
 @;script/util.rkt
 @;script/config.rkt
