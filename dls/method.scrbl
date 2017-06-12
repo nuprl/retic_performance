@@ -55,12 +55,13 @@ The experimental modules and granularity of type annotations define the
  configurations of a fully-typed program.
 
 @definition["configurations"]{
-  Let @${P \rightarrow_1 P'}
+  Let @${P \tcstep P'}
    if and only if program @${P'} can be obtained from
    @${P} by annotating one syntactic unit in an experimental module.
-  Let @${\sqsubseteq} be the reflexive, transitive closure of the @${\rightarrow_1} relation.@note{The @${\rightarrow_1} relation expresses the notion of a @emph{type conversion step}@~cite[takikawa-popl-2016]. The @${\sqsubseteq} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
+  Let @${\tcmulti} be the reflexive, transitive closure of the @${\tcstep} relation.@note{The @${\tcstep} relation expresses the notion of a @emph{type conversion step}@~cite[takikawa-popl-2016]. The @${\tcmulti} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
+  @; note^2: `e0 -->* e1` if and only if `e1 <= e0`
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
-   programs @${P} such that @${P \sqsubseteq P^\tau}.
+   programs @${P} such that @${P\!\tcmulti P^\tau}.
 }
 
 The next step is to measure the performance of these configurations and
