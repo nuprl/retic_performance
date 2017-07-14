@@ -1,0 +1,141 @@
+Dear authors,
+
+The DLS 2017 program committee is sorry to inform you that your paper #5
+was rejected, and will not appear in the conference.
+
+Title: Is Sound Gradual Typing Alive?
+Authors: Ben Greenman (Northeastern University)
+Zeina Migeed (Northeastern University)
+Paper site: https://dls17.hotcrp.com/paper/5?cap=05aE3HXOIrY1ZY
+
+Reviews and comments on your paper are appended to this email. We hope you
+will find the comments helpful for the revision of your paper, and that
+we will see you in Vancouver anyway!
+
+Best regards,
+Davide Ancona
+
+===========================================================================
+DLS 2017 Review #5A
+---------------------------------------------------------------------------
+Paper #5: Is Sound Gradual Typing Alive?
+---------------------------------------------------------------------------
+
+Overall merit: C. Weak paper, though I will not fight
+strongly against it
+Confidence: Y. I am knowledgeable in this area,
+but not an expert
+
+===== Paper summary =====
+
+The paper "Is Sound Gradual Typing Alive?" evaluates the impact of
+gradual typing on Python program by running a set of about 20 tests
+with various type annotations configurations. The paper presents these
+execution statistics. It first concludes that the impact of gradual
+typing on Python performance seems lower than what has been measured
+for Racket. In a second time, the paper seems to invalidate its first
+conclusion when it unveils that the Reticulated gradual typing
+implementation is incorrect (or partial).
+
+===== Comments for author =====
+
+I have found the paper difficult to read. I don't clearly understand
+its organization. I find the explanation of the experiments difficult
+to follow (in particular, I must admit that I have not been able to
+understand the statistics in Figure 5).
+
+However, the main reason for my negative review is that I'm not even
+sure about the conclusion of the paper. The conclusion seems to be
+that because of a flaw in the implementation, Reticulated implements a
+restricted version of the gradual typing that does not correspond to
+Racket gradual typing.  In short, Reticulated seems not traverse
+recursive data types when type checking them as it should do. Because
+of this restriction, it comes to no surprise that gradual typing in
+Reticulated has a much lower impact than in Racket. Then, I'm not sure
+about the message of your paper and I don't understand why you have
+not fixed Reticulated before conducting all this experiment that has
+obviously required a lot of work.
+
+To be a little bit more specific about the state of confusion I have
+been into while reading the explanations of Figure 5, I don't understand
+how it is possible for a test to fall in two of categories simultaneously.
+That is, how come it is possible for a same program to be "very slow" and
+"fast"). How come tests call_method, call_method_slots, and spectralnorm
+be in Type II and IV?
+
+===========================================================================
+DLS 2017 Review #5B
+---------------------------------------------------------------------------
+Paper #5: Is Sound Gradual Typing Alive?
+---------------------------------------------------------------------------
+
+Overall merit: D. Reject
+Confidence: Y. I am knowledgeable in this area,
+but not an expert
+
+===== Paper summary =====
+
+The paper offers a performance evaluation of a gradually typed
+programming system for Python called Reticulated. It aims to show that
+the performance of all type annotation combinations can be approximated
+with a linear sampling technique.
+
+===== Comments for author =====
+
+This paper was not easy to read and review.  The motivations for the
+work are not well explained.  It is not clear what differentiates this
+paper from the POPL16 "Is Sound Gradual Typing Dead?" by the same
+authors (the title of the current paper is clearly uninformative, and
+the tongue in cheek is short lived).
+
+Given my lack of understanding of the motivations, I had a hard time
+with the tsunami of details concerning the benchmarks, the computing
+cluster, and analysis of each minute result. It would have been nice
+to have "the big picture" explained at key places to help navigate the
+paper. The style reminds me more of a project report than a conference
+article.
+
+Finally, the results are consistent with the intuition that more
+precision (error messages, tighter soundness) have a run time cost.
+So what is the contribution of the paper?
+
+===========================================================================
+DLS 2017 Review #5C
+---------------------------------------------------------------------------
+Paper #5: Is Sound Gradual Typing Alive?
+---------------------------------------------------------------------------
+
+Overall merit: C. Weak paper, though I will not fight
+strongly against it
+Confidence: Y. I am knowledgeable in this area,
+but not an expert
+
+===== Paper summary =====
+
+The paper presents a performance evaluation of a gradual type system for
+Python (Reticulated). In particular, the running time of all possible
+typed (gradually) typed version of a program is compared with the one of
+the untyped version. To do the evaluation, 19 Python programs, selected
+from benchmark programs, whose types are expressible in Reticulated are
+used. The running times of the (gradually) typed versions of the programs
+are compared and programs are classified into categories depending on how
+much typing affects their running time. The overall result seems to indicate
+that Reticulated is a good, in the sense of performant, implementation of
+a gradual type system for Python. There are, however, problems with
+Reticulated itself. On one side, it does not have a very expressive types
+system, and moreover, it does not guarantee soundness. So, its good
+performance seems to be, in my opinion, at the expenses of its usefulness.
+
+===== Comments for author =====
+
+The paper is well-written, the experimental results presented are
+exhaustive. However, the method used, is not new. It follows closely
+the paper [8], where the performance of Typed Racket programs is compared
+with the one of Racket programs. However, in this case the typed language
+has some soundness properties.
+I wonder if, given the "deep" difference between Reticulated (as a gradual
+type system for Python) and Typed Racket (as a gradual type system for Racket)
+the comparison could be done in a different way.
+
+Minor remark:
+page 2 first definition granuarity => granularity
