@@ -31,7 +31,7 @@ It would also be impractical to ignore the fine granularity of Reticulated and
 The practical choice lies somewhere in between, and it depends on the size of the
  programs at hand and computing resources available.
 
-@definition["granuarity"]{
+@definition["granularity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
    the evaluation adds or removes type annotations.
 }
