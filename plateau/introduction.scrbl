@@ -2,62 +2,55 @@
 
 @require{bib.rkt}
 
-@title[#:tag "sec:introduction"]{Measuring Reticulated}
+@title[#:tag "sec:introduction"]{How Much does Gradual Soundness Cost?}
 
-Siek and Taha's 2006 paper@~cite[st-sfp-2006] introduces the notion of
-gradual typing, a sound variant of Common Lisp's optional typing. Using
-gradual typing, ``programmers should be able to add or remove type
-annotations without any unexpected impacts on their program''@~cite[svcb-snapl-2015].
-@; TODO 'is' ???
-One unexpected impact is the application of a function on integers to a
-string; similarly, when typed code passes an array of floats to untyped
-code, the programmer expects that the untyped code does not assign a
-boolean to one of the array's slots. By contrast, a programmer may
-expect the addition of types to speed up the program execution because the
-compiler can exploit the type information.
+Gradual typing systems can help programmers with the task of maintaining a
+code base in an untyped scripting language. If the latter comes with a
+gradual typing system, developers may incrementally add type annotations as
+they improve an untyped piece of the code base. The addition of types
+reduces the time that the next developer needs to comprehend this piece of
+the code base. 
 
-Gradual typing implements the sound combination of typed and untyped code
-with the insertion of run-time checks. At a high level, a gradual typing
-system uses the type annotations to determine whether and where a
-typed value may flow into the function position of an application and
-adds a check there to ensure the argument value matches the expected
-type. If not, the run-time check raises an exception. Clearly, the
-insertion of such run-time checks imposes a cost, and the question arises
-how significant this cost is.
+@; @~cite[st-sfp-2006]
 
-@citet[takikawa-popl-2016] present the first comprehensive method for
-evaluating the performance of gradual typing systems.
-If a program consists of @${n} components, Takikawa et al. propose to measure
-@${2^n} configurations. Doing so mimics the process through which
-programmers may gradually equip all possible sites for type declarations
-with annotations. In order to evaluate these measurements, they propose a
-simple metric, the proportion of @emph{D-deliverable} configurations, meaning the
-number of configurations whose running time is at most
-@math{D}x slower than the untyped configuration.
-Follow-up work by @citet[greenman-jfp-2017] confirms that a
-@emph{linear} amount of random sampling approximates the
-exponential measurements well in the case of Typed Racket.
+While the soundness of the gradual type system guarantees that developers
+can easily find and fix an impedance mismatch between typed and untyped
+regions of code, it also has serious implications for
+performance@~cite[takikawa-popl-2016 greenman-jfp-2017]. The problem is due
+to the implementation of soundness with the insertion of run-time checks,
+which obviously imposes a cost. In the case of Typed Racket, partially
+typed code may slow down by up to two orders of magnitude while fully typed
+code is almost always faster than the untyped code.
 
-Simultaneously to Siek and Taha's original work, Tobin-Hochstadt and
-Felleisen launched the development of
-Typed Racket, based on almost the same idea as gradual typing@~cite[thf-dls-2006].
-In 2016, with Typed Racket under development for 10 years, Takikawa et al.'s
-performance evaluation of Typed Racket indicates that this form
-of gradual typing has disastrous performance characteristics.
+Since the design space of gradual typing comes with a range of soundness
+notions, the question arises how much soundness costs in terms of
+performance. For example, Siek et al.'s Reticulated Python
+system@~cite[vksb-dls-2014] implements a laxer@~cite[vss-popl-2017] notion
+of soundness than Typed Racket. Thus, a concrete instance of the question
+is whether Reticulated renders gradual typing more usable than Typed
+Racket. 
 
-This paper contributes three insights. First, it explains an adaptation of
-Takikawa et al.'s method (see @section-ref{sec:method}) for Reticulated@~cite[vksb-dls-2014],
-a gradual typing system that is relatively
-faithful to Siek and Taha's original proposal. Second, it reports on the
-results of applying the adapted method to Reticulated (see
-@section-ref{sec:exhaustive}). While the performance of Reticulated seems to
-be significantly better than Typed Racket's, we conjecture that this
-due to (1) a significant gap in Reticulated's soundness, (2)
-Reticulated's lack of expressiveness, and (3) low-quality error messages
-(see @section-ref{sec:vs-tr}).
-@;Third, the paper confirms a suspicion that the overhead in an arbitrary
-@; Reticulated program is proportional to the number of type annotations in the program (see @section-ref{sec:exhaustive}).
-Third, the paper confirms Greenman et
-al.'s insight that linear sampling is a sufficiently good approximation of
-the exponential set of measurements for the adapted method (see
-@section-ref{sec:linear}). The next section presents the background material.
+This paper reports on the application of Takikawa et al.'s method to
+Reticulated. The central findings are that 
+@itemlist[
+@item{Reticulated experiences a slow down of at most one order of
+magnitude.} 
+
+@item{The performance degradation is basically a linear function of the
+number of type annotations.}
+
+@item{Despite the smaller performance overhead in comparison to Typed
+Racket, Reticulated still does not come with a reasonably small @italic{D}
+for Takikawa et al.'s notion of @italic{D}-deliverable configurations.}
+]
+@;
+To set the stage, this paper first describes the point that Reticulated
+occupies in the design space of gradually typed systems (see
+@secref{sec:reticulated}). It then explains our adaptation of Takikawa et
+al.'s method to Reticulated's system of gradual typing  (see
+@section-ref{sec:method}). @Secref{sec:exhaustive} presents the details of
+the evaluation: the benchmarks, the measurements, and the
+conclusions. 
+
+@; we may wish to include the linear results idea but if we lack space,
+@; it's an obvious piece of writing we can skip. 

@@ -7,7 +7,7 @@
 @; cocktails are.  Look how clean you keep your bar.  Why, man, you actually
 @; take pride in your work. --- Cocktail, 1988
 
-@title{Is Sound Gradual Typing Alive?}
+@title{On the Cost of Soundness for Gradual Typing}
 
 @(define NEU
    @affiliation[
@@ -29,24 +29,26 @@
 
 @; -----------------------------------------------------------------------------
 
-@abstract{Gradual typing empowers developers to freely combine dynamically
-  and statically typed code in a single program. A sound gradual
-  typing system performs run-time checks to ensure the integrity of types
-  at the boundary between typed and untyped code. The question is how much
-  such checks affect the performance of gradually typed software systems.
+@abstract{
+  Gradual typing promises to reduce the cost of software maintenance for
+  scripts. In a scripting language with a gradual typing system, developers
+  can add type annotations to the untyped portion of a code base after they
+  reconstruct the type during some maintenance action.  As Takikawa et
+  al.'s recent work shows, however, the addition of type annotations comes
+  at a large cost in performance. In particular, performance evaluations of
+  Typed Racket suggest that a conventionally sound gradual typing system
+  may slow down a working system by one to two orders of magnitude.
 
-This paper presents a systematic performance evaluation of Reticulated,
-  a gradual typing system for Python.  Since Reticulated allows fine-grained
-  mixing of typed and untyped code, our evaluation method is to establish a fixed-size
-  unit for adding type annotations and measure the performance of all
-  possible combinations of typed and untyped code.
-  The paper also shows that this exponentially expensive performance evaluation
-  method can be approximated with a linear sampling technique. In
-  comparison to the performance of Typed Racket---the first gradual typing
-  system to be evaluated in a comprehensive manner---the measurements look
-  encouraging. On closer inspection, the low cost of run-time checks
-  seem to be due to Reticulated's inexpressive type system,
-  miserable error messages, and alternative notion of type soundness. }
+  Since different gradual typing systems satisfy different notions of
+  soundness, the question arises how much the relaxation of soundness
+  benefits a program's performance. This paper answers this question by
+  applying Takikawa et al.'s evaluation method to Reticulated Python, which
+  in contrast to Typed Racket, merely satisfies tag soundness not type
+  soundness. Numerically, Reticulated is at least one order of magnitude
+  better than Typed Racket in terms of performance. Sadly, the evaluation
+  still suggests that the performance degradation is still intolerable for
+  most developers. 
+}
 
 @;terms{CS}
 @;keywords{CS}
@@ -60,6 +62,16 @@ This paper presents a systematic performance evaluation of Reticulated,
 @include-section{threats.scrbl}
 @include-section{vs-tr.scrbl}
 @include-section{conclusion.scrbl}
+
+@;acks{
+@;  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
+@;  Matthias for all things.
+@;  Mike for Reticulated, bugfixes.
+@;  Sam for access to IU cluster.
+@;  Spenser Bauman for advice about cluster.
+@;  Tony GJ for insisting that overhead plots are CDFs.
+@;  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
+@; }
 
 @generate-bibliography[]
 @include-section{appendix.scrbl}
