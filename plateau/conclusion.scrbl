@@ -1,4 +1,4 @@
-#lang gm-dls-2017
+#lang gm-plateau-2017
 @title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
 The application of Takikawa et al.'s method to Reticulated appears to
@@ -22,3 +22,14 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
  @;Finally, the research community must
  @;continue to search for ways to improve the performance of sound, gradually
  @;typed languages.
+
+@acks{
+  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
+@;  Matthias for all things.
+@;  Mike for Reticulated, bugfixes.
+@;  Sam for access to IU cluster.
+@;  Spenser Bauman for advice about cluster.
+@;  Tony GJ for insisting that overhead plots are CDFs.
+@;  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
+}
+

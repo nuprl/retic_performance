@@ -1,4 +1,4 @@
-#lang gm-dls-2017
+#lang gm-plateau-2017
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"

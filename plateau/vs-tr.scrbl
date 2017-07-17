@@ -1,4 +1,4 @@
-#lang gm-dls-2017
+#lang gm-plateau-2017
 
 @title[#:tag "sec:vs-tr"]{Why is Reticulated so Fast ...}
 

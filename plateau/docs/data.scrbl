@@ -2,11 +2,11 @@
 
 @title{Using the Datasets}
 
-The @racketmodname[gm-dls-2017] package includes command-line tools for
+The @racketmodname[gm-plateau-2017] package includes command-line tools for
  interacting with a dataset.
 
 These tools are defined in modules under the @filepath{script/} folder and are
- declared in the @filepath{info.rkt} file for @racketmodname[gm-dls-2017].
+ declared in the @filepath{info.rkt} file for @racketmodname[gm-plateau-2017].
 
 @itemlist[
 @item{

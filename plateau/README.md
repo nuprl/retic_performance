@@ -1,7 +1,9 @@
 dls
 ===
 
-**Deadline: 2017-05-26**
+**Deadline: 2017-08-01**
+
+8 page limit
 
 
 #### How to write a section
@@ -9,7 +11,7 @@ dls
 Begin every `.scrbl` file with the language:
 
 ```
-#lang gm-dls-2017
+#lang gm-plateau-2017
 ```
 
 This language imports every library you need to start writing a Scribble

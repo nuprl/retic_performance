@@ -1,4 +1,4 @@
-#lang gm-dls-2017
+#lang gm-plateau-2017
 @title[#:style 'unnumbered]{Appendix}
 
 @figure-here["fig:badcode" @elem{Reticulated program @tt{myfile.py}}

@@ -1,4 +1,4 @@
-#lang gm-dls-2017
+#lang gm-plateau-2017
 @title[#:tag "sec:threats"]{Threats to Validity}
 
 Our work may suffer from two problems: measurement error and systematic bias.
