@@ -21,8 +21,8 @@
   slideshow/text
   with-cache)
 #;(require ; for the cache
-  gm-dls-2017/script/benchmark-info
-  gm-dls-2017/script/performance-info)
+  gm-plateau-2017/script/benchmark-info
+  gm-plateau-2017/script/performance-info)
 
 ;; =============================================================================
 
@@ -766,7 +766,7 @@
   (require
     rackunit
     (prefix-in dls:
-      (only-in gm-dls-2017
+      (only-in gm-plateau-2017
         NUM-EXHAUSTIVE-BENCHMARKS)))
 
   (test-case "constants"

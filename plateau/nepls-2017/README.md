@@ -22,4 +22,4 @@ The slideshow uses 2 fonts:
 
 And depends on the collection for the DLS submission:
 
-- `gm-dls-2017`
+- `gm-plateau-2017`
