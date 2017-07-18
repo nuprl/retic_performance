@@ -63,16 +63,6 @@
 @include-section{vs-tr.scrbl}
 @include-section{conclusion.scrbl}
 
-@;acks{
-@;  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
-@;  Matthias for all things.
-@;  Mike for Reticulated, bugfixes.
-@;  Sam for access to IU cluster.
-@;  Spenser Bauman for advice about cluster.
-@;  Tony GJ for insisting that overhead plots are CDFs.
-@;  @;note{Computed using David A. Wheeler's @hyperlink["https://www.dwheeler.com/sloccount/"]{@tt{sloccount}} utility.}
-@; }
-
 @generate-bibliography[]
 @include-section{appendix.scrbl}
 
