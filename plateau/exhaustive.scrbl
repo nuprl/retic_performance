@@ -3,6 +3,12 @@
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[EXHAUSTIVE-BENCHMARKS]]
+@;@(let* ([DLS '(aespython stats)]
+@;        [NEW '(sample_fsm)]) @list{
+@;   @(parameterize ([*CACHE-SUFFIX* "-linear"])
+@;     @render-static-information[SAMPLE-BENCHMARKS])
+@;   @exact{\noindent}@string-titlecase[@integer->word[(length DLS)]] of these programs,
+@;    @bm*[DLS], originate from case studies by @citet[vksb-dls-2014].
 
 This section presents the results of an @defn{exhaustive} performance
  evaluation of @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]
@@ -15,247 +21,11 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
  against the configuration's performance (@figure-ref{fig:exact}).
 
 
-@section{About the Benchmarks}
-
-@(let ([total @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]]
-       [num1 @integer->word[(length DLS-2014-BENCHMARK-NAMES)]]
-       [dls-names @authors*[(map (compose1 tt symbol->string) DLS-2014-BENCHMARK-NAMES)]]
-       [num2 @integer->word[(length POPL-2017-BENCHMARK-NAMES)]]
-       [num3 @integer->word[(length '(Espionage PythonFlow take5))]]
-      ) @elem{
-  @; Many of the benchmark programs stem from prior work on Reticulated.
-  Of the @|total| benchmark programs,
-   @|num1| originate from case studies by @citet[vksb-dls-2014],
-   @;@note{@|dls-names|.}
-   @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
-   the Python Performance Benchmark Suite,
-   and the remaining @|num3| originate from open-source programs.
-  Every listing of the benchmarks in this section is ordered first by the
-   benchmark's origin and second by the benchmark's name.
-})
-@; REMARK: original authors helpful with (code, test input, comments)
-
-@(let* ([column-descr*
-         (list
-           @elem{lines of code (@bold{SLOC}), }
-           @elem{number of modules (@bold{M}), }
-           @elem{number of function and method definitions (@bold{F}), }
-           @elem{and number of class definitions (@bold{C}).})]
-        [num-col @integer->word[(length column-descr*)]]
-       ) @elem{
-  @Figure-ref{fig:static-benchmark} tabulates information about the size and
-   structure of the @defn{experimental} portions of the benchmarks.
-  The @|num-col| columns report the @|column-descr*|
-})
-
-The following descriptions credit each benchmark's original author,
- state whether it depends on any @defn{control} modules,
- and briefly summarize its purpose.
-
-
-@; -----------------------------------------------------------------------------
-@; --- WARNING: the order of benchmarks matters!
-@; ---  Do not re-order without checking ALL PROSE in this file
-@; -----------------------------------------------------------------------------
-
-@bm-desc["futen"
-@hyperlink["http://blog.amedama.jp/"]{@tt{momijiame}}
-@url{https://github.com/momijiame/futen}
-@list[
-  @lib-desc["fnmatch"]{Filename matching}
-  @lib-desc["os.path"]{Path split, path join, path expand, getenv}
-  @lib-desc["re"]{One regular expression match}
-  @lib-desc["shlex"]{Split host names from an input string}
-  @lib-desc["socket"]{Basic socket operations}
-]]{
-  Converts an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
-  file to an inventory file for the
-  @hyperlink["https://www.ansible.com/"]{@emph{Ansiable}} framework.
-  @; 1900 iterations
-}
-
-@bm-desc["http2"
-@authors[@hyperlink["https://github.com/httplib2/httplib2"]{Joe Gregorio}]
-@url{https://github.com/httplib2/httplib2}
-@list[
-  @lib-desc["urllib"]{To split an IRI into components}
-]]{
-  Converts a collection of @hyperlink["https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier"]{Internationalized Resource Identifiers}
-  to equivalent @hyperlink["http://www.asciitable.com/"]{ASCII} resource
-  identifiers.
-  @; 10 iterations
-}
-
-@bm-desc["slowSHA"
-@authors["Stefano Palazzo"]
-@url{http://github.com/sfstpala/SlowSHA}
-@list[
-  @lib-desc["os"]{path split}
-]]{
-  Applies the SHA-1 and SHA-512 algorithms to English words.
-  @; 1 iteration
-}
-
-@bm-desc["call_method"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Microbenchmarks simple method calls;
-  the calls do not use argument lists,
-  keyword arguments, or tuple unpacking.
-  @; Consists of @${32*10^5} calls to trivial functions.
-  @; 1 iteration
-}
-
-@bm-desc["call_method_slots"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Same as @bm{call_method}, but using receiver objects that declare their methods
-   in their @hyperlink["https://docs.python.org/3/reference/datamodel.html#slots"]{@tt{__slots__}}
-   attribute.
-  @; 1 iteration
-}
-
-@bm-desc["call_simple"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Same as @bm{call_method}, using functions rather than methods.
-}
-
-@bm-desc["chaos"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[
-  @lib-desc["math"]{Square root}
-  @lib-desc["random"]{randrange}
-]]{
-  Creates fractals using the @hyperlink["https://en.wikipedia.org/wiki/Chaos_game"]{@emph{chaos game}} method.
-  @; 1 iteration
-}
-
-@bm-desc["fannkuch"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Implements Anderson and Rettig's microbenchmark@~cite[ar-lp-1994].
-  @; 1 iteration
-}
-
-@bm-desc["float"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[
-  @lib-desc["math"]{Sin, Cos, Sqrt}
-]]{
-  Microbenchmarks floating-point operations.
-  @; 1 iteration (200,000 points)
-}
-
-@bm-desc["go"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[
-  @lib-desc["math"]{sqrt log}
-  @lib-desc["random"]{randrange random}
-  "two untyped modules"
-]]{
-  Implements the game @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{Go}.
-  This benchmark is split across three files: an @defn{experimental} module that implements
-  the game board, a @defn{control} module that defines constants, and a @defn{control} module
-  that implements an AI and drives the benchmark.
-  @; 2 iterations
-}
-
-@bm-desc["meteor"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Solves the Shootout benchmarks meteor puzzle.
-  @note{@url{http://benchmarksgame.alioth.debian.org/u32/meteor-description.html}}
-  @; 1 iterations (finds at most 6,000 solutions)
-}
-
-@bm-desc["nbody"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Models the orbits of the @hyperlink["https://en.wikipedia.org/wiki/Giant_planet"]{Jovian planets}.
-  @; 1 iteration
-}
-
-@bm-desc["nqueens"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Solves the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{@math{N} queens} problem by a brute-force algorithm.
-  @; 10 iterations
-}
-
-@bm-desc["pidigits"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Microbenchmarks big-integer arithmetic.
-  @; 1 iteration (5,000 digits)
-}
-
-@bm-desc["pystone"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Implements Weicker's @emph{Dhrystone} benchmark.
-  @note{@url{http://www.eembc.org/techlit/datasheets/ECLDhrystoneWhitePaper2.pdf}}
-  @; 50,000 iterations
-}
-
-@bm-desc["spectralnorm"
-@authors["The Python Benchmark Suite"]
-@url{https://github.com/python/performance}
-@list[]]{
-  Computes the largest singular value of an infinite matrix.
-  @; 10 iterations
-}
-
-@bm-desc["Espionage"
-@authors["Zeina Migeed"]
-""
-@list[
-  @lib-desc["operator"]{itemgetter}
-]]{
-  Implements Kruskal's spanning-tree algorithm.
-  @; 1 iteration
-}
-
-@bm-desc["PythonFlow"
-@authors["Alfian Ramadhan"]
-@url{https://github.com/masphei/PythonFlow}
-@list[
-  @lib-desc["os"]{path join}
-]]{
-  Implements the Ford-Fulkerson max flow algorithm. 
-  @; no longer needs citation
-  @;@~cite[ff-cjm-1956].
-  @; 1 iteration
-}
-
-@bm-desc["take5"
-@authors["Maha Alkhairy" "Zeina Migeed"]
-""
-@list[
-  @lib-desc["random"]{randrange shuffle random seed}
-  @lib-desc["copy"]{deepcopy}
-]]{
-  Implements a card game and a simple player AI.
-  @; 500 iterations
-}
-
-
 @section{Performance Ratios}
 
 @figure["fig:ratio" "Performance ratios"
   @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
+  @; TODO ratio for stats benchmarks?
 ]
 
 @(define RT (get-ratios-table EXHAUSTIVE-BENCHMARKS))
@@ -323,6 +93,10 @@ On the other hand, the overhead is always within an order-of-magnitude.
 
 @figure*["fig:overhead" "Overhead plots"
   @render-overhead-plot*[EXHAUSTIVE-BENCHMARKS]
+  @; TODO add sampling plots
+  @;(parameterize ([*PLOT-HEIGHT* 100]
+  @;               #;[*SINGLE-COLUMN?* #t])
+  @;  @render-samples-plot*[SAMPLE-BENCHMARKS])]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in
@@ -410,8 +184,36 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
  in short, the implementation does not dynamically type-check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
 @; TODO bad linebreak
 
+@;@Figure-ref{fig:sample:overhead} plots the results of applying the protocol
+@; in @section-ref{sec:protocol} to random configurations.
+@;Specifically, the data for a benchmark with @${F} functions and @${C} classes
+@; consists of @integer->word[NUM-SAMPLE-TRIALS] samples of
+@; @${@id[SAMPLE-RATE](F+C)} configurations selected without replacement.
+@;These results confirm many trends from @section-ref{sec:overhead}:
+@;@itemlist[
+@;@item{
+@;  No configurations run faster than the Python program.
+@;  The lowest overheads range between @${1.1}x and @${4}x.
+@;}
+@;@item{
+@;  All configurations are @deliverable[MAX-OVERHEAD].
+@;}
+@;@item{
+@;  Most configurations are @deliverable{T}, where @${T} is the benchmark's
+@;   @|t/p-ratio| (marked on each plot's @|x-axis|).
+@;}
+@;@item{
+@;  The curves have smooth slopes, implying the cost of annotating
+@;   a single function or class is low.
+@;}
+@;@item{
+@;  The intervals are tight.
+@;}
+@;]
+
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
+@; TODO new title
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
   @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
@@ -476,7 +278,6 @@ The variations between individual plots fall into four overlapping categories:
     The dynamic checks that enforce type soundness add insignificant overhead.
 })]
 
-@; TODO is http2 a type IV ?
 @exact-runtime-category[@elem{types make things fast}
   '(call_method call_method_slots spectralnorm)
   (λ (num-in-category) @elem{
@@ -496,3 +297,16 @@ The variations between individual plots fall into four overlapping categories:
   @Section-ref{sec:threats} addresses these and other threats to validity.
   @; TODO really not much of an address at the moment
 })
+
+
+@section{TBA: Conclusions}
+
+Enforcing union/rec/varity types at run-time, however, will impose a higher cost than
+ the single-test types that Reticulated programmers must currently use.
+A union type or (equi-)recursive type requires a disjunction of type tests, and
+ a variable-arity procedure requires a sequence of type checks.
+If, for example, every type annotation @${\tau} in our benchmarks were a
+ union type with @${\tau} and @tt{Void}, then overall performance would be nearly
+ twice as worse as it currently is.
+
+Fixing error messages will be some trouble.
