@@ -18,12 +18,6 @@
 
   *SINGLE-COLUMN?*
 
-  *CACHE-SUFFIX*
-  ;; (Parameterof String)
-  ;; Sometimes used to distinguish caches.
-  ;; As client, should set this if calling the same rendering function in
-  ;;  two different places in the same document.
-
   get-ratios-table
   ratios-table-row
   ratios-row-retic/python
@@ -66,7 +60,6 @@
 
 (define *SINGLE-COLUMN?* (make-parameter #f))
 (define *PLOT-HEIGHT* (make-parameter #f))
-(define *CACHE-SUFFIX* (make-parameter ""))
 
 (define-logger gm-render)
 
@@ -131,7 +124,7 @@
             (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
                            [*current-cache-keys* (list (λ () name*))]
                            [*with-cache-fasl?* #f])
-              (define target (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
+              (define target "static-table.rktd")
               (with-cache (cachefile target)
                 (λ ()
                   (log-gm-render-info "rendering ~a" target)

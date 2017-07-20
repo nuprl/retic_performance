@@ -61,10 +61,6 @@
   *PLOT-HEIGHT*
   ;; Parameter to fix height of individual overhead plots
 
-  *CACHE-SUFFIX*
-  ;; (Parameterof String)
-  ;; Optional tag to distinguish different cachefiles that would have the same name.
-
   *SINGLE-COLUMN?*
   ;; (Parameterof Boolean)
   ;; When true, put all plots in 1 column

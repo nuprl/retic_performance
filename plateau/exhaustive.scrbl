@@ -2,7 +2,8 @@
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"
-  @render-static-information[EXHAUSTIVE-BENCHMARKS]]
+  @render-static-information[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]]
+
 @;@(let* ([DLS '(aespython stats)]
 @;        [NEW '(sample_fsm)]) @list{
 @;   @(parameterize ([*CACHE-SUFFIX* "-linear"])
@@ -24,8 +25,7 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
 @section{Performance Ratios}
 
 @figure["fig:ratio" "Performance ratios"
-  @render-ratios-table[EXHAUSTIVE-BENCHMARKS]
-  @; TODO ratio for stats benchmarks?
+  @render-ratios-table[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
 ]
 
 @(define RT (get-ratios-table EXHAUSTIVE-BENCHMARKS))
