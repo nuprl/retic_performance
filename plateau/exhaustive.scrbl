@@ -92,11 +92,7 @@ On the other hand, the overhead is always within an order-of-magnitude.
 @; - slopes => are there pathological type boundaries
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[EXHAUSTIVE-BENCHMARKS]
-  @; TODO add sampling plots
-  @;(parameterize ([*PLOT-HEIGHT* 100]
-  @;               #;[*SINGLE-COLUMN?* #t])
-  @;  @render-samples-plot*[SAMPLE-BENCHMARKS])]
+  @render-overhead-plot*[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in

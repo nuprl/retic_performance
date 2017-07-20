@@ -462,6 +462,10 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
   Return the mean running times for configurations whose mean running time satisfies the given predicate.
 }
 
+@defproc[(performance-info-has-karst-data? [pi performance-info?]) boolean?]{
+  Returns @racket[#true] if @racket[pi] has exhaustive Karst data.
+}
+
 @defproc[(performance-info->sample* [pi performance-info?]) (cons/c natural? (listof path-string?))]{
   Return a pair with (1) sample size and (2) paths to sample data.
 }

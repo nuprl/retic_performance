@@ -97,6 +97,9 @@
    ;; Return the MEAN RUNNING TIMES for configurations whose mean
    ;;  running time satisfies the given predicate.
 
+   [performance-info-has-karst-data?
+    (-> performance-info? boolean?)]
+
    [performance-info->sample*
     (-> performance-info? (cons/c natural? (listof path-string?)))]
 
@@ -177,6 +180,9 @@
                                     #:untyped-retic-runtime base-retic
                                     #:typed-retic-runtime typed-retic)
   (performance-info name k num-configs python base-retic typed-retic))
+
+(define (performance-info-has-karst-data? pi)
+  (and (performance-info-src pi) #t))
 
 (define (gunzip/cd ps)
   (define-values [base name _dir?] (split-path ps))
@@ -741,7 +747,7 @@
        [(list fannkuch) ==> 0]
        [(list spectralnorm) ==> 13]
        [(list call_method) ==> 66]
-       [(list futen spectralnorm fannkuch) ==> 24511]))
+       [(list futen spectralnorm fannkuch) ==> 23496]))
 
     (test-case "find-speedy-types"
       (check-apply* find-speedy-types
@@ -757,11 +763,15 @@
                                  ("20" . "4") ("12" . "4") ("8" . "0")
                                  ("14" . "6") ("22" . "6")))))])))
 
+  (test-case "has-karst-data"
+    (check-true (performance-info-has-karst-data? (->performance-info 'call_method)))
+    (check-false (performance-info-has-karst-data? (->performance-info 'Evolution))))
+
   (test-case "ratio-for-samples"
     (define (check-t/p-ratio bm-name)
       (define pi (->performance-info bm-name))
       (void ;; assert that `pi` has ONLY sample data
-        (when (performance-info-src pi)
+        (when (performance-info-has-karst-data? pi)
           (raise-user-error 'check-t/p-ratio "benchmark '~a' has more than just sample data" bm-name))
         (performance-info->sample* pi))
       (check-pred typed/python-ratio pi)

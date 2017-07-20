@@ -53,9 +53,9 @@
 ;; =============================================================================
 
 (define OVERHEADS-WIDTH 600)
-(define OVERHEADS-HEIGHT 1000)
+(define OVERHEADS-HEIGHT 1200)
 (define OVERHEADS-HSPACE 30)
-(define OVERHEADS-VSPACE 10)
+(define OVERHEADS-VSPACE 6)
 (define NUM-COLUMNS 3)
 
 (define *SINGLE-COLUMN?* (make-parameter #f))
@@ -66,8 +66,12 @@
 ;; -----------------------------------------------------------------------------
 
 (define (render-overhead-plot* bm*)
+  (define (overhead-or-samples-plot pi)
+    (if (performance-info-has-karst-data? pi)
+      (overhead-plot pi)
+      (samples-plot pi)))
   (parameterize ([*RATIO-DOT-SIZE* 5])
-    (render-benchmark* bm* "overhead" overhead-plot)))
+    (render-benchmark* bm* "overhead" overhead-or-samples-plot)))
 
 (define (render-exact-runtime-plot* bm*)
   (render-benchmark* bm* "exact-runtime" exact-runtime-plot #t))
