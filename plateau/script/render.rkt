@@ -68,6 +68,8 @@
 (define *PLOT-HEIGHT* (make-parameter #f))
 (define *CACHE-SUFFIX* (make-parameter ""))
 
+(define-logger gm-render)
+
 ;; -----------------------------------------------------------------------------
 
 (define (render-overhead-plot* bm*)
@@ -103,8 +105,10 @@
                    [*with-cache-fasl?* #f])
       (filter values
         (for/list ([bm (in-list bm*)])
-          (with-cache (cachefile (format "~a-~a.rktd" descr (benchmark->name bm)))
+          (define target (format "~a-~a.rktd" descr (benchmark->name bm)))
+          (with-cache (cachefile target)
             (λ ()
+              (log-gm-render-info "rendering ~a" target)
               (collect-garbage 'major)
               (render-one (benchmark->performance-info bm))))))))
   (define col*
@@ -127,8 +131,10 @@
             (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
                            [*current-cache-keys* (list (λ () name*))]
                            [*with-cache-fasl?* #f])
-              (with-cache (cachefile (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
+              (define target (format "static-table~a.rktd" (*CACHE-SUFFIX*)))
+              (with-cache (cachefile target)
                 (λ ()
+                  (log-gm-render-info "rendering ~a" target)
                   (map render-static-row bm*))))))))
 
 (define (render-static-row bm)

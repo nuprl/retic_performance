@@ -128,7 +128,6 @@
 ))
 (define POPL-2017-BENCHMARK-NAMES '(
   call_method
-  call_method_slots
   call_simple
   chaos
   fannkuch

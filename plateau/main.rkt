@@ -725,7 +725,7 @@
   (test-case "all-benchmarks"
     (check set=?
       (map benchmark->name EXHAUSTIVE-BENCHMARKS)
-      '(futen http2 slowSHA call_method call_method_slots call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
+      '(futen http2 slowSHA call_method call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
     (check set=?
       (map benchmark->name (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))
       '(futen slowSHA chaos pystone Espionage PythonFlow sample_fsm aespython stats)))
