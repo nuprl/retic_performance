@@ -197,7 +197,7 @@
 (define (render-ratios-row pi)
   (define n (performance-info->name pi))
   (list n
-        (symbol->string n)
+        (tt (symbol->string n))
         (rnd (untyped/python-ratio pi))
         (rnd (typed/retic-ratio pi))
         (rnd (typed/python-ratio pi))))
