@@ -121,6 +121,8 @@
    ;; - C0 is SLOWER than C1
    ;; Return a hash of all enumerations for all given benchmarks.
 
+   [in-configurations
+    (-> performance-info? (sequence/c configuration? natural? (listof real?)))]
   )
   performance-info-src
   line->configuration-string
@@ -155,6 +157,8 @@
     gunzip)
   (only-in math/statistics
     mean)
+  (only-in racket/sequence
+    sequence/c)
   (only-in racket/string
     string-replace))
 
@@ -567,6 +571,35 @@
   (string-set! str2 index new-char)
   str2)
 
+(define (in-configurations pi)
+  (if (performance-info-has-karst-data? pi)
+    (in-configurations/karst-data pi)
+    (in-configurations/sample-data pi)))
+
+(define (in-configurations/karst-data pi)
+  (define go
+    (let ([p (open-input-file (performance-info-src pi))]
+          [line-number (box 0)])
+      (λ ()
+        (define ln (read-line p))
+        (cond
+         [(eof-object? ln)
+          (close-input-port p)
+          (values #f #f #f)]
+         [else
+          (set-box! line-number (+ 1 (unbox line-number)))
+          (line->values ln (unbox line-number))]))))
+  (in-producer go stop?))
+
+(define (in-configurations/sample-data pi)
+  (define pi*
+    (for/list ([s (in-list (cdr (performance-info->sample* pi)))])
+      (performance-info%sample pi s)))
+  (apply in-sequences (map in-configurations/karst-data pi*)))
+
+(define (stop? a b c)
+  (and (eq? #f a) (eq? a b) (eq? b c)))
+
 ;; =============================================================================
 
 (module+ test
@@ -777,6 +810,23 @@
       (check-pred typed/python-ratio pi)
       (void))
     (check-t/p-ratio 'Evolution))
+
+  (test-case "in-configurations/karst"
+    (define pi (->performance-info 'fannkuch))
+    (define x
+      (for/list ([(a b c) (in-configurations pi)])
+        (list a b c)))
+    (check-equal? (length x) 2)
+    (check-equal? (caar x) '(0))
+    (check-equal? (caadr x) '(1)))
+
+  (test-case "in-configurations/sample-data"
+    (define pi (->performance-info 'sample_fsm))
+    (define x
+      (for/list ([(a b c) (in-configurations pi)])
+        (list a b c)))
+    (check-equal? (length x) 1900)
+    (check-equal? (caar x) '(13 0 2 7 7)))
 )
 
 ;; -----------------------------------------------------------------------------

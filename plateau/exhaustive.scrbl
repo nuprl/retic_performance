@@ -212,7 +212,7 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
 @; TODO new title
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[EXHAUSTIVE-BENCHMARKS]
+  @render-exact-runtime-plot*[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
 ]
 
 Since changing the type annotations in a Reticulated program changes its

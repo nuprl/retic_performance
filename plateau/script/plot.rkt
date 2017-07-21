@@ -92,16 +92,16 @@
   (define elem*
     (list
       (make-vrule* nt)
-      (fold/karst pi
-        #:init '()
-        #:f (λ (acc cfg num-types t*)
-              (cons (configuration-points
-                      (for/list ([t (in-list t*)]
-                                 [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
-                        (set-box! max-runtime (max (unbox max-runtime) t))
-                        (set-box! num-points (+ (unbox num-points) 1))
-                        (list x t)))
-                    acc)))))
+      (for/fold ([acc '()])
+                ([(cfg num-types t*) (in-configurations pi)])
+        (cons
+          (configuration-points
+            (for/list ([t (in-list t*)]
+                       [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
+              (set-box! max-runtime (max (unbox max-runtime) t))
+              (set-box! num-points (+ (unbox num-points) 1))
+              (list x t)))
+          acc))))
   (define y-max (exact-ceiling (unbox max-runtime)))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-exact-runtime-xticks nt)]
