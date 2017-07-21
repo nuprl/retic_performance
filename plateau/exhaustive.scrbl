@@ -248,7 +248,7 @@ Overall, there is a clear trend that adding type annotations adds performance
 The variations between individual plots fall into four overlapping categories:
 
 @exact-runtime-category["types make things slow"
-  '(futen slowSHA chaos float pystone PythonFlow take5)
+  '(futen slowSHA chaos float pystone PythonFlow take5 sample_fsm aespython stats)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
      performance as the number of typed components increases.
