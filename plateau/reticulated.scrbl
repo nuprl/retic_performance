@@ -1,15 +1,23 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
-Reticulated is a gradual typing system for
-Python@~cite[vksb-dls-2014].
-In Reticulated, programmers can express types using Python's syntax for
- @hyperlink["https://www.python.org/dev/peps/pep-3107/"]{function annotations} and
- @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{decorators}.
-Reticulated statically checks the annotations and
- translates them to run-time type checks designed to enforce type soundness.
+@; TODO this is a roughest draft, carefully go through technical terms
 
-@; TODO clarify, merge with TR soundness
+Reticulated is a gradual typing system for Python that
+ gives programmers the ability to annotate functions and class fields with types@~cite[vksb-dls-2014].
+The type annotations describe invariants.
+Reticulated enforces the invariants by statically checking the type annotations
+ and dynamically checking the values that flow into annotated positions.
+
+By way of example, @figure-ref{fig:cash} presents a type-annotated class definition.
+The class models US currency values.
+The type annotations effectively guarantee that the class fields are integer-valued.
+More precisely, if @pythoninline{c} is an instance of the @pythoninline{Cash}
+ class, Reticulated guarantees that @pythoninline{c.dollars} either produces an
+ integer or fails with a dynamic type error.
+
+@; how does it enforce this?
+@; what is the guarantee exactly? (new section)
 
 In a statically typed language, type soundness implies that if a program
  is well-typed, running the program results in one of three possible
@@ -64,8 +72,6 @@ class Cash:
   def add_cash(self:Cash, other:Cash)->Void:
     self.dollars += other.dollars
     self.cents += other.cents
-
-c1 = Cash(1000, 0)
 }|]
 
 
