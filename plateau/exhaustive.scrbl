@@ -1,8 +1,12 @@
 #lang gm-plateau-2017
+
+@(define MAIN-BENCHMARKS (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))
+
 @title[#:tag "sec:exhaustive"]{Exhaustive Evaluation}
 
+
 @figure["fig:static-benchmark" "Static summary of benchmarks"
-  @render-static-information[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]]
+  @render-static-information[MAIN-BENCHMARKS]]
 
 @;@(let* ([DLS '(aespython stats)]
 @;        [NEW '(sample_fsm)]) @list{
@@ -25,10 +29,10 @@ The results are @defn["performance ratios"] (@figure-ref{fig:ratio}),
 @section{Performance Ratios}
 
 @figure["fig:ratio" "Performance ratios"
-  @render-ratios-table[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
+  @render-ratios-table[MAIN-BENCHMARKS]
 ]
 
-@(define RT (get-ratios-table EXHAUSTIVE-BENCHMARKS))
+@(define RT (get-ratios-table MAIN-BENCHMARKS))
 
 The table in @figure-ref{fig:ratio} lists three performance ratios.
 These ratios correspond to the extreme endpoints of gradual typing:
@@ -92,7 +96,7 @@ On the other hand, the overhead is always within an order-of-magnitude.
 @; - slopes => are there pathological type boundaries
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
+  @render-overhead-plot*[MAIN-BENCHMARKS]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in
@@ -212,7 +216,7 @@ This speedup occurs because of an unsoundness in the implementation of Reticulat
 @; TODO new title
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[(append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS)]
+  @render-exact-runtime-plot*[MAIN-BENCHMARKS]
 ]
 
 Since changing the type annotations in a Reticulated program changes its

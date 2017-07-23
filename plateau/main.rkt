@@ -727,7 +727,7 @@
       '(futen slowSHA chaos pystone Espionage PythonFlow sample_fsm aespython stats)))
 
   (test-case "partitioning benchmarks"
-    (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 19)
+    (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 18)
     (check-equal? NUM-VALIDATE-SAMPLES 6)
     (check-equal? NUM-NEW-SAMPLES 3))
 
