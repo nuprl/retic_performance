@@ -1,23 +1,80 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
-@; TODO this is a roughest draft, carefully go through technical terms
-
-Reticulated is a gradual typing system for Python that
- gives programmers the ability to annotate functions and class fields with types@~cite[vksb-dls-2014].
-The type annotations describe invariants.
+Reticulated is a gradual typing system for Python that gives programmers the
+ ability to annotate functions and class fields with types@~cite[vksb-dls-2014].
+The type annotations describe program invariants.
 Reticulated enforces the invariants by statically checking the type annotations
  and dynamically checking the values that flow into annotated positions.
 
-By way of example, @figure-ref{fig:cash} presents a type-annotated class definition.
-The class models US currency values.
-The type annotations effectively guarantee that the class fields are integer-valued.
-More precisely, if @pythoninline{c} is an instance of the @pythoninline{Cash}
- class, Reticulated guarantees that @pythoninline{c.dollars} either produces an
- integer or fails with a dynamic type error.
+By way of example, @figure-ref{fig:cash} presents a type-annotated class representing US currency.
+The annotations imply two high-level invariants:
+ (1) instances of the @pythoninline{Cash} class have integer-valued fields, and
+ (2) the @pythoninline{add_cash} method is only invoked with instances of the @pythoninline{Cash} class.
+Reticulated enforces these invariants within the @pythoninline{add_cash} method
+ by translating the type annotations into dynamic checks that protect the two
+ arguments of @pythoninline{add_cash} and the four dereferences of the fields
+ @pythoninline{dollars} and @pythoninline{cents}.
+These defensive checks protect statically typed code from arbitrary interactions with
+ dynamically-typed Python code.
 
-@; how does it enforce this?
-@; what is the guarantee exactly? (new section)
+@; @Figure-ref{fig:retic} defines Reticulated's type system.
+
+
+@section{Tag-Level Soundness}
+
+Reticulated uses dynamic type checks to implement a form of type soundness@~cite[vss-popl-2017].@note{@citet[vss-popl-2017] use the term @emph{open-world soundness} and conjecture that Reticulated is open-world sound.}
+Informally, if @pythoninline{e} is a well-typed expression, then
+ evaluating @pythoninline{e} can result in four possible outcomes:
+@itemlist[#:style 'ordered
+@item{
+  the program execution terminates with a value @pythoninline{v} that has the same @emph{type tag}@note{@Section-ref{sec:defense} defines the types and type tags in Reticulated.}  as the expression @pythoninline{e};
+}
+@item{
+  the execution diverges;
+}
+@item{
+  the execution ends in an exception due to a partial computational primitive (e.g., division-by-zero);
+}
+@item{
+  the execution ends in a type error due to a failed assertion inserted by Reticulated.
+}
+]@;
+Furthermore, if @pythoninline{e} appears in the context of a larger Python program,
+ then the program can observe exactly these four outcomes.
+
+This form of soundness, henceforth @emph{tag soundness}, differs from conventional type soundness in two significant ways.
+First, tag soundness does not rule out type errors in well-typed programs.
+Second, tag soundness implies that a term with type @pythoninline{List(Int)}
+ can produce any kind of @pythoninline{List}.
+In @figure-ref{fig:magic}, for example, the term @pythoninline{make_strings()}
+ has the static type @pythoninline{List(String)} but evaluates to a list containing
+ an integer, a boolean, and a function.
+
+@subsection{In Defense of Tag Soundness}
+
+The fact that the code in @figure-ref{fig:magic}
+ is well-typed seems to contradict the spirit of static typing.
+In particular, it undermines the compositional reasoning principle implicit
+ in static type systems.
+
+
+
+@;This is a natural consequence of interaction between statically and dynamically typed program terms.
+@;
+@;These two differences are 
+
+In general, Reticulated uses dynamic checks for three purposes:
+ (1) to protect the domain of a function;
+ (2) to check the result of a function application; and
+ (3) to check values extracted from some data structure.
+
+
+@; NOTE: could remove any/all annotations and get a valid program, Dyn type
+
+Reticulated's combination of static and dynamic typing implements a notion of
+ type soundness 
+
 
 In a statically typed language, type soundness implies that if a program
  is well-typed, running the program results in one of three possible
@@ -30,39 +87,11 @@ For partially-typed programs, in which typed and untyped code interact,
 Reticulated aims to enforce the first three conditions by static type-checking,
  and the fourth by dynamic type-checking.
 
-@Figure-ref{fig:cash} presents a well-typed class definition.
-If we add the method call @pythoninline{c1.add_cash(20)} to the program,
- then Reticulated raises a static type error because the integer @pythoninline{20}
- is not an instance of the @pythoninline{Cash} class.
-Contrast this to an ill-typed call that occurs in a dynamically-typed context:
-
-@nested[
-@python|{
-    def dyn_add_cash(amount):
-      c1.add_cash(amount)
-
-    dyn_add_cash(20)
-}|]@;
-The variable @pythoninline{amount} is not annotated, so Reticulated
- cannot statically prove that all calls to @pythoninline{dyn_add_cash} violate
- the assumptions of the @pythoninline{add_cash} method.
-To preserve type soundness, Reticulated rewrites the method to defensively
- check its arguments; in particular, Reticulated adds one structural type check
- for each argument of @pythoninline{add_cash}.
-At run-time, the check for the second argument throws an exception
- before the call @pythoninline{dyn_add_cash(c1, 20)} causes
- the program to fail.
-
-Reticulated inserts similar checks around
-  function calls, to enforce the declared return type, and
-  around reads from variables or data structures, to detect strong updates@~cite[vksb-dls-2014].
 These pervasive checks implement a notion of soundness that protects
  typed code without inhibiting untyped code@~cite[vss-popl-2017].
 
 @figure["fig:cash" "Reticulated syntax"
 @python|{
-import math
-
 @fields({"dollars": Int, "cents":Int})
 class Cash:
   def __init__(self:Cash, d:Int, c:Int)->Void:
@@ -74,6 +103,23 @@ class Cash:
     self.cents += other.cents
 }|]
 
+@figure["fig:magic"
+        @list{A well-typed Reticulated program}]{
+@python|{
+    def make_strings()->List(String):
+      xs = []
+      for i in range(3):
+        if   i == 0: xs.append(i)
+        elif i == 1: xs.append([True])
+        else       : xs.append(make_strings)
+      return xs
+
+    make_strings()
+}|}
+
+@;@figure["fig:retic" "Reticulated types"
+@;  "TODO"
+@;]
 
 @; -----------------------------------------------------------------------------
 @section{TBA: Properties, Guarantees, or Lack Thereof}
@@ -170,18 +216,4 @@ It remains to be seen whether these potential scenarios cause serious issues in 
 Developers may embrace the flexibility of alternative soundness and use
  Reticulated in combination with unit tests.
 }|
-
-@figure["fig:magic"
-        @list{A well-typed Reticulated program}]{
-@python|{
-    def make_strings()->List(String):
-      xs = []
-      for i in range(3):
-        if   i == 0: xs.append(i)
-        elif i == 1: xs.append([True])
-        else       : xs.append(make_strings)
-      return xs
-
-    make_strings()
-}|}
 
