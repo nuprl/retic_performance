@@ -8,7 +8,8 @@ pdf: compile texstyle.tex
 all: pkg setup pdf
 
 tex: compile texstyle.tex
-	scribble ++style texstyle.tex --latex $(PAPER).scrbl
+	scribble ++style texstyle.tex \
+           --latex $(PAPER).scrbl
 
 pkg:
 	raco pkg install --skip-installed

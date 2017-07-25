@@ -7,6 +7,8 @@ The type annotations describe program invariants.
 Reticulated enforces the invariants by statically checking the type annotations
  and dynamically checking the values that flow into annotated positions.
 
+@; syntax & semantics?
+
 By way of example, @figure-ref{fig:cash} presents a type-annotated class representing US currency.
 The annotations imply two high-level invariants:
  (1) instances of the @pythoninline{Cash} class have integer-valued fields, and
@@ -28,7 +30,7 @@ Informally, if @pythoninline{e} is a well-typed expression, then
  evaluating @pythoninline{e} can result in four possible outcomes:
 @itemlist[#:style 'ordered
 @item{
-  the program execution terminates with a value @pythoninline{v} that has the same @emph{type tag}@note{@Section-ref{sec:defense} defines the types and type tags in Reticulated.}  as the expression @pythoninline{e};
+  the program execution terminates with a value @pythoninline{v} that has the same @emph{type tag} as the expression @pythoninline{e};
 }
 @item{
   the execution diverges;
@@ -43,21 +45,38 @@ Informally, if @pythoninline{e} is a well-typed expression, then
 Furthermore, if @pythoninline{e} appears in the context of a larger Python program,
  then the program can observe exactly these four outcomes.
 
-This form of soundness, henceforth @emph{tag soundness}, differs from conventional type soundness in two significant ways.
+A @emph{type tag} is essentially a type constructor without parameters.
+For completeness, @figure-ref{fig:retic-types} documents Reticulated's types @${\tau},
+ tags @${\kappa}, and the mapping @$|{\tagof{\cdot}}| from types to tags.
+
+Reticulated's form of soundness, henceforth @emph{tag soundness}, differs from conventional type soundness in two significant ways.
 First, tag soundness does not rule out type errors in well-typed programs.
 Second, tag soundness implies that a term with type @pythoninline{List(Int)}
  can produce any kind of @pythoninline{List}.
 In @figure-ref{fig:magic}, for example, the term @pythoninline{make_strings()}
  has the static type @pythoninline{List(String)} but evaluates to a list containing
  an integer, a boolean, and a function.
+Put another way, Reticulated supports only tag-level compositional reasoning.
 
-@subsection{In Defense of Tag Soundness}
 
-The fact that the code in @figure-ref{fig:magic}
- is well-typed seems to contradict the spirit of static typing.
-In particular, it undermines the compositional reasoning principle implicit
- in static type systems.
+@subsection[#:tag "sec:defense"]{In Defense of Tag Soundness}
 
+The gap between Reticulated's tag soundness and the type soundness
+ property of statically typed languages are due to three design choices.
+@; KEY ... IMPORTANT ... CRUCIAL ... need 2nd sentence here
+
+First, type-annotated code must be fully compatible with un-annotated code.
+
+
+The 
+The fact that the code in @figure-ref{fig:magic} is well-typed undermines the
+ compositional reasoning principle implicit in static type systems.
+A programmer cannot assume that if an expression with type @${\tau} reduces
+ to a value, the value has type @${\tau}.
+The only guarantee is that the value has the same type tag as @${\tau}.
+For completeness, @figure-ref{fig:retic-types} defines the types and type tags
+ in Reticulated.
+Intuitively, the tag of @${\tau} is its top-level type constructor.
 
 
 @;This is a natural consequence of interaction between statically and dynamically typed program terms.
@@ -117,9 +136,19 @@ class Cash:
     make_strings()
 }|}
 
-@;@figure["fig:retic" "Reticulated types"
-@;  "TODO"
-@;]
+@figure["fig:retic-types" "Reticulated types and type tags" @exact|{
+  $\begin{array}{l l l}
+    \tau & = & \ldots \\
+    \kappa & = & \ldots \\[0.6mm]
+  \end{array}$
+
+  \fbox{$\tagof{\tau} = \kappa$}
+  $\begin{array}{l l l}
+    \tagof{Int} & = & Int \\
+    \tagof{List(\tau)} & = & \rightarrow \\
+    \tagof{\tau \rightarrow \tau} & = & \rightarrow
+  \end{array}$
+}|]
 
 @; -----------------------------------------------------------------------------
 @section{TBA: Properties, Guarantees, or Lack Thereof}
@@ -188,7 +217,7 @@ Reticulated@~cite[vss-popl-2017] takes this approach, and weakens the first and 
 @exact|{
 \begin{itemize}
 \item[$1'$.]
-  $e$ reduces to a value ${v}$ with type tag ${\lfloor\tau\rfloor}$;
+  $e$ reduces to a value ${v}$ with type tag ${\tagof{\tau}}$;
 \item[$4'$.]
   $e$ signals an exception that points to a set of potentially guilty boundaries between typed and untyped code.
 \end{itemize}
