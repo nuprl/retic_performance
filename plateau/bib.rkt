@@ -2039,3 +2039,11 @@
     #:author "Matthias Felleisen"
     #:location (proceedings-location popl #:pages '(126 127))
     #:date 2002))
+
+(define wmwz-ecoop-2017
+  (make-bib
+    #:title "Mixed Messages: Measuring Conformance and Non-Interference in TypeScript"
+    #:author (authors "Jack Williams" "J. Garrett Morris" "Philip Wadler" "Jakub Zalewski")
+    #:location (proceedings-location ecoop #:pages '(28:1 28:29))
+    #:date 2017))
+
