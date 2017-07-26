@@ -1,5 +1,7 @@
 #lang gm-plateau-2017
 
+@; TODO untyped configuration vs dynamically typed
+
 @title[#:tag "sec:method"]{Evaluation Method}
 
 @citet[takikawa-popl-2016] introduce a three-step method for evaluating the performance of
@@ -37,9 +39,11 @@ The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
 @Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity that we use.
 
-Once the granularity is fixed, the second step is to ascribe types to representative programs.
+After defining a granularity, a performance evaluation must define a suite of
+ programs to measure.
 A potential complication is that such programs may depend on external libraries
- or other modules that lie outside the scope of the evalutation.
+ or other modules that lie outside the scope of the evaluation.
+@; TODO generalize 'modules'?
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
@@ -59,21 +63,24 @@ The experimental modules and granularity of type annotations define the
    programs @${P} such that @${P\!\tcmulti P^\tau}.
 }
 
-The next step is to measure the performance of these configurations and
- report their overhead relative to the performance a developer would get
- by opting out of gradual typing.
+An evaluation must measure the performance of these configurations
+ relative to the same program without gradual typing.
 In Typed Racket, this baseline is the performance of Racket running the
  untyped configuration.
-In Reticulated, untyped variables still require run-time checks, so the
- baseline is the performance of Python running the untyped configuration.
+In Reticulated, the baseline is the performance of Python running the untyped configuration.
 
 @definition["performance ratio"]{
   A @emph{performance ratio} is the running time of a program
    divided by the running time of the same program in the absence of gradual typing.
 }
 
-After measuring the performance ratio of each configuration, the final step
- is to classify configurations by their performance.
+The performance ratio of a configuration measures its run-time cost of gradual typing.
+
+FORK there are 2 ways to go, exhaustive and sampling.
+@; Grouping configs is a nice way to cluster ... 
+@; .. need metric over performance ratios
+@; ... look this paper is actually coming together but the words are hard.
+
 Since different applications have different performance requirements, the
  only rational way to report performance is with a parameterized metric.
 
@@ -82,6 +89,10 @@ Since different applications have different performance requirements, the
    is the proportion of configurations with performance ratios no greater
    than @${D}.
 }
+
+Counting @deliverable{D} configurations is useful if you have exhaustive data.
+If not, it is possible to approximate the number of @deliverable{D} configurations
+ using simple random sampling.
 
 @definition[@approximation["r" "s" "95"]]{
   A @${95\%} confidence interval generated from @${r} samples, each made of @${s}
