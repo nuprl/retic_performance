@@ -39,7 +39,22 @@
 \newcommand{\bm}[1]{\vspace{1ex}\noindent\textbf{\textit{#1: }}}
 \newcommand{\tcstep}{\rightarrow}
 \newcommand{\tcmulti}{\rightarrow\!\!{}^\ast}
+
 \newcommand{\tagof}[1]{\lfloor #1 \rfloor} %% TODO ugly
+
+\newcommand{\kdyn}{\mathsf{Dyn}}
+\newcommand{\kint}{\mathsf{Int}}
+\newcommand{\kfunction}{\mathsf{Function}}
+\newcommand{\ktuple}{\mathsf{Tuple}}
+\newcommand{\klist}{\mathsf{List}}
+\newcommand{\kdict}{\mathsf{Dict}}
+
+\newcommand{\tdyn}{\kdyn}
+\newcommand{\tint}{\kint}
+\newcommand{\tfunction}[2]{\kfunction([#1],#2)}
+\newcommand{\ttuple}[2]{\ktuple(#1, #2)}
+\newcommand{\tlist}[1]{\klist(#1)}
+\newcommand{\tdict}[1]{\kdict(\{string : #1, \ldots\})}
 
 %\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
 %\newcolumntype{@}{>{\currentrowstyle}}

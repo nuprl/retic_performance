@@ -1,6 +1,8 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
+@; TODO simplify the code examples, make sure look good TOGETHER
+
 Reticulated is a gradual typing system for Python that gives programmers the
  ability to annotate functions and class fields with types@~cite[vksb-dls-2014].
 The type annotations describe program invariants.
@@ -19,8 +21,7 @@ Reticulated enforces these invariants within the @pythoninline{add_cash} method
  @pythoninline{dollars} and @pythoninline{cents}.
 These defensive checks protect statically typed code from dynamically-typed Python code.
 
-@figure["fig:cash" "Reticulated syntax"
-@python|{
+@figure["fig:cash" "A well-typed program" @python|{
 @fields({"dollars": Int, "cents":Int})
 class Cash:
   def __init__(self:Cash, d:Int, c:Int)->Void:
@@ -52,12 +53,13 @@ Informally, if @pythoninline{e} is a well-typed expression, then
   the execution ends in a type error due to a failed assertion inserted by Reticulated.
 }
 ]@;
-Furthermore, if @pythoninline{e} appears in the context of a larger Python program,
- then the program can observe exactly these four outcomes.
+@;Furthermore, if @pythoninline{e} appears in the context of a larger Python program,
+@; then the program can observe exactly these four outcomes.
 
 A @emph{type tag} is essentially a type constructor without parameters.
 For completeness, @figure-ref{fig:retic-types} documents Reticulated's types @${\tau},
  tags @${\kappa}, and the mapping @$|{\tagof{\cdot}}| from types to tags.
+The type @${\tdyn} is the dynamic type; all expressions and values are well-typed at @${\tdyn}.
 
 Reticulated's form of soundness, henceforth @emph{tag soundness}, differs from conventional type soundness in two significant ways.
 First, tag soundness does not rule out type errors in well-typed programs.
@@ -68,8 +70,7 @@ In @figure-ref{fig:magic}, for example, the term @pythoninline{make_strings()}
  an integer, a boolean, and a function.
 Put another way, Reticulated supports only tag-level compositional reasoning.
 
-@figure["fig:magic"
-        @list{A well-typed Reticulated program}]{
+@figure["fig:magic" "Another well-typed program"
 @python|{
     def make_strings()->List(String):
       xs = []
@@ -80,7 +81,7 @@ Put another way, Reticulated supports only tag-level compositional reasoning.
       return xs
 
     make_strings()
-}|}
+}|]
 
 
 @subsection[#:tag "sec:defense"]{In Defense of Tag Soundness}
@@ -127,18 +128,23 @@ Intuitively, tag-level checks should impose little performance overhead no
  matter how a programmer adds types to a Python program.
 Prior work on Reticulated does not evaluate this claim@~cite[vksb-dls-2014 vss-popl-2017].
 
-@figure["fig:retic-types" "Reticulated types and type tags" @exact|{
+@figure["fig:retic-types" "Selected types and type tags" #:style left-figure-style @exact|{
   $\begin{array}{l l l}
-    \tau & = & \ldots \\
-    \kappa & = & \ldots \\[0.6mm]
+    \tau & = & \tint \mid
+               \tlist{\tau} \mid
+               \tfunction{\tau}{\tau} \mid
+               \tdyn \\
+    \kappa & = & \kint \mid
+                 \klist \mid
+                 \kfunction \mid
+                 \kdyn \\[2mm]
   \end{array}$
 
-  \fbox{$\tagof{\tau} = \kappa$}
-  $\begin{array}{l l l}
-    \tagof{Int} & = & Int \\
-    \tagof{List(\tau)} & = & \rightarrow \\
-    \tagof{\tau \rightarrow \tau} & = & \rightarrow
-  \end{array}$
+  {\fbox{$\tagof{\tau} = \kappa$} \hfil} \\
+  ${\setlength{\arraycolsep}{4mm}\begin{array}{l l}
+    \tagof{\tint} = \kint          & \tagof{\tfunction{\tau}{\tau'}} = \kfunction \\
+    \tagof{\tlist{\tau}} = \klist  &  \tagof{\tdyn} = \kdyn \\
+  \end{array}}$
 }|]
 
 @; -----------------------------------------------------------------------------
