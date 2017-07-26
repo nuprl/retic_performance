@@ -1,7 +1,9 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
-@; TODO simplify the code examples, make sure look good TOGETHER
+@; TODO
+@; - simplify the code examples, make sure look good TOGETHER
+@; - granularity
 
 Reticulated is a gradual typing system for Python that gives programmers the
  ability to annotate functions and class fields with types@~cite[vksb-dls-2014].

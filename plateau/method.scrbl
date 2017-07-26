@@ -1,35 +1,46 @@
 #lang gm-plateau-2017
 
 @title[#:tag "sec:method"]{Evaluation Method}
-@; TODO make shorter
 
-@citet[takikawa-popl-2016] introduce a method for evaluating the performance of
-a gradual typing system.
-The method is based on the premise that a performance evaluation cannot assume
-how developers will apply gradual typing, nor can it assume that all developers
-have identical performance requirements.
-Therefore, the method considers all possible configurations that a developer
-may obtain by incrementally adding types and reports the overhead of all configurations relative to the original, untyped program.
+@citet[takikawa-popl-2016] introduce a three-step method for evaluating the performance of
+ a gradual typing system:
+ (1) identify a suite of fully-typed programs;
+ (2) measure the performance of all gradually-typed @emph{configurations} of the programs;
+ (3) count the number of configurations with performance overhead no greater than a certain limit.
 
 Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
- that permits typed and untyped modules.
-Thus a fully-typed program with @${M} modules defines a space
- of @${2^M} configurations.
-@;@note{Conversely, there may be an infinite number of ways to type an untyped program.} @;For example, @racket[(λ (x) x)].
+ with module-level granularity.
+In other words, a fully-typed Typed Racket program with @${M} modules defines
+ a space of @${2^M} configurations.
 Takikawa @|etal| measure the overhead of these configurations relative to
- the fully-untyped configuration and plot how the proportion of so-called
- @emph{@deliverable{D}} configurations varies as developers instantiate the
- parameter @${D} with the highest performance overhead they can tolerate.
+ the fully-untyped configuration and report the number of so-called
+ @emph{@deliverable{D}} configurations for values of @${D} between @${1} and @${20}.
+Intuitively, a configuration is @deliverable{D} if its performance is no worse
+ than a @${D}x slowdown relative to the untyped configuration.
+The idea is that programmers should interpret the paper's results
+ relative to the performance overhead that they can afford to ``deliver'' in a
+ software product.
 
 
-@section{Adapting Takikawa et al.'s Method}
-@; TODO what is purpose? can be clearer that 'adapting'?
+@section{Adapting the Takikawa Method}
+
+@; we generally follow method
+@; make some cuts for pragmatic reasons
+@; this section spells out the details
+@; ... as a sequence of definitions
+
+@; IDEA 1: directly appying is not feasible because too many configs ... so here's details
+
+@; IDEA 2: ....?
+
+To evaluate Reticulated, we generally follow the three-step method of @citet[takikawa-popl-2016].
+This section spells out the details 
 
 Reticulated supports fine-grained combinations of typed and untyped code.
 It would be impractical to directly apply the Takikawa method; measuring all
-configurations would take more time than the universe has left.
-It would also be impractical to ignore the fine granularity of Reticulated and
- apply the module-level protocol that Takikawa @|etal| used for Typed Racket.
+ configurations would take more time than the universe has left.
+It would also be impractical to follow a module-level protocol and ignore
+ the fine granularity of Reticulated.
 The practical choice lies somewhere in between, and it depends on the size of the
  programs at hand and computing resources available.
 
@@ -176,6 +187,9 @@ Third, we wrapped the main computation of every benchmark in a
 
 
 @; ===
+@; The method is based on the premise that a performance evaluation cannot assume
+@; how developers will apply gradual typing, nor can it assume that all developers
+@; have identical performance requirements.
 @;
 @;Counting the proportion of @deliverable{D} configurations is a useful way to
 @; measure the performance overhead of gradual typing because it addresses two
