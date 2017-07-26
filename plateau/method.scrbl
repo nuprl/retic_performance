@@ -7,42 +7,24 @@
  (1) identify a suite of fully-typed programs;
  (2) measure the performance of all gradually-typed @emph{configurations} of the programs;
  (3) count the number of configurations with performance overhead no greater than a certain limit.
-
 Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
  with module-level granularity.
 In other words, a fully-typed Typed Racket program with @${M} modules defines
  a space of @${2^M} configurations.
-Takikawa @|etal| measure the overhead of these configurations relative to
- the fully-untyped configuration and report the number of so-called
- @emph{@deliverable{D}} configurations for values of @${D} between @${1} and @${20}.
-Intuitively, a configuration is @deliverable{D} if its performance is no worse
- than a @${D}x slowdown relative to the untyped configuration.
-The idea is that programmers should interpret the paper's results
- relative to the performance overhead that they can afford to ``deliver'' in a
- software product.
+
+Reticulated supports gradual typing at a much finer granularity,
+ making it impractical to directly apply the Takikawa method.
+The following subsections therefore generalize the Takikawa method (@section-ref{sec:method:adapt})
+ and describe the protocol we use to evaluate Reticulated (@section-ref{sec:protocol}).
 
 
-@section{Adapting the Takikawa Method}
+@section[#:tag "sec:method:adapt"]{Generalizing the Takikawa Method}
 
-@; we generally follow method
-@; make some cuts for pragmatic reasons
-@; this section spells out the details
-@; ... as a sequence of definitions
-
-@; IDEA 1: directly appying is not feasible because too many configs ... so here's details
-
-@; IDEA 2: ....?
-
-To evaluate Reticulated, we generally follow the three-step method of @citet[takikawa-popl-2016].
-This section spells out the details 
-
-Reticulated supports fine-grained combinations of typed and untyped code.
-It would be impractical to directly apply the Takikawa method; measuring all
- configurations would take more time than the universe has left.
-It would also be impractical to follow a module-level protocol and ignore
- the fine granularity of Reticulated.
-The practical choice lies somewhere in between, and it depends on the size of the
- programs at hand and computing resources available.
+A gradual typing system enriches a dynamically typed language with a notion of static typing.
+The type system defines which syntactic units@note{E.g. variables, expressions, modules} of a program may be typed;
+ this is the so-called @emph{granularity} of the gradual typing system.
+A performance evaluation must consider the ways that a programmer may write
+ type annotations, subject to practical constraints.
 
 @definition["granularity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -53,7 +35,7 @@ For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
  of modules.
 The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
-@Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity used in this paper.
+@Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity that we use.
 
 Once the granularity is fixed, the second step is to ascribe types to representative programs.
 A potential complication is that such programs may depend on external libraries
