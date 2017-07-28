@@ -35,6 +35,8 @@
   pict
   plot/no-gui
   plot/utils
+  (only-in math/number-theory
+    binomial)
   (only-in math/statistics
     mean)
   (only-in racket/format
@@ -51,57 +53,65 @@
 (define TICK-SIZE 4)
 (define TITLE-FACE "Liberation Serif")
 (define SAMPLE-COLOR "darkorange")
-;(define SAMPLE-COLOR "chocolate")
+(define axis/c (or/c 'X 'Y))
 
 (define-syntax-rule (defparam id val type)
   (begin (define id (make-parameter val))
          (provide id)))
 
-(defparam *LEGEND-VSPACE* 10 Pict-Units)
+(defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
+(defparam *CONFIDENCE-LEVEL* 95 Percent)
+(defparam *CONFIGURATION-X-JITTER* 0.4 Real)
+(defparam *CLOUD-COLOR-WHEEL* '("black" "slategray" "darkslateblue" "black") (listof plot-color/c))
+(defparam *CLOUD-MIN-ALIGN* 'center anchor/c)
+(defparam *CLOUD-MAX-ALIGN* 'center anchor/c)
+(defparam *FONT-SIZE* 10 Natural)
+(defparam *INTERVAL-ALPHA* 1 Nonnegative-Real)
 (defparam *LEGEND-HSPACE* 20 Pict-Units)
-(defparam *OVERHEAD-PLOT-WIDTH* 600 Pict-Units)
-(defparam *OVERHEAD-PLOT-HEIGHT* 300 Pict-Units)
+(defparam *LEGEND-VSPACE* 10 Pict-Units)
+(defparam *MAJOR-AXIS* 'X axis/c)
 (defparam *OVERHEAD-FONT-FACE* "bold" Font-Face)
 (defparam *OVERHEAD-FONT-SCALE* 0.03 Nonnegative-Real)
+(defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
 (defparam *OVERHEAD-LABEL?* #f boolean?)
 (defparam *OVERHEAD-LINE-COLOR* 3 plot-color/c)
 (defparam *OVERHEAD-LINE-STYLE* 'solid plot-pen-style/c)
 (defparam *OVERHEAD-LINE-WIDTH* 1 Nonnegative-Real)
 (defparam *OVERHEAD-MAX* 10 Natural)
-(defparam *OVERHEAD-SHOW-RATIO* #t (U Symbol Boolean))
+(defparam *OVERHEAD-PLOT-HEIGHT* 300 Pict-Units)
+(defparam *OVERHEAD-PLOT-WIDTH* 600 Pict-Units)
 (defparam *OVERHEAD-SAMPLES* 20 Natural)
-(defparam *FONT-SIZE* 10 Natural)
-(defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
-(defparam *POINT-SIZE* 3 Positive-Index)
+(defparam *OVERHEAD-SHOW-RATIO* #t (U Symbol Boolean))
 (defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
-(defparam *CONFIGURATION-X-JITTER* 0.4 Real)
-(defparam *OVERHEAD-FREEZE-BODY* #f boolean?)
-(defparam *CONFIDENCE-LEVEL* 95 Percent)
-(defparam *INTERVAL-ALPHA* 1 Nonnegative-Real)
-(defparam *RATIO-DOT-SYM* 'plus point-sym/c)
-(defparam *RATIO-DOT-SIZE* 8 Natural)
+(defparam *POINT-COLOR* 2 plot-color/c)
+(defparam *POINT-SIZE* 3 Positive-Index)
 (defparam *RATIO-DOT-COLOR* "firebrick" Color)
+(defparam *RATIO-DOT-SIZE* 8 Natural)
+(defparam *RATIO-DOT-SYM* 'plus point-sym/c)
+(defparam *STANDARD-D* #f (or/c #f positive?))
 (defparam *TYPED/PYTHON-RATIO-XTICK?* #f Boolean)
 
 ;; -----------------------------------------------------------------------------
 
 (define (exact-runtime-plot pi)
+  ;; TODO use standard-D
   (define nt (num-types pi))
   (define max-runtime (box 0))
   (define num-points (box 0))
   (define elem*
-    (list
-      (make-vrule* nt)
-      (for/fold ([acc '()])
-                ([(cfg num-types t*) (in-configurations pi)])
-        (cons
-          (configuration-points
-            (for/list ([t (in-list t*)]
-                       [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
-              (set-box! max-runtime (max (unbox max-runtime) t))
-              (set-box! num-points (+ (unbox num-points) 1))
-              (list x t)))
-          acc))))
+    (parameterize ([*POINT-COLOR* 2])
+      (list
+        (make-vrule* nt)
+        (for/fold ([acc '()])
+                  ([(cfg num-types t*) (in-configurations pi)])
+          (cons
+            (configuration-points
+              (for/list ([t (in-list t*)]
+                         [x (in-list (linear-seq (- num-types (*CONFIGURATION-X-JITTER*)) (+ num-types (*CONFIGURATION-X-JITTER*)) (length t*)))])
+                (set-box! max-runtime (max (unbox max-runtime) t))
+                (set-box! num-points (+ (unbox num-points) 1))
+                (list x t)))
+            acc)))))
   (define y-max (exact-ceiling (unbox max-runtime)))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-exact-runtime-xticks nt)]
@@ -123,6 +133,7 @@
   (exact-add-legend (performance-info->name pi) (unbox num-points) body))
 
 (define (overhead-plot pi)
+  ;; TODO use standard-D
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
                    [plot-x-transform log-transform]
@@ -161,6 +172,7 @@
     #:size (*RATIO-DOT-SIZE*)))
 
 (define (samples-plot pi)
+  ;; TODO use standard-D
   (define-values [sample-size sample*] (performance-info->sample-info pi))
   (define mean-overhead
     (let ([dc*
@@ -201,6 +213,7 @@
   (samples-add-legend pi sample-size (length sample*) body))
 
 (define (validate-samples-plot pi)
+  ;; TODO use standard-D
   (define-values [sample-size sample*] (performance-info->sample-info pi))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
@@ -231,6 +244,63 @@
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (samples-add-legend (performance-info->name pi) sample-size (length sample*) body))
 
+(define (cloud-plot pi)
+  (begin ;; TODO remove these checks
+    (unless (eq? (*MAJOR-AXIS*) 'X)
+      (raise-argument-error 'cloud-plot "(*MAJOR-AXIS*) = 'X" (*MAJOR-AXIS*)))
+    (unless (eq? (*CLOUD-MIN-ALIGN*) 'center)
+      (raise-argument-error 'cloud-plot "(*CLOUD-MIN-ALIGN*) = 'center" (*CLOUD-MIN-ALIGN*)))
+    (unless (eq? (*CLOUD-MAX-ALIGN*) 'center)
+      (raise-argument-error 'cloud-plot "(*CLOUD-MAX-ALIGN*) = 'center" (*CLOUD-MAX-ALIGN*)))
+    (void))
+  (define nt (num-types pi))
+  (define runtime->color ; real? -> plot-color/c
+    (let ()
+      (define color-ref
+        (let* ([colors (*CLOUD-COLOR-WHEEL*)]
+               [N (length colors)])
+          (λ (i) (list-ref colors (min i (- N 1))))))
+      (define runtime->natural
+        (let ([D (*STANDARD-D*)])
+          (if D
+            (let ([ok? (make-D-deliverable? D pi)])
+              (λ (r) (if (ok? r) 0 1)))
+            (let ([O (overhead pi)])
+              (λ (r) (order-of-magnitude (O r)))))))
+      (λ (r)
+        (color-ref (runtime->natural r)))))
+  (define next-y-position ; natural? -> real?
+    ;; Goal: linear-spaced points, one for each configuration, along the Y-axis
+    (let* ([H (make-hash)]
+           [_ (for ([i (in-range (+ nt 1))])
+                ;; TODO linear-seq is not right
+                (hash-set! H i (linear-seq 0 100 (binomial nt i))))])
+      (λ (x-posn)
+        (define seq (hash-ref H x-posn))
+        (hash-set! H x-posn (cdr seq))
+        (car seq))))
+  (define elem*
+    (for/list ([(cfg num-t t*) (in-configurations pi)])
+      (parameterize ([*POINT-COLOR* (runtime->color (mean t*))])
+        (configuration-points
+          (list (list num-t (next-y-position num-t)))))))
+  (define body (maybe-freeze
+    (parameterize ([plot-x-ticks no-ticks]
+                   [plot-y-ticks no-ticks]
+                   [plot-x-far-ticks no-ticks]
+                   [plot-y-far-ticks no-ticks]
+                   [plot-tick-size 0]
+                   [plot-font-face (*OVERHEAD-FONT-FACE*)]
+                   [plot-font-size (*FONT-SIZE*)])
+      (plot-pict elem*
+        #:x-min (- 0 0.5)
+        #:x-max (+ nt 0.5)
+        #:x-label #f #;(and (*OVERHEAD-LABEL?*) "Num Type Ann.")
+        #:y-label #f #;(and (*OVERHEAD-LABEL?*) "Time (ms)")
+        #:width (*OVERHEAD-PLOT-WIDTH*)
+        #:height (*OVERHEAD-PLOT-HEIGHT*)))))
+  (cloud-add-legend (performance-info->name pi) body))
+
 ;; -----------------------------------------------------------------------------
 
 (define (performance-info->sample-info pi)
@@ -245,9 +315,8 @@
         p))))
 
 (define (configuration-points p**)
-  (define i 2)
   (points p**
-    #:color (->pen-color i)
+    #:color (*POINT-COLOR*)
     #:alpha (*POINT-ALPHA*)
     #:sym 'fullcircle
     #:size (*POINT-SIZE*)))
@@ -420,6 +489,10 @@
   (define np (render-count num-points "points"))
   (add-legend name pict np))
 
+(define (cloud-add-legend bm-name pict)
+  (define name (render-benchmark-name bm-name))
+  (add-legend name pict (blank 0 0)))
+
 (define (samples-add-legend pi sample-size num-samples pict)
   (define-values [name tp-ratio]
     (cond
@@ -470,19 +543,40 @@
 ;; =============================================================================
 
 (module+ main
-  (require racket/cmdline)
-  (define OVERHEAD 'overhead)
+  (require racket/cmdline (only-in racket/port with-input-from-string) (only-in racket/math natural?))
+  ;; ---
+  (define CLOUD 'cloud)
   (define EXACT 'exact)
+  (define OVERHEAD 'overhead)
   (define SAMPLE 'sample)
   (define VALIDATE 'validate)
   (define *plot-type* (make-parameter OVERHEAD))
+  (define *output* (make-parameter "rp-plot.png"))
+  ;; ---
+  (*FONT-SIZE* 14)
+  ;; ---
+  (define (read-string str [ok? #f])
+    (define v (with-input-from-string str read))
+    (if (or (not ok?) (ok? v))
+      v
+      (raise-argument-error 'rp-plot (format "~a" (contract-name ok?)) str)))
+  ;; ---
   (command-line
    #:program "rp-plot"
    #:once-any
-   [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
+   [("-c" "--cloud") "Make cloud plot" (*plot-type* CLOUD)]
    [("-e" "--exact") "Plot exact running times" (*plot-type* EXACT)]
+   [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
    [("-s" "--sample") "Plot samples" (*plot-type* SAMPLE)]
    [("-v" "--validate") "Validate samples" (*plot-type* VALIDATE)]
+   #:once-each
+   [("-A" "--axis") major-axis "Set major axis" (*MAJOR-AXIS* (read-string major-axis axis/c))]
+   [("-W" "--width") plot-width "Set plot width" (*OVERHEAD-PLOT-WIDTH* (read-string plot-width positive?))]
+   [("-H" "--height") plot-height "Set plot height" (*OVERHEAD-PLOT-HEIGHT* (read-string plot-height positive?))]
+   [("-D") D "Overhead value for comparison" (*STANDARD-D* (read-string D positive?))]
+   [("--colors") colors "Color palette for cloud plots" (*CLOUD-COLOR-WHEEL* (read-string colors (listof plot-color/c)))]
+   [("--output") out-file "Save plot to" (*output* out-file)]
+   [("--font-size") fs "Change font size" (*FONT-SIZE* (read-string fs natural?))]
    #:args benchmark-name*
    (cond
     [(null? benchmark-name*)
@@ -496,15 +590,14 @@
              (benchmark->performance-info (->benchmark-info n))))))
      (define render-one
        (case (*plot-type*)
+        [(cloud) cloud-plot]
         [(overhead) overhead-plot]
         [(exact) exact-runtime-plot]
         [(sample) samples-plot]
         [(validate) validate-samples-plot]
         [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
-     (define p*
-       (parameterize ([*FONT-SIZE* 14])
-         (map render-one pi*)))
-     (define OUT-FILE "rp-plot.png")
+     (define p* (map render-one pi*))
+     (define OUT-FILE (*output*))
      (and (save-pict OUT-FILE (apply vl-append 50 p*))
           (printf "Saved output to '~a'~n" OUT-FILE))])))
 
