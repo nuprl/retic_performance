@@ -62,7 +62,7 @@
 (defparam *CACHE-SIZE* (expt 2 16) Natural) ;; max num. configs to store in memory
 (defparam *CONFIDENCE-LEVEL* 95 Percent)
 (defparam *CONFIGURATION-X-JITTER* 0.4 Real)
-(defparam *CLOUD-COLOR-WHEEL* '("black" "slategray" "darkslateblue" "black") (listof plot-color/c))
+(defparam *CLOUD-COLOR-WHEEL* '("skyblue" "slategray" "darkslateblue" "black") (listof plot-color/c))
 (defparam *CLOUD-MIN-ALIGN* 'center anchor/c)
 (defparam *CLOUD-MAX-ALIGN* 'center anchor/c)
 (defparam *FONT-SIZE* 10 Natural)
@@ -85,6 +85,7 @@
 (defparam *POINT-ALPHA* 0.4 Nonnegative-Real)
 (defparam *POINT-COLOR* 2 plot-color/c)
 (defparam *POINT-SIZE* 3 Positive-Index)
+(defparam *POINT-SYMBOL* 'fullcircle point-sym/c)
 (defparam *RATIO-DOT-COLOR* "firebrick" Color)
 (defparam *RATIO-DOT-SIZE* 8 Natural)
 (defparam *RATIO-DOT-SYM* 'plus point-sym/c)
@@ -99,7 +100,8 @@
   (define max-runtime (box 0))
   (define num-points (box 0))
   (define elem*
-    (parameterize ([*POINT-COLOR* 2])
+    (parameterize ([*POINT-COLOR* 2]
+                   [*POINT-SYMBOL* 'fullcircle])
       (list
         (make-vrule* nt)
         (for/fold ([acc '()])
@@ -253,7 +255,15 @@
     (unless (eq? (*CLOUD-MAX-ALIGN*) 'center)
       (raise-argument-error 'cloud-plot "(*CLOUD-MAX-ALIGN*) = 'center" (*CLOUD-MAX-ALIGN*)))
     (void))
+  ;; TODO resize depending on plot-withd / plot-height ... 
+  ;; the math plot is doing is not helping
   (define nt (num-types pi))
+  (define point-size 40)
+  (define y-range 20)
+  (define y-max
+    (for/fold ([acc 0])
+              ([k (in-range nt)])
+      (max acc (binomial nt k))))
   (define runtime->color ; real? -> plot-color/c
     (let ()
       (define color-ref
@@ -269,21 +279,30 @@
               (λ (r) (order-of-magnitude (O r)))))))
       (λ (r)
         (color-ref (runtime->natural r)))))
-  (define next-y-position ; natural? -> real?
+  (define (num-types->x-posn t)
+    (* t 0.2))
+  (define num-types->y-posn ; natural? -> real?
     ;; Goal: linear-spaced points, one for each configuration, along the Y-axis
     (let* ([H (make-hash)]
-           [_ (for ([i (in-range (+ nt 1))])
-                ;; TODO linear-seq is not right
-                (hash-set! H i (linear-seq 0 100 (binomial nt i))))])
+           [_ (for ([k (in-range (+ nt 1))])
+                (define pts (binomial nt k))
+                (define width (exact-floor (/ pts nt)))
+                (hash-set! H k (linear-seq (- width) width pts)))])
       (λ (x-posn)
-        (define seq (hash-ref H x-posn))
-        (hash-set! H x-posn (cdr seq))
-        (car seq))))
+        (define old-y (hash-ref H x-posn))
+        (define new-y (cdr old-y))
+        (hash-set! H x-posn new-y)
+        (car old-y))))
   (define elem*
-    (for/list ([(cfg num-t t*) (in-configurations pi)])
-      (parameterize ([*POINT-COLOR* (runtime->color (mean t*))])
-        (configuration-points
-          (list (list num-t (next-y-position num-t)))))))
+    (parameterize ([*POINT-ALPHA* 0.6]
+                   [*POINT-SIZE* point-size]
+                   [*POINT-SYMBOL* 'fullcircle])
+      (for/list ([(cfg num-t t*) (in-configurations pi)])
+        (parameterize ([*POINT-COLOR* (runtime->color (mean t*))])
+          (define x (num-types->x-posn num-t))
+          (define y (num-types->y-posn num-t))
+          (configuration-points
+            (list (list x y)))))))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks no-ticks]
                    [plot-y-ticks no-ticks]
@@ -295,6 +314,8 @@
       (plot-pict elem*
         #:x-min (- 0 0.5)
         #:x-max (+ nt 0.5)
+        #:y-min (- y-range)
+        #:y-max y-range
         #:x-label #f #;(and (*OVERHEAD-LABEL?*) "Num Type Ann.")
         #:y-label #f #;(and (*OVERHEAD-LABEL?*) "Time (ms)")
         #:width (*OVERHEAD-PLOT-WIDTH*)
@@ -318,7 +339,7 @@
   (points p**
     #:color (*POINT-COLOR*)
     #:alpha (*POINT-ALPHA*)
-    #:sym 'fullcircle
+    #:sym (*POINT-SYMBOL*)
     #:size (*POINT-SIZE*)))
 
 (define (make-vrule* count)
