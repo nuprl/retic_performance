@@ -37,6 +37,9 @@
     [log2
      (-> exact-nonnegative-integer? exact-nonnegative-integer?)]
 
+    [order-of-magnitude
+     (-> real? exact-nonnegative-integer?)]
+
     [file-remove-extension
      (-> path-string? path-string?)]
     ;; Removes a Racket-added extension from a filename.
@@ -152,6 +155,12 @@
       (if (= n (expt 2 k))
         k
         (loop (+ k 1))))))
+
+(define (order-of-magnitude n)
+  (let loop ([upper 10] [acc 0])
+    (if (< n upper)
+      acc
+      (loop (* upper 10) (+ acc 1)))))
 
 (define (add-commas n)
   (define str (number->string n))
@@ -270,7 +279,7 @@
       ==> "a\tb\tc"]))
 
   (test-case "rnd"
-    (check-equal? (rnd 2) "2")
+    (check-equal? (rnd 2) "2.00")
     (check-equal? (rnd 1/3) "0.33"))
 
   (test-case "pct"
@@ -356,5 +365,26 @@
       ==> 1]
      ["0000000010"
       ==> 9]))
+
+  (test-case "order-of-magnitude"
+    (check-apply* order-of-magnitude
+     [0
+      ==> 0]
+     [1
+      ==> 0]
+     [5
+      ==> 0]
+     [9
+      ==> 0]
+     [10
+      ==> 1]
+     [12.34
+      ==> 1]
+     [999
+      ==> 2]
+     [999.99999
+      ==> 2]
+     [1032
+      ==> 3]))
 
 )
