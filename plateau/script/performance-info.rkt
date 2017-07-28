@@ -123,6 +123,9 @@
 
    [in-configurations
     (-> performance-info? (sequence/c configuration? natural? (listof real?)))]
+
+   [typed-racket-data->performance-info
+    (-> path-string? performance-info?)]
   )
   performance-info-src
   line->configuration-string
@@ -149,6 +152,10 @@
     append*
     remove-duplicates
     list-set)
+  (only-in racket/file
+    file->value)
+  (only-in racket/format
+    ~r)
   (only-in racket/path
     path-only)
   (only-in racket/math
@@ -184,6 +191,30 @@
                                     #:untyped-retic-runtime base-retic
                                     #:typed-retic-runtime typed-retic)
   (performance-info name k num-configs python base-retic typed-retic))
+
+(define (typed-racket-data->performance-info ps)
+  (define bm-name (parse-typed-racket-filename ps))
+  (define v (file->value ps))
+  (define nc (vector-length v))
+  (define rr (mean (vector-ref v 0)))
+  (define tr (mean (vector-ref v (- nc 1))))
+  (make-performance-info (string->symbol bm-name)
+    #:src ps
+    #:num-configurations nc
+    #:python-runtime rr
+    #:untyped-retic-runtime rr
+    #:typed-retic-runtime tr))
+
+(define (performance-info-for-typed-racket? pi)
+  (define src (performance-info-src pi))
+  (and src (parse-typed-racket-filename src)))
+
+(define (parse-typed-racket-filename ps)
+  (define-values [_base name mbd?] (split-path ps))
+  (and
+    (path-string? name)
+    (let ([m (regexp-match #rx"^([^-]*)-v.*rktd$" (path-string->string name))])
+      (and m (cadr m)))))
 
 (define (performance-info-has-karst-data? pi)
   (and (performance-info-src pi) #t))
@@ -573,8 +604,32 @@
 
 (define (in-configurations pi)
   (if (performance-info-has-karst-data? pi)
-    (in-configurations/karst-data pi)
+    (if (performance-info-for-typed-racket? pi)
+      (in-configurations/tr pi)
+      (in-configurations/karst-data pi))
     (in-configurations/sample-data pi)))
+
+(define (in-configurations/tr pi)
+  (define go
+    (let* ([v (file->value (performance-info-src pi))]
+           [num-configs (vector-length v)]
+           [count-hi-bits (λ (i)
+                            (for/sum ([c (in-string (~r i #:base 2))]
+                                      #:when (eq? c #\1))
+                              1))]
+           [curr (box 0)])
+      (λ ()
+        (define i (unbox curr))
+        (cond
+         [(= i num-configs)
+          (values #f #f #f)]
+         [else
+          (set-box! curr (+ i 1))
+          (define cfg (list i))
+          (define num-types (count-hi-bits i))
+          (define t* (vector-ref v i))
+          (values cfg num-types t*)]))))
+  (in-producer go stop?))
 
 (define (in-configurations/karst-data pi)
   (define go
@@ -827,6 +882,10 @@
         (list a b c)))
     (check-equal? (length x) 1900)
     (check-equal? (caar x) '(13 0 2 7 7)))
+
+  (test-case "parse-typed-racket-filename"
+    (check-equal? (parse-typed-racket-filename "nepls-2017/src/tr-data/mbta-v6.4-2016-07-25T06:46:31.rktd")
+                  "mbta"))
 )
 
 ;; -----------------------------------------------------------------------------

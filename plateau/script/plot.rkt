@@ -255,54 +255,12 @@
     (unless (eq? (*CLOUD-MAX-ALIGN*) 'center)
       (raise-argument-error 'cloud-plot "(*CLOUD-MAX-ALIGN*) = 'center" (*CLOUD-MAX-ALIGN*)))
     (void))
-  ;; TODO resize depending on plot-withd / plot-height ... 
-  ;; the math plot is doing is not helping
-  (define nt (num-types pi))
-  (define point-size 40)
-  (define y-range 20)
-  (define y-max
-    (for/fold ([acc 0])
-              ([k (in-range nt)])
-      (max acc (binomial nt k))))
-  (define runtime->color ; real? -> plot-color/c
-    (let ()
-      (define color-ref
-        (let* ([colors (*CLOUD-COLOR-WHEEL*)]
-               [N (length colors)])
-          (λ (i) (list-ref colors (min i (- N 1))))))
-      (define runtime->natural
-        (let ([D (*STANDARD-D*)])
-          (if D
-            (let ([ok? (make-D-deliverable? D pi)])
-              (λ (r) (if (ok? r) 0 1)))
-            (let ([O (overhead pi)])
-              (λ (r) (order-of-magnitude (O r)))))))
-      (λ (r)
-        (color-ref (runtime->natural r)))))
-  (define (num-types->x-posn t)
-    (* t 0.2))
-  (define num-types->y-posn ; natural? -> real?
-    ;; Goal: linear-spaced points, one for each configuration, along the Y-axis
-    (let* ([H (make-hash)]
-           [_ (for ([k (in-range (+ nt 1))])
-                (define pts (binomial nt k))
-                (define width (exact-floor (/ pts nt)))
-                (hash-set! H k (linear-seq (- width) width pts)))])
-      (λ (x-posn)
-        (define old-y (hash-ref H x-posn))
-        (define new-y (cdr old-y))
-        (hash-set! H x-posn new-y)
-        (car old-y))))
+  (define cloud-builder
+    (make-cloud-builder pi))
   (define elem*
-    (parameterize ([*POINT-ALPHA* 0.6]
-                   [*POINT-SIZE* point-size]
-                   [*POINT-SYMBOL* 'fullcircle])
+    (parameterize ([*POINT-ALPHA* 0.8])
       (for/list ([(cfg num-t t*) (in-configurations pi)])
-        (parameterize ([*POINT-COLOR* (runtime->color (mean t*))])
-          (define x (num-types->x-posn num-t))
-          (define y (num-types->y-posn num-t))
-          (configuration-points
-            (list (list x y)))))))
+        (cloud-builder num-t t*))))
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks no-ticks]
                    [plot-y-ticks no-ticks]
@@ -312,10 +270,10 @@
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
                    [plot-font-size (*FONT-SIZE*)])
       (plot-pict elem*
-        #:x-min (- 0 0.5)
-        #:x-max (+ nt 0.5)
-        #:y-min (- y-range)
-        #:y-max y-range
+        ;; #:x-min 0
+        ;; #:x-max (+ nt 1)
+        ;; #:y-min 0
+        ;; #:y-max ;; OBVIOUS
         #:x-label #f #;(and (*OVERHEAD-LABEL?*) "Num Type Ann.")
         #:y-label #f #;(and (*OVERHEAD-LABEL?*) "Time (ms)")
         #:width (*OVERHEAD-PLOT-WIDTH*)
@@ -345,6 +303,58 @@
 (define (make-vrule* count)
   (for/list ([i (in-range (+ 1 count))])
     (vrule (- i 0.5) #:width 0.2 #:color 0)))
+
+(define (make-cloud-builder pi)
+  (define runtime->color ; real? -> plot-color/c
+    (let ()
+      (define color-ref
+        (let* ([colors (*CLOUD-COLOR-WHEEL*)]
+               [N (length colors)])
+          (λ (i) (list-ref colors (min i (- N 1))))))
+      (define runtime->natural
+        (let ([D (*STANDARD-D*)])
+          (if D
+            (let ([ok? (make-D-deliverable? D pi)])
+              (λ (r) (if (ok? r) 0 1)))
+            (let ([O (overhead pi)])
+              (λ (r) (order-of-magnitude (O r)))))))
+      (λ (r)
+        (color-ref (runtime->natural r)))))
+  (define (num-types->x-posn x)
+    x)
+  (define num-types->y-posn ; natural? -> real?
+    (let* ([nt (num-types pi)]
+           [H (make-hash)]
+           [_ (for/fold ([acc 0])
+                        ([k (in-range (+ nt 1))])
+                (define-values [max-configs-per-type rising?]
+                  (let ([num-configs (binomial nt k)])
+                    (if (< num-configs acc)
+                      (values acc #f)
+                      (values num-configs #t))))
+                (define-values [init step]
+                  (if rising?
+                    (values 0 +1)
+                    (values max-configs-per-type -1)))
+                (hash-set! H k (cons init step))
+                max-configs-per-type)])
+      (λ (x-posn)
+        (define-values [curr step]
+          (let ([y (hash-ref H x-posn)])
+            (values (car y) (cdr y))))
+        (hash-set! H x-posn (cons (+ curr step) step))
+        curr)))
+  (λ (n-types t*)
+    (define x (num-types->x-posn n-types))
+    (define y (num-types->y-posn n-types))
+    (define c (runtime->color (mean t*)))
+    (rectangles
+      (list (vector (ivl x (+ x 1)) (ivl y (+ y 1))))
+      #:line-width 0
+      #:line-color c
+      #:color c
+      #:alpha (*POINT-ALPHA*))))
+
 
 (define (make-count-configurations-function pi #:interval? [ivl #t])
   (define f (if (performance-info? pi) (make-deliverable-counter pi) pi))
@@ -581,6 +591,10 @@
     (if (or (not ok?) (ok? v))
       v
       (raise-argument-error 'rp-plot (format "~a" (contract-name ok?)) str)))
+  (define (->performance-info x)
+    (if (file-exists? x)
+      (typed-racket-data->performance-info x)
+      (benchmark->performance-info (->benchmark-info x))))
   ;; ---
   (command-line
    #:program "rp-plot"
@@ -605,10 +619,10 @@
     [else
      (define pi*
        (if (null? (cdr benchmark-name*))
-         (list (benchmark->performance-info (->benchmark-info (car benchmark-name*))))
+         (list (->performance-info (car benchmark-name*)))
          (for/list ([n (in-list benchmark-name*)])
            (with-handlers ([exn:fail? (λ (e) (printf "Error processing '~a', run 'raco rp-plot ~a' to debug.~n" n n))])
-             (benchmark->performance-info (->benchmark-info n))))))
+             (->performance-info n)))))
      (define render-one
        (case (*plot-type*)
         [(cloud) cloud-plot]
