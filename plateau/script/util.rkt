@@ -254,7 +254,8 @@
      [(18) "eighteen"]
      [(19) "nineteen"]
      [(20) "twenty"]
-     [else (raise-argument-error 'integer->word "integer less than 20" i)])))
+     [(21) "twenty-one"]
+     [else (raise-argument-error 'integer->word "integer less than 22" i)])))
   (if title? (string-titlecase str) str))
 
 ;; =============================================================================

@@ -261,7 +261,7 @@
   ;; Build a table of static information about each benchmark
 
   render-ratios-table
-  ;; (-> (listof benchmark-info?) table?)
+  ;; (-> (or/c table (listof benchmark-info?)) pict?)
   ;; Build a table of Python/Retic/Typed ratios
 
   render-samples-plot*
@@ -544,14 +544,14 @@
                         (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
      (λ (name pre-bm* make-descr)
        (define bm-name* (map render-benchmark-name pre-bm*))
-       (define perf-type (format "Type ~a " (get-number)))
+       (define perf-type (format "Trend ~a " (get-number)))
        (elem (bold perf-type)
              ~ ~
              (emph "(" name ")") ": "
              (make-descr (integer->word (length pre-bm*)))
-             "\n"
-             "\n"
-             (list "The " (authors* bm-name*) " benchmarks are of " perf-type ".")))))
+             #;"\n"
+             #;"\n"
+             #;(list "The " (authors* bm-name*) " benchmarks are of " perf-type ".")))))
 
 (define (format-deps dep*)
   (if (null? dep*)

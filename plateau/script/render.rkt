@@ -156,6 +156,14 @@
   (map bold '("Benchmark" "python" "retic" "  python")))
 
 (define (render-ratios-table bm*)
+  (define row*
+    (cond
+     [(null? bm*)
+      (raise-argument-error 'render-ratios-table "non-empty list" bm*)]
+     [(benchmark-info? (car bm*))
+      (get-ratios-table bm*)]
+     [else
+      bm*]))
   (centered
     (tabular
       #:sep (hspace 2)
@@ -164,7 +172,7 @@
       #:column-properties '(left right right (left-border right))
       (list* RATIOS-TITLE-TOP*
              RATIOS-TITLE-BOT*
-             (map cdr (get-ratios-table bm*))))))
+             (map cdr row*)))))
 
 (define (get-ratios-table bm*)
   (define name* (map benchmark->name bm*))

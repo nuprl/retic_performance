@@ -48,7 +48,7 @@ To set the stage, this paper first describes the point that Reticulated
 occupies in the design space of gradually typed systems (see
 @secref{sec:reticulated}). It then explains our adaptation of Takikawa et
 al.'s method to Reticulated's system of gradual typing  (see
-@section-ref{sec:method}). @Secref{sec:exhaustive} presents the details of
+@section-ref{sec:method}). @Secref{sec:evaluation} presents the details of
 the evaluation: the benchmarks, the measurements, and the
 conclusions. 
 

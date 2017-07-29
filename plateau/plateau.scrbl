@@ -56,7 +56,7 @@
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
 @include-section{method.scrbl}
-@include-section{exhaustive.scrbl}
+@include-section{evaluation.scrbl}
 @include-section{threats.scrbl}
 @include-section{conclusion.scrbl}
 

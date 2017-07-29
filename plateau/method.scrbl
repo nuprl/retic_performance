@@ -110,7 +110,7 @@ The appendix contains theoretical and empirical justification for the simple
 @section[#:tag "sec:protocol"]{Protocol}
 
 @parag{Granularity}
-The evaluation presented in @section-ref{sec:exhaustive} is at the granularity
+The evaluation presented in @section-ref{sec:evaluation} is at the granularity
  of @emph{function and class fields}.
 In general, one syntactic unit in the experiment is either one function,
  one method, or the collection of all fields for one class.
