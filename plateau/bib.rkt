@@ -466,7 +466,7 @@
    #:location (proceedings-location ecoop #:pages '(4 27))
    #:date 2015))
 
-(define takikawa-popl-2016
+(define tfgnvf-popl-2016
   (make-bib
    #:author (authors
 	      "Asumu Takikawa"

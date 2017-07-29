@@ -4,7 +4,7 @@
 
 @title[#:tag "sec:method"]{Evaluation Method}
 
-@citet[takikawa-popl-2016] introduce a three-step method for evaluating the performance of
+@citet[tfgnvf-popl-2016] introduce a three-step method for evaluating the performance of
  a gradual typing system:
  (1) identify a suite of fully-typed programs;
  (2) measure the performance of all gradually-typed @emph{configurations} of the programs;
@@ -33,7 +33,7 @@ A performance evaluation must consider the ways that a programmer may write
    the evaluation adds or removes type annotations.
 }
 
-For example, the evaluation in @citet[takikawa-popl-2016] is at the granularity
+For example, the evaluation in @citet[tfgnvf-popl-2016] is at the granularity
  of modules.
 The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
@@ -57,7 +57,10 @@ The experimental modules and granularity of type annotations define the
   Let @${P \tcstep P'}
    if and only if program @${P'} can be obtained from
    @${P} by annotating one syntactic unit in an experimental module.
-  Let @${\tcmulti} be the reflexive, transitive closure of the @${\tcstep} relation.@note{The @${\tcstep} relation expresses the notion of a @emph{type conversion step}@~cite[takikawa-popl-2016]. The @${\tcmulti} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
+  Let @${\tcmulti} be the reflexive, transitive closure of the @${\tcstep}
+   relation.@note{The @${\tcstep} relation expresses the notion of a
+   @emph{type conversion step}@~cite[tfgnvf-popl-2016].
+   The @${\tcmulti} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
   @; note^2: `e0 -->* e1` if and only if `e1 <= e0`
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P\!\tcmulti P^\tau}.
@@ -80,7 +83,7 @@ An @emph{exhaustive} performance evaluation measures the performance of every
  configuration.
 The natural way to interpret this data is to choose a notion of "good performance"
  and count the number of "good" configurations.
-In this spirit, @citet[takikawa-popl-2016] ask programmers to consider the
+In this spirit, @citet[tfgnvf-popl-2016] ask programmers to consider the
  performance overhead they could deliver to clients of their software.
 
 @definition[@deliverable{D}]{

@@ -16,7 +16,7 @@ the code base.
 While the soundness of the gradual type system guarantees that developers
 can easily find and fix an impedance mismatch between typed and untyped
 regions of code, it also has serious implications for
-performance@~cite[takikawa-popl-2016 greenman-jfp-2017]. The problem is due
+performance@~cite[tfgnvf-popl-2016 greenman-jfp-2017]. The problem is due
 to the implementation of soundness with the insertion of run-time checks,
 which obviously imposes a cost. In the case of Typed Racket, partially
 typed code may slow down by up to two orders of magnitude while fully typed
