@@ -23,6 +23,8 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
  @;continue to search for ways to improve the performance of sound, gradually
  @;typed languages.
 
+@; TODO future work for Reticulated
+
 @acks{
   This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
 @;  Matthias for all things.
