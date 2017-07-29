@@ -194,7 +194,7 @@ In these benchmarks, the fully-typed configuration is one of the slowest-running
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of the configurations.
 This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not type-check the contents of tuples.@note{@url{https://github.com/mvitousek/reticulated/issues/36}}
+ in short, the implementation does not type-check the contents of tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}

@@ -415,3 +415,53 @@ Third, we wrapped the main computation of every benchmark in a
 @; twice as worse as it currently is.
 @;
 @;Fixing error messages will be some trouble.
+
+@; =============================================================================
+
+@section{TBA: Leftovers}
+@(define pystone-union-fields
+        @; grep for 'PtrComp = ' to find assignments
+        @; It's initially `None`, and assigned away-from and back-to `None`
+        @;  in `Proc1`
+        '(PSRecord.PtrComp))
+@(define stats-union-functions
+        @; Most of these functions all have a dead-giveaway pair of lines:
+        @; ```
+        @;  if type(cols) not in [list,tuple]:
+        @;      cols = [cols]
+        @; ```
+        '(abut simpleabut colex linexand recode))
+@(define dyn* '(go pystone stats take5 lisp))
+@; TODO add better in-file evidence
+
+Reticulated currently lacks union types, recursive types, and types for variable-arity functions.
+Consequently, Reticulated cannot fully-type some programs in our experiment.
+One common issue is Python code that uses @tt{None} as a default value.
+The benchmark versions of such code use well-typed defaults instead.
+Other benchmark versions resort to dynamic typing.
+Both @bm{pystone} and @bm{stats} suffer from the lack of union types,
+ and @bm{go} contains a recursive class type.
+Lastly, we tried typing a Lisp interpreter, but the program made too-heavy use of union and recursive types.
+
+
+@; ===
+
+@(define vss-popl-2017-benchmarks
+   '(callsimple nqueens pidigits meteor fannkuch nbody callmethod
+     callmethodslots pystone float chaos go spectralnorm))
+@(define vss-2x-benchmarks
+   '(nqueens meteor fannkuch callmethod callmethodslots pystone float chaos go))
+
+Refining the dynamic error messages will add performance overhead.
+For example, @citet[vss-popl-2017] built an extension to Reticulated that reports a set of potentially-guilty casts when a dynamic type error occurs.
+They report that tracking these casts can double a program's @|t/p-ratio|.
+
+
+@; ===
+
+The performance implications of @${1'} are substantial.
+A gradual type system that enforces traditional soundness must exhaustively traverse
+ data structures before they leave typed code, and must monitor functional values
+ to ensure their future applications are well-typed.
+Enforcing @${1'} requires a tag check, nothing more.
+
