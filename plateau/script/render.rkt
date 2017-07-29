@@ -122,17 +122,18 @@
     (tabular
       #:sep (hspace 2)
       #:style 'block
-      #:row-properties '(bottom-border 1)
+      #:row-properties '(l bottom-border 1)
       #:column-properties (cons 'left (make-list (sub1 (length STATIC-INFO-TITLE*)) 'right))
-      (cons STATIC-INFO-TITLE*
-            (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
-                           [*current-cache-keys* (list (λ () name*))]
-                           [*with-cache-fasl?* #f])
-              (define target "static-table.rktd")
-              (with-cache (cachefile target)
-                (λ ()
-                  (log-gm-render-info "rendering ~a" target)
-                  (map render-static-row bm*))))))))
+      (list* (map (λ (_) "") STATIC-INFO-TITLE*)
+             STATIC-INFO-TITLE*
+             (parameterize ([*current-cache-directory* (build-path (current-directory) "with-cache")]
+                            [*current-cache-keys* (list (λ () name*))]
+                            [*with-cache-fasl?* #f])
+               (define target "static-table.rktd")
+               (with-cache (cachefile target)
+                 (λ ()
+                   (log-gm-render-info "rendering ~a" target)
+                   (map render-static-row bm*))))))))
 
 (define (render-static-row bm)
   (define py (benchmark-info->python-info bm))

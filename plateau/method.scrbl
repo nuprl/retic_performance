@@ -63,88 +63,77 @@ The experimental modules and granularity of type annotations define the
    programs @${P} such that @${P\!\tcmulti P^\tau}.
 }
 
-An evaluation must measure the performance of these configurations
+A performance evaluation must measure the running time of these configurations
  relative to the same program without gradual typing.
 In Typed Racket, this baseline is the performance of Racket running the
  untyped configuration.
 In Reticulated, the baseline is the performance of Python running the untyped configuration.
+
+@; TODO confusing 'program' and 'configuration', maybe need to define "baseline" or underlying-program?
 
 @definition["performance ratio"]{
   A @emph{performance ratio} is the running time of a program
    divided by the running time of the same program in the absence of gradual typing.
 }
 
-The performance ratio of a configuration measures its run-time cost of gradual typing.
-
-FORK there are 2 ways to go, exhaustive and sampling.
-@; Grouping configs is a nice way to cluster ... 
-@; .. need metric over performance ratios
-@; ... look this paper is actually coming together but the words are hard.
-
-Since different applications have different performance requirements, the
- only rational way to report performance is with a parameterized metric.
+An @emph{exhaustive} performance evaluation measures the performance of every
+ configuration.
+The natural way to interpret this data is to choose a notion of "good performance"
+ and count the number of "good" configurations.
+In this spirit, @citet[takikawa-popl-2016] ask programmers to consider the
+ performance overhead they could deliver to clients of their software.
 
 @definition[@deliverable{D}]{
-  For real-valued @${D}, the proportion of @deliverable{D} configurations
-   is the proportion of configurations with performance ratios no greater
-   than @${D}.
+  For @$|{D \in \mathbb{R}^{+}}|, a configuration is @deliverable{D} if its performance ratio is no greater than @${D}.
 }
 
-Counting @deliverable{D} configurations is useful if you have exhaustive data.
-If not, it is possible to approximate the number of @deliverable{D} configurations
- using simple random sampling.
+If an exhaustive performance evaluation is infeasible, one alternative is
+ to select configurations via simple random sampling and measure the
+ proportion of @deliverable{D} configurations in the sample.
+Repeating this experiment yields a @emph{simple random approximation} of the
+ true proportion of @deliverable{D} configurations.
+@; TODO this is unclear
 
 @definition[@approximation["r" "s" "95"]]{
-  A @${95\%} confidence interval generated from @${r} samples, each made of @${s}
-   configurations is a @approximation["r" "s" "95"]
-  (informally, a @emph{simple random approximation}.)
- @; ^^^ to disambiguate from other approximations
+  Given @${r} samples each containing @${s} configurations chosen uniformly at random,
+   a @approximation["r" "s" "95"] is a @${95\%} confidence interval for the
+   proportion of @deliverable{D} configurations in each sample.
 }
 
-A given sample of @${s} randomly-selected configurations contains some
- number @${n} of @deliverable{D} configurations.
-The proportion @${n/s} is the proportion of @deliverable{D} configurations
- in the sample.
-Repeating the sampling process @${r} times yields a sequence of proportions;
- the @${95\%} confidence interval of such a sequence is a @approximation["r" "s" "95"].
+The appendix contains theoretical and empirical justification for the simple
+ random approximation method.
 
 
 @section[#:tag "sec:protocol"]{Protocol}
 
-@; TODO add statistics
+@parag{Granularity}
+The evaluation presented in @section-ref{sec:exhaustive} is at the granularity
+ of @emph{function and class fields}.
+In general, one syntactic unit in the experiment is either one function,
+ one method, or the collection of all fields for one class.
+In particular, the class in @figure-ref{fig:cash} has 3 syntactic units and
+ therefore @${2^3} configurations.
 
-@Section-ref{sec:exhaustive} reports the
- performance of Reticulated at a function and class-fields granularity;
- more precisely, one syntactic unit in the experiment is either one function, one method, or
- the collection of all fields for one class.
-The evaluation furthermore adheres to the following protocols for
- benchmark creation and data collection.
 
 @parag{Benchmark Creation}
-Given a Python program, we first build a driver module that performs some
- non-trivial computation using the program.
-Second, we remove any non-determinism or I/O actions from the program.
-Third, we define the experimental modules.
-Fourth, we ascribe types to the experimental modules.
-
-When possible, we use existing type annotations or comments to infer
- the fully-typed configuration.
-When necessary, we use details of the driver module to infer types;
- for example, any polymorphic functions must use monomorphic types
- because Reticulated does not support polymorphism.
+To convert a Reticulated program into a benchmark, we:
+ (1) build a driver module that runs the program and collects timing information;
+ (2) remove any non-determinism or I/O actions;
+ (3) partition the program into experimental and control modules; and
+ (4) ascribe types to the experimental modules.
+When ascribing types, we re-use any type annotations or comments in the original program.
+@; TODO awkward
 
 
 @parag{Data Collection}
-We enumerate the configuration space and choose a random permutation of the
- enumeration.
-Optionally, we divide the permutation across identical processors or machines.
-We run the main module of the configuration a fixed number of times and record
- each running time.
-Finally, we run the main module of the untyped configuration using the
- @|PYTHON| interpreter.@note{@url{https://www.python.org/download/releases/3.4.3/}}
+For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
+ evaluation.
+For larger benchmarks, with @${F} functions and @${C} classes,
+ we conduct a simple random approximation using
+ @integer->word[NUM-SAMPLE-TRIALS] samples of @${@id[SAMPLE-RATE] * (F + C)}
+ configurations.
 
-
-@parag{Details of the Evaluation} All data in this paper was produced by jobs we sent
+All data in this paper was produced by jobs we sent
  to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} high-throughput computing cluster.
 Each job:
 @itemlist[#:style 'ordered
@@ -157,7 +146,7 @@ Each job:
   on the @hyperlink["https://github.com/mvitousek/reticulated"]{@tt{master}} branch);
 }
 @item{
-  for the rest of the 24-hour span:
+  (repeatedly)
   selected a random configuration to measure,
   ran the configuration's main module @id[NUM-ITERATIONS] times,
   and recorded the result of each run.
@@ -165,53 +154,3 @@ Each job:
 ]
 Cluster nodes are IBM NeXtScale nx360 M4 servers with two Intel Xeon E5-2650 v2
  8-core processors, 32 GB of RAM, and 250 GB of local disk storage.
-
-Three details of the Karst protocol warrant further attention.
-First, nodes selected a random configuration by reading from a
- text file that contained a permutation of the configuration space.
-This text file was stored on a dedicated machine.
-Second, the same dedicated machine that stored the text file also stored
- all configurations for each @emph{module} of each benchmark.
-After a node selected a configuration to run, it copied the relevant files
- to private storage before running the main module.
-Third, we wrapped the main computation of every benchmark in a
- @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{@tt{with} statement}
- that recorded execution time using the Python function @|time.process_time|.
-
-
-@; ===
-@; The method is based on the premise that a performance evaluation cannot assume
-@; how developers will apply gradual typing, nor can it assume that all developers
-@; have identical performance requirements.
-@;
-@;Counting the proportion of @deliverable{D} configurations is a useful way to
-@; measure the performance overhead of gradual typing because it addresses two
-@; forms of uncertainty.
-@;First, the parameter @${D} addresses the fact that different software applications
-@; have different performance requirements.
-@;Second, the proportion quantifies over the entire configuration space of a
-@; program---because it is impossible to predict how developers will apply gradual
-@;  typing.@note{
-@;    The promise of gradual typing is that developers can run @emph{any configuration}.
-@;    At present, there is no data to suggest that developers are more likely to
-@;    choose some configurations over others.}
-@;For an arbitrary configuration, the proportion of @deliverable{D} configurations
-@; @emph{is} the probability that this configuration is @deliverable{D}.
-@;
-@;While computing the exact proportion of @deliverable{D} configurations requires
-@; measuring an exponential number of configurations, a random sampling protocol
-@; can accurately and quickly approximate it.
-@;To illustrate the protocol, suppose a few developers independently apply
-@; gradual typing to a program.
-@;Each arrives at some configuration and observes some performance overhead.
-@;For a given value of @${D} some proportion of the developers have
-@; @deliverable{D} configurations.
-@;There is a remote chance that this proportion coincides with the true proportion
-@; of @deliverable{D} configurations.
-@;Intuitively, the chance is less remote if the number of developers is large.
-@;But even for a small number of developers, if they repeat this experiment
-@; multiple times, then the average proportion of @deliverable{D} configurations
-@; should tend towards the true proportion.
-@;After all, if the true proportion of @deliverable{D} configurations is
-@; @${10\%} then approximately @${1} in @${10} randomly sampled configurations is
-@; @deliverable{D}.

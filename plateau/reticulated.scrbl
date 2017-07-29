@@ -126,11 +126,16 @@ This indistinguishability constraint explains why it is difficult for
 Reticulated @emph{chooses} to implement tag-level soundness instead of some
  other compromise because of an implicit design goal:
  @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated, and assumed by @citet[vss-popl-2017].}
+@; TODO example of O(n) check
+@; TODO worst case is O(fields)
+@; TODO union types?
 Intuitively, tag-level checks should impose little performance overhead no
  matter how a programmer adds types to a Python program.
 Prior work on Reticulated does not evaluate this claim@~cite[vksb-dls-2014 vss-popl-2017].
 
-@figure["fig:retic-types" "Selected types and type tags" #:style left-figure-style @exact|{
+@figure["fig:retic-types"
+        @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
+        #:style left-figure-style @exact|{
   $\begin{array}{l l l}
     \tau & = & \tint \mid
                \tlist{\tau} \mid

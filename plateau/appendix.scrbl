@@ -89,6 +89,20 @@ The intervals are futhermore small, and thus practical substitutes for the overh
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
 ]
 
+To illustrate the protocol, suppose a few developers independently apply
+ gradual typing to a program.
+Each arrives at some configuration and observes some performance overhead.
+For a given value of @${D} some proportion of the developers have
+ @deliverable{D} configurations.
+There is a remote chance that this proportion coincides with the true proportion
+ of @deliverable{D} configurations.
+Intuitively, the chance is less remote if the number of developers is large.
+But even for a small number of developers, if they repeat this experiment
+ multiple times, then the average proportion of @deliverable{D} configurations
+ should tend towards the true proportion.
+After all, if the true proportion of @deliverable{D} configurations is
+ @${10\%} then approximately @${1} in @${10} randomly sampled configurations is
+ @deliverable{D}.
 
 The theoretical justification for why this protocol should yield a useful
  estimate requires some basic statistics.
@@ -388,3 +402,20 @@ The following descriptions credit each benchmark's original author,
    code to reduce the size of each module's configuration space.
   @; 1 iteration
 }
+
+@; 
+
+@section{Evaluation: More Details}
+
+Three details of the Karst protocol warrant further attention.
+First, nodes selected a random configuration by reading from a
+ text file that contained a permutation of the configuration space.
+This text file was stored on a dedicated machine.
+Second, the same dedicated machine that stored the text file also stored
+ all configurations for each @emph{module} of each benchmark.
+After a node selected a configuration to run, it copied the relevant files
+ to private storage before running the main module.
+Third, we wrapped the main computation of every benchmark in a
+ @hyperlink["https://www.python.org/dev/peps/pep-0318/"]{@tt{with} statement}
+ that recorded execution time using the Python function @|time.process_time|.
+
