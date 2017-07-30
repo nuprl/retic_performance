@@ -2,7 +2,7 @@
 @title[#:tag "sec:threats"]{Threats to Validity}
 
 We have identified five sources of systematic
- bias that question the validity of our conclusions.
+ bias that cast doubt upon the validity of our conclusions.
 @(let* ( @; See `src/PyPI-ranking/README.md` to reproduce these claims
         [lib-data* '((simplejson 50 "https://github.com/simplejson/simplejson")
                      (requests 200 "https://github.com/kennethreitz/requests")
@@ -31,7 +31,7 @@ The types in this experiment may differ from types ascribed by another Python
  programmer, which, in turn, may lead to different performance overhead.
 
 @(let ([missing-types '(take5)]
-       [retic-limited '(go pystone stats)]
+       [retic-limited '(pystone stats)]
        [format-bm* (lambda (bm*) (authors* (map bm bm*)))]
        @; see also https://github.com/nuprl/retic_performance/issues/55
        @;
@@ -56,10 +56,10 @@ The types in this experiment may differ from types ascribed by another Python
   Third, some benchmarks use dynamic typing.
   The @bm{take5} benchmark contains one function that accepts optional arguments,
    and is therefore dynamically typed.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
-  @Integer->word[(length retic-limited)] other
-   benchmarks (@format-bm*[retic-limited]) use
-   dynamic typing to overcome Reticulated's lack of untagged union types
-   and recursive types.
+  The @bm{go} benchmark uses dynamic typing because Reticulated cannot validate
+   its use of a recursive class definition.
+  The @format-bm*[retic-limited] benchmarks use dynamic typing
+   to overcome Reticulated's lack of untagged union types.
 })
 
 @(let ([use-io* '(aespython futen http2 slowSHA)]) @elem{

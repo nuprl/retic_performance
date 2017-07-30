@@ -9,8 +9,8 @@ Appearances are misleading, however.
 Typed Racket implements a generalized form of type soundness whereas
  Reticulated implements tag soundness.
 Furthermore, Reticulated lacks untagged union types, recursive types,
- and Typed Racket's guarantee that every run-time type error is attributed
- to a static boundary between statically-typed and dynamically-typed
+ and the property that every run-time type error is attributed
+ to a boundary between statically-typed and dynamically-typed
  code.@note{@citet[vss-popl-2017] attribute run-time type errors to sets of
  coercions. Implementing this weaker guarantee doubled the @|t/u-ratio| in
  most of their benchmark programs.}
@@ -19,13 +19,18 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
  with a number of open research problems:
 @itemlist[
 @item{
-  Will programmers accept the shallow guarantees of tag soundness?
+  Will programmers accept tag soundness?
   Substantial user studies are needed.
 }
 @item{
-  Exactly how much does soundness affect performance?
-  To answer this question, Typed Racket must implement tag soundness
-   and/or Reticulated must implement generalized soundness.
+  How does the cost of soundness compare to the cost of expressive types
+   and informative error messages?
+  This question demands a two-pronged answer:
+   (1) Reticulated must implement additional types and improve its error messages;
+   (2) Typed Racket must implement tag soundness.
+}
+@item{
+  Can Reticulated reduce its overhead relative to Python?
 }
 @item{
   Can Reticulated use type information to @emph{remove} dynamic checks

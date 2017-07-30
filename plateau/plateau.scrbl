@@ -31,22 +31,26 @@
 
 @abstract{
   Gradual typing promises to reduce the cost of software maintenance for
-  scripts. In a scripting language with a gradual typing system, developers
-  can add type annotations to the untyped portion of a code base after they
-  reconstruct the type during some maintenance action.  As Takikawa @|etal|'s
-  recent work shows, however, the addition of type annotations comes
-  at a large cost in performance. In particular, performance evaluations of
-  Typed Racket suggest that a conventionally sound gradual typing system
-  may slow down a working system by one to two orders of magnitude.
+   dynamically typed languages.
+  In a language with a gradual typing system, developers
+   can add type annotations to a portion of a code base after they
+   reconstruct its type during some maintenance action.
+  As Takikawa @|etal|'s recent work shows, however, the addition of type
+   annotations comes at a large cost in performance.
+  In particular, performance evaluations of Typed Racket suggest that a
+   conventionally sound gradual typing system may slow down a working system by
+   two orders of magnitude.
 
   Since different gradual typing systems satisfy different notions of
-  soundness, the question arises how much the relaxation of soundness
-  benefits a program's performance. This paper answers this question by
-  applying Takikawa @|etal|'s evaluation method to Reticulated Python, which
-  in contrast to Typed Racket, merely satisfies tag soundness not type
-  soundness. Numerically, Reticulated is at least one order of magnitude
-  better than Typed Racket in terms of performance. Substantial user studies
-  are needed to determine whether programmers will be content with tag soundness.
+   soundness, the question arises how much the relaxation of soundness
+   benefits a program's performance.
+  This paper answers this question by applying Takikawa @|etal|'s evaluation
+   method to Reticulated Python, which in contrast to Typed Racket, merely
+   satisfies type-tag soundness.
+  Numerically, Reticulated is at least one order of magnitude better than Typed
+   Racket in terms of performance.
+  Substantial user studies are needed to determine whether programmers will
+   accept tag soundness.
 }
 
 @;terms{CS}

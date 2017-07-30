@@ -2047,3 +2047,10 @@
     #:location (proceedings-location ecoop #:pages '(28:1 28:29))
     #:date 2017))
 
+(define gm-tr-2017
+  (make-bib
+    #:title "On the Cost of Soundness for Gradual Typing"
+    #:author (authors "Ben Greenman" "Zeina Migeed")
+    #:location (techrpt-location #:institution "Northeastern University" #:number 0)
+    #:date 2017))
+

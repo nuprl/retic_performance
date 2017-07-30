@@ -9,8 +9,8 @@
  (3) count the number of configurations with performance overhead no greater than a certain limit.
 Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
  with module-level granularity.
-In other words, a fully-typed Typed Racket program with @${M} modules defines
- a space of @${2^M} configurations.
+In other words, a Typed Racket program with @${M} modules has
+ @${2^M} gradually-typed configurations.
 
 Reticulated supports gradual typing at a much finer granularity,
  making it impractical to directly apply the Takikawa method.
@@ -62,7 +62,7 @@ The experimental modules and granularity of type annotations define the
   @; note^2: `e0 -->* e1` if and only if `e1 <= e0`
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P\!\tcmulti P^\tau}.
-  Furthermore @${P^\tau} is a so-called @emph{fully-typed configuration} and
+  Furthermore, @${P^\tau} is a so-called @emph{fully-typed configuration};
    an @emph{untyped configuration} is a @${P^\lambda} such that @${P^\lambda\!\tcmulti P}
    for all configurations @${P}.
 }
@@ -72,7 +72,8 @@ A performance evaluation must measure the running time of these configurations
  the absence of gradual typing.
 In Typed Racket, the baseline is the performance of Racket running the
  untyped configuration.
-In Reticulated, the baseline is the performance of Python running the untyped configuration.
+Reticulated adds type checks to un-annotated programs@~cite[vksb-dls-2014],
+ so its baseline is Python running the untyped configurations.
 
 @definition["performance ratio"]{
   A @emph{performance ratio} is the running time of a configuration
@@ -81,30 +82,30 @@ In Reticulated, the baseline is the performance of Python running the untyped co
 
 An @emph{exhaustive} performance evaluation measures the performance of every
  configuration.
-The natural way to interpret this data is to choose a notion of "good performance"
- and count the number of "good" configurations.
+The natural way to interpret this data is to choose binary a notion of
+ "good performance" and count the proportion of "good" configurations.
 In this spirit, @citet[tfgnvf-popl-2016] ask programmers to consider the
- performance overhead they could deliver to clients of their software.
+ performance overhead they could deliver to clients.
 
 @definition[@deliverable{D}]{
-  For @$|{D \in \mathbb{R}^{+}}|, a configuration is @deliverable{D} if its performance ratio is no greater than @${D}.
+  For @$|{D \in \mathbb{R}^{+}}|, a configuration is @emph{@deliverable{D}}
+   if its performance ratio is no greater than @${D}.
 }
 
 If an exhaustive performance evaluation is infeasible, one alternative is
  to select configurations via simple random sampling and measure the
  proportion of @deliverable{D} configurations in the sample.
-Repeating this experiment yields a @emph{simple random approximation} of the
- true proportion of @deliverable{D} configurations.
-@; TODO this is unclear
+Repeating this sampling experiment yields a @emph{simple random approximation}
+ of the true proportion of @deliverable{D} configurations.
 
 @definition[@approximation["r" "s" "95"]]{
   Given @${r} samples each containing @${s} configurations chosen uniformly at random,
-   a @approximation["r" "s" "95"] is a @${95\%} confidence interval for the
-   proportion of @deliverable{D} configurations in each sample.
+   a @emph{@approximation["r" "s" "95"]} is a @${95\%} confidence interval for
+   the proportion of @deliverable{D} configurations in each sample.
 }
 
-The appendix contains theoretical and empirical justification for the simple
- random approximation method.
+Our technical report contains theoretical and empirical justification
+ for the simple random approximation method@~cite[gm-tr-2017].
 
 
 @section[#:tag "sec:protocol"]{Protocol}
@@ -114,8 +115,7 @@ The evaluation presented in @section-ref{sec:evaluation} is at the granularity
  of @emph{function and class fields}.
 In general, one syntactic unit in the experiment is either one function,
  one method, or the collection of all fields for one class.
-In particular, the class in @figure-ref{fig:cash} has 3 syntactic units and
- therefore @${2^3} configurations.
+The class in @figure-ref{fig:cash}, for example, has 3 syntactic units.
 
 
 @parag{Benchmark Creation}
@@ -125,16 +125,15 @@ To convert a Reticulated program into a benchmark, we:
  (3) partition the program into experimental and control modules; and
  (4) add type annotations to the experimental modules.
 We modify any Python code that Reticulated's type
- system cannot validate, such as code that requires untagged union types
- or recursive object types.
+ system cannot validate, such as code that requires untagged unions or polymorphism.
 
 
 @parag{Data Collection}
 For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
  evaluation.
-For larger a benchmark, with @${F} functions and @${C} classes,
+For a larger benchmark, with @${F} functions and @${C} classes,
  we conduct a simple random approximation using
- @integer->word[NUM-SAMPLE-TRIALS] samples of @${@id[SAMPLE-RATE] * (F + C)}
+ @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE] * (F + C)}
  configurations.
 
 All data in this paper was produced by jobs we sent
@@ -142,7 +141,7 @@ All data in this paper was produced by jobs we sent
 Each job:
 @itemlist[#:style 'ordered
 @item{
-  reserved all processors on one node for 24 hours;
+  reserved all processors on one node;
 }
 @item{
   downloaded fresh copies of @|PYTHON|

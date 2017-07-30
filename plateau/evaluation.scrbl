@@ -1,13 +1,15 @@
 #lang gm-plateau-2017
 
 @(define MAIN-BENCHMARKS (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))
+@(define FAKE-MAIN-BENCHMARKS (let ((x (car EXHAUSTIVE-BENCHMARKS))) (map (lambda (_) x) MAIN-BENCHMARKS)))
 @(define NUM-MAIN-BENCHMARKS (length MAIN-BENCHMARKS))
-
-@title[#:tag "sec:evaluation"]{Performance Evaluation}
-
+@(define RT (get-ratios-table MAIN-BENCHMARKS))
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"
   @render-static-information[MAIN-BENCHMARKS]]
+
+
+@title[#:tag "sec:evaluation"]{Performance Evaluation}
 
 To assess the run-time cost of gradual typing in Reticulated, we measured
  the performance of @integer->word[NUM-MAIN-BENCHMARKS] benchmark programs.
@@ -22,24 +24,20 @@ To assess the run-time cost of gradual typing in Reticulated, we measured
   @Figure-ref{fig:static-benchmark} tabulates information about the size and
    structure of the @defn{experimental} portions of the benchmarks.
   The @|num-col| columns report the @|column-descr*|
-  For more information about the benchmarks' origin and purpose, see the appendix.
+  Our technical appendix contains more information about the benchmarks'
+   origin and purpose@~cite[gm-tr-2017].
 })
 
 The following three subsections present the results of the evaluation.
-First, @section-ref{sec:ratio} reports the performance of the untyped
+@Section-ref{sec:ratio} reports the performance of the untyped
  and fully-typed configurations.
-Second, @section-ref{sec:overhead} plots the proportion of @deliverable{D}
+@Section-ref{sec:overhead} plots the proportion of @deliverable{D}
  configurations for @${D} between @${1} and @${@id[MAX-OVERHEAD]}.
-Third, @section-ref{sec:exact} demonstrates that the number of type annotations
+@Section-ref{sec:exact} demonstrates that the number of type annotations
  in a configuration is correlated to its performance.
 
 
 @section[#:tag "sec:ratio"]{Performance Ratios}
-
-@(define RT (get-ratios-table MAIN-BENCHMARKS))
-@figure["fig:ratio" "Performance ratios"
-  @render-ratios-table[RT]
-]
 
 The table in @figure-ref{fig:ratio} lists the extremes of gradual typing in
  Reticulated.
@@ -54,7 +52,7 @@ From left to right, these are:
   For example, the row for @bm{futen} reports a @|u/p-ratio| of @${@|futen-u/p|}.
   This means that the average time to run the untyped configuration of the
    @bm{futen} benchmark using Reticulated was @${@|futen-u/p|} times slower than the
-   average time of running the same code using @|PYTHON|.
+   average time of running the same code using Python.
   Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
    is @${@|futen-t/u|} times slower than the untyped configuration.
 })
@@ -92,15 +90,19 @@ On the other hand, the overhead is always within an order-of-magnitude.
       and the final @integer->word[(- tr-<3.5 tr-<3)] are below @${3.5}x.
 
     @Integer->word[num->] benchmarks have larger @|u/p-ratio|s than @|t/u-ratio|s.
-    It is surprising that the @|u/p-ratio|s are so high.
-    Since Python is dynamically typed, Reticulated should not add run-time checks
-     to programs without type annotations.
+    It is surprising that running a Python program through Reticulated
+     causes such a large slowdown.
 })
+
+@figure["fig:ratio" "Performance ratios"
+  @render-ratios-table[RT]
+]
+
 
 @section[#:tag "sec:overhead"]{Overhead Plots}
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[MAIN-BENCHMARKS]
+  @render-overhead-plot*[FAKE-MAIN-BENCHMARKS]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in the
@@ -112,7 +114,7 @@ The @|x-axes| are log-scaled to focus on low overheads;
 
 The heading above the plot for a given benchmark states the benchmark's name
  and the nature of the underlying dataset.
-If the data is exhaustive, the heading lists the number of configurations
+If the data is exhaustive, this heading lists the number of configurations
  in the benchmark.
 If the data is approximate, the heading lists the number of samples
  and the number of randomly-selected configurations in each sample.
@@ -130,10 +132,10 @@ The area under the curve is the answer; in short, more is better.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
 
-@(let ([d0 "a"]
-       [d1 "b"]) @elem{
-  After surveying the area under a curve, the second most important aspects of
-   an overhead plot are the values of @${D} where the curve starts and ends.
+@(let ([d0 "d_0"]
+       [d1 "d_1"]) @elem{
+  The second most important aspects of an overhead plot are the values of @${D}
+   where the curve starts and ends.
   More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
    that counts the number of @deliverable{D}
    configurations in a benchmark, the critical points are the smallest
@@ -151,7 +153,8 @@ Lastly, the slope of a curve corresponds to the likelihood that
 A flat curve (zero slope) suggests that the performance of a group of
  configurations is dominated by a common set of type annotations.
 Such observations are no help to programmers facing performance issues,
- but may help language designers find inefficiencies.
+ but may help language designers find inefficiencies in their implementation
+ of gradual typing.
 
 
 @parag{Conclusions}
@@ -167,8 +170,8 @@ For many benchmarks, the maximum overhead is significantly lower.
 @; TODO 'indeed' is awkward
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise given the @|u/p-ratio|s above and the fact that Reticulated
- translates type annotations into run-time checks.
+This is no surprise given the @|u/p-ratio|s in @figure-ref{fig:ratio} and the
+ fact that Reticulated translates type annotations into run-time checks.
 
 @(let ([smooth '(futen http2 slowSHA chaos fannkuch float nbody pidigits
                  pystone PythonFlow take5 sample_fsm aespython stats)])
@@ -188,15 +191,16 @@ This is no surprise given the @|u/p-ratio|s above and the fact that Reticulated
 In these benchmarks, the fully-typed configuration is one of the slowest-running
  configurations.
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
- runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of the configurations.
-This speedup occurs because of an unsoundness in the implementation of Reticulated;
- in short, the implementation does not type-check the contents of tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
+ runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of all configurations.
+Unfortunately, this speedup is due to a soundness bug; in short, the
+ implementation of Reticulated does not type-check the contents of
+ tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[MAIN-BENCHMARKS]
+  @render-exact-runtime-plot*[FAKE-MAIN-BENCHMARKS]
 ]
 
 Since changing the type annotations in a Reticulated program changes its
@@ -207,11 +211,11 @@ The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
  proportional to the number of type annotations in the configuration}.
 
 @parag{How to Read the Plots}
-@Figure-ref{fig:exact} contains one green point for every run of every
+@Figure-ref{fig:exact} contains one point for every run of every
  configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
  the data for each configuration is @id[NUM-ITERATIONS] runs.}
 Each point compares the number of typed functions, methods, and classes in a
- configuration (@|x-axis|) against its running time in seconds (@|y-axis|).
+ configuration (@|x-axis|) against its running time, measured in seconds (@|y-axis|).
 
 The plots contain many points with both the same number of typed components
  and similar performance.
@@ -220,16 +224,20 @@ To reduce the visual overlap between such points, the points for a given
  the @id[NUM-ITERATIONS] points for a configuration with @math{N}
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
-For example, @bm{fannkuch} has two configurations: the untyped
- configuration and the fully-typed configuration.
+
+For example, @bm{fannkuch} has two configurations: the untyped configuration,
+ with zero typed components, and the fully-typed configuration, with one
+ typed component.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
  the untyped or fully-typed configuration, round @${x} to the nearest integer.
 
 
 @parag{Conclusions}
 
-There are four notable trends regarding how adding types to an arbitrary
- configuration can affect its performance.
+Suppose a programmer starts at an arbitrary configuration and adds some
+ type annotations.
+The plots in @figure-ref{fig:exact} suggest that this action will affect
+ performance in one of four possible ways, based on trends among the plots.
 
 @exact-runtime-category["types make things slow"
   '(futen slowSHA chaos float pystone PythonFlow take5 sample_fsm aespython stats)
@@ -274,4 +282,7 @@ There are four notable trends regarding how adding types to an arbitrary
 Overall, there is a clear trend that adding type annotations adds performance
  overhead.
 The increase is typically linear.
-Clearly, Reticulated does not optimize type-annotated code.
+On one hand, this is an interesting observation and may help programmers predict
+ performance issues.
+On the other hand, the linear increase demonstrates that Reticulated does
+ not use type information to optimize programs.
