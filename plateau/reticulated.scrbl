@@ -131,7 +131,7 @@ Reticulated must therefore ensure that a value from statically-typed code is
  indistinguishable from a Python value.
 The only way to meet this criterion is to use the same value in both
  cases.@note{Other gradually-typed languages use proxies to approximate
-  indistinguishability@~cite[thf-popl-2008 rsfbv-popl-2015 rnv-ecoop-2015 wmwz-ecoop-2017].
+  indistinguishability@~cite[thf-popl-2008 wmwz-ecoop-2017].
   This approach typically fails when values are serialized or sent across an FFI boundary.}
 In particular, a Reticulated list must be indistinguishable from a Python list.
 This indistinguishability constraint explains why it is difficult for

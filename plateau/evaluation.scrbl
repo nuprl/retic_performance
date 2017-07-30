@@ -118,6 +118,15 @@ If the data is exhaustive, this heading lists the number of configurations
 If the data is approximate, the heading lists the number of samples
  and the number of randomly-selected configurations in each sample.
 
+@emph{Technical Note:} the curves for @bm{sample_fsm}, @bm{aespython}, and
+ @bm{stats} are intervals.
+The height of the interval at a given @${x} position is the width of the
+ @approximation[NUM-SAMPLE-TRIALS (format "[~a(F+C)]" SAMPLE-RATE) "95"]
+ for the number of @deliverable{x} configurations.
+These intervals are thin because there is little variance in the proportion
+ of @deliverable{D} configurations across the @integer->word[NUM-SAMPLE-TRIALS]
+ samples.
+
 
 @parag{How to Read the Plots}
 Overhead plots are cumulative distribution functions.
@@ -224,9 +233,8 @@ To reduce the visual overlap between such points, the points for a given
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
 
-For example, @bm{fannkuch} has two configurations: the untyped configuration,
- with zero typed components, and the fully-typed configuration, with one
- typed component.
+For example, @bm{fannkuch} has two configurations: the untyped configuration
+ and the fully-typed configuration.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
  the untyped or fully-typed configuration, round @${x} to the nearest integer.
 

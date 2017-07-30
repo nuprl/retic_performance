@@ -8,8 +8,8 @@ In particular, the overhead plots for Reticulated look an order of magnitude
 Appearances are misleading, however.
 Typed Racket implements a generalized form of type soundness whereas
  Reticulated implements tag soundness.
-Furthermore, Reticulated lacks untagged union types, recursive types,
- and the property that every run-time type error is attributed
+Furthermore, Reticulated has a less expressive type system and lacks
+ the property that every run-time type error is attributed
  to a boundary between statically-typed and dynamically-typed
  code.@note{@citet[vss-popl-2017] attribute run-time type errors to sets of
  coercions. Implementing this weaker guarantee doubled the @|t/u-ratio| in
@@ -31,10 +31,11 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
 }
 @item{
   Can Reticulated reduce its overhead relative to Python?
+  Ideally, Reticulated programs with no type annotations should have the
+   same performance as Python.
 }
 @item{
-  Can Reticulated use type information to @emph{remove} dynamic checks
-   from programs, or does its implementation prohibit standard type-based optimizations?
+  Can Reticulated use type information to remove dynamic checks from Python programs?
 }
 ]
 
