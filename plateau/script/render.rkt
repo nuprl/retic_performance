@@ -53,7 +53,7 @@
 ;; =============================================================================
 
 (define OVERHEADS-WIDTH 600)
-(define OVERHEADS-HEIGHT 1200)
+(define OVERHEADS-HEIGHT 1300)
 (define OVERHEADS-HSPACE 30)
 (define OVERHEADS-VSPACE 6)
 (define NUM-COLUMNS 3)

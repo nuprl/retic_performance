@@ -1,7 +1,6 @@
 #lang gm-plateau-2017
 
 @(define MAIN-BENCHMARKS (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))
-@(define FAKE-MAIN-BENCHMARKS (let ((x (car EXHAUSTIVE-BENCHMARKS))) (map (lambda (_) x) MAIN-BENCHMARKS)))
 @(define NUM-MAIN-BENCHMARKS (length MAIN-BENCHMARKS))
 @(define RT (get-ratios-table MAIN-BENCHMARKS))
 
@@ -102,7 +101,7 @@ On the other hand, the overhead is always within an order-of-magnitude.
 @section[#:tag "sec:overhead"]{Overhead Plots}
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[FAKE-MAIN-BENCHMARKS]
+  @render-overhead-plot*[MAIN-BENCHMARKS]
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in the
@@ -200,7 +199,7 @@ Unfortunately, this speedup is due to a soundness bug; in short, the
 @section[#:tag "sec:exact"]{Absolute Running Times}
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[FAKE-MAIN-BENCHMARKS]
+  @render-exact-runtime-plot*[MAIN-BENCHMARKS]
 ]
 
 Since changing the type annotations in a Reticulated program changes its
