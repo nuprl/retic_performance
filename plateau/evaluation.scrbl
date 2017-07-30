@@ -23,17 +23,16 @@ To assess the run-time cost of gradual typing in Reticulated, we measured
        ) @elem{
   @Figure-ref{fig:static-benchmark} tabulates information about the size and
    structure of the @defn{experimental} portions of the benchmarks.
-  The @|num-col| columns report the @|column-descr*| 
+  The @|num-col| columns report the @|column-descr*|
   For more information about the benchmarks' origin and purpose, see the appendix.
 })
 
-The following subsections present our results in three parts.
+The following three subsections present the results of the evaluation.
 First, @section-ref{sec:ratio} reports the performance of the fully-untyped
  and fully-typed configurations.
 Second, @section-ref{sec:overhead} plots the proportion of @deliverable{D}
  configurations for @${D} between @${1} and @${@id[MAX-OVERHEAD]}.
-This is our main result.
-Third, @section-ref{sec:exact} confirms that the number of type annotations
+Third, @section-ref{sec:exact} demonstrates that the number of type annotations
  in a configuration is correlated to its performance.
 
 
@@ -47,9 +46,9 @@ Third, @section-ref{sec:exact} confirms that the number of type annotations
 The table in @figure-ref{fig:ratio} lists the extremes of gradual typing in
  Reticulated.
 From left to right, these are:
- the performance of the untyped Reticulated configuration relative to Python (the @emph[u/p-ratio]),
- the performance of the fully-typed configuration relative to the untyped Reticulated configuration (the @emph[t/u-ratio]),
- and the overall delta between fully-typed Reticulated and Python (the @emph[t/p-ratio]).
+ the performance of the untyped configuration relative to the Python baseline (the @emph[u/p-ratio]),
+ the performance of the fully-typed configuration relative to the untyped configuration (the @emph[t/u-ratio]),
+ and the overall delta between fully-typed and Python (the @emph[t/p-ratio]).
 
 @(let* ([futen-row (ratios-table-row RT 'futen)]
         [futen-u/p (ratios-row-retic/python futen-row)]
@@ -62,6 +61,8 @@ From left to right, these are:
    is @${@|futen-t/u|} times slower than the untyped configuration.
 })
 
+
+@parag{Conclusions}
 On one hand, these ratios demonstrate that migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
@@ -89,13 +90,13 @@ On the other hand, the overhead is always within an order-of-magnitude.
      the remaining @integer->word[(- rp-<4.5 rp-<3)] are below @${4.5}x.
     The @|t/u-ratio|s are typically lower:
       @integer->word[tr-<2] are below @${2}x,
-      @integer->word[(- tr-<3 tr-<2)] is between @${2}x and @${3}x,
+      @integer->word[(- tr-<3 tr-<2)] are between @${2}x and @${3}x,
       and the final @integer->word[(- tr-<3.5 tr-<3)] are below @${3.5}x.
-    In particular, @integer->word[num->] benchmarks
-     have larger @|u/p-ratio|s than @|t/u-ratio|s.
-    This data suggests that migrating an arbitrary
-     Python program to Reticulated adds a relatively larger overhead
-     than migrating the same program to a fully-typed configuration.
+
+    @Integer->word[num->] benchmarks have larger @|u/p-ratio|s than @|t/u-ratio|s.
+    It is surprising that the @|u/p-ratio|s are so high.
+    Since Python is dynamically typed, Reticulated should not add run-time checks
+     to programs without type annotations.
 })
 
 @section[#:tag "sec:overhead"]{Overhead Plots}
@@ -126,7 +127,7 @@ As the value of @${D} increases along the @|x-axis|, the number of
 The important question is how many configurations are @deliverable{D}
  for low values of @${D}.
 If this number is large, then a developer who applies gradual typing to a
- similar program has a larger change of arriving at a @deliverable{D} configuration.
+ similar program has a better change of arriving at a @deliverable{D} configuration.
 The area under the curve is the answer; in short, more is better.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
@@ -141,7 +142,7 @@ A curve with a large shaded area below it implies that a large number
    overheads @${@|d0|, @|d1|} such
    that @${h(@|d0|) > 0} and @${h(@|d1|) = 100}.
   An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
-   at least one configuration runs faster than the original Python code.
+   at least one configuration runs faster than the Python baseline.
   The end-value @${@|d1|} is the overhead of the slowest-running configuration
    in the benchmark.
 })
@@ -152,11 +153,10 @@ Lastly, the slope of a curve corresponds to the likelihood that
 A flat curve (zero slope) suggests that the performance of a group of
  configurations is dominated by a common set of type annotations.
 Such observations are no help to programmers facing performance issues,
- but can help language designers find inefficiencies.
+ but may help language designers find inefficiencies.
 
 
 @parag{Conclusions}
-
 Curves in @figure-ref{fig:overhead} typically cover a large area and reach the
  top of the @|y-axis| at a low value of @${D}.
 This value is always less than @${@id[MAX-OVERHEAD]}.
@@ -169,19 +169,17 @@ For many benchmarks, the maximum overhead is significantly lower.
 @; TODO 'indeed' is awkward
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise, because Reticulated adds run-time checks to Python code for
- each type annotation.
+This is no surprise given the @|u/p-ratio|s above and the fact that Reticulated
+ translates type annotations into run-time checks.
 
 @(let ([smooth '(futen http2 slowSHA chaos fannkuch float nbody pidigits
                  pystone PythonFlow take5 sample_fsm aespython stats)])
   @elem{
     @Integer->word[(length smooth)] benchmarks have relatively smooth slopes.
     The plots for the other @integer->word[(- NUM-EXHAUSTIVE-BENCHMARKS (length smooth))]
-     benchmarks have wide, flat segments because those benchmarks contain at
-     least one function or method that is called frequently.
-    For example, if a benchmark creates many instances of a class @tt{C},
-     adding a type annotation to the method @tt{C.__init__} adds significant
-     overhead.
+     benchmarks have wide, flat segments.
+    In fact, these flat segments are due to functions that are frequently executed
+     in the benchmarks' traces.
 })
 
 @(let* ([NOT-tp '(http2 call_method spectralnorm)]
@@ -220,25 +218,20 @@ Each point compares the number of typed functions, methods, and classes in a
 The plots contain many points with both the same number of typed components
  and similar performance.
 To reduce the visual overlap between such points, the points for a given
- configuration are spread across the @|x-axis|.
-The @id[NUM-ITERATIONS] points for a configuration with @math{N}
+ configuration are spread across the @|x-axis|; in particular,
+ the @id[NUM-ITERATIONS] points for a configuration with @math{N}
  typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
-For example, @bm{fannkuch} has two configurations: one untyped
- configuration with zero typed components and one fully-typed configuration
-  with one typed component.
+For example, @bm{fannkuch} has two configurations: the untyped
+ configuration and the fully-typed configuration.
 To determine whether a point @${(x,y)} in the plot for @bm{fannkuch} represents
  the untyped or fully-typed configuration, round @${x} to the nearest integer.
 
 
 @parag{Conclusions}
 
-There are four notable trends regarding how adding types can affect
- performance.
-To illustrate the trends, suppose a programmer starts at some configuration
- and adds some type annotations.
-Depending on the benchmark and the configuration, there are at most four
- possible outcomes.
+There are four notable trends regarding how adding types to an arbitrary
+ configuration can affect its performance.
 
 @exact-runtime-category["types make things slow"
   '(futen slowSHA chaos float pystone PythonFlow take5 sample_fsm aespython stats)
@@ -277,9 +270,10 @@ Depending on the benchmark and the configuration, there are at most four
      or because of omitted checks on values annotated with tuple types.
     The former is due to an overlap between Reticulated's semantics and
      Python's dynamic typing@~cite[vksb-dls-2014].
-    The latter is due to a bug in the implementation (see @section-ref{sec:overhead}).
+    The latter is due to the implementation bug noted in @section-ref{sec:overhead}.
 })]
 
 Overall, there is a clear trend that adding type annotations adds performance
  overhead.
 The increase is typically linear.
+Clearly, Reticulated does not optimize type-annotated code.

@@ -22,11 +22,12 @@ The following subsections therefore generalize the Takikawa method (@section-ref
 
 @section[#:tag "sec:method:adapt"]{Generalizing the Takikawa Method}
 
-A gradual typing system enriches a dynamically typed language with a notion of static typing.
-The type system defines which syntactic units@note{E.g. variables, expressions, modules} of a program may be typed;
- this is the so-called @emph{granularity} of the gradual typing system.
+A gradual typing system enriches a dynamically typed language with a notion of static typing;
+ that is, some pieces of a program can be statically typed.
+The @emph{granularity} of a gradual typing system defines the minimum size of
+ such pieces in terms of abstract syntax.
 A performance evaluation must consider the ways that a programmer may write
- type annotations, subject to practical constraints.
+ type annotations, subject to the type system's granularity and practical constraints.
 
 @definition["granularity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -43,7 +44,6 @@ After defining a granularity, a performance evaluation must define a suite of
  programs to measure.
 A potential complication is that such programs may depend on external libraries
  or other modules that lie outside the scope of the evaluation.
-@; TODO generalize 'modules'?
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
@@ -64,19 +64,21 @@ The experimental modules and granularity of type annotations define the
   @; note^2: `e0 -->* e1` if and only if `e1 <= e0`
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P\!\tcmulti P^\tau}.
+  Furthermore @${P^\tau} is a so-called @emph{fully-typed configuration} and
+   an @emph{untyped configuration} is a @${P^\lambda} such that @${P^\lambda\!\tcmulti P}
+   for all configurations @${P}.
 }
 
 A performance evaluation must measure the running time of these configurations
- relative to the same program without gradual typing.
-In Typed Racket, this baseline is the performance of Racket running the
+ relative to the @emph{baseline} performance of the untyped configuration in
+ the absence of gradual typing.
+In Typed Racket, the baseline is the performance of Racket running the
  untyped configuration.
 In Reticulated, the baseline is the performance of Python running the untyped configuration.
 
-@; TODO confusing 'program' and 'configuration', maybe need to define "baseline" or underlying-program?
-
 @definition["performance ratio"]{
-  A @emph{performance ratio} is the running time of a program
-   divided by the running time of the same program in the absence of gradual typing.
+  A @emph{performance ratio} is the running time of a configuration
+   divided by the baseline performance of the untyped configuration.
 }
 
 An @emph{exhaustive} performance evaluation measures the performance of every
@@ -123,15 +125,16 @@ To convert a Reticulated program into a benchmark, we:
  (1) build a driver module that runs the program and collects timing information;
  (2) remove any non-determinism or I/O actions;
  (3) partition the program into experimental and control modules; and
- (4) ascribe types to the experimental modules.
-When ascribing types, we re-use any type annotations or comments in the original program.
-@; TODO awkward
+ (4) add type annotations to the experimental modules.
+We modify any Python code that Reticulated's type
+ system cannot validate, such as code that requires untagged union types
+ or recursive object types.
 
 
 @parag{Data Collection}
 For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
  evaluation.
-For larger benchmarks, with @${F} functions and @${C} classes,
+For larger a benchmark, with @${F} functions and @${C} classes,
  we conduct a simple random approximation using
  @integer->word[NUM-SAMPLE-TRIALS] samples of @${@id[SAMPLE-RATE] * (F + C)}
  configurations.
@@ -149,7 +152,7 @@ Each job:
   on the @hyperlink["https://github.com/mvitousek/reticulated"]{@tt{master}} branch);
 }
 @item{
-  (repeatedly)
+  repeatedly:
   selected a random configuration to measure,
   ran the configuration's main module @id[NUM-ITERATIONS] times,
   and recorded the result of each run.

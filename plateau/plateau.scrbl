@@ -33,8 +33,8 @@
   Gradual typing promises to reduce the cost of software maintenance for
   scripts. In a scripting language with a gradual typing system, developers
   can add type annotations to the untyped portion of a code base after they
-  reconstruct the type during some maintenance action.  As Takikawa et
-  al.'s recent work shows, however, the addition of type annotations comes
+  reconstruct the type during some maintenance action.  As Takikawa @|etal|'s
+  recent work shows, however, the addition of type annotations comes
   at a large cost in performance. In particular, performance evaluations of
   Typed Racket suggest that a conventionally sound gradual typing system
   may slow down a working system by one to two orders of magnitude.
@@ -42,12 +42,11 @@
   Since different gradual typing systems satisfy different notions of
   soundness, the question arises how much the relaxation of soundness
   benefits a program's performance. This paper answers this question by
-  applying Takikawa et al.'s evaluation method to Reticulated Python, which
+  applying Takikawa @|etal|'s evaluation method to Reticulated Python, which
   in contrast to Typed Racket, merely satisfies tag soundness not type
   soundness. Numerically, Reticulated is at least one order of magnitude
-  better than Typed Racket in terms of performance. Sadly, the evaluation
-  still suggests that the performance degradation is still intolerable for
-  most developers. 
+  better than Typed Racket in terms of performance. Substantial user studies
+  are needed to determine whether programmers will be content with tag soundness.
 }
 
 @;terms{CS}

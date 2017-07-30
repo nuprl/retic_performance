@@ -1,18 +1,8 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
-@; TODO
-@; - simplify the code examples, make sure look good TOGETHER
-@; - granularity
-
-Reticulated is a gradual typing system for Python that gives programmers the
- ability to annotate functions and class fields with types@~cite[vksb-dls-2014].
-The type annotations describe program invariants.
-Reticulated enforces the invariants by statically checking the type annotations
- and dynamically checking the values that flow into annotated positions.
-
-@; syntax & semantics?
-
+Reticulated is a gradual typing system for Python@note{Specifically, CPython 3.}
+ that gives programmers the ability to annotate functions and class fields with types@~cite[vksb-dls-2014 vss-popl-2017].
 By way of example, @figure-ref{fig:cash} presents a type-annotated class representing US currency.
 The annotations imply two high-level invariants:
  (1) instances of the @pythoninline{Cash} class have integer-valued fields, and
@@ -21,9 +11,9 @@ Reticulated enforces these invariants within the @pythoninline{add_cash} method
  by translating the type annotations into dynamic checks that protect the two
  arguments of @pythoninline{add_cash} and the four dereferences of the fields
  @pythoninline{dollars} and @pythoninline{cents}.
-These defensive checks protect statically typed code from dynamically-typed Python code.
+These defensive checks protect the statically typed method from arbitrary callers.
 
-@figure["fig:cash" "A well-typed program" @python|{
+@figure["fig:cash" "A well-typed class" @python|{
 @fields({"dollars": Int, "cents":Int})
 class Cash:
   def __init__(self:Cash, d:Int, c:Int)->Void:
@@ -59,39 +49,38 @@ Informally, if @pythoninline{e} is a well-typed expression, then
 @; then the program can observe exactly these four outcomes.
 
 A @emph{type tag} is essentially a type constructor without parameters.
-For completeness, @figure-ref{fig:retic-types} documents Reticulated's types @${\tau},
- tags @${\kappa}, and the mapping @$|{\tagof{\cdot}}| from types to tags.
-The type @${\tdyn} is the dynamic type; all expressions and values are well-typed at @${\tdyn}.
+For completeness, @figure-ref{fig:retic-types} presents selected types @${\tau}
+ and tags @${\kappa}, as well as the mapping @$|{\tagof{\cdot}}| from types to tags.@note{The
+  type @${\tdyn} is the dynamic type.
+  Every Python term is well-typed at @${\tdyn}.}
 
-Reticulated's form of soundness, henceforth @emph{tag soundness}, differs from conventional type soundness in two significant ways.
+Note that Reticulated's form of soundness, henceforth @emph{tag soundness},
+ differs from conventional type soundness in two significant ways.
 First, tag soundness does not rule out type errors in well-typed programs.
 Second, tag soundness implies that a term with type @pythoninline{List(Int)}
  can produce any kind of @pythoninline{List}.
 In @figure-ref{fig:magic}, for example, the term @pythoninline{make_strings()}
- has the static type @pythoninline{List(String)} but evaluates to a list containing
- an integer, a boolean, and a function.
+ has the static type @pythoninline{List(String)} but evaluates
+ to a list containing an integer, an empty list, and a function.
 Put another way, Reticulated supports only tag-level compositional reasoning.
 
-@figure["fig:magic" "Another well-typed program"
+@figure["fig:magic" "A well-typed function"
 @python|{
     def make_strings()->List(String):
       xs = []
       for i in range(3):
         if   i == 0: xs.append(i)
-        elif i == 1: xs.append([True])
+        elif i == 1: xs.append([])
         else       : xs.append(make_strings)
       return xs
 
-    make_strings()
+    make_strings() # returns [0, [], <function>]
 }|]
 
 
 @subsection[#:tag "sec:defense"]{In Defense of Tag Soundness}
 
-Reticulated's main design goal is to provide seamless interaction with Python code.@note{Specifically, CPython 3@~cite[vksb-dls-2014 vss-popl-2017].}
-If a programmer debugging a large Python codebase wants to be sure that one
- function always returns values of a given type, he or she can use Reticulated
- to enforce that @emph{one type} without affecting the rest of the program.
+Reticulated's main design goal is to provide seamless interaction with Python code.
 To quote the vision paper of @citet[svcb-snapl-2015]:
 
 @nested[#:style 'inset @emph{
@@ -103,8 +92,9 @@ To quote the vision paper of @citet[svcb-snapl-2015]:
 Consequently, Reticulated cannot implement a standard form of type soundness.
 There are two fundamental reasons why Reticulated must aim for a different guarantee.
 
-First, any interaction between type-annotated code and dynamically-typed
+First, any interaction between typed code and dynamically-typed
  Python code can potentially cause a dynamic type error.
+There are two reasons for this.
 On one hand, the Reticulated type annotation might not match the behaviors implemented
  by the Python code.
 On the other hand, the Python code might contain a bug.
@@ -114,24 +104,26 @@ Tag-level soundness admits this reality with its fourth clause, which states
  that execution may end in a type error.
 
 Second, Python code may inspect the representation of values.
-Reticulated must therefore ensure that a type-annotated value is
- indistinguishable from a Python version of the same value.
-In particular, a Reticulated list must be indistinguishable from a Python list;
- the only way to meet this criterion is to use the same list in both cases.@note{
- Other gradually-typed languages use proxies to approximate indistinguishability@~cite[thf-popl-2008 rsfbv-popl-2015 rnv-ecoop-2015 wmwz-ecoop-2017].
- This approach typically fails when values are serialized or sent across an FFI boundary.}
+Reticulated must therefore ensure that a value from statically-typed code is
+ indistinguishable from a Python value.
+The only way to meet this criterion is to use the same value in both
+ cases.@note{Other gradually-typed languages use proxies to approximate
+  indistinguishability@~cite[thf-popl-2008 rsfbv-popl-2015 rnv-ecoop-2015 wmwz-ecoop-2017].
+  This approach typically fails when values are serialized or sent across an FFI boundary.}
+In particular, a Reticulated list must be indistinguishable from a Python list.
 This indistinguishability constraint explains why it is difficult for
- Reticulated to predict the type of a run-time value.
+ Reticulated to predict the run-time type of a value.
 
 Reticulated @emph{chooses} to implement tag-level soundness instead of some
  other compromise because of an implicit design goal:
  @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated, and assumed by @citet[vss-popl-2017].}
-@; TODO example of O(n) check
-@; TODO worst case is O(fields)
-@; TODO union types?
-Intuitively, tag-level checks should impose little performance overhead no
- matter how a programmer adds types to a Python program.
-Prior work on Reticulated does not evaluate this claim@~cite[vksb-dls-2014 vss-popl-2017].
+Instead of checking the type of values within a data structure, Reticulated
+ stops at the structure's outermost tag.
+Hence list types require an @${\Theta(1)} tag check and structural object types
+ with @${f} fields require a @${\Theta(f)} check that the given value binds
+ the proper fields.
+Intuitively, such checks should impose little overhead no matter how a programmer
+ adds type annotations.
 
 @figure["fig:retic-types"
         @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
@@ -154,98 +146,42 @@ Prior work on Reticulated does not evaluate this claim@~cite[vksb-dls-2014 vss-p
   \end{array}}$
 }|]
 
-@; -----------------------------------------------------------------------------
-@;
-@;@section[#:tag "sec:vs-tr:types"]{Types}
-@;
-@;@; math types side-by-side with programming types
-@;Document the types Reticulated has, document the grammar?
-@;
-@;Mention the types Retic does not have.
-@;
-@;
-@;@section[#:tag "sec:vs-tr:errors"]{Error Messages}
-@;
-@;Two kinds of faults can occur in Reticulated: static type errors and dynamic type errors.
-@;A static type error is a mismatch between two types.
-@;A dynamic type error is the result of a mismatch between a type annotation and an untyped value.
-@;Typically, a dynamic type error occurs long after the value enters typed code.
-@;
-@;When Reticulated discovers a static type error, it reports the current line number and the conflicting types.
-@;To its credit, this information often pinpoints the source of the fault.
-@;
-@;When Reticulated discovers a dynamic type error, it prints a value,
-@; the name of the check that failed, and a stack trace.
-@;This information does little to help diagnose the problem.
-@;For one, the relevant type annotation is not reported.
-@;A programmer must scan the stack trace for line numbers and consider the type
-@; annotations that are in scope.
-@;Second, the value in the error message may not be the value that caused the error.
-@;For instance, the reported value may be an element of an ill-typed data structure
-@; or a return value of an ill-typed function.
-@;Third, the relevant boundary is rarely on the stack trace when the program
-@; raises the check error.
-@;The stack may contain only well-typed code (see the appendix for an example).
-@;
-@;
-@;@section[#:tag "sec:vs-tr:soundness"]{Alternative Soundness}
-@;
-@;Sound type systems are useful because they provide guarantees.
-@;A sound @emph{static} type system guarantees that evaluating a well-typed program can result in one of three possible outcomes:
-@; evaluation terminates with a value of the same type; evaluation diverges; or evaluation raises an error from a well-defined set.
-@;A sound @emph{gradual} type system cannot provide the same guarantee because it admits untyped code.
-@;Thus, a gradual type system must redefine soundness.
-@;@; TODO never repeat anything ever in this short paper
-@;
-@;One approach is to @emph{generalize} traditional type soundness with a fourth clause to cover interactions between typed and untyped code.
-@;Typed Racket takes this approach@~cite[tfffgksst-snapl-2017].
-@;In particular, if a program @${e} is well typed at type @${\tau}, then either:
-@;@itemlist[#:style 'ordered
-@;@item{
-@; @${e} reduces to a value @${v} with type @${\tau};
-@;}
-@;@item{
-@;  @${e} diverges;
-@;}
-@;@item{
-@;  @${e} signals an error due to a partial primitive operation; or
-@;}
-@;@item{
-@;  @${e} raises an exception that points to the guilty boundary@~cite[dthf-esop-2012] between typed and untyped code.
-@;}
-@;]
-@;
-@;A second approach is to @emph{modify} soundness.
-@;Reticulated@~cite[vss-popl-2017] takes this approach, and weakens the first and fourth clauses:
-@;@exact|{
-@;\begin{itemize}
-@;\item[$1'$.]
-@;  $e$ reduces to a value ${v}$ with type tag ${\tagof{\tau}}$;
-@;\item[$4'$.]
-@;  $e$ signals an exception that points to a set of potentially guilty boundaries between typed and untyped code.
-@;\end{itemize}
-@;The type tag of ${\tau}$ is its outermost constructor.
-@;For example, the type tag of ${\mathsf{List(Int)}}$ is ${\mathsf{List}}$.}|
-@;The set of boundaries is always empty in the version of Reticulated that was public when we began our evaluation@~cite[vksb-dls-2014];
-@; @section-ref{sec:vs-tr:errors} addresses the performance implications of @${4'}.
-@;
-@;As @figure-ref{fig:magic} demonstrates, the modified clause @${1'} implies that a Reticulated term with
-@; type @tt{List(String)} may evaluate to a list containing any kind of data.
-@;On one hand, this fact is harmless because type-tag soundness implies that any
-@; read from a variable with type @tt{List(String)} in typed code is tag-checked.
-@;On the other hand, Reticulated does not monitor values that leave a typed region.
-@;Thus, two interesting scenarios can arise:
-@;@exact|{\begin{description}
-@;\item[The \href{"https://en.wikipedia.org/wiki/Mary_Mallon"}{\emph{typhoid mary}} scenario]
-@;  Typed code can create an ill-typed value,
-@;  pass it to untyped code, and trigger an error by violating an implicit
-@;  assumption in the untyped code.
-@;  The source of such ``disguised'' type errors may be impossible to pinpoint.
-@;\item[The \href{"https://en.wikipedia.org/wiki/Sybil_(Schreiber_book)"}{\emph{sybil}} scenario]
-@;  Two typed contexts can safely reference the same value at incompatible types.
-@;\end{description}%
-@;It remains to be seen whether these potential scenarios cause serious issues in practice.
-@;Developers may embrace the flexibility of alternative soundness and use
-@; Reticulated in combination with unit tests.
-@;}|
-@;
+
+@section{In Contrast, Generalized Type Soudness}
+
+Typed Racket@~cite[thf-popl-2008 tfffgksst-snapl-2017] implements a
+ soundness guarantee that generalizes conventional type soundness.
+It is useful to compare Typed Racket's soundness to tag soundness.
+
+If the Typed Racket expression @pythoninline{e} has the static type @${\tau},
+ then evaluating @pythoninline{e} can result in four possible outcomes:
+@itemlist[#:style 'ordered
+@item{
+  the program execution terminates with a value @pythoninline{v} that
+  has type @${\tau'} such that @${\tau'} is a subtype of @${\tau};
+}
+@item{
+  the execution diverges;
+}
+@item{
+  the execution ends in an exception due to a partial computational primitive (e.g., division-by-zero);
+}
+@item{
+  the execution ends in a type error that points to one of the fixed number of
+   boundaries between statically typed and dynamically typed code.
+}
+]
+
+In contrast to Reticulated, Typed Racket types are sound in the conventional
+ sense; a term with type @$|{\tlist{\tint}}| cannot yield a list of strings.
+Furthermore, Typed Racket guarantees that every run-time type error directs
+ programmers to the mis-matched value and type annotation at its root.
+
+These guarantees are clearly an improvement over tag soundness,
+ but have two non-obvious costs.
+First, the host language must implement proxies that protect
+ typed code@~cite[chaperones-impersonators].
+Second, gradually-typed programs suffer the allocation, interposition, and
+ validation costs implied by the proxies.
+As mentioned in the introduction, these run-time costs can slow gradually typed
+ programs by two orders of magnitude@~cite[tfgnvf-popl-2016] or more@~cite[greenman-jfp-2017].

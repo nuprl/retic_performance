@@ -7,7 +7,7 @@ We have identified five sources of systematic
         [lib-data* '((simplejson 50 "https://github.com/simplejson/simplejson")
                      (requests 200 "https://github.com/kennethreitz/requests")
                      (Jinja2 600 "https://github.com/pallets/jinja/tree/master/jinja2"))]
-        [rank-info @hyperlink["http://pypi-ranking.info/alltime"]{PyPI Ranking}]
+        [rank-info @elem{PyPI Ranking@note{@url{http://pypi-ranking.info/alltime}}}]
         [lib-info (authors*
                     (for/list ([ld (in-list lib-data*)]
                                [long-style? (in-sequences '(#t)
@@ -21,7 +21,7 @@ We have identified five sources of systematic
   First, the experiment consists of a small suite of benchmarks, and these
    benchmarks are rather small.
   For example, an ad-hoc sample of the @|rank-info| reveals that even small
-   packages have many functions and methods.
+   packages have far more functions and methods.
   @|lib-info|.
 })
 
@@ -58,8 +58,8 @@ The types in this experiment may differ from types ascribed by another Python
    and is therefore untyped.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
   @Integer->word[(length retic-limited)] other
    benchmarks (@format-bm*[retic-limited]) use
-   dynamic typing to overcome limitations in Reticulated's type system,
-   such as the lack of untagged union types.
+   dynamic typing to overcome Reticulated's lack of untagged union types
+   and recursive types.
 })
 
 @(let ([use-io* '(aespython futen http2 slowSHA)]) @elem{
