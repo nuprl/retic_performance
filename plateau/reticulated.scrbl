@@ -115,7 +115,7 @@ This indistinguishability constraint explains why it is difficult for
  Reticulated to predict the run-time type of a value.
 
 Reticulated @emph{chooses} to implement tag-level soundness instead of some
- other compromise because of an implicit design goal:
+ other compromise because of an implicit design goal;
  @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated, and assumed by @citet[vss-popl-2017].}
 Instead of checking the type of values within a data structure, Reticulated
  stops at the structure's outermost tag.

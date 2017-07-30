@@ -1,7 +1,5 @@
 #lang gm-plateau-2017
 
-@; TODO too many words ya know
-
 @(define MAIN-BENCHMARKS (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))
 @(define NUM-MAIN-BENCHMARKS (length MAIN-BENCHMARKS))
 
@@ -265,7 +263,7 @@ There are four notable trends regarding how adding types to an arbitrary
   (λ (num-in-category) @elem{
     In @|num-in-category| benchmarks, there are some configurations
      that run faster than similar configurations with fewer typed components.
-    These speedups happen for one of two reasons: either because of duplicate
+    These speedups happen for two reasons: either because of duplicate
      checks on dynamically-typed receivers of method calls,
      or because of omitted checks on values annotated with tuple types.
     The former is due to an overlap between Reticulated's semantics and
