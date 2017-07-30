@@ -26,7 +26,7 @@ To assess the run-time cost of gradual typing in Reticulated, we measured
 })
 
 The following three subsections present the results of the evaluation.
-First, @section-ref{sec:ratio} reports the performance of the fully-untyped
+First, @section-ref{sec:ratio} reports the performance of the untyped
  and fully-typed configurations.
 Second, @section-ref{sec:overhead} plots the proportion of @deliverable{D}
  configurations for @${D} between @${1} and @${@id[MAX-OVERHEAD]}.

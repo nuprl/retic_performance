@@ -55,7 +55,7 @@ The types in this experiment may differ from types ascribed by another Python
       ) @elem{
   Third, some benchmarks use dynamic typing.
   The @bm{take5} benchmark contains one function that accepts optional arguments,
-   and is therefore untyped.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
+   and is therefore dynamically typed.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/32}.}
   @Integer->word[(length retic-limited)] other
    benchmarks (@format-bm*[retic-limited]) use
    dynamic typing to overcome Reticulated's lack of untagged union types

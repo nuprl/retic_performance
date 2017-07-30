@@ -1,7 +1,5 @@
 #lang gm-plateau-2017
 
-@; TODO untyped configuration vs dynamically typed
-
 @title[#:tag "sec:method"]{Evaluation Method}
 
 @citet[tfgnvf-popl-2016] introduce a three-step method for evaluating the performance of
