@@ -52,7 +52,7 @@
 
 (define TICK-SIZE 4)
 (define TITLE-FACE "Liberation Serif")
-(define SAMPLE-COLOR "darkorange")
+(define SAMPLE-COLOR "chocolate" #;"darkorange")
 (define axis/c (or/c 'X 'Y))
 
 (define-syntax-rule (defparam id val type)
