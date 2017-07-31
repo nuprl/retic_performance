@@ -107,7 +107,7 @@ On the other hand, the overhead is always within an order-of-magnitude.
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in the
  benchmark programs.
 Each plot reports the percent of @deliverable[] configurations (@|y-axis|)
- for values of @${D} between @${1} and @${@id[MAX-OVERHEAD]} (@|x-axis|).
+ for values of @${D} between @${1}x overhead and @${@id[MAX-OVERHEAD]}x overhead (@|x-axis|).
 The @|x-axes| are log-scaled to focus on low overheads;
  vertical tick marks appear at @${1.2}x, @${1.4}x, @${1.6}x, @${1.8}x, @${4}x, @${6}x, and @${8}x overhead.
 

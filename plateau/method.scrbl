@@ -48,7 +48,7 @@ A potential complication is that such programs may depend on external libraries
   The @emph{control modules} in a program are common across all configurations.
 }
 
-The experimental modules and granularity of type annotations define the
+The granularity and experiemental modules define the so-called
  configurations of a fully-typed program.
 
 @definition["configurations"]{
