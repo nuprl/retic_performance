@@ -103,15 +103,19 @@ Put another way, Reticulated supports only tag-level compositional reasoning.
   \end{array}}$
 }|]
 
+
 @subsection[#:tag "sec:defense"]{In Defense of Tag Soundness}
 
+At first glance, tag soundness appears strictly worse than standard type soundness.
+To illustrate its utility, we must explain a little more about Reticulated.
+
 Reticulated's main design goal is to provide seamless interaction with Python code.
-To quote the vision paper of @citet[svcb-snapl-2015]:
+To quote @citet[svcb-snapl-2015]:
  @nested[#:style 'inset @emph{
-   That is, programmers should
+    [P]rogrammers should
     be able to add or remove type annotations without any unexpected impacts on
     their program, such as whether it still typechecks and whether its runtime
-    behavior remains the same.}]@;
+    behavior remains the same}]@;
 Consequently, Reticulated cannot implement a standard form of type soundness.
 There are two fundamental reasons why Reticulated must aim for a different guarantee.
 
