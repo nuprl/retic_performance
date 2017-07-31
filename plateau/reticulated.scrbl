@@ -62,9 +62,9 @@ For completeness, @figure-ref{fig:retic-types} presents selected types @${\tau}
 Note that Reticulated's form of soundness, henceforth @emph{tag soundness},
  differs from conventional type soundness in two significant ways.
 First, tag soundness does not rule out type errors in well-typed programs.
-Second, tag soundness implies that a term with type @pythoninline{List(Int)}
+Second, tag soundness implies that an expression with type @pythoninline{List(Int)}
  can produce any kind of @pythoninline{List}.
-In @figure-ref{fig:magic}, for example, the term @pythoninline{make_ints()}
+In @figure-ref{fig:magic}, for example, the expression @pythoninline{make_ints()}
  has the static type @pythoninline{List(Int)} but evaluates
  to a list containing a string, an empty list, and a function.
 Put another way, Reticulated supports only tag-level compositional reasoning.
