@@ -89,6 +89,7 @@
 (defparam *RATIO-DOT-COLOR* "firebrick" Color)
 (defparam *RATIO-DOT-SIZE* 8 Natural)
 (defparam *RATIO-DOT-SYM* 'plus point-sym/c)
+(defparam *RECTANGLE-BORDER-COLOR* "black" Color)
 (defparam *STANDARD-D* #f (or/c #f positive?))
 (defparam *TYPED/PYTHON-RATIO-XTICK?* #f Boolean)
 
@@ -279,6 +280,25 @@
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (cloud-add-legend (performance-info->name pi) body))
+
+(define (rectangle-plot pi)
+  (define W (*OVERHEAD-PLOT-WIDTH*))
+  (define H (*OVERHEAD-PLOT-HEIGHT*))
+  (define RADIUS 5)
+  (define LINE-WIDTH 1)
+  (define COLOR "black")
+  (define num-D
+    ((deliverable (or (*STANDARD-D*) 10)) pi))
+  (define nc
+    (num-configurations pi))
+  (define outer
+    (filled-rounded-rectangle
+      W H RADIUS #:color "white" #:border-color COLOR #:border-width LINE-WIDTH))
+  (define inner
+    (filled-rounded-rectangle
+      W (* (/ num-D nc) H) RADIUS #:color COLOR #:border-color COLOR #:border-width LINE-WIDTH))
+  (define shim (rectangle W (* 2 LINE-WIDTH) #:border-color COLOR #:border-width LINE-WIDTH))
+  (lb-superimpose outer (lt-superimpose inner shim)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -579,6 +599,7 @@
   (define CLOUD 'cloud)
   (define EXACT 'exact)
   (define OVERHEAD 'overhead)
+  (define RECTANGLE 'rectangle)
   (define SAMPLE 'sample)
   (define VALIDATE 'validate)
   (define *plot-type* (make-parameter OVERHEAD))
@@ -603,6 +624,7 @@
    [("-e" "--exact") "Plot exact running times" (*plot-type* EXACT)]
    [("-o" "--overhead") "Make overhead plot" (*plot-type* OVERHEAD)]
    [("-s" "--sample") "Plot samples" (*plot-type* SAMPLE)]
+   [("-r" "--rectangle") "Plot a rectangle" (*plot-type* RECTANGLE)]
    [("-v" "--validate") "Validate samples" (*plot-type* VALIDATE)]
    #:once-each
    [("-A" "--axis") major-axis "Set major axis" (*MAJOR-AXIS* (read-string major-axis axis/c))]
@@ -628,6 +650,7 @@
         [(cloud) cloud-plot]
         [(overhead) overhead-plot]
         [(exact) exact-runtime-plot]
+        [(rectangle) rectangle-plot]
         [(sample) samples-plot]
         [(validate) validate-samples-plot]
         [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
