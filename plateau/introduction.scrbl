@@ -67,3 +67,5 @@ To set the stage, this paper first describes the point that Reticulated
 It then explains our adaptation of the Takikawa method to Reticulated (@section-ref{sec:method}).
 @Section-ref{sec:evaluation} presents the details of the evaluation:
  the benchmarks, the measurements, and the conclusions.
+
+@if-techrpt[@exact{\newpage}]

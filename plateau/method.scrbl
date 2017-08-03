@@ -104,7 +104,7 @@ Repeating this sampling experiment yields a @emph{simple random approximation}
    the proportion of @deliverable{D} configurations in each sample.
 }
 
-Our technical report contains theoretical and empirical justification
+Our technical appendix contains theoretical and empirical justification
  for the simple random approximation method@~cite[gm-tr-2017].
 
 

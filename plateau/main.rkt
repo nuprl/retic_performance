@@ -8,6 +8,7 @@
 ;; (The file `lang/reader.rkt` sets up the actual reader.)
 
 (provide
+  if-techrpt
   (all-from-out
     "bib.rkt"
     scribble/acmart
@@ -347,6 +348,14 @@
 
 ;; =============================================================================
 
+(define-for-syntax TECHRPT #false)
+
+(define-syntax (if-techrpt stx)
+   (if TECHRPT
+     (syntax-case stx ()
+      [(_ x) #'x])
+     #'(void)))
+
 (define-values [EXHAUSTIVE-BENCHMARKS VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS]
   (let ([bm* (all-benchmarks)])
     (define e* (filter benchmark->karst-data bm*))
@@ -410,7 +419,7 @@
     (raise-argument-error '->benchmark "the name of a benchmark" x)))
 
 (define (render-benchmark-name str)
-  (define bm (->benchmark str))
+  (define bm (if (benchmark-info? str) str (->benchmark str)))
   (tt (symbol->string (benchmark->name bm))))
 
 (define (render-benchmark-names . str*)

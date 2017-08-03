@@ -1,5 +1,7 @@
 #lang gm-plateau-2017 @sigplan @10pt
 
+@require[(for-syntax racket/base)]
+
 @; You see, there are two kinds of people in this world: the workers and the
 @; hustlers.  The hustlers never work and the workers never hustle.  And you,
 @; my friend, are a worker.  God knows I've tried to beat that instinct out of
@@ -8,6 +10,7 @@
 @; take pride in your work. --- Cocktail, 1988
 
 @title{On the Cost of Soundness for Gradual Typing}
+@if-techrpt[@subtitle{(Extended Version)}]
 
 @(define NEU
    @affiliation[
@@ -64,4 +67,5 @@
 @include-section{conclusion.scrbl}
 
 @generate-bibliography[]
-@;@include-section{appendix.scrbl}
+
+@if-techrpt[@include-section{appendix.scrbl}]
