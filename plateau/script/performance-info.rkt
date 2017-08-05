@@ -382,16 +382,16 @@
       (λ (v) (/ v baseline)))]))
 
 (define (min-overhead pf)
-  (overhead pf (fold/mean (performance-info-src pf) min)))
+  (overhead pf (fold/mean pf min)))
 
 (define (max-overhead pf)
-  (overhead pf (fold/mean (performance-info-src pf) max)))
+  (overhead pf (fold/mean pf max)))
 
 (define (mean-overhead pf)
   (define 1/N (/ 1 (num-configurations pf)))
   (define (avg acc v)
     (+ acc (* 1/N v)))
-  (overhead pf (fold/mean (performance-info-src pf) avg #:init (λ (v) (* 1/N v)))))
+  (overhead pf (fold/mean pf avg #:init (λ (v) (* 1/N v)))))
 
 (define (fold/karst pf #:init init #:f f)
   (define src
@@ -416,23 +416,15 @@
   (let ([lines++ (λ (acc cfg nt t*) (+ acc 1))])
     (λ (ps) (fold/karst ps #:f lines++ #:init 0))))
 
-;; fold/mean : (All (A) Path-String (-> A Real A) #:init (U #f (-> Real A)) -> A)
-(define fold/mean
-  (let ([line->mean (λ (ln line-number)
-                      (with-handlers ([exn:fail:read?
-                                       (lambda (e)
-                                         (printf "PARSE ERROR on line ~a~n" line-number)
-                                         (raise e))])
-                        (let ([times-str (caddr (parse-line ln))])
-                          (mean (string->time* times-str)))))])
-    (λ (filename f #:init [init-f #f])
-      (with-input-from-file filename
-        (λ ()
-          (define init (line->mean (read-line) 1))
-          (for/fold ([acc (if init-f (init-f init) init)])
-                    ([ln (in-lines)]
-                     [i (in-naturals 2)])
-            (f acc (line->mean ln i))))))))
+;; fold/mean : (All (A) performance-info? (-> A Real A) #:init (U #f (-> Real A)) -> A)
+(define (fold/mean pf f #:init [init-f #f])
+  (define gen (in-configurations pf))
+  (define init
+    (for/first ([(_a _b t*) gen])
+      (mean t*)))
+  (for/fold ([acc (if init-f (init-f init) init)])
+            ([(_a _b t*) gen])
+    (f acc (mean t*))))
 
 (define ((deliverable D) pf)
   (count-configurations pf (make-D-deliverable? D pf)))
@@ -445,14 +437,12 @@
 (define (count-configurations pf good?)
   (define (add-good? count t)
     (if (good? t) (+ count 1) count))
-  (fold/mean (performance-info-src pf)
-             add-good?
-             #:init (λ (t) (add-good? 0 t))))
+  (fold/mean pf add-good? #:init (λ (t0) (add-good? 0 t0))))
 
 (define (filter-time* pf keep?)
   (define (keep-it acc t)
     (if (keep? t) (cons t acc) acc))
-  (fold/mean (performance-info-src pf) keep-it #:init (λ (t) (keep-it '() t))))
+  (fold/mean pf keep-it #:init (λ (t) (keep-it '() t))))
 
 (define (typed/python-ratio pf)
   (/ (performance-info-typed-runtime pf)
