@@ -135,7 +135,9 @@
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
   (exact-add-legend (performance-info->name pi) (unbox num-points) body))
 
-(define (overhead-plot pi)
+(define (overhead-plot pre-pi*)
+  (define multi? (pair? pre-pi*))
+  (define pi* (if multi? pre-pi* (list pre-pi*)))
   ;; TODO use standard-D
   (define body (maybe-freeze
     (parameterize ([plot-x-ticks (make-overhead-x-ticks)]
@@ -145,11 +147,15 @@
                    [plot-y-far-ticks no-ticks]
                    [plot-tick-size TICK-SIZE]
                    [plot-font-face (*OVERHEAD-FONT-FACE*)]
-                   [plot-font-size (*FONT-SIZE*)])
+                   [plot-font-size (*FONT-SIZE*)]
+                   [*INTERVAL-ALPHA* (if multi? 0.6 (*INTERVAL-ALPHA*))])
       (plot-pict
         (list
-          (make-count-configurations-function pi)
-          (if #f ;(*OVERHEAD-SHOW-RATIO*)
+          (for/list ([pi (in-list pi*)]
+                     [i (in-naturals 3)])
+            (parameterize ([*OVERHEAD-LINE-COLOR* i])
+              (make-count-configurations-function pi)))
+          #;(if #f ;(*OVERHEAD-SHOW-RATIO*)
             (make-dot pi typed/python-ratio)
             '())
           (tick-grid))
@@ -161,7 +167,8 @@
         #:y-label (and (*OVERHEAD-LABEL?*) "% Configs.")
         #:width (*OVERHEAD-PLOT-WIDTH*)
         #:height (*OVERHEAD-PLOT-HEIGHT*)))))
-  (overhead-add-legend pi body))
+  ;; TODO don't just use car
+  (overhead-add-legend (car pi*) body))
 
 (define (make-dot pi get-x)
   (define x-posn (get-x pi))
@@ -603,6 +610,7 @@
   (define SAMPLE 'sample)
   (define VALIDATE 'validate)
   (define *plot-type* (make-parameter OVERHEAD))
+  (define *single-plot?* (make-parameter #f))
   (define *output* (make-parameter "rp-plot.png"))
   ;; ---
   (*FONT-SIZE* 14)
@@ -631,6 +639,7 @@
    [("-W" "--width") plot-width "Set plot width" (*OVERHEAD-PLOT-WIDTH* (read-string plot-width positive?))]
    [("-H" "--height") plot-height "Set plot height" (*OVERHEAD-PLOT-HEIGHT* (read-string plot-height positive?))]
    [("-D") D "Overhead value for comparison" (*STANDARD-D* (read-string D positive?))]
+   [("--single") "All plots on same axis (maybe nonsense)" (*single-plot?* #t)]
    [("--colors") colors "Color palette for cloud plots" (*CLOUD-COLOR-WHEEL* (read-string colors (listof plot-color/c)))]
    [("--output") out-file "Save plot to" (*output* out-file)]
    [("--font-size") fs "Change font size" (*FONT-SIZE* (read-string fs natural?))]
@@ -654,7 +663,10 @@
         [(sample) samples-plot]
         [(validate) validate-samples-plot]
         [else (raise-user-error 'rp-plot "unknown plot type '~a'" (*plot-type*))]))
-     (define p* (map render-one pi*))
+     (define p*
+       (if (*single-plot?*)
+         (list (render-one pi*))
+         (map render-one pi*)))
      (define OUT-FILE (*output*))
      (and (save-pict OUT-FILE (apply vl-append 50 p*))
           (printf "Saved output to '~a'~n" OUT-FILE))])))
