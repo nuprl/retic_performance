@@ -285,10 +285,14 @@ The plots in @figure-ref{fig:exact} suggest that this action will affect
     The latter is due to the implementation bug noted in @section-ref{sec:overhead}.
 })]
 
+@exact{\par}
+
 Overall, there is a clear trend that adding type annotations adds performance
  overhead.
 The increase is typically linear.
-On one hand, this is an interesting observation and may help programmers predict
- performance issues.
+On one hand, this observation may help programmers predict performance issues.
 On the other hand, the linear increase demonstrates that Reticulated does
  not use type information to optimize programs.
+In principle a JIT compiler could generate check-free code if it could infer
+ the run-time type of a variable, but it remains to be seen whether this
+ approach would work in practice.

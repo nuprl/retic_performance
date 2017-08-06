@@ -36,6 +36,10 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
 }
 @item{
   Can Reticulated use type information to remove dynamic checks from Python programs?
+  At present, Typed Racket is more performant than Reticulated on fully-typed
+   programs because it adds run-time checks only when linked to dynamically-typed code.
+  @;Reticulated cannot make the same assumption, but a JIT compiler
+  @; may be able to generate code with performance to match Typed Racket.
 }
 ]
 
