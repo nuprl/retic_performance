@@ -1,22 +1,20 @@
 #lang gm-plateau-2017
 @title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
-The application of the Takikawa method to Reticulated demonstrates that at
- least one gradually typed language has a performant implementation.
-In particular, the overhead plots for Reticulated look an order of magnitude
- better than those for Typed Racket.
-Appearances are misleading, however.
-Typed Racket implements a generalized form of type soundness whereas
- Reticulated implements tag soundness.
-Furthermore, Reticulated has a less expressive type system and lacks
- the property that every run-time type error is attributed
- to a boundary between statically-typed and dynamically-typed
- code.@note{@citet[vss-popl-2017] attribute run-time type errors to sets of
- coercions. Implementing this weaker guarantee doubled the @|t/u-ratio| in
+The application of the Takikawa method suggests that any combination of
+ statically typed and dynamically typed code in Reticulated runs within one
+ order of magnitude of the original Python program.
+This impressive performance comes at a three-fold cost.
+First, soundness is at the level of type-tags rather than full static types.
+Second, run-time type errors point to a set of potentially-guilty
+ type boundaries rather than a single location.@note{The version of Reticulated
+ in this paper always reports an empty set. @citet[vss-popl-2017] improve the
+ error messages and report that the improvement doubled the @|t/u-ratio| in
  most of their benchmark programs.}
+Third, fully-typed programs typically suffer more overhead than any other
+ configuration.
 
-Our evaluation effort thus confirms a widely held conjecture and leaves us
- with a number of open research problems:
+Our evaluation effort thus leaves us with a number of open research problems:
 @itemlist[
 @item{
   Will programmers accept tag soundness?
@@ -26,8 +24,8 @@ Our evaluation effort thus confirms a widely held conjecture and leaves us
   How does the cost of soundness compare to the cost of expressive types
    and informative error messages?
   This question demands a two-pronged answer:
-   (1) Reticulated must implement additional types and improve its error messages;
-   (2) Typed Racket must implement tag soundness.
+   (1) Reticulated must improve its types and error messages;
+   (2) Typed Racket must implement a form of tag soundness.
 }
 @item{
   Can Reticulated reduce its overhead relative to Python?

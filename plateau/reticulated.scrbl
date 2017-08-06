@@ -59,8 +59,8 @@ For completeness, @figure-ref{fig:retic-types} presents selected types @${\tau}
   type @${\tdyn} is the dynamic type.
   Every expression is well-typed at @${\tdyn}.}
 
-Note that Reticulated's form of soundness, henceforth @emph{tag soundness},
- differs from conventional type soundness in two significant ways.
+
+Tag soundness is weaker than standard type soundness in two ways.
 First, tag soundness does not rule out type errors in well-typed programs.
 Second, tag soundness implies that an expression with type @pythoninline{List(Int)}
  can produce any kind of @pythoninline{List}.
@@ -68,19 +68,6 @@ In @figure-ref{fig:magic}, for example, the expression @pythoninline{make_ints()
  has the static type @pythoninline{List(Int)} but evaluates
  to a list containing a string, an empty list, and a function.
 Put another way, Reticulated supports only tag-level compositional reasoning.
-
-@figure["fig:magic" "A strange but well-typed function"
-@python|{
-    def make_ints()->List(Int):
-      xs = []
-      for i in range(3):
-        if   i == 0: xs.append("NaN")
-        elif i == 1: xs.append([])
-        else       : xs.append(make_ints)
-      return xs
-
-    make_ints() # returns ["NaN", [], <function>]
-}|]
 
 @figure["fig:retic-types"
         @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
@@ -103,19 +90,27 @@ Put another way, Reticulated supports only tag-level compositional reasoning.
   \end{array}}$
 }|]
 
+@figure["fig:magic" "A strange but well-typed function"
+@python|{
+    def make_ints()->List(Int):
+      xs = []
+      xs.append("NaN")
+      xs.append([])
+      xs.append(make_ints)
+      return xs
 
-@subsection[#:tag "sec:defense"]{In Defense of Tag Soundness}
+    make_ints() # returns ["NaN", [], <function>]
+}|]
 
-At first glance, tag soundness appears strictly worse than standard type soundness.
-To illustrate its utility, we must explain a little more about Reticulated.
 
+Nevertheless, tag soundness is a very useful guarantee in the context of Reticulated.
 Reticulated's main design goal is to provide seamless interaction with Python code.
-To quote @citet[svcb-snapl-2015]:
+To quote the vision paper of @citet[svcb-snapl-2015]:
  @nested[#:style 'inset @emph{
     [P]rogrammers should
     be able to add or remove type annotations without any unexpected impacts on
     their program, such as whether it still typechecks and whether its runtime
-    behavior remains the same}]@;
+    behavior remains the same.}]@;
 Consequently, Reticulated cannot implement a standard form of type soundness.
 There are two fundamental reasons why Reticulated must aim for a different guarantee.
 
@@ -136,7 +131,7 @@ Reticulated must therefore ensure that a value from statically-typed code is
 The only way to meet this criterion is to use the same value in both
  cases.@note{Other gradually-typed languages use proxies to approximate
   indistinguishability@~cite[thf-popl-2008 wmwz-ecoop-2017].
-  This approach typically fails when values are serialized or sent across an FFI boundary.}
+  This approach typically fails when values are serialized or sent across a foreign function interface (FFI).}
 In particular, a Reticulated list must be indistinguishable from a Python list.
 This indistinguishability constraint explains why it is difficult for
  Reticulated to predict the run-time type of a value.

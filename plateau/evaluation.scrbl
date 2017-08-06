@@ -119,9 +119,9 @@ If the data is approximate, the heading lists the number of samples
 
 @emph{Technical Note:} the curves for @bm{sample_fsm}, @bm{aespython}, and
  @bm{stats} are intervals.
-The height of the interval at a given @${x} position is the width of the
+For instance, the height of an interval at @${x\!=\!4} is the range of the
  @approximation[NUM-SAMPLE-TRIALS (format "[~a(F+C)]" SAMPLE-RATE) "95"]
- for the number of @deliverable{x} configurations.
+ for the number of @deliverable[4] configurations.
 These intervals are thin because there is little variance in the proportion
  of @deliverable{D} configurations across the @integer->word[NUM-SAMPLE-TRIALS]
  samples.
@@ -134,7 +134,7 @@ As the value of @${D} increases along the @|x-axis|, the number of
 The important question is how many configurations are @deliverable{D}
  for low values of @${D}.
 If this number is large, then a developer who applies gradual typing to a
- similar program has a better change of arriving at a @deliverable{D} configuration.
+ similar program has a better channe of arriving at a @deliverable{D} configuration.
 The area under the curve is the answer; in short, more is better.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
@@ -144,10 +144,10 @@ A curve with a large shaded area below it implies that a large number
   The second most important aspects of an overhead plot are the values of @${D}
    where the curve starts and ends.
   More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
-   that counts the number of @deliverable{D}
+   that counts the percent of @deliverable{D}
    configurations in a benchmark, the critical points are the smallest
    overheads @${@|d0|, @|d1|} such
-   that @${h(@|d0|) > 0} and @${h(@|d1|) = 100}.
+   that @${h(@|d0|) > 0\%} and @${h(@|d1|) = 100\%}.
   An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
    at least one configuration runs faster than the Python baseline.
   The end-value @${@|d1|} is the overhead of the slowest-running configuration
@@ -195,8 +195,8 @@ This is no surprise given the @|u/p-ratio|s in @figure-ref{fig:ratio} and the
   @Integer->word[num-tp] benchmarks are roughly @deliverable{T}, where @${T} is
    the @|t/p-ratio| listed in @figure-ref{fig:ratio}.
 })
-In these benchmarks, the fully-typed configuration is one of the slowest-running
- configurations.
+In these benchmarks, the fully-typed configuration is one of the slowest configurations.
+@;Note that these ratios are typically larger than Typed Racket's typed/untyped ratios@~cite[tfgnvf-popl-2016].
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of all configurations.
 Unfortunately, this speedup is due to a soundness bug; in short, the

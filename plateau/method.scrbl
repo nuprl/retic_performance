@@ -25,7 +25,7 @@ A gradual typing system enriches a dynamically typed language with a notion of s
 The @emph{granularity} of a gradual typing system defines the minimum size of
  such pieces in terms of abstract syntax.
 A performance evaluation must consider the ways that a programmer may write
- type annotations, subject to the type system's granularity and practical constraints.
+ type annotations, subject to practical constraints.
 
 @definition["granularity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -82,7 +82,7 @@ Reticulated adds type checks to un-annotated programs@~cite[vksb-dls-2014],
 
 An @emph{exhaustive} performance evaluation measures the performance of every
  configuration.
-The natural way to interpret this data is to choose binary a notion of
+The natural way to interpret this data is to choose a notion of
  "good performance" and count the proportion of "good" configurations.
 In this spirit, @citet[tfgnvf-popl-2016] ask programmers to consider the
  performance overhead they could deliver to clients.
@@ -113,7 +113,7 @@ Our technical appendix contains theoretical and empirical justification
 @parag{Granularity}
 The evaluation presented in @section-ref{sec:evaluation} is at the granularity
  of @emph{function and class fields}.
-In general, one syntactic unit in the experiment is either one function,
+One syntactic unit in the experiment is either one function,
  one method, or the collection of all fields for one class.
 The class in @figure-ref{fig:cash}, for example, has 3 syntactic units.
 
@@ -121,7 +121,7 @@ The class in @figure-ref{fig:cash}, for example, has 3 syntactic units.
 @parag{Benchmark Creation}
 To convert a Reticulated program into a benchmark, we:
  (1) build a driver module that runs the program and collects timing information;
- (2) remove any non-determinism or I/O actions;
+ (2) remove any non-determinism or I/O actions;@note{@Integer->word[(length '(aespython futen http2 slowSHA))] benchmarks inadvertantly perform I/O actions, see @section-ref{sec:threats}.}
  (3) partition the program into experimental and control modules; and
  (4) add type annotations to the experimental modules.
 We modify any Python code that Reticulated's type
