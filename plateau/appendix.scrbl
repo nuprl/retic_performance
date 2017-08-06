@@ -301,7 +301,8 @@ The following descriptions credit each benchmark's original author,
   @lib-desc["os"]{path split}
   @lib-desc["random"]{random randrange}
 ]]{
-  Simulates the interactions of economic agents via finite-state automata@~cite[n-mthesis-2014].
+  Simulates the interactions of economic agents via finite-state automata.
+  @;@~cite[n-mthesis-2014].
   This benchmark is adapted from a similar Racket program called @tt{fsmoo}@~cite[greenman-jfp-2017].
   @; 100 iterations
 }
