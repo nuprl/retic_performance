@@ -36,7 +36,7 @@ For example, the evaluation in @citet[tfgnvf-popl-2016] is at the granularity
  of modules.
 The evaluation in @citet[vss-popl-2017] is at the granularity
  of whole programs.
-@Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity that we use.
+@Section-ref{sec:protocol} defines the @emph{function and class-fields} granularity, which we use for this evaluation.
 
 After defining a granularity, a performance evaluation must define a suite of
  programs to measure.

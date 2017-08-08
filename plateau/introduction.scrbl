@@ -16,12 +16,12 @@ While gradual typing can improve readability and robustness, it has serious
 The problem is that gradual typing systems implement soundness with run-time
  type checks, and these checks can impose a large performance cost.
 
-Since the design space of gradual typing comes with a range of soundness
-notions, the question arises how much soundness costs in terms of
-performance.
-A concrete instance of this question is whether Reticulated Python's
- notion of tag soundness@~cite[vss-popl-2017] renders gradual typing more performant than Typed
+Since the design space of gradual typing comes with a range of soundness notions,
+the question arises how much soundness costs in terms of performance. 
+An evaluation by Takikawa et al. measured the performance of Typed
  Racket's generalized type soundness@~cite[tfffgksst-snapl-2017].
+ In this paper, we apply the same method to measure Reticulated Python's
+ tag soundness@~cite[vss-popl-2017], which is a more relaxed notion of soundness.
 
 Tag soundness guarantees that if a well-typed expression reduces to a value,
  then the value and expression share the same top-level type constructor
@@ -51,7 +51,7 @@ The central findings are that:
  magnitude.
 }
 @item{
- The performance degradation is basically a linear function of the
+ The performance degradation is approximately a linear function of the
  number of type annotations.
 }
 @item{
