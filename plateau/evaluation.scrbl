@@ -295,4 +295,4 @@ On the other hand, the linear increase demonstrates that Reticulated does
  not use type information to optimize programs.
 In principle a JIT compiler could generate check-free code if it could infer
  the run-time type of a variable, but it remains to be seen whether this
- approach would work in practice.
+ approach would improve performance in practice.
