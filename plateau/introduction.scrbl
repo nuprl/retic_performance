@@ -18,7 +18,7 @@ The problem is that gradual typing systems implement soundness with run-time
 
 Since the design space of gradual typing comes with a range of soundness notions,
 the question arises how much soundness costs in terms of performance. 
-An evaluation by Takikawa et al. measured the performance of Typed
+An evaluation by Takikawa @|etal| measured the performance of Typed
  Racket's generalized type soundness@~cite[tfffgksst-snapl-2017].
  In this paper, we apply the same method to measure Reticulated Python's
  tag soundness@~cite[vss-popl-2017], which is a more relaxed notion of soundness.
