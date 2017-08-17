@@ -1,4 +1,4 @@
-dls
+plateau
 ===
 
 **Deadline: 2017-08-01**
@@ -29,8 +29,6 @@ If you want more, edit `main.rkt` to provide it.
 
 #### Dependencies
 
-- racket (6.8 ?)
+- racket (6.8+)
 - scribble (6.8+)
-- git
 - LaTeX
-

@@ -1,7 +1,12 @@
 script
 ===
 
-Scripts for processing data or running experiments.
+Python scripts for processing data or running experiments.
+
+Either `Python 3.4` and/or `Python 3.5`.
+
+
+### Summary
 
 - `ProcessCsv.py` : searches a `.csv` file for configurations with a given typed component
 - `ProcessText.py` : converts output from `zrun` to .csv format (for R)
