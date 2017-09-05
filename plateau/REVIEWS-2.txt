@@ -1,0 +1,145 @@
+Dear authors,
+
+The 8th Workshop on Evaluation and Usability of Programming Languages and
+Tools (PLATEAU 2017) program committee is sorry to inform you that your
+paper #4 was rejected, and will not appear in the workshop.
+
+Title: On the Cost of Soundness for Gradual Typing
+Authors: Ben Greenman (Northeastern University)
+Zeina Migeed (Northeastern University)
+Paper site: https://plateau17.hotcrp.com/paper/4?cap=04a8oY_WTRlBT4
+
+
+Reviews and comments on your paper are appended to this email. The
+submissions site also has the paper's reviews and comments, as well as more
+information about review scores.
+
+Contact plateau-chairs@googlegroups.com with any questions or concerns.
+
+- PLATEAU 2017 Submissions
+
+Review #4A
+===========================================================================
+
+Overall merit
+-------------
+2. Weak reject
+
+Reviewer expertise
+------------------
+2. Some familiarity
+
+Paper summary
+-------------
+The authors argue that while gradual typing systems can help developers with
+code maintenance, it comes at a large cost in performance. The authors apply
+Takikawa et al.'s prior work evaluating Typed Racket's performance of
+soundness, to the previously unevaluated Reticulated Python. Like in Typed
+Racket, the authors found that cost of soundness in Reticulated Python is
+substantial (up to one order of magnitude as an approximately linear function
+of the number of type annotations).
+
+Comments for author
+-------------------
+The authors do a great job describing the evaluation method and how they
+generalized the Takikawa method to fit with Reticulated Python. The reviewer
+especially appreciated the detail the authors took to explain their
+definitions, protocol, and findings. Overall, the reviewer enjoyed reading this
+paper, but is concerned about its fit with the conference, as it does not focus
+at all on usability. In addition to adding more about usability and
+implications, there are a few points, written below, that the reviewer
+recommends the authors consider to improve their paper.
+
+However, the reviewer was not entirely clear about the nature of the data/code
+the authors evaluated. In the protocol section (3.2), "benchmark creation"
+explains how code was modified, and "data collection" appears to "jobs sent to
+the ... computing cluster." The reviewer interpreted these "jobs" as the
+paper's output (i.e., what is reported in the figures), so it is still unclear
+what exactly these jobs consisted of. So then, the "twenty-one benchmark
+programs" mentioned in Section 4 appear to be the data that was evaluated. If
+so, the reviewer recommends the authors explain where this set of benchmark
+programs came from, why this specific set (and number of benchmarks) was
+chosen, and how these programs might be representative of the type of code
+programmers/users would generate. Since the rest of the paper is about the
+analyses of this data, clarity in this information is essential.
+
+The authors also state that "Reticulated supports gradual typing at a much
+finer granularity [than Racket]." Perhaps a short explanation about this would
+also help with the clarity of the paper, and help differentiate this paper more
+from Takikawa et al.'s work.
+
+Minor recommendation: relabel "figure X" and "section Y" using capital letters
+for "Figure X" and "Section Y" since they are proper nouns referring to thing
+in the paper.
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #4B
+===========================================================================
+
+Overall merit
+-------------
+2. Weak reject
+
+Reviewer expertise
+------------------
+2. Some familiarity
+
+Paper summary
+-------------
+The paper presents a performance evaluation of Reticulated Python, a gradual
+typing system for Python. The authors employ an evaluation method used by
+others to evaluate Typed Racket, a stronger gradual type system for Python.
+They find that Reticulated Python, which provides so called tag soundness,
+provides less of a slowdown.
+
+Comments for author
+-------------------
+The paper seems overall OK to me. My main concern is whether it is a good match
+for the venue as it is mainly a performance evaluation paper and there is no
+focus on usability.
+
+Regarding the trends in the evaluation, perhaps it would help to slice the
+results on the kinds of components to gain a better understanding.
+
+Nits:
+Throughout the paper: “figure” -> “Figure” ?
+Section 4.2, par. 4: “channe” -> “chance”
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #4C
+===========================================================================
+
+Overall merit
+-------------
+1. Reject
+
+Reviewer expertise
+------------------
+2. Some familiarity
+
+Paper summary
+-------------
+This paper describes a study on the performance impact of ensuring soundness of
+gradual typing. A gradually typed variant of Python, Reticulated, is introduced
+and the idea of tag soundness explained. An existing performance evaluation
+method is then applied to measure the performance overhead of gradual typing.
+The results reveal that the performance overhead to be within one order of
+magnitude within the baseline.
+
+Comments for author
+-------------------
+This paper does not seem to be within the scope of PLATEAU. The work is
+primarily evaluating the runtime performance of a technique rather than the
+usability of the technique. Clearly, the intention behind the performance
+analysis is to ultimately assess whether a user would use it. But the
+contribution of the work is simply to measure the performance overhead, not to
+discuss its usability implications. The paper is dedicated almost entirely to
+the design principles of the system and the measurement of the performance
+rather than any topic directly relevant to usability. Thus, I believe this
+paper would be a better fit for an alternative venue.
