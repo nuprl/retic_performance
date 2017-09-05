@@ -134,7 +134,7 @@ As the value of @${D} increases along the @|x-axis|, the number of
 The important question is how many configurations are @deliverable{D}
  for low values of @${D}.
 If this number is large, then a developer who applies gradual typing to a
- similar program has a better channe of arriving at a @deliverable{D} configuration.
+ similar program has a better chance of arriving at a @deliverable{D} configuration.
 The area under the curve is the answer; in short, more is better.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
