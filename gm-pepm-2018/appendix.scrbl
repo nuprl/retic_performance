@@ -1,7 +1,8 @@
 #lang gm-pepm-2018
-@title[#:style 'unnumbered]{Appendix}
 
-@section{Validating the Approximation Method}
+@title[#:style 'unnumbered #:tag "sec:appendix"]{Appendix}
+
+@section[#:tag "sec:appendix:validating"]{Validating the Approximation Method}
 
 @Section-ref{sec:method} proposes a so-called @emph{simple random approximation}
  method for guessing the number of @deliverable{D} configurations in a benchmark:
@@ -86,7 +87,7 @@ The intervals accurately enclose the true proportions of @deliverable{D} configu
 ]
 @exact{\vspace*{2em}}
 
-@section{Benchmark Descriptions}
+@section[#:tag "sec:appendix:benchmarks"]{Benchmark Descriptions}
 
 @(let ([total @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]]
        [num1 @Integer->word[(length (list* 'aespython 'stats DLS-2014-BENCHMARK-NAMES))]]

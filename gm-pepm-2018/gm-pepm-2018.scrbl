@@ -1,4 +1,4 @@
-#lang gm-pepm-2018 @sigplan @anonymous
+#lang gm-pepm-2018 @sigplan
 
 @require[(for-syntax racket/base)]
 
@@ -11,6 +11,15 @@
 
 @title{On the Cost of Soundness for Gradual Typing}
 
+@(define ANONU
+   @affiliation[
+     #:institution "Anonymous University"
+     @;#:city "Boston"
+     @;#:state "Massachusetts"
+     @;#:postcode "02115"
+     @;#:country "USA"
+   ])
+
 @(define NEU
    @affiliation[
      #:institution "Northeastern University"
@@ -20,14 +29,16 @@
      @;#:country "USA"
    ])
 
-@author["Ben Greenman"
-        #:email "benjaminlgreenman@gmail.com"
-        #:orcid "0000-0001-7078-9287"
-        #:affiliation NEU]
+@author["Anonymous Author(s)" #:affiliation ANONU]
 
-@author["Zeina Migeed"
-        #:email "migeed.z@outlook.com"
-        #:affiliation NEU]
+@;@author["Ben Greenman"
+@;        #:email "benjaminlgreenman@gmail.com"
+@;        #:orcid "0000-0001-7078-9287"
+@;        #:affiliation NEU]
+@;
+@;@author["Zeina Migeed"
+@;        #:email "migeed.z@outlook.com"
+@;        #:affiliation NEU]
 
 @acmYear{2018}
 

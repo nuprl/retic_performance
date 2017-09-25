@@ -18,7 +18,6 @@ Our evaluation effort thus leaves us with a number of open research problems:
 @itemlist[
 @item{
   Will programmers accept tag soundness?
-  Substantial user studies are needed.
 }
 @item{
   How does the cost of soundness compare to the cost of expressive types

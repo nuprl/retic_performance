@@ -72,7 +72,7 @@ A performance evaluation must measure the running time of these configurations
  the absence of gradual typing.
 In Typed Racket, the baseline is the performance of Racket running the
  untyped configuration.
-Reticulated adds type checks to un-annotated programs@~cite[vksb-dls-2014],
+Reticulated adds dynamic checks to all programs@~cite[vksb-dls-2014],
  so its baseline is Python running the untyped configurations.
 
 @definition["performance ratio"]{
@@ -104,8 +104,8 @@ Repeating this sampling experiment yields a @emph{simple random approximation}
    the proportion of @deliverable{D} configurations in each sample.
 }
 
-Our technical appendix contains theoretical and empirical justification
- for the simple random approximation method@~cite[gm-tr-2017].
+@Section-ref{sec:appendix:validating} of the appendix contains theoretical and
+ empirical justification for the simple random approximation method.
 
 
 @section[#:tag "sec:protocol"]{Protocol}

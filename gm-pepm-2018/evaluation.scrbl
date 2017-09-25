@@ -23,7 +23,8 @@ To assess the run-time cost of gradual typing in Reticulated, we measured
   @Figure-ref{fig:static-benchmark} tabulates information about the size and
    structure of the @defn{experimental} portions of the benchmarks.
   The @|num-col| columns report the @|column-descr*|
-  Our technical appendix describes the benchmarks' origin and purpose@~cite[gm-tr-2017].
+  @Section-ref{sec:appendix:benchmarks} of the appendix
+   describes the benchmarks' origin and purpose.
 })
 
 The following three subsections present the results of the evaluation.
