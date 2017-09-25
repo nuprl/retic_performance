@@ -1,4 +1,4 @@
-#lang gm-plateau-2017 @sigplan @10pt
+#lang gm-pepm-2018 @sigplan @anonymous
 
 @require[(for-syntax racket/base)]
 
@@ -10,7 +10,6 @@
 @; take pride in your work. --- Cocktail, 1988
 
 @title{On the Cost of Soundness for Gradual Typing}
-@if-techrpt[@subtitle{(Extended Version)}]
 
 @(define NEU
    @affiliation[
@@ -29,6 +28,8 @@
 @author["Zeina Migeed"
         #:email "migeed.z@outlook.com"
         #:affiliation NEU]
+
+@acmYear{2018}
 
 @; -----------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-#lang gm-plateau-2017
+#lang gm-pepm-2018
 @title[#:tag "sec:reticulated"]{Reticulated Python}
 
 Reticulated is a gradual typing system for Python@note{Specifically, CPython 3.}

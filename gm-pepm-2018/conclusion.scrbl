@@ -1,4 +1,4 @@
-#lang gm-plateau-2017
+#lang gm-pepm-2018
 @title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
 The application of the Takikawa method suggests that any combination of

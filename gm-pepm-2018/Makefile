@@ -1,5 +1,5 @@
-PAPER=plateau
-PKG=gm-plateau-2017
+PAPER=gm-pepm-2018
+PKG=gm-pepm-2018
 
 pdf: compile texstyle.tex
 	scribble ++style texstyle.tex \

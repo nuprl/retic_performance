@@ -348,7 +348,7 @@
 
 ;; =============================================================================
 
-(define-for-syntax TECHRPT #false)
+(define-for-syntax TECHRPT #true)
 
 (define-syntax (if-techrpt stx)
    (if TECHRPT

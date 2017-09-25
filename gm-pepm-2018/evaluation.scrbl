@@ -1,4 +1,4 @@
-#lang gm-plateau-2017
+#lang gm-pepm-2018
 
 @(define MAIN-BENCHMARKS (append EXHAUSTIVE-BENCHMARKS SAMPLE-BENCHMARKS))
 @(define NUM-MAIN-BENCHMARKS (length MAIN-BENCHMARKS))

@@ -1498,6 +1498,56 @@ Computing Machinery]
     \footnotetextcopyrightpermission{%
       \def\par{\let\par\@par}\parindent\z@\@setthanks}%
   \fi
+  \footnotetextcopyrightpermission{%
+    \if@ACM@authordraft
+        \raisebox{-2ex}[\z@][\z@]{\makebox[0pt][l]{\large\bfseries
+            Unpublished
+            working draft. Not for distribution}}%
+       \color[gray]{0.9}%
+    \fi
+    \parindent\z@\parskip0.1\baselineskip
+    \if@ACM@authorversion\else
+      \if@printpermission\@copyrightpermission\par\fi
+    \fi
+    \if@ACM@manuscript\else
+       \if@ACM@journal\else % Print the conference information
+         {\itshape \acmConference@shortname, \acmConference@date, \acmConference@venue}\par
+       \fi
+    \fi
+    \if@printcopyright
+      \copyright\ \@copyrightyear\ \@copyrightowner\\
+    \else
+     \@copyrightyear.\
+    \fi
+    \if@ACM@manuscript
+      Manuscript submitted to ACM\\
+    \else
+      \if@ACM@authorversion
+          This is the author's version of the work. It is posted here for
+          your personal use. Not for redistribution. The definitive Version
+          of Record was published in
+          \if@ACM@journal
+            \emph{\@journalName}%
+          \else
+            \emph{Proceedings of \acmConference@name, \acmConference@date}%
+          \fi
+          \ifx\@acmDOI\@empty
+          .
+          \else
+            , \@formatdoi{\@acmDOI}.
+          \fi\\
+        \else
+          \if@ACM@journal
+            \@permissionCodeOne/\@acmYear/\@acmMonth-ART\@acmArticle
+            \ifx\@acmPrice\@empty\else\ \$\@acmPrice\fi\\
+            \@formatdoi{\@acmDOI}%
+          \else % Conference
+             ACM~ISBN~\@acmISBN
+             \ifx\@acmPrice\@empty.\else\dots\$\@acmPrice\fi\\
+             \@formatdoi{\@acmDOI}%
+          \fi
+        \fi
+      \fi}
   \endgroup
   \setcounter{footnote}{0}%
   \@mkabstract
@@ -1965,21 +2015,20 @@ Computing Machinery]
   \def\footnote{\ClassError{\@classname}{Please do note use footnotes
       inside \string\title{} or \string\author{} command! Use
       \string\titlenote{} or \string\authornote{} instead!}}%
-  \par\medskip\small\noindent{\bfseries Reference Format:}\par\nobreak
-  \noindent\authors. \@title.
+  \par\medskip\small\noindent{\bfseries ACM Reference Format:}\par\nobreak
+  \noindent\authors. \@acmYear. \@title.
   \if@ACM@journal
      \textit{\@journalNameShort}
      \@acmVolume, \@acmNumber, Article~\@acmArticle\ (\@acmPubDate),
      \ref{TotPages}~pages.
   \else
-     Northeastern University, NU-CCIS-2017-001, 2017.
-     %In \textit{Proceedings of \acmConference@name, \acmConference@venue,
-     %  \acmConference@date
-     %  \ifx\acmConference@name\acmConference@shortname\else
-     %    \ (\acmConference@shortname)\fi
-     %    ,} \ref{TotPages}~pages.
+     In \textit{Proceedings of \acmConference@name, \acmConference@venue,
+       \acmConference@date
+       \ifx\acmConference@name\acmConference@shortname\else
+         \ (\acmConference@shortname)\fi
+         ,} \ref{TotPages}~pages.
   \fi\par
-  %\noindent\@formatdoi{\@acmDOI}
+  \noindent\@formatdoi{\@acmDOI}
 \par\egroup}
 \def\@printendtopmatter{\par\medskip
   \ifcase\ACM@format@nr

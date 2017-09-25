@@ -1,13 +1,15 @@
 #lang racket/base
 
-;; Bibliography for DLS 2017 submission
+;; A scriblib/autobib bibliography,
+;;  based off Sam Tobin-Hochstadt's gradual-typing-bib:
+;;  <https://github.com/samth/gradual-typing-bib>
 ;;
 ;; To add a new entry, define a new `make-bib` at the bottom of this file.
 ;; Look to the previous definitions for examples.
 
-(require racket/format scriblib/autobib)
-
 (provide (all-defined-out))
+
+(require racket/format scriblib/autobib)
 
 ;; shortens names
 (abbreviate-given-names #f)
@@ -46,7 +48,7 @@
   (define/short esop "ESOP" (string-append "European " Symposium "on Programming"))
   (define/short flops "FLOPS" (string-append Symposium "Functional and Logic Programming"))
   (define/short foal "FOAL" "Foundations of Aspect-Oriented Languages")
-  (define/short fool "FOOL" (~a International Workshop "on Foundations of Object-Oriented Languages"))
+  (define/short fool "FOOL" (string-append International Workshop "on Foundations of Object-Oriented Languages"))
   (define/short fpca "FPCA" (string-append ACM International Conference "on Functional Programming Languages and Computer Architecture"))
   (define/short fse "FSE" (string-append International Symposium "on the Foundations of Software Engineering"))
   (define/short gpce "GPCE" "Generative Programming: Concepts & Experiences")
@@ -57,7 +59,7 @@
   (define/short icalp "ICALP" (string-append International "Colloquium on Automata, Languages, and Programming"))
   (define/short icfp "ICFP" (string-append ACM International Conference "on Functional Programming"))
   (define/short iclp "ICLP" (string-append  International Conference "on Logic Programming"))
-  (define/short icse "ICSE" (~a International Conference "on Software Engineering"))
+  (define/short icse "ICSE" (string-append International Conference "on Software Engineering"))
   (define/short ieee-software (string-append IEEE "Software"))
   (define/short ifl "IFL" (string-append International Symposium "Functional and Logic Programming"))
   (define/short issta "ISSTA" (string-append International Symposium "on Software Testing and Analysis"))
@@ -468,27 +470,25 @@
 
 (define tfgnvf-popl-2016
   (make-bib
-   #:author (authors
-	      "Asumu Takikawa"
-	      "Daniel Feltey"
-	      "Ben Greenman"
-	      "Max S. New"
-	      "Jan Vitek"
-	      "Matthias Felleisen")
+   #:author (authors "Asumu Takikawa"
+                     "Daniel Feltey"
+                     "Ben Greenman"
+                     "Max S. New"
+                     "Jan Vitek"
+                     "Matthias Felleisen")
    #:title "Is Sound Gradual Typing Dead?"
    #:location (proceedings-location popl #:pages '(456 468))
    #:date 2016))
 
 (define greenman-jfp-2017
   (make-bib
-   #:author (authors
-	      "Ben Greenman"
-	      "Asumu Takikawa"
-	      "Max S. New"
-	      "Daniel Feltey"
-	      "Robert Bruce Findler"
-	      "Jan Vitek"
-	      "Matthias Felleisen")
+   #:author (authors "Ben Greenman"
+                     "Asumu Takikawa"
+                     "Max S. New"
+                     "Daniel Feltey"
+                     "Robert Bruce Findler"
+                     "Jan Vitek"
+                     "Matthias Felleisen")
    #:title "How to Evaluate the Performance of Gradual Type Systems"
    #:location "Submitted for publication"
    #:date 2017))
@@ -804,16 +804,15 @@
 (define TypeDynamic
   (make-bib
     #:title "Dynamic Typing in a Statically Typed Language"
-    #:author (authors
-	       "Martin Abadi"
-	       "Luca Cardelli"
-	       "Benjamin C. Pierce"
-	       "Gordon D. Plotkin")
+    #:author (authors "Martin Abadi"
+                      "Luca Cardelli"
+                      "Benjamin C. Pierce"
+                      "Gordon D. Plotkin")
     #:date 1991
     #:location (journal-location toplas
-		 #:volume 13
-		 #:number 2
-		 #:pages '("237" "268"))))
+    #:volume 13
+    #:number 2
+    #:pages '("237" "268"))))
 
 (define |Space Efficient Gradual Typing|
   (make-bib
@@ -1400,7 +1399,7 @@
    #:location (techrpt-location #:institution "University of Copenhagen"
                                 ;; I'm not 100% sure of the TR number since
                                 ;; it's not listed anywhere officially
-				#:number "DIKU Report 89/12")
+                                #:number "DIKU Report 89/12")
    #:date 1989))
 
 (define AbstractingControl
@@ -1455,7 +1454,7 @@
    #:author (authors "Asumu Takikawa" "T. Stephen Strickland" "Sam Tobin-Hochstadt")
    #:title "Constraining Delimited Control with Contracts"
    #:location (techrpt-location #:institution "Northeastern University"
-				#:number "NU-CCIS-13-01")
+                                #:number "NU-CCIS-13-01")
    #:date "2013"))
 
 ;; ----------------------------------------
@@ -1965,13 +1964,13 @@
    #:title "Migratory Typing: Ten years later"
    #:author (authors "Sam Tobin-Hochstadt"
                      "Matthias Felleisen"
-		     "Robert Bruce Findler"
-		     "Matthew Flatt"
-		     "Ben Greenman"
-		     "Andrew M. Kent"
-		     "Vincent St-Amour"
-		     "T. Stephen Strickland"
-		     "Asumu Takikawa")
+                     "Robert Bruce Findler"
+                     "Matthew Flatt"
+                     "Ben Greenman"
+                     "Andrew M. Kent"
+                     "Vincent St-Amour"
+                     "T. Stephen Strickland"
+                     "Asumu Takikawa")
    #:location (proceedings-location snapl)
    #:date 2017))
 

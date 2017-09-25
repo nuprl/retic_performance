@@ -1,4 +1,4 @@
-#lang gm-plateau-2017
+#lang gm-pepm-2018
 
 @title[#:tag "sec:method"]{Evaluation Method}
 
