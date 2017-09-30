@@ -42,15 +42,14 @@ Our evaluation effort thus leaves us with a number of open research problems:
 
 
 
-@acks{
-  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
-  Part of this work was completed while the second author was an REU under Jeremy Siek at Indiana University.
-  We thank
-   Matthias Felleisen,  @; advisor
-   Michael Vitousek,    @; making retic, working with Zeina, fixing bugs
-   Sam Tobin-Hochstadt, @; access to Karst
-   Spenser Bauman,      @; advice about Karst
-   Tony Garnock-Jones,  @; insisting that overhead plots are CDFs
-   and Ming-Ho Yee.     @; reading a draft
-}
-
+@;@acks{
+@;  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
+@;  Part of this work was completed while the second author was an REU under Jeremy Siek at Indiana University.
+@;  We thank
+@;   Matthias Felleisen,  @; advisor
+@;   Michael Vitousek,    @; making retic, working with Zeina, fixing bugs
+@;   Sam Tobin-Hochstadt, @; access to Karst
+@;   Spenser Bauman,      @; advice about Karst
+@;   Tony Garnock-Jones,  @; insisting that overhead plots are CDFs
+@;   and Ming-Ho Yee.     @; reading a draft
+@;}

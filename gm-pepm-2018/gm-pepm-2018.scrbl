@@ -40,6 +40,7 @@
 @;        #:email "migeed.z@outlook.com"
 @;        #:affiliation NEU]
 
+@acmConference["ACM Conference" "2018" "Washington, DC, USA"]
 @acmYear{2018}
 
 @; -----------------------------------------------------------------------------
