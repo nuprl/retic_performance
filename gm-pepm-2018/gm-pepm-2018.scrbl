@@ -46,26 +46,22 @@
 @; -----------------------------------------------------------------------------
 
 @abstract{
-  Gradual typing promises to reduce the cost of software maintenance for
-   dynamically typed languages.
-  In a language with a gradual typing system, developers
-   can add type annotations to a portion of a code base after they
-   reconstruct its type during some maintenance action.
-  As Takikawa @|etal|'s recent work shows, however, the addition of type
-   annotations comes at a large cost in performance.
-  In particular, performance evaluations of Typed Racket suggest that a
-   conventionally sound gradual typing system may slow down a working system by
-   two orders of magnitude.
-
+  Gradual typing systems ensure type soundness by transforming static type
+   annotations into run-time checks.
+  These checks provide semantic guarantees, but may come at a large cost in
+   performance.
+  In particular, recent work by Takikawa @|etal| suggests that enforcing a
+   conventional form of type soundness may slow a working program by over two
+   orders of magnitude.
 
   Since different gradual typing systems satisfy different notions of
-   soundness, the question then arises: what is the cost of such varying notions of soundness?
-   This paper answers an instance of this question by applying Takikawa @|etal|'s evaluation
-   method to Reticulated Python, which in contrast to Typed Racket, satisfies a more relaxed
-   notion of soundness which we refer to as tag soundness. We find that the cost
-   of soundness in Reticulated is at most one order of magnitude. Substantial user studies
-   are needed to determine whether programmers will accept tag soundness.
-  
+   soundness, the question then arises: what is the cost of such varying
+   notions of soundness?
+  This paper answers an instance of this question by applying
+   Takikawa @|etal|'s evaluation method to Reticulated Python, which satisfies
+   a notion of type-tag soundness.
+  We find that the cost of soundness in Reticulated is at most one order of
+   magnitude.
 }
 
 @;terms{CS}
