@@ -6,66 +6,70 @@
 
 Gradual typing systems can help programmers with the task of maintaining
  code written in a dynamically typed language.
-If the latter comes with a gradual typing system, developers may incrementally
+If the language comes with a gradual typing system, developers may incrementally
  add type annotations as they improve a piece of the code base.
-The next developer that needs to comprehend this piece of the code base
+The next developer that needs to comprehend this part of the application
  can use the type annotations to understand its structure and invariants.
 
 While gradual typing can improve readability and robustness, it has serious
  implications for performance@~cite[tfgnvf-popl-2016 greenman-jfp-2017].
-The problem is that gradual typing systems implement soundness with run-time
- type checks, and these checks can impose a large performance cost.
+The problem is that gradual typing systems implement soundness by transforming
+ well-typed programs to semantically-equivalent programs that check whether
+ values supplied by dynamically typed code match the type system's assumptions.
+These checks can impose a large performance cost.
 
 Since the design space of gradual typing comes with a range of soundness notions,
-the question arises how much soundness costs in terms of performance. 
-An evaluation by Takikawa @|etal| measured the performance of Typed
- Racket's generalized type soundness@~cite[tfffgksst-snapl-2017].
- In this paper, we apply the same method to measure Reticulated Python's
- tag soundness@~cite[vss-popl-2017], which is a more relaxed notion of soundness.
+ the question arises how much soundness costs in terms of performance.
+One such notion is Typed Racket's generalized type soundness@~cite[tfffgksst-snapl-2017].
+At a high level, generalized soundness states that if a well-typed term
+ reduces to a value, the value has the expected type.
+Otherwise, evaluation halts with a type error that directs the programmer to
+ the source of the unexpected value.
+The performance cost of this guarantee is evidently high.
+An evaluation by @citet[tfgnvf-popl-2016] found that Typed Racket's
+ implementation of generalized soundness can slow a working program by over two
+ orders of magnitude.
 
+A second notion of gradual type soundness is Reticulated's tag soundness@~cite[vss-popl-2017].
 Tag soundness guarantees that if a well-typed expression reduces to a value,
- then the value and expression share the same top-level type constructor
- (see @section-ref{sec:tag-soundness}).
-Thus an expression with type @${\tlist{\tint}} can reduce to a list of strings,
+ then the value has the correct top-level type constructor.
+Thus an expression with type @${\tlist{\tint}} may reduce to a list of strings,
  but not to an integer or a function.
 
-In contrast, generalized type soundness guarantees that if an expression
- with type @${\tau} reduces to a value, then the value is well-typed at @${\tau}.
-Furthermore, if the evalution ends in a type error, generalized soundness
- guarantees that the error points to one of the finitely-many boundaries
- between statically-typed and dynamically-typed code, thereby helping programmers
- diagnose the source of the error.
+One might expect that gradual typing in Reticulated comes at a lower
+ performance cost, but this claim has not been systematically evaluated.
+For example, both @citet[vss-popl-2017] and @citet[mt-oopsla-2017] report
+ the performance of Reticulated on fully-typed and fully-untyped programs,
+ but do not report the performance of programs that actually use gradual typing.
+Part of the challenge is that Reticulated supports the addition of type
+ annotations at a fine granularity, making exhastive evaluation infeasible
+ for programs with more than twenty functions.
+We address this limitation with an evaluation
+ method based on random sampling.
 
-Generalized soundness clearly provides stronger guarantees than tag soundness,
- but @citet[tfgnvf-popl-2016] show that its implementation in Typed Racket can
- slow programs by two orders of magnitude.
-Prior work on Reticulated does not report the performance of gradually-typed
- programs@~cite[vksb-dls-2014 vss-popl-2017].
-
-This paper reports on the application of the Takikawa performance evaluation
- method@~cite[tfgnvf-popl-2016] to Reticulated.
+This paper contributes a systematic evaluation of the cost of gradual typing
+ in Reticulated.
 The central findings are that:
 @itemlist[
 @item{
- Reticulated experiences a slow down of at most one order of
- magnitude.
+ Reticulated experiences a slow down of at most one order of magnitude.
 }
 @item{
  The performance degradation is approximately a linear function of the
  number of type annotations.
 }
 @item{
- Despite the smaller performance overhead, it remains to be seen whether
-  developers will tolerate the overhead of gradual typing in Reticulated
-  and the weaker notion of soundness.
+ Randomly sampling can approximate the performance overhead of gradual typing
+  with a linear number of samples from an exponentially-large space.
 }
 ]
-@;
+
+Substantial user studies are needed to determine whether the weaker guarantees
+ of tag soundness help developers build and maintain large systems.
+
 To set the stage, this paper first describes the point that Reticulated
  occupies in the design space of gradual typing systems
  (@section-ref{sec:reticulated}).
-It then explains our adaptation of the Takikawa method to Reticulated (@section-ref{sec:method}).
+It then explains how to adapt the Takikawa method to Reticulated (@section-ref{sec:method}).
 @Section-ref{sec:evaluation} presents the details of the evaluation:
  the benchmarks, the measurements, and the conclusions.
-
-@if-techrpt[@exact{\newpage}]

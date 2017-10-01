@@ -51,8 +51,7 @@
   These checks provide semantic guarantees, but may come at a large cost in
    performance.
   In particular, recent work by Takikawa @|etal| suggests that enforcing a
-   conventional form of type soundness may slow a working program by over two
-   orders of magnitude.
+   conventional form of type soundness may slow a program by two orders of magnitude.
 
   Since different gradual typing systems satisfy different notions of
    soundness, the question then arises: what is the cost of such varying
