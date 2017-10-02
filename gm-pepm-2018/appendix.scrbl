@@ -91,10 +91,10 @@ The intervals accurately enclose the true proportions of @deliverable{D} configu
 
 @(let ([total @integer->word[NUM-EXHAUSTIVE-BENCHMARKS]]
        [num1 @Integer->word[(length (list* 'aespython 'stats DLS-2014-BENCHMARK-NAMES))]]
-       [num2 @integer->word[(length POPL-2017-BENCHMARK-NAMES)]]
+       [num2 @Integer->word[(length POPL-2017-BENCHMARK-NAMES)]]
        [num3 @integer->word[(length '(Espionage PythonFlow take5 sample_fsm))]]
       ) @elem{
-   @|num1| benchmarks originate from case studies by @citet[vksb-dls-2014],
+   @|num1| benchmarks originate from case studies by @citet[vksb-dls-2014].
    @;@note{@|dls-names|.}
    @|num2| are from the evaluation by @citet[vss-popl-2017] on programs from
    the Python Performance Benchmark Suite.
@@ -122,7 +122,7 @@ The following descriptions credit each benchmark's original author,
 ]]{
   Converts an @hyperlink["https://www.openssh.com/"]{OpenSSH} configuration
   file to an inventory file for the
-  @hyperlink["https://www.ansible.com/"]{@emph{Ansiable}} framework.
+  @hyperlink["https://www.ansible.com/"]{@emph{Ansiable}} automation framework.
   @; 1900 iterations
 }
 
@@ -224,7 +224,7 @@ The following descriptions credit each benchmark's original author,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Models the orbits of the @hyperlink["https://en.wikipedia.org/wiki/Giant_planet"]{Jovian planets}.
+  Models the orbits of Jupiter, Saturn, Uranus, and Neptune.
   @; 1 iteration
 }
 
@@ -232,7 +232,7 @@ The following descriptions credit each benchmark's original author,
 @authors["The Python Benchmark Suite"]
 @url{https://github.com/python/performance}
 @list[]]{
-  Solves the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{@math{N} queens} problem by a brute-force algorithm.
+  Solves the @hyperlink["https://developers.google.com/optimization/puzzles/queens"]{@math{8}-queens} problem by a brute-force algorithm.
   @; 10 iterations
 }
 
@@ -302,9 +302,8 @@ The following descriptions credit each benchmark's original author,
   @lib-desc["os"]{path split}
   @lib-desc["random"]{random randrange}
 ]]{
-  Simulates the interactions of economic agents via finite-state automata.
+  Simulates the interactions of economic agents modeled as finite-state automata.
   @;@~cite[n-mthesis-2014].
-  This benchmark is adapted from a similar Racket program called @tt{fsmoo}@~cite[greenman-jfp-2017].
   @; 100 iterations
 }
 
@@ -319,9 +318,9 @@ The following descriptions credit each benchmark's original author,
   @; Second sentence is a little awkward. I just want to say, "this is really
   @;  a Python implementation of AES, not just a wrapper to some UNIX implementation"
   Implements the @hyperlink["http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf"]{Advanced Encryption Standard}.
-  Uses the @tt{os} library only to generate random bytes and invoke the
-   @hyperlink["http://man7.org/linux/man-pages/man2/stat.2.html"]{@tt{stat()}}
-   system call.
+  @;Uses the @tt{os} library only to generate random bytes and invoke the
+  @; @hyperlink["http://man7.org/linux/man-pages/man2/stat.2.html"]{@tt{stat()}}
+  @; system call.
   @; 1 iteration, encrypts the book of Leviticus (2800 lines)
 }
 

@@ -12,7 +12,7 @@ The next developer that needs to comprehend this part of the application
  can use the type annotations to understand its structure and invariants.
 
 While gradual typing can improve readability and robustness, it has serious
- implications for performance@~cite[tfgnvf-popl-2016 greenman-jfp-2017].
+ implications for performance.
 The problem is that gradual typing systems implement soundness by transforming
  well-typed programs to semantically-equivalent programs that check whether
  values supplied by dynamically typed code match the type system's assumptions.
@@ -59,7 +59,7 @@ The central findings are that:
  number of type annotations.
 }
 @item{
- Randomly sampling can approximate the performance overhead of gradual typing
+ Random sampling can approximate the performance overhead of gradual typing
   with a linear number of samples from an exponentially-large space.
 }
 ]
@@ -67,9 +67,9 @@ The central findings are that:
 Substantial user studies are needed to determine whether the weaker guarantees
  of tag soundness help developers build and maintain large systems.
 
-To set the stage, this paper first describes the point that Reticulated
+This paper first describes the point that Reticulated
  occupies in the design space of gradual typing systems
  (@section-ref{sec:reticulated}).
 It then explains how to adapt the Takikawa method to Reticulated (@section-ref{sec:method}).
 @Section-ref{sec:evaluation} presents the details of the evaluation:
- the benchmarks, the measurements, and the conclusions.
+ the benchmarks, the data, and the conclusions.

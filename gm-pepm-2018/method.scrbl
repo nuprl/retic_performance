@@ -8,12 +8,13 @@
  (2) measure the performance of all gradually-typed @emph{configurations} of the programs;
  (3) count the number of configurations with performance overhead no greater than a certain limit.
 Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
- with module-level granularity.
-In other words, a Typed Racket program with @${M} modules has
+ with module-level granularity; in other words, a Typed Racket program with @${M} modules has
  @${2^M} gradually-typed configurations.
 
 Reticulated supports gradual typing at a much finer granularity,
  making it impractical to directly apply the Takikawa method.
+A naive application would require @${2^a} measurements for one function with @${a} formal parameters,
+ and similarly @${2^f} measurements for one class with @${f} fields.
 The following subsections therefore generalize the Takikawa method (@section-ref{sec:method:adapt})
  and describe the protocol we use to evaluate Reticulated (@section-ref{sec:protocol}).
 
@@ -24,8 +25,9 @@ A gradual typing system enriches a dynamically typed language with a notion of s
  that is, some pieces of a program can be statically typed.
 The @emph{granularity} of a gradual typing system defines the minimum size of
  such pieces in terms of abstract syntax.
-A performance evaluation must consider the ways that a programmer may write
- type annotations, subject to practical constraints.
+A performance evaluation must define its own granularity to systematically
+ explore the ways that a programmer may write type annotations, subject to
+ practical constraints.
 
 @definition["granularity"]{
   The @emph{granularity} of an evaluation is the syntactic unit at which
@@ -42,14 +44,16 @@ After defining a granularity, a performance evaluation must define a suite of
  programs to measure.
 A potential complication is that such programs may depend on external libraries
  or other modules that lie outside the scope of the evaluation.
+It is important to distinguish these so-called @emph{control modules} from the
+ focus of the experiment.
 
 @definition["experimental, control"]{
   The @emph{experimental modules} in a program define its configurations.
   The @emph{control modules} in a program are common across all configurations.
 }
 
-The granularity and experiemental modules define the so-called
- configurations of a fully-typed program.
+The granularity and experimental modules define the
+ @emph{configurations} of a fully-typed program.
 
 @definition["configurations"]{
   Let @${P \tcstep P'}
@@ -67,13 +71,21 @@ The granularity and experiemental modules define the so-called
    for all configurations @${P}.
 }
 
-A performance evaluation must measure the running time of these configurations
- relative to the @emph{baseline} performance of the untyped configuration in
- the absence of gradual typing.
+An evaluation must measure the performance overhead of these configurations
+ relative to some default.
+A natural baseline is the performance of the original program, distinct from the
+ gradual typing system.
+
+@definition["baseline"]{
+ The @emph{baseline performance} of a program is its running time in the absence
+  of gradual typing.
+}
+
 In Typed Racket, the baseline is the performance of Racket running the
  untyped configuration.
-Reticulated adds dynamic checks to all programs@~cite[vksb-dls-2014],
- so its baseline is Python running the untyped configurations.
+In Reticulated, the baseline is Python running the untyped configuration
+This is different from Reticulated running the untyped configuration
+ because Reticulated inserts checks in untyped code@~cite[vksb-dls-2014].
 
 @definition["performance ratio"]{
   A @emph{performance ratio} is the running time of a configuration
@@ -92,7 +104,7 @@ In this spirit, @citet[tfgnvf-popl-2016] ask programmers to consider the
    if its performance ratio is no greater than @${D}.
 }
 
-If an exhaustive performance evaluation is infeasible, one alternative is
+If an exhaustive performance evaluation is infeasible, an alternative is
  to select configurations via simple random sampling and measure the
  proportion of @deliverable{D} configurations in the sample.
 Repeating this sampling experiment yields a @emph{simple random approximation}
@@ -104,7 +116,7 @@ Repeating this sampling experiment yields a @emph{simple random approximation}
    the proportion of @deliverable{D} configurations in each sample.
 }
 
-@Section-ref{sec:appendix:validating} of the appendix contains theoretical and
+The appendix contains mathematical and
  empirical justification for the simple random approximation method.
 
 
@@ -131,10 +143,10 @@ We modify any Python code that Reticulated's type
 @parag{Data Collection}
 For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
  evaluation.
-For a larger benchmark, with @${F} functions and @${C} classes,
- we conduct a simple random approximation using
+For larger benchmarks we conduct a simple random approximation using
  @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE] * (F + C)}
- configurations.
+ configurations, where @${F} is the number of functions in the benchmark and
+ @${C} is the number of classes.
 
 All data in this paper was produced by jobs we sent
  to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} high-throughput computing cluster.
@@ -150,7 +162,7 @@ Each job:
 }
 @item{
   repeatedly:
-  selected a random configuration to measure,
+  selected a random configuration from a random benchmark,
   ran the configuration's main module @id[NUM-ITERATIONS] times,
   and recorded the result of each run.
 }

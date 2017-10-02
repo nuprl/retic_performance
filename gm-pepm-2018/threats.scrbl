@@ -2,7 +2,7 @@
 @title[#:tag "sec:threats"]{Threats to Validity}
 
 We have identified five sources of systematic
- bias that cast doubt upon the validity of our conclusions.
+ bias.
 @(let* ( @; See `src/PyPI-ranking/README.md` to reproduce these claims
         [lib-data* '((simplejson 50 "https://github.com/simplejson/simplejson")
                      (requests 200 "https://github.com/kennethreitz/requests")
@@ -21,7 +21,7 @@ We have identified five sources of systematic
   First, the experiment consists of a small suite of benchmarks, and these
    benchmarks are rather small.
   For example, an ad-hoc sample of the @|rank-info| reveals that even small
-   packages have far more functions and methods.
+   Python packages have far more functions and methods than our benchmarks.
   @|lib-info|.
 })
 

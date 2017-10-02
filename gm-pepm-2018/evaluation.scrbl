@@ -21,7 +21,7 @@ To assess the run-time cost of gradual typing in Reticulated, we measured
         [num-col @integer->word[(length column-descr*)]]
        ) @elem{
   @Figure-ref{fig:static-benchmark} tabulates information about the size and
-   structure of the @defn{experimental} portions of the benchmarks.
+   structure of the @defn{experimental} portions of these benchmarks.
   The @|num-col| columns report the @|column-descr*|
   @Section-ref{sec:appendix:benchmarks} of the appendix
    describes the benchmarks' origin and purpose.
@@ -32,8 +32,8 @@ The following three subsections present the results of the evaluation.
  and fully-typed configurations.
 @Section-ref{sec:overhead} plots the proportion of @deliverable{D}
  configurations for @${D} between @${1} and @${@id[MAX-OVERHEAD]}.
-@Section-ref{sec:exact} demonstrates that the number of type annotations
- in a configuration is correlated to its performance.
+@Section-ref{sec:exact} compares the number of type annotations in each
+ configuration to its performance.
 
 
 @section[#:tag "sec:ratio"]{Performance Ratios}
@@ -112,14 +112,14 @@ The @|x-axes| are log-scaled to focus on low overheads;
  vertical tick marks appear at @${1.2}x, @${1.4}x, @${1.6}x, @${1.8}x, @${4}x, @${6}x, and @${8}x overhead.
 
 The heading above the plot for a given benchmark states the benchmark's name
- and the nature of the underlying dataset.
+ and indicate whether the data is exhaustive or approximate.
 If the data is exhaustive, this heading lists the number of configurations
  in the benchmark.
 If the data is approximate, the heading lists the number of samples
  and the number of randomly-selected configurations in each sample.
 
-@emph{Technical Note:} the curves for @bm{sample_fsm}, @bm{aespython}, and
- @bm{stats} are intervals.
+@emph{Technical Note:} the curves for the approximate data
+ (i.e., the curves for @bm{sample_fsm}, @bm{aespython}, and @bm{stats}) are intervals.
 For instance, the height of an interval at @${x\!=\!4} is the range of the
  @approximation[NUM-SAMPLE-TRIALS (format "[~a(F+C)]" SAMPLE-RATE) "95"]
  for the number of @deliverable[4] configurations.
@@ -135,14 +135,15 @@ As the value of @${D} increases along the @|x-axis|, the number of
 The important question is how many configurations are @deliverable{D}
  for low values of @${D}.
 If this number is large, then a developer who applies gradual typing to a
- similar program has a better chance of arriving at a @deliverable{D} configuration.
-The area under the curve is the answer; in short, more is better.
+ similar program has a large chance that the configuration they arrive at
+ is a @deliverable{D} configuration.
+The area under the curve is the answer to this question.
 A curve with a large shaded area below it implies that a large number
  of configurations have low performance overhead.
 
 @(let ([d0 "d_0"]
        [d1 "d_1"]) @elem{
-  The second most important aspects of an overhead plot are the values of @${D}
+  The second most important aspects of an overhead plot are the two values of @${D}
    where the curve starts and ends.
   More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
    that counts the percent of @deliverable{D}
@@ -178,7 +179,7 @@ For many benchmarks, the maximum overhead is significantly lower.
 @; TODO 'indeed' is awkward
 
 None of the configurations in the experiment run faster than the Python baseline.
-This is no surprise given the @|u/p-ratio|s in @figure-ref{fig:ratio} and the
+This is to be expected, given the @|u/p-ratio|s in @figure-ref{fig:ratio} and the
  fact that Reticulated translates type annotations into run-time checks.
 
 @(let ([smooth '(futen http2 slowSHA chaos fannkuch float nbody pidigits
@@ -187,7 +188,7 @@ This is no surprise given the @|u/p-ratio|s in @figure-ref{fig:ratio} and the
     @Integer->word[(length smooth)] benchmarks have relatively smooth slopes.
     The plots for the other @integer->word[(- NUM-EXHAUSTIVE-BENCHMARKS (length smooth))]
      benchmarks have wide, flat segments.
-    In fact, these flat segments are due to functions that are frequently executed
+    These flat segments are due to functions that are frequently executed
      in the benchmarks' traces.
 })
 
@@ -202,7 +203,9 @@ The notable exception is @bm{spectralnorm}, in which the fully-typed configurati
  runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of all configurations.
 Unfortunately, this speedup is due to a soundness bug; in short, the
  implementation of Reticulated does not type-check the contents of
- tuples.@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
+ tuples.
+
+@; @note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
@@ -222,7 +225,7 @@ The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
 @Figure-ref{fig:exact} contains one point for every run of every
  configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
  the data for each configuration is @id[NUM-ITERATIONS] runs.}
-Each point compares the number of typed functions, methods, and classes in a
+Each point compares the number of type annotations in a
  configuration (@|x-axis|) against its running time, measured in seconds (@|y-axis|).
 
 The plots contain many points with both the same number of typed components
@@ -270,7 +273,7 @@ The plots in @figure-ref{fig:exact} suggest that this action will affect
   '(fannkuch nbody pidigits)
   (λ (num-in-category) @elem{
     In @|num-in-category| benchmarks, all configurations have similar performance.
-    The dynamic checks that enforce type soundness add insignificant overhead.
+    The dynamic checks that enforce tag soundness add insignificant overhead.
 })]
 
 @exact-runtime-category[@elem{types make things fast}
@@ -286,7 +289,7 @@ The plots in @figure-ref{fig:exact} suggest that this action will affect
     The latter is due to the implementation bug noted in @section-ref{sec:overhead}.
 })]
 
-@exact{\par}
+@exact{\smallskip}
 
 Overall, there is a clear trend that adding type annotations adds performance
  overhead.

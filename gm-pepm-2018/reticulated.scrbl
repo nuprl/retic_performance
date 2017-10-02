@@ -11,8 +11,8 @@ The annotations imply two high-level invariants:
 Within the @pythoninline{add_cash} method, Reticulated enforces these invariants
  by translating the type annotations into dynamic checks that protect the two
  arguments of @pythoninline{add_cash} and the four dereferences of the fields
- @pythoninline{dollars} and @pythoninline{cents}.
-These defensive checks protect the statically typed method from arbitrary callers.
+ @pythoninline{dollars} and @pythoninline{cents}@~cite[vksb-dls-2014].
+These checks conservatively protect the statically typed method from arbitrary callers.
 If a Python context invokes @pythoninline{add_cash} with an integer, the
  inserted checks will halt the program with a so-called @emph{dynamic type error}.
 
@@ -60,14 +60,15 @@ For completeness, @figure-ref{fig:retic-types} presents selected types @${\tau}
   Every expression is well-typed at @${\tdyn}.}
 
 
-Tag soundness is weaker than standard type soundness in two ways.
-First, tag soundness does not rule out type errors in well-typed programs.
-Second, tag soundness implies that an expression with type @pythoninline{List(Int)}
- can produce any kind of @pythoninline{List}.
-In @figure-ref{fig:magic}, for example, the expression @pythoninline{make_ints()}
- has the static type @pythoninline{List(Int)} but evaluates
- to a list containing a string, an empty list, and a function.
-Put another way, Reticulated supports only tag-level compositional reasoning.
+Tag soundness is clearly weaker than standard type soundness; a well-typed
+ program can reduce to a value that does not match its static type annotation.
+@Figure-ref{fig:magic} demonstrates with an expression that has the static
+ type @pythoninline{List(Int)} but evaluates to a list containing a string, an
+ empty list, and a function.
+This particular program succeeds because the @pythoninline{append} method
+ is dynamically typed, but the general issue is that Reticulated supports
+ only tag-level compositional reasoning.
+A programmer cannot trust the types beyond their top-level constructor.
 
 @figure["fig:retic-types"
         @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
@@ -103,7 +104,7 @@ Put another way, Reticulated supports only tag-level compositional reasoning.
 }|]
 
 
-Nevertheless, tag soundness is a very useful guarantee in the context of Reticulated.
+Nevertheless, tag soundness is a useful guarantee in the context of Reticulated.
 Reticulated's main design goal is to provide seamless interaction with Python code.
 To quote the vision paper of @citet[svcb-snapl-2015]:
  @nested[#:style 'inset @emph{
@@ -122,8 +123,7 @@ On one hand, the Reticulated type annotation might not match the behaviors imple
 On the other hand, the Python code might contain a bug.
 These impedance mismatches cannot be caught without a static analysis of the
  Python code.
-Tag soundness admits this reality with its fourth clause, which states
- that execution may end in a nondescript type error.
+Tag soundness admits this reality with its fourth clause.
 
 Second, Python code may inspect the representation of values.
 Reticulated must therefore ensure that a value from statically-typed code is
@@ -138,7 +138,7 @@ This indistinguishability constraint explains why it is difficult for
 
 Reticulated @emph{chooses} to implement tag soundness instead of some
  other compromise because of an implicit design goal;
- @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated, and assumed by @citet[vss-popl-2017].}
+ @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated@~cite[vss-popl-2017].}
 Instead of checking the type of values within a data structure, Reticulated
  stops at the structure's outermost tag.
 Hence list types require an @${\Theta(1)} tag check and structural object types

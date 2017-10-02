@@ -1,46 +1,36 @@
 #lang gm-pepm-2018
 @title[#:tag "sec:conclusion"]{Is Sound Gradual Typing Alive?}
 
-The application of the Takikawa method suggests that any combination of
+Our application of the Takikawa method suggests that any combination of
  statically typed and dynamically typed code in Reticulated runs within one
  order of magnitude of the original Python program.
 This impressive performance comes at a three-fold cost.
 First, soundness is at the level of type-tags rather than full static types.
-Second, run-time type errors point to a set of potentially-guilty
- type boundaries rather than a single location.@note{The version of Reticulated
- in this paper always reports an empty set. @citet[vss-popl-2017] improve the
- error messages and report that the improvement doubled the @|t/u-ratio| in
- most of their benchmark programs.}
+Second, run-time type errors do not describe the source of the ill-typed value.
 Third, fully-typed programs typically suffer more overhead than any other
- configuration.
+ combination of typed and untyped code.
 
-Our evaluation effort thus leaves us with a number of open research problems:
-@itemlist[
-@item{
-  Will programmers accept tag soundness?
-}
-@item{
-  How does the cost of soundness compare to the cost of expressive types
-   and informative error messages?
-  This question demands a two-pronged answer:
-   (1) Reticulated must improve its types and error messages;
-   (2) Typed Racket must implement a form of tag soundness.
-}
-@item{
-  Can Reticulated reduce its overhead relative to Python?
-  Ideally, Reticulated programs with no type annotations should have the
-   same performance as Python.
-}
-@item{
-  Can Reticulated use type information to remove dynamic checks from Python programs?
-  At present, Typed Racket is more performant than Reticulated on fully-typed
-   programs because it adds run-time checks only when linked to dynamically-typed code.
-  @;Reticulated cannot make the same assumption, but a JIT compiler
-  @; may be able to generate code with performance to match Typed Racket.
-}
-]
+Our evaluation thus raises a number of open research problems.
+First among these is whether programmers will accept tag soundness as
+ a compromise between classic type soundness and performance.
 
+A second question is how the cost of soundness compares to the cost of
+ expressive types and precise error messages.
+Experience by @citet[vss-popl-2017] suggests that the cost of useful error
+ messages is high.
+They extend Reticulated to track a set of @emph{possibly-guilty} boundaries
+ and find that maintaining the set doubled the @|t/u-ratio| in the majority
+ of their benchmark programs.
 
+A third question is whether Reticulated can reduce its overhead relative
+ to Python.
+Ideally, untyped Reticulated programs should have the same performance as Python.
+
+Finally, we ask whether Reticulated can leverage type information to remove
+ run-time checks from Python programs.
+The current implementation performs far worse than Typed Racket on fully-typed
+ programs because the latter only adds run-time checks at boundaries between
+ statically-typed and dynamically-typed code.
 
 @;@acks{
 @;  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
