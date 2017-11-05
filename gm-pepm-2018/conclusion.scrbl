@@ -42,4 +42,7 @@ The current implementation performs far worse than Typed Racket on fully-typed
 @;   Spenser Bauman,      @; advice about Karst
 @;   Tony Garnock-Jones,  @; insisting that overhead plots are CDFs
 @;   and Ming-Ho Yee.     @; reading a draft
+@; DLS reviews sort of, @; sad reviews, but helped
+@; PLATEAU reviews sort of @; we were off-topic for them, but reviews tried to help anyway
+@; PEPM reviews, very helpful comments.
 @;}
