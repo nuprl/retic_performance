@@ -9,7 +9,7 @@
 @; cocktails are.  Look how clean you keep your bar.  Why, man, you actually
 @; take pride in your work. --- Cocktail, 1988
 
-@title{On the Cost of Soundness for Gradual Typing}
+@title{On the Cost of Type-Tag Soundness}
 
 @(define ANONU
    @affiliation[
