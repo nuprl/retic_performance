@@ -14,7 +14,7 @@ Source code: @url{https://github.com/nuprl/retic_performance}
 
 @bold{Note}: the code in this package assumes that certain relative paths exist.
  For example, it assumes the Karst datasets are in the folder @filepath{../data/karst}
- relative to the source for the @racketmodname[gm-plateau-2017] package.
+ relative to the source for the @racketmodname[gm-pepm-2018] package.
 
 @include-section{data.scrbl}
 @include-section{reference.scrbl}

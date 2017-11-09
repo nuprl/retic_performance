@@ -2,11 +2,11 @@
 
 @require[
   (for-label
-    gm-plateau-2017
+    gm-pepm-2018
     with-cache
     openssl/md5
-    (only-in gm-plateau-2017/script/benchmark-info benchmark-info?)
-    (only-in gm-plateau-2017/script/performance-info performance-info?)
+    (only-in gm-pepm-2018/script/benchmark-info benchmark-info?)
+    (only-in gm-pepm-2018/script/performance-info performance-info?)
     (only-in racket/string string-split string-join)
     (only-in racket/math natural?)
     (only-in racket/set set/c)
@@ -19,9 +19,9 @@
     (only-in scriblib/figure figure figure*))]
 @title{Reference}
 
-@defmodulelang[gm-plateau-2017]{
-  The @racketmodname[gm-plateau-2017] language provides the reader from
-   @racketmodname[scribble/base] and all exports from the @racketmodname[gm-plateau-2017] module.
+@defmodulelang[gm-pepm-2018]{
+  The @racketmodname[gm-pepm-2018] language provides the reader from
+   @racketmodname[scribble/base] and all exports from the @racketmodname[gm-pepm-2018] module.
 }
 
 Other modules in the collection process the Reticulated benchmarks and the datasets.
@@ -242,7 +242,7 @@ A benchmark program consists of:
 The "other modules" may be typed or untyped;
  the point is that all configurations use identical copies of these modules.
 
-@defmodule[gm-plateau-2017/script/benchmark-info]{
+@defmodule[gm-pepm-2018/script/benchmark-info]{
   API to the benchmark programs
 }
 
@@ -333,10 +333,10 @@ The "other modules" may be typed or untyped;
 
 @section{Python Data}
 
-The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts information
+The Python script @filepath{gm-pepm-2018/script/explode_module.py} extracts information
  about the structure of a Python module (e.g., number of classes).
 
-@defmodule[gm-plateau-2017/script/python]{
+@defmodule[gm-pepm-2018/script/python]{
   API to Python syntax trees
 }
 
@@ -391,7 +391,7 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
 
 @section{Reticulated Performance Data}
 
-@defmodule[gm-plateau-2017/script/performance-info]{
+@defmodule[gm-pepm-2018/script/performance-info]{
   API to performance data
 }
 
@@ -493,7 +493,7 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
 
 @section{Generating Plots}
 
-@defmodule[gm-plateau-2017/script/plot]{
+@defmodule[gm-pepm-2018/script/plot]{
   for building plots
 }
 
@@ -540,7 +540,7 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
 
 @section{Rendering Figures}
 
-@defmodule[gm-plateau-2017/script/render]{}
+@defmodule[gm-pepm-2018/script/render]{}
 
 @deftogether[(
   @defproc[(render-overhead-plot* [bm* (listof benchmark-info?)]) pict?]
@@ -584,7 +584,7 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
 
 @section{System Calls}
 
-@defmodule[gm-plateau-2017/script/system]{
+@defmodule[gm-pepm-2018/script/system]{
   A system call interface
 }
 
@@ -599,7 +599,7 @@ The Python script @filepath{gm-plateau-2017/script/explode_module.py} extracts i
 
 @section{Utility Functions}
 
-@defmodule[gm-plateau-2017/script/util]{
+@defmodule[gm-pepm-2018/script/util]{
   Miscellaneous utilities
 }
 

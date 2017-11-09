@@ -12,7 +12,7 @@ Within the @pythoninline{add_cash} method, Reticulated enforces these invariants
  by translating the type annotations into dynamic checks that protect the two
  arguments of @pythoninline{add_cash} and the four dereferences of the fields
  @pythoninline{dollars} and @pythoninline{cents}@~cite[vksb-dls-2014].
-These checks conservatively protect the statically typed method from arbitrary callers.
+These checks defend the statically typed method from arbitrary callers.
 If a Python context invokes @pythoninline{add_cash} with an integer, the
  inserted checks will halt the program with a so-called @emph{dynamic type error}.
 
@@ -74,11 +74,11 @@ A programmer cannot trust the types beyond their top-level constructor.
         @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
         #:style left-figure-style @exact|{
   $\begin{array}{l l l}
-    \tau & = & \tint \mid
+    \tau & \Coloneqq & \tint \mid
                \tlist{\tau} \mid
                \tfunction{\tau}{\tau} \mid
                \tdyn \\
-    \kappa & = & \kint \mid
+    \kappa & \Coloneqq & \kint \mid
                  \klist \mid
                  \kfunction \mid
                  \kdyn \\[2mm]
@@ -105,7 +105,8 @@ A programmer cannot trust the types beyond their top-level constructor.
 
 
 Nevertheless, tag soundness is a useful guarantee in the context of Reticulated.
-Reticulated's main design goal is to provide seamless interaction with Python code.
+Reticulated's main design goal is to provide seamless interaction with
+ the Python 3 runtime and libraries.
 To quote the vision paper of @citet[svcb-snapl-2015]:
  @nested[#:style 'inset @emph{
     [P]rogrammers should
@@ -122,8 +123,8 @@ On one hand, the Reticulated type annotation might not match the behaviors imple
  by the Python code.
 On the other hand, the Python code might contain a bug.
 These impedance mismatches cannot be caught without a static analysis of the
- Python code.
-Tag soundness admits this reality with its fourth clause.
+ Python code, and so the fourth clause of tag soundness states that evaluation
+ may end in a dynamic typing error.
 
 Second, Python code may inspect the representation of values.
 Reticulated must therefore ensure that a value from statically-typed code is
@@ -136,8 +137,8 @@ In particular, a Reticulated list must be indistinguishable from a Python list.
 This indistinguishability constraint explains why it is difficult for
  Reticulated to predict the run-time type of a value.
 
-Reticulated @emph{chooses} to implement tag soundness instead of some
- other compromise because of an implicit design goal;
+Reticulated chooses to implement tag soundness instead of some
+ other compromise because of a secondary design goal:
  @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated@~cite[vss-popl-2017].}
 Instead of checking the type of values within a data structure, Reticulated
  stops at the structure's outermost tag.
@@ -146,5 +147,4 @@ Hence list types require an @${\Theta(1)} tag check and structural object types
  the proper fields.
 Intuitively, such checks should impose little overhead no matter how a programmer
  adds type annotations.
-
 

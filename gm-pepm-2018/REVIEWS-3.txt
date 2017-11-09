@@ -1,0 +1,401 @@
+Dear Ben,
+
+We are pleased to inform you that your paper
+
+On the Cost of Soundness for Gradual Typing
+
+has been accepted for PEPM 2018.
+
+Please find attached the reviews, which should help you revise your paper
+for publication in the proceedings.  We will send more information
+regarding the publication process shortly.
+
+Please reply with the final title and authors information by Tuesday 7
+November 2017, anywhere on earth.  And please make sure that at least one
+author will register for the workshop and present the paper.
+
+We look forward to seeing you in Los Angeles.
+
+Best,
+Fritz Henglein and Josh Ko
+PEPM 2018 programme co-chairs
+
+Review #2A
+===========================================================================
+
+Score
+-----
+A. Accept — will argue for
+
+Confidence
+----------
+Y. Knowledgeable
+
+Paper summary
+-------------
+This paper follows up the study by Takikawa et al. on the cost of sound gradual
+typing. That work evaluated the performance cost of gradual typing in Racket,
+and found that the dynamic type checks at the boundaries between typed and
+untyped code can introduce a performance overhead of two orders of magnitude.
+The current work evaluates Reticulated Python, which provides a different form
+of type soundness: only the top-level type constructor is guaranteed to be
+correct. The results show that there is still a performance overhead, as
+expected, but it is limited to a single order of magnitude.
+
+Evaluation ---------- The paper is clearly presented and the experimental
+methodology is described thoroughly. The experimental results are presented
+systematically and analysed carefully. I think it's a valuable contribution to
+this line of research, and I recommend acceptance.
+
+Comments to authors ------------------- p7 Trend I: "gradual increase in
+performance" - I think this should be "gradual decrease in performance" or
+"gradual increase in performance overhead".
+
+When describing these four trends, it would be helpful to explicitly say which
+plots show each trend.
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #2B
+===========================================================================
+
+Score ----- B. Weak accept — will not argue for
+
+Confidence ---------- X. Expert
+
+Paper summary ------------- This paper presents the design of, and results of,
+an evaluation methodology for the runtime performance overhead of gradual
+typing in the Reticulated Python variant of the Python.  It builds on an
+evaluation methodology designed for the Racket programming language, accounting
+for Reticulated Python's more fine-grained gradual typing model.  To address
+the configuration-space blow-up of fine-grained gradual typing, the paper
+resorts to sampling and statistical analysis.
+
+Reticulated Python's dynamic checking model, and typing guarantees, differ
+substantially from those of Racket, and the paper demonstrates that these
+differences lead to lower peak overheads on a suite of benchmarks, as well as a
+different performance degradation profile.
+
+Evaluation ---------- The results in this paper make an important contribution
+to the study of gradual type systems.  The Reticulated approach to gradual
+typing was presented recently as an alternative approach to sound gradual
+typing.  This work reports on the implications of that design as currently
+implemented.  The comparison to Typed Racket, which has a different notion of
+soundness and a different gradual typing granularity model, is useful.
+Extending Takikawa et al's evaluation methodology with a sampling approach is
+an important step for evaluating fine-grained gradual typing systems.
+
+The paper as-written overemphasizes positive results, or at least states them
+too coarsely, while burying more pessimistic and nuanced results, especially
+the relationship between how typed Reticulated code is and how it performs.
+This should be stated up front so that the cost-benefit tradeoffs for the
+Reticulated approach are made clear early.
+
+
+Detailed comments:
+
+
+Abstract:
+
+"recent work by Takikawa et al. suggests that enforcing a conventional form of
+type soundness may slow a program by two orders of magnitude."  This statement
+is way too easily read as an overgeneralization.  Really Takikawa et all found
+that specifically Typed Racket's specific contract-based approach to enforcing
+type soundness slows Typed Racket by two orders of magnitude.  The above
+sentence makes this sound more inevitable than I think is reasonable.
+
+"we find that the cost of soundness in Reticulated is at most one order of
+magnitude."  You should also state that the degradation profile is different
+than that of Typed Racket, in particular that it scales linearly with the
+number of type annotations, whereas TR's does not.  This would be a more
+comprehensive reporting of the results for the abstract (which will be read by
+many more people than the paper).
+
+Section 1:
+
+"gradual typing systems implement soundness by transforming well-typed programs
+to semantically-equivalent programs that..."  this reads strange to me since
+many gradual type systems have semantics that is defined by the transformation
+in question (to a cast calculus), so calling it semantically-equivalent is kind
+of a no-op: it's equivalent to itself.  You may be able to say something more
+precise here that is also more meaningful.
+
+"Thus an expression with type List(Int) may reduce to a list of strings, but
+not to an integer or a function."  If I understand this correctly, then if I
+grab an element out of that list, I will either get a number or a dynamic type
+error right? In other words, if I change the last line in Figure 3 to
+"make_ints()[1]", I get an error, right?  If so, that is worth stating here:
+it's a bit more comforting to know that the inner type constructors still play
+a roll, though it may be lazier.
+
+"Part of the challenge is that Reticulated supports the addition of type
+annotations at a fine granularity, making ... with more than twenty functions."
+This sentence reads as a combination of over-vague followed by over-specific.
+I didn't understand 1) why functions; then 2) why twenty, when I read this.
+Maybe adjust the beginning of the sentence to say that granularity is at the
+function-argument and class-field level, rather than module-level, so the
+reader knows why functions in particular.  I'm not sure how to make sense of
+twenty functions:  maybe it should be functions or classes?
+
+"Random sampling can approximate the performance overhead of gradual typing
+with a linear number of samples from an exponentially-large space"  Are you
+claiming that this is true for any granularity model in general or specifically
+for Reticulated?  Better to make that clear here rather than require the reader
+to dig into the details of the evaluation to find out.
+
+
+Section 2:
+
+Does Reticulated Python support user-defined types?
+
+Also, I am not clear on how Reticulated is used in practice.  It sounds like
+Reticulated translates to vanilla Python code, and then run on the CPython
+runtime with a library.  Is that true?  It would be useful to be clear about
+that.  It also sounds like the resulting code is supposed to live alongside
+non-translated CPython code?  These questions bear directly on some of the
+comments that follow.
+
+"Reticulated's main design goal is to provide seamless interaction with Python
+code" I suspect that by this you also *really* mean seamless interaction with
+the CPython implementation and its C API and C object model (insofar as Python
+objects can be manipulated from C without going through function calls).  If
+you mean this, you should say this.  Subsequent discussion also sounds like
+performance drives the design ("...because of an implicit design goal").
+
+More on the above: the immediately following paragraphs, starting at
+"Reticulated's main design goal is to...",  including the quotation, are as far
+as I can tell just as true of Racket/Typed Racket as they are of Reticulated
+Python/Python: if I literally replace "Reticulated" with "Typed Racket" and
+"Python" with "Racket", the same statements seem to be true. Nonetheless Typed
+Racket shoots for type soundness rather than toplevel-type-constructor
+soundness, so I don't see what is fundamental in this explanation.  Because of
+this I assume that the issue is something about interoperation with the
+existing CPython implementation and ecosystem without rewriting them.  If this
+is the case, then please be more clear about it.  If not, then at least rewrite
+the remainder of section 2.1 so that the above language substitutions no longer
+produce statements that are either true or false only for subtle reasons I
+can't see.
+
+Also, it appears that the "implicit" design goal of Reticulated is part of the
+driver that leads to a focus on tag soundness.  Why not make that explicit in
+addition to providing seamless interaction?
+
+Figure 2: missing the colons (i.e., "::=") in your BNF entries for types and
+tags.
+
+Section 3:
+
+It is important to distinguish these so-called "control modules".  Please don't
+use the word "control" to describe these modules, especially since the
+methodology is a statistical experiment.  They are not the control group of an
+experiment as far as I can tell, but rather happen to be a fixed part of the
+broader experimental infrastructure.  I find that terminology confusing.  Maybe
+just call them "fixed" or "scaffolding" or some such.  I can live with
+"experimental" modules.
+
+"an untyped configuration is a P^\lambda":  this reads as though a P^\lambda is
+something that the reader has already heard of.  Perhaps instead, "an untyped
+configuration P^\lambda has the property that" or some other similar fix.
+
+"running the untyped configuration This is different"  missing a period
+
+
+Section 3.1:
+
+"Section 3.2 defines the function and class fields granularity, which we use
+for this evaluation."  Does Reticulated allow the programmer to type some
+fields and not others, or type some arguments to a function and not others?
+The discussion of number of configurations at the beginning of section 3
+suggests so, so then does the experimental evidence somehow ensure that the
+results carry over to this more fine-grained use of gradual typing?  By the end
+of the paper I found the answer to be "yes", but it's worth clarifying this
+point well before the last page of the paper.  Currently the paper's abstract
+and introduction does not say much about this distinction, but instead makes
+what sounds like an absolute claim about gradual typing in Reticulated, but
+should (e.g. "when restricted to class- and function-scale granularity, we find
+that the cost of soundness...").  In any case it's worth explicitly saying
+_why_ you use this granularity, so that later evaluators of gradual type
+systems understand the experimental design should they wish to adapt it.
+
+Section 3.2:
+
+"ten samples, each containing 10 * (F + C) configurations."  Why *that*
+formula?  Is it arbitrary?  Does it somehow support your statistics?  The
+answer to this question will be important to others who wish to reuse this
+methodology.
+
+
+Section 4.1:
+
+"It is surprising that running a Python program through Reticulated causes such
+a large slowdown."  Why is it surprising?  Without some extra intuition or
+analysis, this sentence doesn't provide much insight.
+
+Section 4.2:
+
+I found this discussion of the plots somewhat peculiar.  It focuses on the
+percentage of configurations that are over a certain performance profile, but
+that seems like a far less interesting piece of information when the raw data
+demonstrates that performance correlates with the amount of static typing in a
+program.  In a system with a "curve" where partway-typed programs are slower
+than the two extremes, this seems like generally more useful information.
+
+Section 5:
+
+"The types in this experiment may differ from types ascribed by another python
+programmer, which, in turn, may lead to different performance overhead."  This
+is not obvious from the discussion.  Why do you believe that different types
+change performance?
+
+Section 6:
+
+"This impressive impressive performance..." this performance is not impressive
+in the absolute.  Presumably you're referring to the improvement over Racket's
+worst case, rather than the performance per se.
+
+
+"as a compromise between classic type soundness and performance" you really
+mean "worst-case performance", otherwise this sentence sets up a false
+dichotomy, as the last sentence of the paper makes clear.  One of the key
+points of this work and that of Takikawa is that performance analysis of
+gradual type systems is a nuanced matter.  Its discussion should be similarly
+nuanced.
+
+
+Appendix 1: "The paper does not argue that the intervals are accurate."  Really
+you should say "very likely to be accurate." This is statistics after all.
+
+Appendix 1.2: A better name for this section is "Empirical Illustration"
+because it does not constitute a reasonable argument on behalf of the
+methodology used, but it may be useful for the reader to see an example of this
+applied to existing full census data for some benchmarks.  The materials
+discussed in Section 1.1 serve that purpose.
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #2C
+===========================================================================
+
+Score ----- B. Weak accept — will not argue for
+
+Confidence ---------- Z. Outsider
+
+Paper summary ------------- The paper deals with the question of how different
+notions of soundness affect the performance of gradually typed programs. The
+authors start from the prior work by Takikawa et al. that evaluates the cost of
+Typed Racket's generalized soundness and they adapt it to Reticulated Python.
+More concretely, they present an evaluation of the cost of type-tag based
+soundness, a notion which is more relaxed than the generalized type soundness
+of Takikawa et al., in the context of Reticulated Python. Their hypothesis,
+i.e. relaxing the soundness statement would improve the performance, is
+validated for Reticulated Python: the worst observed slowdown wrt. Python is
+within one order of magnitude. Even though the evaluation is based on a small
+set of benchmarks from various domains, authors present their findings with the
+necessary commentary on possible obstacles to validity. One of the main
+challenges in experimental evaluation is the fine granularity level of
+Reticulated's type annotations which makes an exhaustive evaluation infeasible.
+To remedy this challenge, authors make use of a statistical argument by random
+sampling.
+
+Evaluation ---------- Overall, I enjoyed reading the paper and I found the
+evaluation worthwhile but lacking in terms of a more through user study and
+number of benchmarks. It is not clear how conclusive their arguments are
+considering that they have not done a larger scale study and Reticulated has
+limitations on its expressiveness. Still, I favor the acceptance of the paper
+since the main research question is interesting and open questions at the end
+shed some light on possible future directions to explore.
+
+Comments to authors ------------------- I suggest the authors to change the
+title to "On the Cost of **Type-tag** Soundness for Gradual Typing" since the
+paper only focuses on type-tag soundness and does not evaluate other notions of
+soundness.
+
+Q. The relaxed notion of type-tag based soundness can be potentially too weak
+for many programs. Programmers minght find it beneficial to adjust how deep the
+type tags needs to be inspected (even at the cost of higher tag checking). How
+easy it is to generalize type-tag based soundness to deeper levels (e.g. to
+handle lists of lists (matrices))?  The performance most likely would suffer,
+but do you have any ideas on how much?
+
+Q. Do you have a sense of how programmers would be able to interact with
+type-tag based error-messages?
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #2D
+===========================================================================
+
+Score ----- C. Weak reject — will not argue against
+
+Confidence ---------- Y. Knowledgeable
+
+Paper summary ------------- This paper presents a systematic evaluation on the
+performance overhead of sound gradual typing, following up on Takikawa et al.'s
+work. The authors choose Reticulated Python as a platform, using a weaker
+notion of soundness --- tag soundness, and conclude that adding typed
+components (in most cases) only increases the overhead, but moderately in a
+linear manner. The quantitative results are acquired based on statistical
+methodologies, extending Takikawa et al.'s method.
+
+Comments to authors ------------------- I appreciate the effort that the
+authors have spent on evaluating the programs. My major concern is the validity
+and impact of the results. As the remarks at the end of the paper, there leaves
+lots of uncertainties in the assumptions on which this result is based, for
+example how the community accept the notion of tag soundness, how useful it is
+in practice. Also as the authors have identified, there are a few threats to
+the validity of the results; among these threats some are more fundamental. (By
+the way, these threads are well-identified by the authors.) The choice of the
+relatively small benchmark programs is in particular questionable. These lead
+to a few more specific questions that I would like the authors to clarify.
+
+Sec 4.3, the authors claim that "the performance of the config is proportional
+to the number of type annotations". This conclusion fails to convince me: By
+reading the plots (Fig. 7) I don't see an evident proportional trend, esp. when
+the number of components is too small (e.g. nqueens, only 2 components are
+present, which is not representative at all). It would be more convincing if
+the authors could use some mathematical means to justify the proportional
+growth. If we only look at the upper bound of the plots, it seems that the
+worst performance usually comes from the middle section of the x-axes (and I
+conjecture if Reticulated optimised, it would be more obvious).
+
+Also in Fig. 7, unless I missed it, I don't see why the sampled benchmarks (the
+three on the bottom row) only have samples ranging over the middle portion of
+the x-axes. I would expect to see the plots with the number of typed components
+ranging from 0 to maximal in order to see the proportional shape better.
+
+The Conclusions paragraph of 4.3: The authors present four trends. In trend II,
+I failed to see from the paper why this would be the case. Without a lattice
+similar to that in Takikawa et al.'s paper, how do we know that it's not the
+case that keeping adding type annotations to an existing configuration will
+make a plot jump up and down across the gap? I don't think it will add
+performance overhead monotonically.
+
+The analysis of the evaluation results is a bit shallow. It would improve a lot
+if the authors could draw some connections between the performance overhead
+with the type of language constructs that are annotated in that configuration.
+Does annotating classes have the same effects as annotating methods or
+functions? Does the structure of the program affect the trend? These particular
+questions may not be what you want to answer but I would suggest more
+analysis/discussion beyond the facts that the paper presents.
+
+The writing of the paper poses some difficulty to the readers, esp. for those
+who are not familiar with the specific experimental Python variant Reticulated.
+Section 1 leaves too many names that are not defined/introduced. Of course they
+become less obscure when one reads on. The use of forward referencing
+throughout this paper does not make it any easier to follow. I strongly
+encourage the authors thinking again on the flow of the paper.
+
+The paper also confuses me in how Reticulated works and which time you
+measured. The heavily overloaded terminology is one major contributor: dynamic,
+type error, etc. What do they mean in this particular context? Reticulated has
+three different dynamic semantics, and which is the one that you use?
+Reticulated reports type error both statically and dynamically. Do you take the
+static type errors into account in your work? What is the difference between
+plain Python and untyped Reticulated? For self-containment and integrity, these
+matters are worth crisp clarification/explanations in the text.

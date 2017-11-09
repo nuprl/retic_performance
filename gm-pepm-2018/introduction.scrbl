@@ -13,9 +13,9 @@ The next developer that needs to comprehend this part of the application
 
 While gradual typing can improve readability and robustness, it has serious
  implications for performance.
-The problem is that gradual typing systems implement soundness by transforming
- well-typed programs to semantically-equivalent programs that check whether
- values supplied by dynamically typed code match the type system's assumptions.
+The problem is that gradual typing systems enforce type soundness with
+ run-time assertions that check whether values supplied by dynamically typed
+ code match the type system's assumptions.
 These checks can impose a large performance cost.
 
 Since the design space of gradual typing comes with a range of soundness notions,
@@ -43,7 +43,7 @@ For example, both @citet[vss-popl-2017] and @citet[mt-oopsla-2017] report
  but do not report the performance of programs that actually use gradual typing.
 Part of the challenge is that Reticulated supports the addition of type
  annotations at a fine granularity, making exhastive evaluation infeasible
- for programs with more than twenty functions.
+ for many programs.
 We address this limitation with an evaluation
  method based on random sampling.
 
@@ -60,7 +60,7 @@ The central findings are that:
 }
 @item{
  Random sampling can approximate the performance overhead of gradual typing
-  with a linear number of samples from an exponentially-large space.
+  in Reticulated with a linear number of samples from an exponentially-large space.
 }
 ]
 

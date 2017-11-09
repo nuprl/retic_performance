@@ -89,8 +89,8 @@ On the other hand, the overhead is always within an order-of-magnitude.
       and the final @integer->word[(- tr-<3.5 tr-<3)] are below @${3.5}x.
 
     @Integer->word[num->] benchmarks have larger @|u/p-ratio|s than @|t/u-ratio|s.
-    It is surprising that running a Python program through Reticulated
-     causes such a large slowdown.
+    Given that an untyped Reticulated program offers the same safety guarantees
+     as Python, it is surprising that the @|u/p-ratio|s are so large.
 })
 
 @figure["fig:ratio" "Performance ratios"
@@ -253,7 +253,7 @@ The plots in @figure-ref{fig:exact} suggest that this action will affect
   '(futen slowSHA chaos float pystone PythonFlow take5 sample_fsm aespython stats)
   (λ (num-in-category) @elem{
     The plots for @|num-in-category| benchmarks show a gradual increase in
-     performance as the number of typed components increases.
+     performance overhead as the number of typed components increases.
     Typing any function, class, or method adds a small performance overhead.
 })]
 
@@ -279,14 +279,12 @@ The plots in @figure-ref{fig:exact} suggest that this action will affect
 @exact-runtime-category[@elem{types make things fast}
   '(call_method spectralnorm)
   (λ (num-in-category) @elem{
-    In @|num-in-category| benchmarks, there are some configurations
-     that run faster than similar configurations with fewer typed components.
-    These speedups happen for two reasons: either because of duplicate
-     checks on dynamically-typed receivers of method calls,
-     or because of omitted checks on values annotated with tuple types.
-    The former is due to an overlap between Reticulated's semantics and
-     Python's dynamic typing@~cite[vksb-dls-2014].
-    The latter is due to the implementation bug noted in @section-ref{sec:overhead}.
+    In @|num-in-category| benchmarks, some configurations
+     run faster than similar configurations with fewer typed components.
+    These speedups are the result of two implementation bugs:
+     (1) Reticulated does not dynamically check the contents of statically-typed tuples,
+     and (2) for method calls to dynamically-typed objects, Reticulated performs
+     a run-time check that overlaps with Python's dynamic typing@~cite[vksb-dls-2014].
 })]
 
 @exact{\smallskip}
