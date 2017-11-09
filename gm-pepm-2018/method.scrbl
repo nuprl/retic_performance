@@ -44,12 +44,12 @@ After defining a granularity, a performance evaluation must define a suite of
  programs to measure.
 A potential complication is that such programs may depend on external libraries
  or other modules that lie outside the scope of the evaluation.
-It is important to distinguish these so-called @emph{control modules} from the
+It is important to distinguish these so-called @emph{fixed modules} from the
  focus of the experiment.
 
-@definition["experimental, control"]{
+@definition["experimental, fixed"]{
   The @emph{experimental modules} in a program define its configurations.
-  The @emph{control modules} in a program are common across all configurations.
+  The @emph{fixed modules} in a program are common across all configurations.
 }
 
 The granularity and experimental modules define the
@@ -67,7 +67,7 @@ The granularity and experimental modules define the
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
    programs @${P} such that @${P\!\tcmulti P^\tau}.
   Furthermore, @${P^\tau} is a so-called @emph{fully-typed configuration};
-   an @emph{untyped configuration} is a @${P^\lambda} such that @${P^\lambda\!\tcmulti P}
+   an @emph{untyped configuration} @${P^\lambda} has the property @${P^\lambda\!\tcmulti P}
    for all configurations @${P}.
 }
 
@@ -83,8 +83,8 @@ A natural baseline is the performance of the original program, distinct from the
 
 In Typed Racket, the baseline is the performance of Racket running the
  untyped configuration.
-In Reticulated, the baseline is Python running the untyped configuration
-This is different from Reticulated running the untyped configuration
+In Reticulated, the baseline is Python running the untyped configuration.
+This is not the same as Reticulated running the untyped configuration
  because Reticulated inserts checks in untyped code@~cite[vksb-dls-2014].
 
 @definition["performance ratio"]{
@@ -134,7 +134,7 @@ The class in @figure-ref{fig:cash}, for example, has 3 syntactic units.
 To convert a Reticulated program into a benchmark, we:
  (1) build a driver module that runs the program and collects timing information;
  (2) remove any non-determinism or I/O actions;@note{@Integer->word[(length '(aespython futen http2 slowSHA))] benchmarks inadvertantly perform I/O actions, see @section-ref{sec:threats}.}
- (3) partition the program into experimental and control modules; and
+ (3) partition the program into experimental and fixed modules; and
  (4) add type annotations to the experimental modules.
 We modify any Python code that Reticulated's type
  system cannot validate, such as code that requires untagged unions or polymorphism.
@@ -147,6 +147,9 @@ For larger benchmarks we conduct a simple random approximation using
  @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE] * (F + C)}
  configurations, where @${F} is the number of functions in the benchmark and
  @${C} is the number of classes.
+Note that the number @id[SAMPLE-RATE] is arbitrary; our goal was to collect
+ as much data as possible in a reasonable amount of time.
+
 
 All data in this paper was produced by jobs we sent
  to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} high-throughput computing cluster.

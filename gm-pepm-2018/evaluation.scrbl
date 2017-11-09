@@ -89,8 +89,8 @@ On the other hand, the overhead is always within an order-of-magnitude.
       and the final @integer->word[(- tr-<3.5 tr-<3)] are below @${3.5}x.
 
     @Integer->word[num->] benchmarks have larger @|u/p-ratio|s than @|t/u-ratio|s.
-    It is surprising that running a Python program through Reticulated
-     causes such a large slowdown.
+    Given that an untyped Reticulated program offers the same safety guarantees
+     as Python, it is surprising that the @|u/p-ratio|s are so large.
 })
 
 @figure["fig:ratio" "Performance ratios"

@@ -19,7 +19,7 @@
  @${C} is the number of class definitions.
 The intervals produced by this method
  (for the @bm*[SAMPLE-BENCHMARKS] benchmarks) are thin,
- but the paper does not argue that the intervals are accurate.
+ but the paper does not argue that the intervals are very likely to be accurate.
 This appendix provides the missing argument.
 
 @subsection{Statistical Argument}
@@ -56,7 +56,7 @@ A @${95\%} confidence interval generated from sample averages is therefore
 @; @deliverable{D}.
 
 
-@subsection{Empirical Argument}
+@subsection{Empirical Illustration}
 
 @Figure-ref{fig:sample:validate} superimposes the results of simple random
  sampling upon the exhaustive data for three benchmarks.
@@ -78,14 +78,13 @@ Specifically, these plots are the result of a two-step recipe:
 }
 ]
 
-The intervals accurately enclose the true proportions of @deliverable{D} configurations.
+@;The intervals accurately enclose the true proportions of @deliverable{D} configurations.
 
 @figure["fig:sample:validate" @elem{Simple random approximations of large benchmarks}
   (parameterize ([*PLOT-HEIGHT* 100]
                  [*SINGLE-COLUMN?* #true])
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
 ]
-@exact{\vspace*{2em}}
 
 @section[#:tag "sec:appendix:benchmarks"]{Benchmark Descriptions}
 
@@ -102,7 +101,7 @@ The intervals accurately enclose the true proportions of @deliverable{D} configu
 })
 
 The following descriptions credit each benchmark's original author,
- state whether the benchmark depends on any control modules,
+ state whether the benchmark depends on any fixed modules,
  and briefly summarize its purpose.
 
 @; -----------------------------------------------------------------------------
@@ -206,7 +205,7 @@ The following descriptions credit each benchmark's original author,
 ]]{
   Implements the game @hyperlink["https://en.wikipedia.org/wiki/Go_(game)"]{Go}.
   This benchmark is split across three files: an @defn{experimental} module that implements
-  the game board, a @defn{control} module that defines constants, and a @defn{control} module
+  the game board, a @defn{fixed} module that defines constants, and a @defn{fixed} module
   that implements an AI and drives the benchmark.
   @; 2 iterations
 }

@@ -70,7 +70,8 @@ The types in this experiment may differ from types ascribed by another Python
 
 Fifth, Reticulated supports a finer granularity of type annotations than the
  experiment considers.
-Partially-typed functions may come with entirely different performance.
-We leave this as an open question.
-
+Function signatures can leave some arguments untyped, and class field
+ declaractions can omit types for some members.
+We believe that a fine-grained evaluation would support the
+ conclusions presented in this paper, but leave this as an open question.
 
