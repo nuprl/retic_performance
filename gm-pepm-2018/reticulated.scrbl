@@ -74,11 +74,11 @@ A programmer cannot trust the types beyond their top-level constructor.
         @elem{Selected types (@${\tau}) and type tags (@${\kappa})}
         #:style left-figure-style @exact|{
   $\begin{array}{l l l}
-    \tau & \Coloneqq & \tint \mid
+    \tau & = & \tint \mid
                \tlist{\tau} \mid
                \tfunction{\tau}{\tau} \mid
                \tdyn \\
-    \kappa & \Coloneqq & \kint \mid
+    \kappa & = & \kint \mid
                  \klist \mid
                  \kfunction \mid
                  \kdyn \\[2mm]
