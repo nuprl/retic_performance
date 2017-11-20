@@ -2,7 +2,7 @@
 
 @require{bib.rkt}
 
-@title[#:tag "sec:introduction"]{How Much does Gradual Soundness Cost?}
+@title[#:tag "sec:introduction"]{How Much does Soundness Cost?}
 
 Gradual typing systems can help programmers with the task of maintaining
  code written in a dynamically typed language.
@@ -32,7 +32,7 @@ An evaluation by @citet[tfgnvf-popl-2016] found that Typed Racket's
 
 A second notion of gradual type soundness is Reticulated's tag soundness@~cite[vss-popl-2017].
 Tag soundness guarantees that if a well-typed expression reduces to a value,
- then the value has the correct top-level type constructor.
+ then the value has the correct top-level type constructor (see @section-ref{sec:reticulated}).
 Thus an expression with type @${\tlist{\tint}} may reduce to a list of strings,
  but not to an integer or a function.
 
@@ -45,21 +45,22 @@ Part of the challenge is that Reticulated supports the addition of type
  annotations at a fine granularity, making exhastive evaluation infeasible
  for many programs.
 We address this limitation with an evaluation
- method based on random sampling.
+ method based on random sampling (see @section-ref{sec:method:adapt} and the appendix).
 
 This paper contributes a systematic evaluation of the cost of gradual typing
  in Reticulated.
-The central findings are that:
+The central findings are:
 @itemlist[
 @item{
- Reticulated experiences a slow down of at most one order of magnitude.
+ Reticulated experiences a slow down of at most one order of magnitude
+  at a function-level granularity;
 }
 @item{
- The performance degradation is approximately a linear function of the
- number of type annotations.
+ the performance degradation is approximately a linear function of the
+ number of type annotations; and
 }
 @item{
- Random sampling can approximate the performance overhead of gradual typing
+ random sampling can approximate the performance overhead of gradual typing
   in Reticulated with a linear number of samples from an exponentially-large space.
 }
 ]

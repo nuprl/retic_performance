@@ -60,7 +60,7 @@
    Takikawa @|etal|'s evaluation method to Reticulated Python, which satisfies
    a notion of type-tag soundness.
   We find that the cost of soundness in Reticulated is at most one order of
-   magnitude, and this cost increases linearly with the number of type annotations.
+   magnitude, and increases linearly with the number of type annotations.
 }
 
 @;terms{CS}

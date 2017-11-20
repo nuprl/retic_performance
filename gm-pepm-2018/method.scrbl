@@ -7,7 +7,7 @@
  (1) identify a suite of fully-typed programs;
  (2) measure the performance of all gradually-typed @emph{configurations} of the programs;
  (3) count the number of configurations with performance overhead no greater than a certain limit.
-Takikawa @|etal| apply this method to Typed Racket, a gradual typing system
+They apply this method to Typed Racket, a gradual typing system
  with module-level granularity; in other words, a Typed Racket program with @${M} modules has
  @${2^M} gradually-typed configurations.
 
@@ -95,7 +95,7 @@ This is not the same as Reticulated running the untyped configuration
 An @emph{exhaustive} performance evaluation measures the performance of every
  configuration.
 The natural way to interpret this data is to choose a notion of
- "good performance" and count the proportion of "good" configurations.
+ ``good performance'' and count the proportion of ``good'' configurations.
 In this spirit, @citet[tfgnvf-popl-2016] ask programmers to consider the
  performance overhead they could deliver to clients.
 
@@ -110,11 +110,7 @@ If an exhaustive performance evaluation is infeasible, an alternative is
 Repeating this sampling experiment yields a @emph{simple random approximation}
  of the true proportion of @deliverable{D} configurations.
 
-@definition[@approximation["r" "s" "95"]]{
-  Given @${r} samples each containing @${s} configurations chosen uniformly at random,
-   a @emph{@approximation["r" "s" "95"]} is a @${95\%} confidence interval for
-   the proportion of @deliverable{D} configurations in each sample.
-}
+@|DEF-APPROX|
 
 The appendix contains mathematical and
  empirical justification for the simple random approximation method.
@@ -127,7 +123,7 @@ The evaluation presented in @section-ref{sec:evaluation} is at the granularity
  of @emph{function and class fields}.
 One syntactic unit in the experiment is either one function,
  one method, or the collection of all fields for one class.
-The class in @figure-ref{fig:cash}, for example, has 3 syntactic units.
+The class in @figure-ref{fig:cash}, for example, has 3 syntactic units at this granularity.
 
 
 @parag{Benchmark Creation}
@@ -144,15 +140,15 @@ We modify any Python code that Reticulated's type
 For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
  evaluation.
 For larger benchmarks we conduct a simple random approximation using
- @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE] * (F + C)}
+ @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE]\!*\!(F + C)}
  configurations, where @${F} is the number of functions in the benchmark and
  @${C} is the number of classes.
-Note that the number @id[SAMPLE-RATE] is arbitrary; our goal was to collect
- as much data as possible in a reasonable amount of time.
+@emph{Note} the number @id[SAMPLE-RATE] is arbitrary; our goal was to collect
+ as much data as possible in a reasonable amount of time. @emph{End}
 
 
 All data in this paper was produced by jobs we sent
- to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} high-throughput computing cluster.
+ to the @emph{Karst at Indiana University}@note{@url{https://kb.iu.edu/d/bezu}} computing cluster.
 Each job:
 @itemlist[#:style 'ordered
 @item{

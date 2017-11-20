@@ -1,4 +1,4 @@
-#lang racket/base
+#lang at-exp racket/base
 
 ;; Programming environment for the DLS 2017 submission. Includes utilities for:
 ;; - formatting
@@ -9,6 +9,7 @@
 
 (provide
   if-techrpt
+  DEF-APPROX
   (all-from-out
     "bib.rkt"
     scribble/acmart
@@ -706,6 +707,13 @@
 
 (define time.process_time
   (hyperlink "https://docs.python.org/3/library/time.html#time.process_time" (tt "time.process_time()")))
+
+(define DEF-APPROX
+  @definition[@approximation["r" "s" "95"]]{
+    Given @${r} samples each containing @${s} configurations chosen uniformly at random,
+     a @emph{@approximation["r" "s" "95"]} is a @${95\%} confidence interval for
+     the proportion of @deliverable{D} configurations in each sample.
+  })
 
 ;; =============================================================================
 

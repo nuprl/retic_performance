@@ -7,14 +7,10 @@
 @Section-ref{sec:method} proposes a so-called @emph{simple random approximation}
  method for guessing the number of @deliverable{D} configurations in a benchmark:
 
-@definition[@approximation["r" "s" "95"]]{
-  Given @${r} samples each containing @${s} configurations chosen uniformly at random,
-   a @emph{@approximation["r" "s" "95"]} is a @${95\%} confidence interval for
-   the proportion of @deliverable{D} configurations in each sample.
-}@;
+@|DEF-APPROX|@;
 @;
-@Section-ref{sec:evaluation} instantiates this method using @${r\!=\!  @id[NUM-SAMPLE-TRIALS]}
- samples each containing @${@id[SAMPLE-RATE] * (F + C)} configurations,
+@Section-ref{sec:evaluation} instantiates this method using @${r\!=\!@id[NUM-SAMPLE-TRIALS]}
+ samples each containing @${@id[SAMPLE-RATE]\!*\!(F + C)} configurations,
  where @${F} is the number of functions and methods in the benchmark and
  @${C} is the number of class definitions.
 The intervals produced by this method
