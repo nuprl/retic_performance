@@ -118,7 +118,7 @@ If the data is exhaustive, this heading lists the number of configurations
 If the data is approximate, the heading lists the number of samples
  and the number of randomly-selected configurations in each sample.
 
-@emph{Technical Note:} the curves for the approximate data
+@emph{Note} the curves for the approximate data
  (i.e., the curves for @bm{sample_fsm}, @bm{aespython}, and @bm{stats}) are intervals.
 For instance, the height of an interval at @${x\!=\!4} is the range of the
  @approximation[NUM-SAMPLE-TRIALS (format "[~a(F+C)]" SAMPLE-RATE) "95"]
@@ -126,6 +126,7 @@ For instance, the height of an interval at @${x\!=\!4} is the range of the
 These intervals are thin because there is little variance in the proportion
  of @deliverable{D} configurations across the @integer->word[NUM-SAMPLE-TRIALS]
  samples.
+@emph{End}
 
 
 @parag{How to Read the Plots}
@@ -145,15 +146,14 @@ A curve with a large shaded area below it implies that a large number
        [d1 "d_1"]) @elem{
   The second most important aspects of an overhead plot are the two values of @${D}
    where the curve starts and ends.
-  More precisely, if @${h : \mathbb{R}^+ \rightarrow \mathbb{N}} is a function
+  More precisely, if @${h\!:\!\mathbb{R}^+\!\rightarrow\!\mathbb{N}} is a function
    that counts the percent of @deliverable{D}
    configurations in a benchmark, the critical points are the smallest
    overheads @${@|d0|, @|d1|} such
-   that @${h(@|d0|) > 0\%} and @${h(@|d1|) = 100\%}.
-  An ideal start-value would lie between zero and one; if @${@|d0| < 1} then
+   that @${h(@|d0|)\!>\!0\%} and @${h(@|d1|)\!=\!100\%}.
+  An ideal start-value would lie between zero and one; if @${@|d0|\!<\!1} then
    at least one configuration runs faster than the Python baseline.
-  The end-value @${@|d1|} is the overhead of the slowest-running configuration
-   in the benchmark.
+  The end-value @${@|d1|} is the overhead of the slowest-running configuration.
 })
 
 Lastly, the slope of a curve corresponds to the likelihood that
@@ -223,8 +223,9 @@ The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
 
 @parag{How to Read the Plots}
 @Figure-ref{fig:exact} contains one point for every run of every
- configuration in the experiment.@note{Recall from @section-ref{sec:protocol},
- the data for each configuration is @id[NUM-ITERATIONS] runs.}
+ configuration in the experiment.
+(Recall from @section-ref{sec:protocol},
+ the data for each configuration is @id[NUM-ITERATIONS] runs.)
 Each point compares the number of type annotations in a
  configuration (@|x-axis|) against its running time, measured in seconds (@|y-axis|).
 
@@ -233,7 +234,7 @@ The plots contain many points with both the same number of typed components
 To reduce the visual overlap between such points, the points for a given
  configuration are spread across the @|x-axis|; in particular,
  the @id[NUM-ITERATIONS] points for a configuration with @math{N}
- typed components lie within the interval @${N \pm @id[EXACT-RUNTIME-XSPACE]}
+ typed components lie within the interval @${N\!\pm\!@id[EXACT-RUNTIME-XSPACE]}
  on the @|x-axis|.
 
 For example, @bm{fannkuch} has two configurations: the untyped configuration

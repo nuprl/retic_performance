@@ -6,7 +6,7 @@ Our application of the Takikawa method suggests that any combination of
  order of magnitude of the original Python program.
 This relatively impressive performance comes at a three-fold cost.
 First, soundness is at the level of type-tags rather than full static types.
-Second, run-time type errors do not describe the source of the ill-typed value.
+Second, run-time tag errors do not describe the source of the ill-typed value.
 Third, fully-typed programs typically suffer more overhead than any other
  combination of typed and untyped code.
 
