@@ -58,10 +58,13 @@
 (define SAMPLE "sample")
 
 (define-runtime-path PWD ".")
+(define-runtime-path RP_HOME "../")
 
 (define (retic-performance-home-dir)
-  (parameterize ([current-directory PWD])
-    (shell "git" '("rev-parse" "--show-toplevel"))))
+  (if (find-executable-path "git")
+    (parameterize ([current-directory PWD])
+      (shell "git" '("rev-parse" "--show-toplevel")))
+    RP_HOME))
 
 (define (retic-performance-benchmarks-dir home-dir)
   (build-path home-dir BENCHMARKS))
