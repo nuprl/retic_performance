@@ -11,14 +11,14 @@
 
 @title{On the Cost of Type-Tag Soundness}
 
-@(define ANONU
-   @affiliation[
-     #:institution "Anonymous University"
-     @;#:city "Boston"
-     @;#:state "Massachusetts"
-     @;#:postcode "02115"
-     @;#:country "USA"
-   ])
+@;@(define ANONU
+@;   @affiliation[
+@;     #:institution "Anonymous University"
+@;     @;#:city "Boston"
+@;     @;#:state "Massachusetts"
+@;     @;#:postcode "02115"
+@;     @;#:country "USA"
+@;   ])
 
 @(define NEU
    @affiliation[
@@ -41,7 +41,6 @@
 @acmPrice{15.00}
 @acmDOI{10.1145/3162066}
 @acmYear{2018}
-@acmISBN{978-1-4503-5587-2/18/01}
 @keywords{Migratory typing, Performance evaluation, Tag soundness, D-deliverable, Type granularity}
 
 @; -----------------------------------------------------------------------------

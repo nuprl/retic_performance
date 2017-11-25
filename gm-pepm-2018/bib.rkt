@@ -1932,7 +1932,7 @@
   (make-bib
     #:title "Big Types in Little Runtime: Open-World Soundness and Collaborative Blame for Gradual Type Systems"
     #:author (authors "Michael M. Vitousek" "Cameron Swords" "Jeremy G. Siek")
-    #:location (proceedings-location popl #:pages '(762 774))
+    #:location (proceedings-location popl)
     #:date 2017))
 
 (define ar-lp-1994
@@ -1956,7 +1956,7 @@
   (make-bib
     #:title "Refined Criteria for Gradual Typing"
     #:author (authors "Jeremy G. Siek" "Michael M. Vitousek" "Matteo Cimini" "John Tang Boyland")
-    #:location (proceedings-location snapl #:pages '(274 293))
+    #:location (proceedings-location snapl)
     #:date 2015))
 
 (define tfffgksst-snapl-2017
