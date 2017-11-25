@@ -29,6 +29,6 @@
   ("plateau-python" (submod gm-pepm-2018/script/python main) "Parse and query Python programs" #f)
   ("plateau-sample" (submod gm-pepm-2018/script/sample main) "Generate samples for a benchmark" #f)
 ))
-(define scribblings '(("docs/gm-pepm-2018.scrbl" () (omit-start))))
+(define scribblings '(("docs/gm-pepm-2018.scrbl" () (omit))))
 (define compile-omit-paths '("src" "nepls-2017" "pi_meeting_2017"))
 (define test-omit-paths '("src" "nepls-2017" "pi_meeting_2017"))
