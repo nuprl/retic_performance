@@ -76,7 +76,7 @@ Specifically, these plots are the result of a two-step recipe:
 
 @;The intervals accurately enclose the true proportions of @deliverable{D} configurations.
 
-@figure["fig:sample:validate" @elem{Simple random approximations of large benchmarks}
+@figure["fig:sample:validate" @elem{Simple random approximations}
   (parameterize ([*PLOT-HEIGHT* 100]
                  [*SINGLE-COLUMN?* #true])
     @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
@@ -334,8 +334,7 @@ The following descriptions credit each benchmark's original author,
   @; 1 iteration
 }
 
-
-@acks{
+@subsection[#:style 'unnumbered]{Acknowledgments}
   This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
   Part of this work was completed while the second author was an REU under Jeremy Siek at Indiana University.
   We thank
@@ -348,7 +347,6 @@ The following descriptions credit each benchmark's original author,
    the PEPM review committee.
 @; DLS reviews sort of, @; sad reviews, but helped
 @; PLATEAU reviews sort of @; we were off-topic for them, but reviews tried to help anyway
-}
-
+@;}
 
 @generate-bibliography[#:sec-title "References"]

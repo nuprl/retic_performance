@@ -559,9 +559,8 @@
              ~ ~
              (emph "(" name ")") ": "
              (make-descr (integer->word (length pre-bm*)))
-             #;"\n"
-             #;"\n"
-             #;(list "The " (authors* bm-name*) " benchmarks are of " perf-type ".")))))
+             "\n"
+             (list "Applies to " (authors* bm-name*) ".")))))
 
 (define (format-deps dep*)
   (if (null? dep*)

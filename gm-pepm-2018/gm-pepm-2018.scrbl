@@ -42,7 +42,7 @@
 @acmDOI{10.1145/3162066}
 @acmYear{2018}
 @acmISBN{978-1-4503-5587-2/18/01}
-@keywords{Migratory typing, Performance evaluation, Type-tag soundness, D-deliverable, Type granularity}
+@keywords{Migratory typing, Performance evaluation, Tag soundness, D-deliverable, Type granularity}
 
 @; -----------------------------------------------------------------------------
 
@@ -64,9 +64,6 @@
    magnitude, and increases linearly with the number of type annotations.
 }
 
-@;terms{CS}
-@;keywords{CS}
-
 @include-section{introduction.scrbl}
 @include-section{reticulated.scrbl}
 @include-section{method.scrbl}
@@ -75,4 +72,3 @@
 @include-section{conclusion.scrbl}
 
 @if-techrpt[@include-section{appendix.scrbl}]
-

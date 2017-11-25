@@ -19,7 +19,7 @@ A second question is how the cost of soundness compares to the cost of
  expressive types and precise error messages.
 Experience by @citet[vss-popl-2017] suggests that the cost of useful error
  messages is high.
-They extend Reticulated to track a set of @emph{possibly-guilty} boundaries
+They extend Reticulated to track a set of possibly-guilty boundaries
  and find that maintaining the set doubled the @|t/u-ratio| in the majority
  of their benchmark programs.
 

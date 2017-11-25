@@ -65,7 +65,7 @@ The central findings are:
 }
 ]
 
-@Section-ref{sec:reticulated} introduces Reticulated,
+@emph{Outline}: @Section-ref{sec:reticulated} introduces Reticulated,
 @Section-ref{sec:method} adapts the Takikawa method, and
 @Section-ref{sec:evaluation} presents the evaluation.
 

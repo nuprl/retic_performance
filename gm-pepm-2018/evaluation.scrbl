@@ -58,10 +58,10 @@ From left to right, these are:
 
 
 @parag{Conclusions}
-On one hand, these ratios demonstrate that migrating a benchmark to
+Migrating a benchmark to
  Reticulated, or from untyped to fully-typed, always adds performance overhead.
 The migration never improves performance.
-On the other hand, the overhead is always within an order-of-magnitude.
+The overhead is always within an order-of-magnitude.
 @(let* ([rp* (map ratios-row-retic/python RT)]
         [tr* (map ratios-row-typed/retic RT)]
         [count-< (λ (x* n) (length (filter (λ (str) (< (string->number str) n)) x*)))]
@@ -189,7 +189,8 @@ This is to be expected, given the @|u/p-ratio|s in @figure-ref{fig:ratio} and th
     The plots for the other @integer->word[(- NUM-EXHAUSTIVE-BENCHMARKS (length smooth))]
      benchmarks have wide, flat segments.
     These flat segments are due to functions that are frequently executed
-     in the benchmarks' traces.
+     in the benchmarks' traces; all configurations in which one of these functions
+     is typed incur a significant performance overhead.
 })
 
 @(let* ([NOT-tp '(http2 call_method spectralnorm)]
@@ -201,11 +202,8 @@ In these benchmarks, the fully-typed configuration is one of the slowest configu
 @;Note that these ratios are typically larger than Typed Racket's typed/untyped ratios@~cite[tfgnvf-popl-2016].
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
  runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of all configurations.
-Unfortunately, this speedup is due to a soundness bug; in short, the
- implementation of Reticulated does not type-check the contents of
- tuples.
-
-@; @note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
+Unfortunately, this speedup is due to a soundness bug;@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
+ in short, the implementation of Reticulated does not type-check the contents of tuples.
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
@@ -218,8 +216,8 @@ Since changing the type annotations in a Reticulated program changes its
  performance, the language should provide a cost model to help developers
  predict the performance of a given configuration.
 The plots in @figure-ref{fig:exact} demonstrate that a simple heuristic
- works well for these benchmarks; @emph{the performance of a configuration is
- proportional to the number of type annotations in the configuration}.
+ works well for these benchmarks: the performance of a configuration is
+ proportional to the number of type annotations in the configuration.
 
 @parag{How to Read the Plots}
 @Figure-ref{fig:exact} contains one point for every run of every

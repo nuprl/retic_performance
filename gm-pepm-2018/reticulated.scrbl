@@ -37,7 +37,7 @@ Informally, if @pythoninline{e} is a well-typed expression, then
  evaluating @pythoninline{e} can result in one of four outcomes:
 @itemlist[#:style 'ordered
 @item{
-  the program execution terminates with a value @pythoninline{v} that has the same @emph{type tag} as the expression @pythoninline{e};
+  the program execution terminates with a value @pythoninline{v} that has the same type tag as the expression @pythoninline{e};
 }
 @item{
   the execution diverges;
@@ -136,7 +136,7 @@ This indistinguishability constraint explains why it is difficult for
 
 Reticulated chooses to implement tag soundness instead of some
  other compromise because of a secondary design goal:
- @emph{all dynamic type checks run in near-constant time}.@note{This goal is implicit in the implementation of Reticulated@~cite[vss-popl-2017].}
+ all dynamic type checks run in near-constant time.@note{This goal is implicit in the implementation of Reticulated@~cite[vss-popl-2017].}
 Instead of checking the type of values within a data structure, Reticulated
  stops at the structure's outermost tag.
 Hence list types require an @${\Theta(1)} tag check and structural object types

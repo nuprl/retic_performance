@@ -61,7 +61,7 @@ The granularity and experimental modules define the
    @${P} by annotating one syntactic unit in an experimental module.
   Let @${\tcmulti} be the reflexive, transitive closure of the @${\tcstep}
    relation.@note{The @${\tcstep} relation expresses the notion of a
-   @emph{type conversion step}@~cite[tfgnvf-popl-2016].
+   @emph{type conversion step}@~cite[tfgnvf-popl-2016 greenman-jfp-2017].
    The @${\tcmulti} relation expresses the notion of @emph{term precision}@~cite[svcb-snapl-2015].}
   @; note^2: `e0 -->* e1` if and only if `e1 <= e0`
   The @emph{configurations} of a fully-typed program @${P^\tau} are all
