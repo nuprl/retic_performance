@@ -65,12 +65,13 @@ The central findings are:
 }
 ]
 
-Substantial user studies are needed to determine whether the weaker guarantees
- of tag soundness help developers build and maintain large systems.
+@Section-ref{sec:reticulated} introduces Reticulated,
+@Section-ref{sec:method} adapts the Takikawa method, and
+@Section-ref{sec:evaluation} presents the evaluation.
 
-This paper first describes the point that Reticulated
- occupies in the design space of gradual typing systems
- (@section-ref{sec:reticulated}).
-It then explains how to adapt the Takikawa method to Reticulated (@section-ref{sec:method}).
-@Section-ref{sec:evaluation} presents the details of the evaluation:
- the benchmarks, the data, and the conclusions.
+@;This paper first describes the point that Reticulated
+@; occupies in the design space of gradual typing systems
+@; (@section-ref{sec:reticulated}).
+@;It then explains how to adapt the Takikawa method to Reticulated (@section-ref{sec:method}).
+@;@Section-ref{sec:evaluation} presents the details of the evaluation:
+@; the benchmarks, the data, and the conclusions.

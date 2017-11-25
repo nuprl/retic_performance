@@ -20,7 +20,7 @@ This appendix provides the missing argument.
 
 @subsection{Statistical Argument}
 
-Let @${d} be a predicate that checks whether a given configuration from
+Let @${d} be a predicate that checks whether a configuration from
  a fixed program is @deliverable{D}.
 Since @${d} is either true or false for every configuration,
  this predicate defines a Bernoulli random variable @${X_d} with parameter
@@ -29,7 +29,7 @@ Consequently, the expected value of this random variable is @${p}.
 The law of large numbers therefore states that the average of infinitely
  many samples of @${X_d} converges to @${p}, the true proportion
  of deliverable configurations.
-Convergence suggests that the average of "enough" samples is "close to" @${p}.
+Convergence suggests that the average of ``enough'' samples is ``close to'' @${p}.
 The central limit theorem provides a similar guarantee---any sequence of
  such averages is normally distributed around the true proportion.
 A @${95\%} confidence interval generated from sample averages is therefore
@@ -334,3 +334,21 @@ The following descriptions credit each benchmark's original author,
   @; 1 iteration
 }
 
+
+@acks{
+  This paper is supported by @hyperlink["https://www.nsf.gov/awardsearch/showAward?AWD_ID=1518844"]{NSF grant CCF-1518844}.
+  Part of this work was completed while the second author was an REU under Jeremy Siek at Indiana University.
+  We thank
+   Spenser Bauman,      @; advice about Karst
+   Matthias Felleisen,  @; advisor
+   Tony Garnock-Jones,  @; insisting that overhead plots are CDFs
+   Sam Tobin-Hochstadt, @; access to Karst
+   Michael Vitousek,    @; making retic, working with Zeina, fixing bugs
+   Ming-Ho Yee, and     @; reading a draft
+   the PEPM review committee.
+@; DLS reviews sort of, @; sad reviews, but helped
+@; PLATEAU reviews sort of @; we were off-topic for them, but reviews tried to help anyway
+}
+
+
+@generate-bibliography[#:sec-title "References"]

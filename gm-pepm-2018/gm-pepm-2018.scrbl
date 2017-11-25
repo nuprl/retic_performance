@@ -1,4 +1,4 @@
-#lang gm-pepm-2018 @sigplan
+#lang gm-pepm-2018 @sigplan @screen @10pt
 
 @require[(for-syntax racket/base)]
 
@@ -23,25 +23,26 @@
 @(define NEU
    @affiliation[
      #:institution "Northeastern University"
-     @;#:city "Boston"
-     @;#:state "Massachusetts"
-     @;#:postcode "02115"
-     @;#:country "USA"
+     #:city "Boston"
+     #:state "Massachusetts"
+     #:postcode "02115"
+     #:country "USA"
    ])
 
-@author["Anonymous Author(s)" #:affiliation ANONU]
+@author["Ben Greenman"
+        #:email "benjaminlgreenman@gmail.com"
+        #:orcid "0000-0001-7078-9287"
+        #:affiliation NEU]
 
-@;@author["Ben Greenman"
-@;        #:email "benjaminlgreenman@gmail.com"
-@;        #:orcid "0000-0001-7078-9287"
-@;        #:affiliation NEU]
-@;
-@;@author["Zeina Migeed"
-@;        #:email "migeed.z@outlook.com"
-@;        #:affiliation NEU]
+@author["Zeina Migeed"
+        #:email "migeed.z@outlook.com"
+        #:affiliation NEU]
 
-@acmConference["ACM Conference" "2018" "Washington, DC, USA"]
+@acmPrice{15.00}
+@acmDOI{10.1145/3162066}
 @acmYear{2018}
+@acmISBN{978-1-4503-5587-2/18/01}
+@keywords{Migratory typing, Performance evaluation, Type-tag soundness, D-deliverable, Type granularity}
 
 @; -----------------------------------------------------------------------------
 
@@ -73,6 +74,5 @@
 @include-section{threats.scrbl}
 @include-section{conclusion.scrbl}
 
-@generate-bibliography[]
-
 @if-techrpt[@include-section{appendix.scrbl}]
+
