@@ -41,6 +41,9 @@
   generate-bibliography
   bm-desc
 
+  appendix
+  ;; Typesets '\appendix{}' before the title of the current part
+
   exact-runtime-category
   ;; Usage: @category[name bm* make-descr]
   ;;  where `name` is a string, broadly describes the category
@@ -501,6 +504,10 @@
 (define (exact . items)
   (make-element (make-style "relax" '(exact-chars))
                 items))
+
+(define appendix
+  (make-paragraph (make-style 'pretitle '())
+    (make-element (make-style "appendix" '(exact-chars)) '())))
 
 (define etal
   (exact "et~al."))

@@ -1,6 +1,6 @@
 #lang gm-pepm-2018
-
-@title[#:style 'unnumbered #:tag "sec:appendix"]{Appendix}
+@appendix
+@title[#:tag "sec:appendix"]{Appendix}
 
 @section[#:tag "sec:appendix:validating"]{Validating the Approximation Method}
 
