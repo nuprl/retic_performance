@@ -11,7 +11,11 @@
 
 % Override Scribble's default SecRef to numeric only
 \renewcommand{\SecRef}[2]{#1}
+
 \renewcommand{\vee}{\mbox{or}}
+
+% Render figure targets in bold (e.g. "{\bf Figure N:} ....")
+\renewcommand{\FigureTarget}[2]{\textbf{#1}}
 
 %\hypersetup{hidelinks}
 
