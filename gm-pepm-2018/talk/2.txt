@@ -1,0 +1,71 @@
+On the Cost of Type-Tag Soundness
+===
+
+Hello ben and zeina going to talk about type-tag soundness
+
+3 points to cover
+1 what is type-tag soundness
+2 how can soundness have a cost ... what is meant by this ...
+3 what is the cost
+
+- - -
+
+To begin lets review classic type soundness.
+A typing judgment \vdash e : \tau is sound with respect to a
+ reduction relation e ->* e if the following theorem holds.
+   \vdash e t implies:
+    - e diverges
+    - e error
+    - e v, \vdash v:t
+
+[[ can all agree, useful property. (1) no undef behavior (2) predict ]]
+
+type tag soundness is similar, weaker. If \vdash e t then either
+- e diverges
+- e error
+- e v, \vdash v \tagof t
+where \tagof gets top-level type constructor ... here are some examples
+
+still no undefined behavior, but weaker prediction power
+
+so that is type-tag soundness and how it relates to type soundness,
+ the difference is just \vdash v : ??? the guarantee on the result value
+tag soundness is a weaker guarantee
+
+- - -
+
+if you have a language, reduction relation, and type system and can prove
+ type soundness, there is no need to consider tag soundness.
+this is often the case for nice, lambda-calculus style languages
+
+if you have a "useful" langauge that can interact with the outside world,
+then it might not be possible to prove type soundness without imposing some
+kind of cost on client programs
+
+for example, `read : \forall a . () -> a`
+semantics, gets a value from some input device
+this type above is un-sound, can conclude `read() : int x int`
+and get something completely different at runtime
+
+that is a problem. I know 4 work-arounds:
+1 do nothing, trust that read will give the right type
+2 restrict read
+3 widen type
+4 check the input at runtime against the static type assumptions
+
+in general, the same problem is whenever a typed expression can receive
+input from a source that is not type-checked.
+Might be a port, an ffi, or the runtime system
+
+general solutions are to trust, change outside world, change types, or change ->
+
+- trust obviously silly, only for restricted setting
+- change world, ditto
+- change types... okay, but "lowest common denominator" solution, force dumb
+                  work onto programmers
+- change -> makes the most sense
+
+When we talk abouut "cost of soundness",
+ we mean the extra steps in -> needed for the guarantees
+
+- - -
