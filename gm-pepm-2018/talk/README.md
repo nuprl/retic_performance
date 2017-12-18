@@ -1,39 +1,46 @@
 On the Cost of Type-Tag Soundness
 ===
 
-Hello I'm Ben this is Zeinna we're here to talk about the cost of type-tag soundness.
-There are 3 things we want to share with you today
- (1) define type-tag soundness
- (2) what mean for soundness to have a cost and
- (3) share what we've learned about the cost of type-tag soundness for gradual tying in Reticulated
+Ben:
+       Hello everyone, our goal today is to share what we have learned about the
+        _performance cost_ of type-tag soundness in Reticulated, which is a
+        gradual typing system for Python.
+       In order to do that, first we'll define type-tag soundness, second we'll
+        explain what it means for soundness to have a cost, and third we'll tell
+        you about the experiment we conducted and our conclusions.
 
-To begin lets review classic type soudnness.
-There are N ingredients:
- expression language e
- errors \Omega
- reduction relation -->
- types \tau
- typing judgment \vdash
-Type soundness is a theorem that connects the typing judgment to the reduction relation.
-If can express e well typed then running e has three possible outcomes [[ so many 3's ]]
- either diverges,
- reduces to a well-defined error state,
- or reduces to a well-typed value.
-That is type soundness.
-This is a useful theorem for two reasons,
- (1) guarantees that reduction never reaches an undefined state and
- (2) "states that the type of the expression predicts the type of value it can reduce to"
-That second part enables a kind of compositional reasoning about programs.
-Ok so that is soundness, type-tag soundness is similar but weaker.
+Zeina:
+       To begin, let us review a standard type soundness theorem.
+       We say that a typing judgment is sound with respect to a semantics if
+        whenever the typing judgment proves that an expression `e` has the
+        static type `\tau`, then the evaluation of `e` either: diverges,
+        ends in a well-defined error, or ends in a well-typed value.
+       This is a useful theorem for two reasons: it guarantees that evaluation
+        never reaches an undefined state, and it guarantees that the type of the
+        expression matches the type of the value.
+       Put another way, in a type-sound language you can use the types to reason
+        about the behavior of a program.
 
-Again the ingredients include e \Omega --> \tau \vdash,
-We add to that a notion of type-tags K, a map from types to tags, and a typing judgment \vdash e : K
-The idea is, \vdash v : K decidable in constant time, kind-of canonical forms.
-Now the statement of type-tag soundness connects the typing judgment to the reduction relation (same as before) if \vdash e : \tau then either
- evalution diverges,
- reduces to error,
- or reduces to a value with the same type tag as the input
-There we are type-tag soundness
+       Type-tag soundness is a similar, but weaker theorem.
+       A typing judgment is type-tag sound with respect to a semantics, where
+        "floor of" is a relation that maps a type to a type tag, if whenever
+        `e` has the static type `\tau` the evaluation of `e` either: diverges,
+        ends in a valid error, or ends in a value with the same type-tag as `e`
+        (according to a type-tagging judgment).
+
+       For example, if the language of types includes integers, pairs, and
+        functions, the language of type-tags might include the tags Integer,
+        Pair, and Function.
+       The idea is that type-tags express first-order properties of values;
+        the judgment that checks whether a value matches a type-tag should
+        be decidable in near-constant time (`\Theta(\tau)`).
+
+       Of course this is a weaker theorem.
+       Next we will explain why you might want such a theorem.
+
+Ben:
+       a
+
 
 Next we need to explain what it means for soundness to have a cost.
 Lets start with an example
