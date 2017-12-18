@@ -39,39 +39,48 @@ Zeina:
        Next we will explain why you might want such a theorem.
 
 Ben:
-       a
+       Suppose the language includes a function `read` that prompts the user for
+        a value and steps to the new value.
+       So `read()` steps to `v`, where `v` is some non-deterministically-chosen
+        value.
+       I claim that it is not obvious how to give a sound typing rule for `read`.
+       One idea is to say `read()` is well-typed in any context because it
+        _might_ be well-typed depending on what it steps to, but this is
+        clearly unsound.
+       We don't know ahead of time what the value will be --- its coming from
+        a source that it outside the scope of the static typing judgment.
+       For `read`, the source is a programmer.
+       Other possible sources are API server, program written in another language,
+        the runtime library.
+       In general, I call this a "type safe FFI" problem.
 
+       There are essentially two solutions.
+       One is to assume that the input is type-correct and trust that this
+        assumption holds at runtime.
+       This solution makes sense for a runtime library, or source that
+        could be formally verified, but not so much for user input.
+       A second is to check the input at runtime.
+       We think of this as changing the semantics of `read` ... instead of
+        the simple rule where `read()` steps directly to `v`, have `read()`
+        step to a form that checks the value `check \tau v` and either returns
+        `v` or signals an error.
+       This second solution provides soundness at the cost of a runtime check;
+        when we say "the cost of soundness" we mean the performance cost of
+        these "extra" steps that check the type system's assumptions at
+        runtime.
 
-Next we need to explain what it means for soundness to have a cost.
-Lets start with an example
-Suppose the language e includes a function 'read' that gets a value from the outside world.
-We'll say read : \forall a . () -> a and give a non-deterministic reduction semantics
- read() -> v where v is any value.
-Clearly this typing rule is not sound with respect to the reduction relation.
-Can prove \vdash read() : Int x Int but might produce an integer instead of a
- pair value.
-We have a problem.
-And in general, this is a problem for any kind of expression that interacts
- "with stuff outside the language, any external interface", that receives input
- that is not type-checked.
-Could be input from a user, input from another language, or input from the runtime.
-"Correct me if I'm wrong byt I think even Haskell and SML have untyped runtime"
-We have a type-safe FFI problem.
-Possible solutions are to
- (1) do nothing ignore the unsoundness hope for the best
- (2) restrict the outside world so it only produces good values (either by typing it,
-     or by other verification)
- (3) widen the type, read : () -> Any, make user check & verify
- (4) automatically check at runtime
-If you take solution 4 -- which is what we are interested in -- then you effectively
- add rules to --> to make it a type-safe reduction relation.
-In the case of read, the idea is check against the expected type.
-Of course the runtime checks have a cost'
-This is what we mean by the cost of soundness, it's the cost of running -->t
- relative to --> 
-Clearly the cost of (check t v) depends on size of t (and v) and (chck K v) probably
- has lower cost because of \vdash v : K being decidable and all that 
-"you get what you pay for"
+       The exact cost of soundness depends on the expected type, the size of
+        the value, and the number of values that need to be checked.
+       This is difficult to predict.
+       But in general, its faster to check type-tags than types.
+       This is why type-tag soundness might be useful --- you might be running
+        a program where the cost of type soundness is extreme, but the cost
+        of type-tag soundness is more reasonable.
+
+Zeina:
+       In the paper, we measure the cost of type-tag soundness in Reticulated,
+        a gradual typing system for Python.
+
 
 In this paper we measure the cost of type-tag soundness in Reticulated, a gradual typing system for Python.
 The ingredients for Reticulated build on the ingredients for Python.
