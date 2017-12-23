@@ -17,7 +17,7 @@ Ben:
 
 
 Zeina:
-       To understand type-tag soundness, let us first review a standard type
+       To introduce type-tag soundness, let us first review a standard type
         soundness theorem.
        We say that a typing judgment is sound with respect to a reduction semantics if
         whenever the typing judgment proves that an expression `e` has the
@@ -51,47 +51,52 @@ Zeina:
 
 
 Ben:
-       Now that we have seen type-tag soundness, let us say what it means for
-        soundness to have a cost.
+       Now that we've seen type-tag soundness, let's say what it means for
+        soundness to have a performance cost.
+       The cost we have in mind "comes into play" when a type-correct program
+        interacts with the outside world, with a source of values that is not
+        necessarily type checked.
 
-       Suppose the language includes a function `read` that prompts the user for
-        a value and steps to the new value.
-       We model this with a rule that says `read()` steps to `v`, where `v`
-        is some non-deterministically-chosen value.
-       It is not obvious how to give a sound typing rule for `read`.
-       One idea is to say `read()` is well-typed in any context because it
-        _might_ be well-typed depending on what it steps to.
-       But clearly this is unsound.
-       You can prove that `read ()` has type `Int * Int` and it might evaluate
-        to a string, boolean, or any other value.
+       One kind of source is user input ... a program might ask the program
+        for an integer, and then get some kind of value in return --- maybe not
+        an integer.
+       Another, similar source is a serialize/deserialize API,
+        in which you can write a value to a file in some compact format, and
+        later read it back in at the same type (needs illustration on slide).
+       A foreign function interface is a third kind of external source,
+        and a special case of that is interactions with a runtime system through
+        primops, such as arithmetic functions.
 
-       The trouble with `read` is that it interacts with a source of values
-        that lies outside the scope of the static typing judgment.
-       In this case, the source is the programmer.
-       Other possible sources are (1) libraries written in another language
-        and (2) the runtime system.
-       This is a general problem --- a "type-safe FFI" problem --- and the
-        challenge is how to provide a kind of type soundness for programs
-        that have FFIs to the user, other languages, and to the runtime.
+       These interactions pose a type soundness problem, which I like to call
+        the "type safe FFI" problem.
+       What can we do to safely and efficiently interact with values that don't
+        come with a proof of type-correctness.
 
        There are essentially two solutions to the problem.
        One is to assume that the input is type-correct and trust that this
         assumption holds at runtime.
        This solution makes sense for a runtime library, or source that
-        could be formally verified, but not so much for user input.
+        could be formally verified.
+       Not so much for user input.
        A second is to check the input at runtime.
-       We think of this as changing the semantics of `read` ... instead of
-        the simple rule where `read()` steps directly to `v`, have `read()`
-        step to a form that checks the value `check \tau v` and either returns
-        `v` or signals an error.
+       We think of this as changing the semantics.
+       Take `deserialize` for example,
+        the standard "unsafe" deserialize steps to a non-deterministic value.
+       A "safe" deserialize could take one step to a form that checks the
+        deserialized value against the expected type.
+       Checking will take further steps, and eventually return the value or an
+        error.
        This second solution provides soundness at the cost of a runtime check.
-       When we say "the cost of soundness" we mean the performance cost of
-        these "extra" steps that check the type system's assumptions at
-        runtime.
+       This is what we mean by the cost of type-tag soundness:
+        the performance cost of these "extra" steps that check the type
+        system's assumptions at runtime.
 
-       The exact cost of soundness depends on the expected type, the size of
-        the value, and the number of values that need to be checked.
-       This is difficult to predict.
+       Since we have a cost, the question is, how much?
+       This is difficult to predict; it depends on the size of the value,
+        size of the type, and number of values that need to be checked.
+
+       (For example with size, to check the type `List(Int)` need to check every element of the list.)
+
        But in general, its faster to check type-tags than types.
        This is why type-tag soundness might be useful --- you might be running
         a program where the cost of type soundness is extreme, but the cost
@@ -101,12 +106,17 @@ Ben:
 Zeina:
        Back to the paper.
        Reticulated is a gradual typing system for Python.
-       A Reticulated program is a Python program with optional type annotations,
-        such as this function that computes the distance between two cartesian
+       A Reticulated program is a Python program with optional type annotations.
+       Type-annotated parts of the program are type-checked,
+        and their interactions with un-annotated parts poses a "type-safe FFI"
+        problem.
+
+       For example, this function that computes the distance between two cartesian
         coordinates.
        Reticulated statically checks the type annotations, then compiles the types
         to runtime tag checks.
-       These checks enforce tag soundness, so no matter what input this
+       These checks solve the "FFI problem" at the level of type-tags.
+       No matter what input this
         `distance` function receives, it will never segfault or give undefined
         behavior.
 
