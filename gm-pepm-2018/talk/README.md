@@ -2,59 +2,79 @@ On the Cost of Type-Tag Soundness
 ===
 
 Ben:
-       Hello everyone, our goal today is to share what we have learned about the
-        _performance cost_ of type-tag soundness in Reticulated, which is a
-        gradual typing system for Python.
-       In order to do that, first we'll define type-tag soundness, second we'll
-        explain what it means for soundness to have a cost, and third we'll tell
-        you about the experiment we conducted and our conclusions.
+       Hi everyone.
+       I'm Ben, this is Zeina, and our paper is titled _On the Cost of Type-Tag
+        Soundness_. (Alt: and we're giving a joint talk)
+       In the paper, we describe an experiment where we take 21 programs
+        written in Reticulated, which is a gradual typing system for Python,
+        and systematically measure the performance cost of soundness in each
+        program.
+       As the title suggests, Reticulated's soundness is not type soundness
+        but rather a weaker property that we call type-tag soundness.
+       And so, the plan for this talk is to first define type-tag soundness,
+        then explain what it means for soundness to have a performance cost,
+        and then share some details and conclusions from the experiment.
+
 
 Zeina:
-       To begin, let us review a standard type soundness theorem.
-       We say that a typing judgment is sound with respect to a semantics if
+       To understand type-tag soundness, let us first review a standard type
+        soundness theorem.
+       We say that a typing judgment is sound with respect to a reduction semantics if
         whenever the typing judgment proves that an expression `e` has the
         static type `\tau`, then the evaluation of `e` either: diverges,
         ends in a well-defined error, or ends in a well-typed value.
        This is a useful theorem for two reasons: it guarantees that evaluation
         never reaches an undefined state, and it guarantees that the type of the
-        expression matches the type of the value.
+        expression predicts the type of the value.
        Put another way, in a type-sound language you can use the types to reason
         about the behavior of a program.
 
        Type-tag soundness is a similar, but weaker theorem.
-       A typing judgment is type-tag sound with respect to a semantics, where
-        "floor of" is a relation that maps a type to a type tag, if whenever
-        `e` has the static type `\tau` the evaluation of `e` either: diverges,
-        ends in a valid error, or ends in a value with the same type-tag as `e`
-        (according to a type-tagging judgment).
+       A typing judgment is type-tag sound with respect to a semantics if whenever
+        `e` has the static type `\tau`, the evaluation of `e` either: diverges,
+        ends in a valid error, or ends in a value with the same type-tag as `e`.
+       This last clause uses a map "floorof" from types to type-tags, and
+        a "tagging" judgment analogous to the typing judgment.
 
        For example, if the language of types includes integers, pairs, and
-        functions, the language of type-tags might include the tags Integer,
+        functions, then the language of type-tags might include the tags Integer,
         Pair, and Function.
-       The idea is that type-tags express first-order properties of values;
-        the judgment that checks whether a value matches a type-tag should
-        be decidable in near-constant time (`\Theta(\tau)`).
+       The idea is that type-tags express first-order properties of values.
+       And the judgment that checks whether a value matches a type-tag should
+        be decidable in near-constant time.
 
-       Of course this is a weaker theorem.
-       Next we will explain why you might want such a theorem.
+       Type-tag soundness guarantees that evaluation does not reach an undefined
+        state, just like type soundness, but only weakly predicts the type of
+        the value if evaluation terminates successfully.
+       So whereas type soundness supports compositional reasoning, type tag
+        soundness does not.
+
 
 Ben:
+       Now that we have seen type-tag soundness, let us say what it means for
+        soundness to have a cost.
+
        Suppose the language includes a function `read` that prompts the user for
         a value and steps to the new value.
-       So `read()` steps to `v`, where `v` is some non-deterministically-chosen
-        value.
-       I claim that it is not obvious how to give a sound typing rule for `read`.
+       We model this with a rule that says `read()` steps to `v`, where `v`
+        is some non-deterministically-chosen value.
+       It is not obvious how to give a sound typing rule for `read`.
        One idea is to say `read()` is well-typed in any context because it
-        _might_ be well-typed depending on what it steps to, but this is
-        clearly unsound.
-       We don't know ahead of time what the value will be --- its coming from
-        a source that it outside the scope of the static typing judgment.
-       For `read`, the source is a programmer.
-       Other possible sources are API server, program written in another language,
-        the runtime library.
-       In general, I call this a "type safe FFI" problem.
+        _might_ be well-typed depending on what it steps to.
+       But clearly this is unsound.
+       You can prove that `read ()` has type `Int * Int` and it might evaluate
+        to a string, boolean, or any other value.
 
-       There are essentially two solutions.
+       The trouble with `read` is that it interacts with a source of values
+        that lies outside the scope of the static typing judgment.
+       In this case, the source is the programmer.
+       Other possible sources are (1) libraries written in another language
+        and (2) the runtime system.
+       This is a general problem --- a "type-safe FFI" problem --- and the
+        challenge is how to provide a kind of type soundness for programs
+        that have FFIs to the user, other languages, and to the runtime.
+
+       There are essentially two solutions to the problem.
        One is to assume that the input is type-correct and trust that this
         assumption holds at runtime.
        This solution makes sense for a runtime library, or source that
@@ -64,8 +84,8 @@ Ben:
         the simple rule where `read()` steps directly to `v`, have `read()`
         step to a form that checks the value `check \tau v` and either returns
         `v` or signals an error.
-       This second solution provides soundness at the cost of a runtime check;
-        when we say "the cost of soundness" we mean the performance cost of
+       This second solution provides soundness at the cost of a runtime check.
+       When we say "the cost of soundness" we mean the performance cost of
         these "extra" steps that check the type system's assumptions at
         runtime.
 
@@ -77,9 +97,10 @@ Ben:
         a program where the cost of type soundness is extreme, but the cost
         of type-tag soundness is more reasonable.
 
+
 Zeina:
-       In the paper, we measure the cost of type-tag soundness in Reticulated,
-        a gradual typing system for Python.
+       Back to the paper.
+       Reticulated is a gradual typing system for Python.
        A Reticulated program is a Python program with optional type annotations,
         such as this function that computes the distance between two cartesian
         coordinates.
@@ -106,7 +127,7 @@ Zeina:
         configurations because each method can be typed and the class's fields
         can be typed.
 
-       NOTE that in principle we could get `2**8` configurations from this
+       Note: in principle we could get `2**8` configurations from this
         program by toggling each function parameter, function return type,
         and individual class field.
        We picked the coarser granularity to make the evaluation tractable.
