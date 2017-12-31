@@ -2,7 +2,7 @@ On the Cost of Type-Tag Soundness
 ===
 
 Ben:
-       Hi everyone.
+[00]   Hi everyone.
        I'm Ben, this is Zeina, and our paper is titled _On the Cost of Type-Tag
         Soundness_. (Alt: and we're giving a joint talk)
        In the paper, we describe an experiment where we take 21 programs
@@ -11,123 +11,135 @@ Ben:
         program.
        As the title suggests, Reticulated's soundness is not type soundness
         but rather a weaker property that we call type-tag soundness.
-       And so, the plan for this talk is to first define type-tag soundness,
+[01]   And so, the plan for this talk is to first define type-tag soundness,
         then explain what it means for soundness to have a performance cost,
         and then share some details and conclusions from the experiment.
 
 
 Zeina:
-       To introduce type-tag soundness, let us first review a standard type
+[02]   To introduce type-tag soundness, let us first review a standard type
         soundness theorem.
        We say that a typing judgment is sound with respect to a reduction semantics if
         whenever the typing judgment proves that an expression `e` has the
-        static type `\tau`, then the evaluation of `e` either: diverges,
-        ends in a well-defined error, or ends in a well-typed value.
-       This is a useful theorem for two reasons: it guarantees that evaluation
-        never reaches an undefined state, and it guarantees that the type of the
-        expression predicts the type of the value.
+        static type `\tau`, then the evaluation of `e` either:
+        steps to a well-typed value,
+        steps to a well-defined error,
+        or diverges.
+       This is a useful theorem for two reasons:
+[03]    it guarantees that evaluation never reaches an undefined state,
+        and it guarantees that the type of the expression predicts the type of the value.
        Put another way, in a type-sound language you can use the types to reason
         about the behavior of a program.
 
        Type-tag soundness is a similar, but weaker theorem.
-       A typing judgment is type-tag sound with respect to a semantics if whenever
-        `e` has the static type `\tau`, the evaluation of `e` either: diverges,
-        ends in a valid error, or ends in a value with the same type-tag as `e`.
-       This last clause uses a map "floorof" from types to type-tags, and
-        a "tagging" judgment analogous to the typing judgment.
+[04]   A typing judgment is type-tag sound with respect to a semantics if whenever
+        `e` has the static type `\tau`, the evaluation of `e` either:
+         steps to a value with the same type-tag as `e`,
+         steps to a valid error,
+         or diverges.
+       In this theorem statement we use two auxiliary notions:
+        a map "floorof" from types to type-tags, and
+        a judgment that decides if a value matches, or models, a type-tag.
 
-       For example, if the language of types includes integers, pairs, and
+[05]   For example, if the language of types includes integers, pairs, and
         functions, then the language of type-tags might include the tags Integer,
         Pair, and Function.
        The idea is that type-tags express first-order properties of values.
        And the judgment that checks whether a value matches a type-tag should
         be decidable in near-constant time.
 
-       Type-tag soundness guarantees that evaluation does not reach an undefined
-        state, just like type soundness, but only weakly predicts the type of
-        the value if evaluation terminates successfully.
-       So whereas type soundness supports compositional reasoning, type tag
-        soundness does not.
+[06]   So that is type-tags, and here again is type-tag soundness.
+
+[07]   Type-tag soundness guarantees that
+        evaluation does not reach an undefined state, just like type soundness,
+        but only predicts the type-tag of the value.
+       So whereas type soundness supports compositional type-based reasoning,
+        type tag soundness is only compositional at a superficial level.
+       Compared to type soundness this is a weaker guarantee,
+        but it may be easier to prove for certain typing systems and reduction
+        semantics.
 
 
 Ben:
-       Now that we've seen type-tag soundness, let's say what it means for
+[08]   Now that we've seen type-tag soundness, let's say what it means for
         soundness to have a performance cost.
-       The cost we have in mind "comes into play" when a type-correct program
-        interacts with the outside world, with a source of values that is not
-        necessarily type checked.
+       The cost we have in mind comes about when a well-typed program
+        interacts with the outside world; more precisely, with a source of
+        values that is not necessarily type checked.
 
-       One kind of source is user input ... a program might ask the program
-        for an integer, and then get some kind of value in return --- maybe not
-        an integer.
-       Another, similar source is a serialize/deserialize API,
+       This happens never in the lambda calculus, but happens all the time
+        in a useful programming language.
+
+[09]   For example, one kind of source is user input.
+       A program might ask the user for an integer, and then get some kind of
+        value in return --- maybe not an integer.
+[10]   Another, similar source is a serialize/deserialize API,
         in which you can write a value to a file in some compact format, and
-        later read it back in at the same type (needs illustration on slide).
-       A foreign function interface is a third kind of external source,
-        and a special case of that is interactions with a runtime system through
+        later read it back in at the same type.
+[11]   A foreign function interface is a third kind of external source,
+[12]    and a special case of that is interactions with a runtime system through
         primops, such as arithmetic functions.
 
-       These interactions pose a type soundness problem, which I like to call
+[13]   These interactions pose a type soundness problem, which I like to call
         the "type safe FFI" problem.
-       What can we do to safely and efficiently interact with values that don't
-        come with a proof of type-correctness.
+       What can we do to safely, conveniently, and efficiently interact with
+        values that don't come with a proof of type-correctness.
 
-       There are essentially two solutions to the problem.
+[14]   There are essentially two solutions to the problem.
        One is to assume that the input is type-correct and trust that this
         assumption holds at runtime.
        This solution makes sense for a runtime library, or source that
         could be formally verified.
        Not so much for user input.
        A second is to check the input at runtime.
-       We think of this as changing the semantics.
-       Take `deserialize` for example,
-        the standard "unsafe" deserialize steps to a non-deterministic value.
-       A "safe" deserialize could take one step to a form that checks the
-        deserialized value against the expected type.
-       Checking will take further steps, and eventually return the value or an
-        error.
        This second solution provides soundness at the cost of a runtime check.
        This is what we mean by the cost of type-tag soundness:
         the performance cost of these "extra" steps that check the type
         system's assumptions at runtime.
+       We think of this as changing the semantics.
 
-       Since we have a cost, the question is, how much?
-       This is difficult to predict; it depends on the size of the value,
-        size of the type, and number of values that need to be checked.
+[15]   As a concrete example, suppose we have a call to `deserialize` that
+        expects an integer.
+       A safe deserialize function will read the value from the outside world
+        and then check that it's actually an integer.
+       So there is one extra step to ensure type soundness.
 
-       (For example with size, to check the type `List(Int)` need to check every element of the list.)
+[16]   If the expected type is more complex, for instance a list of integers,
+        then the check to ensure type soundness will be more expensive.
+       Naturally the question arises how expensive these checks are in
+        your "average" program.
 
-       But in general, its faster to check type-tags than types.
-       This is why type-tag soundness might be useful --- you might be running
-        a program where the cost of type soundness is extreme, but the cost
-        of type-tag soundness is more reasonable.
+[17]   The same question arises for tag soundness, and we can hypothesize that
+        it should be much less costly to enforce.
 
 
 Zeina:
-       Back to the paper.
-       Reticulated is a gradual typing system for Python.
-       A Reticulated program is a Python program with optional type annotations.
-       Type-annotated parts of the program are type-checked,
-        and their interactions with un-annotated parts poses a "type-safe FFI"
-        problem.
+[18]   Back to the paper, we ask "what is the cost of type-tag soundness in Reticulated?"
 
-       For example, this function that computes the distance between two cartesian
-        coordinates.
-       Reticulated statically checks the type annotations, then compiles the types
-        to runtime tag checks.
-       These checks solve the "FFI problem" at the level of type-tags.
-       No matter what input this
-        `distance` function receives, it will never segfault or give undefined
-        behavior.
+[19]   Reticulated is a gradual typing system for Python.
+       A Reticulated program is a Python program with optional type annotations,
+        as the function on the slide demonstrates.
+       Type-annotated parts of the program are type-checke,
+        in this case, the body of this distance function is statically type-checked.
+       Typed and untyped code can interact, and these interactions pose a
+        "type-safe FFI" problem as Ben just described.
+[20]   Python code can invoke the `distance` function with any kind of arguments;
+        at runtime, Reticulated checks that the arguments are type-tag correct.
+[21]   Similarly, Reticulated checks the reads from the first and second component
+        of each pair --- again to preserve tag soundness.
 
-       The promise of Reticulated is that a programmer can use any combination
+       That explains how this program works with one set of type annotations.
+[22]   The promise of Reticulated is that a programmer can use any combination
         of typed and untyped and the program will run.
-       Our research question is how fast these configurations run relative to
+       The distance function can be fully typed, untyped, or partially typed
+        in 8 ways.
+[23]   In a larger program, there are more possibilities.
+[24]   Our research question is how fast these configurations run relative to
         the untyped Python program; more precisely, for a program with N
         possible typed/untyped configurations, we ask what proportion of
         configurations run with at most Dx overhead.
 
-       The method we use to answer this question is adapted from the method
+[25]   The method we use to answer this question is adapted from the method
         presented at POPL 2016 for Typed Racket.
        Starting from a fully-annotated program, we systematically generate
         `2**N` configurations by toggling the types on each function and class
@@ -146,18 +158,18 @@ Zeina:
       Second, we measure the performance.
       For programs with less than `2**22` configurations, we measure each
        configuration.
-      For larger programs we use simple random sampling to approximate the
+[26]  For larger programs we use simple random sampling to approximate the
        performance --- the paper explains why we believe sampling gives a useful
        approximation.
 
 Ben:
-      After measuring, we are ready to answer questions like "what proportion
+[27]  After measuring, we are ready to answer questions like "what proportion
        of configurations have at most 5x overhead relative to Python".
       For the smaller benchmarks, we give a precise answer to this question.
       For the larger benchmarks, we give a confidence interval; here, the plot
        says we are 95% sure that the true proportion of "5-deliverable"
        configurations is between A% and B%.
-      Then we plot a sequence of answers by varying the overhead along an
+[28]  Then we plot a sequence of answers by varying the overhead along an
        x-axis and plotting a CDF.
       A large area under the curve means that a large proportion of
        configurations run with low overhead. (Say the ideal?)
@@ -167,7 +179,7 @@ Ben:
        encouraging ... in fact these 2 plots are "typical" examples.
       I want to share our high-level conclusions.
 
-      First, the largest overhead we observed is under 10x; for any combination
+[29]  First, the largest overhead we observed is under 10x; for any combination
        of typed and untyped, the worst-case performance is within one order
        of magnitude.
       This is far from perfect, but much better than the cost of type soundness
@@ -201,14 +213,18 @@ One interesting point we skipped --- 3 benchmarks got faster by adding type anno
 All three were due to bugs, one was an unsoundness and the others were overlap where Retic and Python check the same thing.
 Performance evaluation helped us find those issues.
 
+This is science, not enlightened prediction.
+
 
 #### Q. didn't Vitousek POPL 2017 evaluate Reticulated
 
 they did not measure the performance of partially-typed programs
 
+
 #### Q. Do you have data for the linear increase
 
 Yes of course here are the graphs
+
 
 #### Q. why not get the correlation, compute an R^2
 
@@ -217,7 +233,7 @@ no reason, I don't see who that helps besides people who don't want to read the 
 
 #### Q. tag soundness sounds horrible, lose type-based reasoning
 
-Agree completely.
+Agreed.
 With tags only get top-level compositional reasoning which is basically nothing.
 Coming from type soundness tag is really bad.
 
