@@ -137,7 +137,7 @@ We modify any Python code that Reticulated's type
 
 
 @parag{Data Collection}
-For benchmarks with at most @$|{2^{21}}| configurations, we conduct an exhaustive
+For benchmarks with at most @$|{2^{17}}| configurations, we conduct an exhaustive
  evaluation.
 For larger benchmarks we conduct a simple random approximation using
  @integer->word[NUM-SAMPLE-TRIALS] samples each containing @${@id[SAMPLE-RATE]\!*\!(F + C)}
