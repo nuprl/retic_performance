@@ -120,7 +120,8 @@ Zeina:
        A Reticulated program is a Python program with optional type annotations,
         as the function on the slide demonstrates.
        Type-annotated parts of the program are type-checke,
-        in this case, the body of this distance function is statically type-checked.
+        in this case, the body of this "Manhattan distance" function is
+        statically type-checked.
        Typed and untyped code can interact, and these interactions pose a
         "type-safe FFI" problem as Ben just described.
 [20]   Python code can invoke the `distance` function with any kind of arguments;
@@ -131,9 +132,13 @@ Zeina:
        That explains how this program works with one set of type annotations.
 [22]   The promise of Reticulated is that a programmer can use any combination
         of typed and untyped and the program will run.
-       The distance function can be fully typed, untyped, or partially typed
-        in 8 ways.
-[23]   In a larger program, there are more possibilities.
+       For the distance function, that means we can remove the return type,
+        remove the argument type,
+        or remove both types.
+
+[23]   There are 4 possibilities in total; we like to think of these as a lattice.
+       In a larger program, there are exponentially more possibilities.
+
 [24]   Our research question is how fast these configurations run relative to
         the untyped Python program; more precisely, for a program with N
         possible typed/untyped configurations, we ask what proportion of
