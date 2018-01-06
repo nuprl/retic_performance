@@ -55,9 +55,9 @@ Zeina:
         but only predicts the type-tag of the value.
        So whereas type soundness supports compositional type-based reasoning,
         type tag soundness is only compositional at a superficial level.
-       Compared to type soundness this is a weaker guarantee,
-        but it may be easier to prove for certain typing systems and reduction
-        semantics.
+       Compared to type soundness this is a much weaker guarantee,
+        but notice that it may be easier to prove for certain typing systems
+        and reduction semantics.
 
 
 Ben:
@@ -65,17 +65,20 @@ Ben:
         soundness to have a performance cost.
        The cost we have in mind comes about when a well-typed program
         interacts with the outside world; more precisely, with a source of
-        values that is not necessarily type checked.
+        values that may not be type correct.
 
-       This happens never in the lambda calculus, but happens all the time
-        in a useful programming language.
+       [[ This never happens in the lambda calculus, but happens all the time
+        in a useful programming language. ]]
 
-[09]   For example, one kind of source is user input.
+[09]   For example, one kind of unreliable source is user input.
        A program might ask the user for an integer, and then get some kind of
         value in return --- maybe not an integer.
 [10]   Another, similar source is a serialize/deserialize API,
         in which you can write a value to a file in some compact format, and
         later read it back in at the same type.
+       I like this example because it reminds me of OCaml's marshalling API,
+        which uses polymorphic types for convenience and comes with a warning
+        that deserialization is not type safe.
 [11]   A foreign function interface is a third kind of external source,
 [12]    and a special case of that is interactions with a runtime system through
         primops, such as arithmetic functions.
@@ -87,13 +90,14 @@ Ben:
 
 [14]   There are essentially two solutions to the problem.
        One is to assume that the input is type-correct and trust that this
-        assumption holds at runtime.
+        assumption holds at runtime; add to the trusted computing base.
        This solution makes sense for a runtime library, or source that
         could be formally verified.
        Not so much for user input.
        A second is to check the input at runtime.
        This second solution provides soundness at the cost of a runtime check.
-       This is what we mean by the cost of type-tag soundness:
+       And this is what we mean by the cost of type-tag soundness:
+        assuming you take solution 2, it's
         the performance cost of these "extra" steps that check the type
         system's assumptions at runtime.
        We think of this as changing the semantics.
@@ -119,13 +123,14 @@ Zeina:
 [19]   Reticulated is a gradual typing system for Python.
        A Reticulated program is a Python program with optional type annotations,
         as the function on the slide demonstrates.
-       Type-annotated parts of the program are type-checke,
+       Type-annotated parts of the program are type-checked,
         in this case, the body of this "Manhattan distance" function is
         statically type-checked.
        Typed and untyped code can interact, and these interactions pose a
         "type-safe FFI" problem as Ben just described.
-[20]   Python code can invoke the `distance` function with any kind of arguments;
-        at runtime, Reticulated checks that the arguments are type-tag correct.
+[20]   Python code can invoke the `distance` function with any kind of arguments.
+       To solve the problem, Reticulated checks that the arguments are type-tag correct
+        at run-time.
 [21]   Similarly, Reticulated checks the reads from the first and second component
         of each pair --- again to preserve tag soundness.
 
@@ -142,7 +147,7 @@ Zeina:
 [24]   Our research question is how fast these configurations run relative to
         the untyped Python program; more precisely, for a program with N
         possible typed/untyped configurations, we ask what proportion of
-        configurations run with at most Dx overhead.
+        configurations run with at most D times slower than Python.
 
 [25]   The method we use to answer this question is adapted from the method
         presented at POPL 2016 for Typed Racket.
@@ -161,7 +166,7 @@ Zeina:
        (Sampling experiment coming up)
 
       Second, we measure the performance.
-      For programs with less than `2**22` configurations, we measure each
+      For programs with less than `2**17` configurations, we measure each
        configuration.
 [26]  For larger programs we use simple random sampling to approximate the
        performance --- the paper explains why we believe sampling gives a useful
@@ -233,7 +238,12 @@ Yes of course here are the graphs
 
 #### Q. why not get the correlation, compute an R^2
 
-no reason, I don't see who that helps besides people who don't want to read the plots
+Because we don't see how that could be useful, and we're worried it might
+ be harmful.
+If we show an R**2, there's danger that readers will think it is more precise.
+
+This paper is not really about prediction & extrapolation, just trying to report
+ what we saw.
 
 
 #### Q. tag soundness sounds horrible, lose type-based reasoning
