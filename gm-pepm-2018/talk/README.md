@@ -283,10 +283,6 @@ Dyn is useful for describing some programs, but it also weakens the static typin
 
 - - -
 
-maybe floorof before type-tag soundness, impossible to read that slide in stride
-
-tag team
-
 4 examples, too many, almost forgot what the problem was
 (remind what the problem is)
 each example should have connection to the problem
@@ -296,9 +292,5 @@ how do measurements connect to the problem?
 
 compare to typed racket at end, perforamcne (why care about tag soundness)
 
-examples with the soundnesses, what kind of things occur
-
 more time on graphs, curve looks like this, why an S,
  knowing where the spike is, what conclusions from graph
-
-add "experiment" section
