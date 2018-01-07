@@ -26,31 +26,26 @@ Zeina:
        Therefore in type-sound languages we can use the types to reason about
         the program.
 
-       Type-tag soundness is a similar, but weaker theorem.
-       A typing judgment is type-tag sound if whenever
-        `e` has the static type `\tau`, the evaluation of `e` either:
-         steps to a value with the same type-tag as `e`,
-         steps to a well-defined error,
-         or diverges.
-       In this theorem statement we use two auxiliary notions:
-        a map from types to type-tags, and
-        a judgment that decides if a value matches a type-tag.
+       
+       To move from Type soundness to tag soundness, we weaken the first clause. (switch slide)
+       
+	Instead of returning a well typed value, we return a well tagged value. 
 
-       For example, consider this grammar with types integers pairs and functions
-        and their corresponding tags.
-       The idea is that type-tags express first-order properties of values.
-       And the judgment that checks whether a value matches a type-tag should
+	Now we will define what well-tagged means. 
+      Consider this grammar with values integers pairs and functions
+        and their corresponding types and tags. 
+        
+       The idea is that the tags express first-order properties of values.
+       So, checking whether a value matches a tag should
         be decidable in near-constant time.
+        
+        Therefore, tag soundness also guarantees  that
+        evaluation does not reach an undefined state but it only predicts the tag of the value.
+        
+       Suppose we have an expression whose type is a pair of integers. Then type soundness guarantees that e evaluates to a pair with integers components, 
+       while tag soundness guarantees that e evaluates to a pair regardless of types of the components. 
+        
 
-       So that is type-tags, and here again is type-tag soundness.
-
-       Type-tag soundness guarantees that
-        evaluation does not reach an undefined state, just like type soundness,
-        but only predicts the type-tag of the value.
-       Type-tag soundness is more superficial in comparison, and provides a
-        weaker guarantee.
-
-       [[ later: compositional, easier-to-prove ]]
 
 
 Ben:
@@ -114,21 +109,21 @@ Ben:
 
 
 Zeina:
-       So our question is, "what is the cost of type-tag soundness in Reticulated?"
+       So our question is, "what is the cost of tag soundness in Reticulated?"
 
-       Reticulated is a gradual typing system for Python.
-       A Reticulated program is a Python program with optional type annotations,
-        as the function on the slide demonstrates.
-       Type-annotated parts of the program are type-checked,
-        in this case, the body of this "Manhattan distance" function.
+       Reticulated is a gradual typing system for Python that enforces tag soundness. 
+       A program in Reticulated is a Python program with optional type annotations,
 
-       Python code can invoke the `distance` function with any kind of arguments.
-       At run-time, Reticulated checks that the arguments are type-tag correct.
-       Similarly, Reticulated checks the reads from the first and second component
-        of the argument.
-       [[ make sure to emphasize, 3 tag checks]]
 
-       [[ EXAMPLES ]]
+	This distance function is an example of a fully-annotated reticulated program.	
+
+       Python code can invoke this function with any kind of arguments. To prevent untyped code from violating the types on the distance function,
+       At run-time, Reticulated inserts two kinds of checks. First, it checks that the arguments are of type tuple. Second it checks that each read from the tuple are integers. 
+   
+   So let's see some usages of this function. 
+   This usage uses the correct types-- ok
+   The first check will fail (not a tuple)
+   The second check will fail  because the second component of the tuple is not an integer.
 
        That explains how this program works with one set of type annotations.
 [22]   The promise of Reticulated is that a programmer can use any combination
@@ -141,23 +136,18 @@ Zeina:
         set and we call them configurations.
        We have 4 configurations on the slide.
 
-       Our research question is how fast these configurations run relative to
-        the untyped Python program; more precisely, for a program with N
-        possible typed/untyped configurations, we ask what proportion of
-        configurations run at most D times slower than Python.
+So, for some program we have an exponential number of configurations relative 
+to the number of typable components on the program
 
-       The method we use to answer this question is adapted from the method
-        presented at POPL 2016 for Typed Racket.
+       Our research question is what proportion of
+        these configurations run at most D times slower than Python.
+
+       The method we use to answer this question is adapted from Takikawa et al. for Typed Racket.
        Starting from a fully-annotated program, we systematically generate
-        `2**N` configurations by varying the types on each function and class
-        declaration.
-
-       Second, we measure the performance.
-       For programs with less than `2**17` configurations, we measure each
-        configuration.
-       For larger programs we use simple random sampling to approximate the
-        performance --- the paper explains why we believe sampling gives a useful
-        approximation.
+        `2**N` configurations 
+        
+       Then, we measure the performance either by running all configurations in that space or by sampling a linear number of them.
+              
        Finally we compare the performance to Python,
         which is what programmers would get without gradual typing.
 
