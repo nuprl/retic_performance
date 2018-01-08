@@ -17,27 +17,29 @@ First I'll define type-tag soundness,
 #### Tag Soundness
 
 To introduce type-tag soundness, let's first review type soundness.
-A type soundness theorem usually reads like the following:
+A type soundness theorem says:
  if an expression is well-typed, then the evaluation of the expression will
  either end in a well-typed value,
  diverge,
- or end in an error state, where "Error" is a clearly-defined set of ways that
- a well-typed program can go wrong.
+ or end in an error state, where "Error" here represents
+ a clearly-defined set of ways that a well-typed program can go wrong.
 
-This is a useful theorem for two reasons:
+Type soundness is useful because it provides two guarantees:
  (1) a well-typed program never exhibits undefined behavior,
- and (2) the type of an expression predicts the type of the value.
+ and (2) the static type of an expression predicts the type of the value
+ that it reduces to.
+This makes it possible to use types to reason about complex program behaviors.
 
 To move from type soundness to tag soundness, we weaken the first clause.
 Instead of returning a well typed value, tag soundness guarantees a well-tagged
- value, where a tag is basically the top-level type constructor of a type.
+ value, where a tag expresses a basic property about the shape of value.
+I think of it as, the tag of a type is its top-level type constructor.
 
-Otherwise, the statement of type-tag soundness is similar:
+The rest of the statement of type-tag soundness is similar:
  a well-typed program might diverge
- and it might end in some kind of error.
+ and it might end in some kind of acceptable error.
 
-That's the main idea behind tag soundness.
-To give an example of the difference,
+To give an example of the difference between types and takes,
  if an expression is statically typed as a pair of integers,
  type soundness guarantees that the expression can only reduce to
  a pair of integers.
@@ -47,31 +49,44 @@ It might be a pair of integers, and it might be any other kind of pair.
 Clearly tag soundness is a weaker theorem.
 It is less clear why you would want such a theorem, especially given a choice
  between type soundness and tag soundness.
-The reason is performance, it lies in the choice of reduction relation.         ANIMATION
-You might have a very efficient reduction relation for which you can prove      SLIDE
- tag soundness, but not type soundness.
+The reason is performance, to illustrate we need to focus on the reduction
+ relation that so far we've glossed over.
 
-In other words, the performance cost of tag soundness is lower.
-Lets go into detail.
+Suppose instead of one true reduction relation
+ you have two arrows where one is more efficient than the other (so of course the faster one is better),
+ and suppose you don't know how to prove type soundness for the efficient
+ reduction relation.
+In this case tag soundness lets you trade speed for safety.
+
+At this point I should point out that the static type checking for type soundness
+ and tag soundness can be the same.
+You can use the same static type checker for each;
+ moving to tag soundness just affects the quality of runtime errors
+ and your ability to use types to reason about behavior.
+
+Next: I want to go into detail about how this scenario can come about.
+To do that I need to explain what I mean by the performance cost of soundness.
 
 
-#### Cost of soundness
+#### Performance cost of soundness
 
 So the cost I have in mind comes about when a statically typed program interacts,
  at runtime, with some thing that is outside the domain of the static type checker.
+Here "e-tau" is a statically typed program
+ and the question-mark represents an external source of values.
 
-Gradual typing is a perfect example:
- you often have the case where a statically typed expression receives a
- dynamically typed value as input.
+Gradual typing is a perfect example of this kind of interaction.
+A statically typed expression might receive a dynamically typed value at runtime.
 
-But this "outside world" problem comes up in many statically typed languages.
+But this "outside world" problem is not unique to gradually typed languages,
+ it affects almost any language with a notion of type soundness.
 
 For example, if the language includes a function `read` that accepts keyboard input
  from a user, the user acts an un-checked source of data.
-Similarly, if we deserialize a value from a file or a port, that's another
- un-checked source of data.
+Similarly, if the language has a function for de-serializing a value from a file
+ or a port, that byte stream is most likely an un-checked source of values.
 Another example, of course, is calls through a foreign function interface,
- and also calls to the runtime system fall under this category.
+ and this includes calls to the runtime system.
 When you invoke a primitive operation, like addition, you're interacting
  with a low-level language and hoping that it returns a well-typed value.
 
@@ -82,26 +97,29 @@ All these examples are instances of the same general problem,
 There are essentially two solutions to this problem.
 One is to trust the outside world, trust that it returns well-typed values.
 This makes sense in some special cases.
-The alternative is to check the incoming value at runtime.
-Instaed of assuming the value is type-correct,
+The alternative is to somehow check the incoming value at runtime.
+Instead of assuming the value is type-correct,
  we take some additional reduction steps to check that assumption,
  and either approve the value or halt the program.
 
-These extra steps, the black arrows on the slide, are the performance
- cost of soundness.
+These extra steps are the performance cost of soundness.
 The cost is the number of reduction steps that the program takes to
  validate the static typing assumptions.
 
-At this point I can give an example comparing type soundness and tag            SLIDE
- soundness.
-Suppose the program expects a pair of integers, and receives some value.
+Now I can illustrate my point for earlier about the relative cost of
+ types versus tags.
+Suppose the program expects a pair of integers, and receives a value from
+ an untrusted source.
 To check type soundness, we need three steps:
- check that the value is a pair, and check that its components are integers.
-To check tag soundness, we need only one step,
+ check that the value is a pair,
+ check that the first component is an integer,
+ and check that the second component is an integer
+To check tag soundness, we need only one step:
  to check that the value is a pair.
 
-That's one example, depending on the types and the program, it might add up
- to a big difference.
+That's one example where the cost of tag soundness is lower,
+ and depending on the types and data flow in a program, it could add up to
+ a big performance difference.
 
 
 #### Reticulated
@@ -109,20 +127,34 @@ That's one example, depending on the types and the program, it might add up
 In the paper, we measure the cost of tag soundness in Reticulated,
  which is a gradual typing system for Python.
 
-Our method for measuring performance is as follows.
+Statically typed code in a Reticulated program can receive input from Python
+ code, so Reticulated has an "outside world" problem like we've just discussed.
+
+As a concrete example, here is a typed Reticulated function that computes
+ the taxi-cab distance from a point to the origin.
+If we call this function with a tuple of integers, then all goes well and
+ it returns an integer.
+If we call this function with something that is not a tuple,
+ then Reticulated raises a tag error before entering the body of the function.
+And if we call the function with a tuple that contains a string,
+ then Reticulated raises a tag error on the line where it tries to extract
+ an integer from the pair.
+
+Our method for measuring the cost of soundness in Reticulated is as follows.
 First, we start with a Python program and add type annotations to get a
  fully-typed Reticulated program.
 This blue rectangle represents one program with 4 type annotations.
-Second, we take the fully typed program and generate all gradually typed
- configurations.
+Second, we take the fully typed program and generate a powerset of gradually
+ typed programs.
+We call elements of this set "configurations" of the original program.
 Third, we measure performance.
-Depending on the size of this set of configurations, we either measure
- performance of every configuration, or we use simple random sampling and
- look at a linear number of configurations, more on that in a minute.
-Fourth, we compare performance to Python --- which is the performance a programmer
- would get with no gradual typing at all --- and report the overhead.
-Specifically we ask you the reader to decide what overhead you think is acceptable,
- and we count the configurations that run with at most that overhead.
+Depending on the number of configurations, we might measure
+ performance exhaustively, as shown on the slide,
+ or take an approximate measure by simple random sampling.
+Fourth, we ask you the reader to choose an cutoff for "good performance"
+ and compare the overhead relative to Python.
+If you are willing to accept a 4x slowdown relative to Python, then
+ we count the configurations that meet your requirement.
 
 Here's the method all on one slide:
  fully typed program,
@@ -133,19 +165,21 @@ Here's the method all on one slide:
 
 #### Experiment & Results
 
-Finally, lets talk about the experiment and results.
+Next up, our experiment and results.
 
-We apply the method to 21 reticulated programs.
-Most programs are from prior work on Reticulated; four programs are our own.
+We apply the method to 21 Reticulated programs.
+The programs in the first two columns come from prior work by Michael Vitousek
+ at Indiana University.
+The programs in the third column are programs that we added.
 
-To give a sense of size, this table gives `N` for each benchmark.
-That is, the number of type annotations.
+To give a sense of size, this table gives `N`, the number of type annotations,
+ for each benchmark.
 You can see, they range from 1 to 79.
 Three of these numbers have asterisks, and they correspond to the benchmarks
  that we do not have exhaustive results for --- only sampling data.
 
 For each benchmark that we measure exhaustively,
- we can answer questions like: what % of configurations in this benchmark
+ we can answer questions like we saw before: what % of configurations in this benchmark
  run with at most 4x overhead relative to Python.
 If we ask the same question for different overheads we obtain a histogram,
  and for the paper we build a very dense histogram and plot it as a line.
@@ -154,46 +188,53 @@ For each benchmark with sampling data, we can answer a similar question:
  what % of configurations in this benchmark run with at most 4x overhead
  based on R samples of S configurations each.
 In this case our answer is a confidence interval.
-The shaded area on this bar represents a 95% confidence inverval
- between 8% and 10%.
+The shaded area on this bar represents a 95% confidence inverval,
+ this one happens to fall between 8% and 10%.
 Again we can ask a similar question for other overheads to obtain a histogram,
  and in the paper we plot a dense histogram as a function interval.
 
 Ok.
 We've shown two plots so far, and these are results for two benchmarks.
-The high-level takeaway from these figures is that a large shaded area
- is better.
+To read plots like these, you want to look for the shaded area,
+ a larger shaded area is better.
 Ideally the shading starts early on the x-axis, meaning some configurations
  run with very low overhead.
 And ideally this monotonically-increasing line quickly reaches the top of
  the y-axis.
 Wherever it does, that is the worst-case overhead for the benchmark.
 
-So that's a crash-course on reading the plots you can find in the paper.
+So that's your crash-course on reading the plots you can find in the paper.
 Here they all are, and you can see there's a fair amount of shaded area.
 Performance is "good".
 
 Our main conclusions are the following.
-First, the worst-case overhead in all our benchmarks was within 10x.
-10x is a fairly large number, but this is very good news --- it's an order
- of magnitude improvement over what's been reported for the cost of type
- soundness in Typed Racket.
-Second, some bad news, the best-case overhead was between 1x and 4x.
+First, the worst-case overhead out of all configurations was within 10x.
+
+Now 10x is a fairly large number, but this is very good news compared to
+ what we've seen for the cost of type soundness.
+Here's a very high level comparison.
+On the right, these are the worst-case overheads for tag soundness in Reticulated.
+On the left, these are the worst-case overheads for type soundness in Typed Racket.
+This is an apples-to-oranges comparison: different programs, different languages,
+ and different guarantees, but its also an order-of-magnitude improvement.
+That's why we say 10x is good news.
+
+Second, some bad news, the best-case overhead in Reticulated was between 1x and 4x.
 This means that for all ways of gradual typing, moving from Python to
  Reticulated made the program run slower.
 Third, "how much slower" appears to be a linear function of the number of
  type annotations.
 In fact the fully-typed configuration was among the slowest in all benchmarks.
 
-Also in the paper, we quickly compare the sampling method to the exhaustive
+Also in the paper, we compare the sampling method to the exhaustive
  evaluation method.
 Here are plots for the six largest benchmarks that we have exhaustive data for,
  in blue.
-We applied the sampling method to these benchmarks and found that the intervals
- based on a linear number of measurements provide an accurate and precise
- approximation to the true data.
+The orange intervals are based on a linear number of samples,
+ and you can see that the intervals give an accurate and precise approximation
+ for these benchmarks.
 
-So that's good news, here again is the cost of tag soundness,
+So that's good news, here again are our conclusions
  and I'm happy to take questions.
 
 - - -
