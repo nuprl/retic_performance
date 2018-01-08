@@ -10,7 +10,7 @@ First I'll define type-tag soundness,
  then I'll explain what it means for soundness to have a cost,
  and finally I'll share what we learned about the cost of type-tag
  soundness in Reticulated, which is a gradual typing system for Python,
- and why we think tag soundness might be a good "gateway drug" to get TypeScript
+ and why we think tag soundness might be a good "gateway drug" to get JavaScript
  developers to start caring about soundness.
 
 
@@ -25,10 +25,10 @@ A type soundness theorem says:
  a clearly-defined set of ways that a well-typed program can go wrong.
 
 Type soundness is useful because it provides two guarantees:
- (1) a well-typed program never exhibits undefined behavior,
+ (1) a well-typed program never has undefined behavior,
  and (2) the static type of an expression predicts the type of the value
  that it reduces to.
-This makes it possible to use types to reason about complex program behaviors.
+This second point makes it possible to use types to reason about complex program behaviors.
 
 To move from type soundness to tag soundness, we weaken the first clause.
 Instead of returning a well typed value, tag soundness guarantees a well-tagged
@@ -39,7 +39,7 @@ The rest of the statement of type-tag soundness is similar:
  a well-typed program might diverge
  and it might end in some kind of acceptable error.
 
-To give an example of the difference between types and takes,
+To give an example of the difference between types and tags,
  if an expression is statically typed as a pair of integers,
  type soundness guarantees that the expression can only reduce to
  a pair of integers.
@@ -47,8 +47,7 @@ Tag soundness guarantees a pair, but nothing more.
 It might be a pair of integers, and it might be any other kind of pair.
 
 Clearly tag soundness is a weaker theorem.
-It is less clear why you would want such a theorem, especially given a choice
- between type soundness and tag soundness.
+It is less clear why you would want such a theorem.
 The reason is performance, to illustrate we need to focus on the reduction
  relation that so far we've glossed over.
 
@@ -56,9 +55,9 @@ Suppose instead of one true reduction relation
  you have two arrows where one is more efficient than the other (so of course the faster one is better),
  and suppose you don't know how to prove type soundness for the efficient
  reduction relation.
-In this case tag soundness lets you trade speed for safety.
+In this case tag soundness lets you trade safety for speed.
 
-At this point I should point out that the static type checking for type soundness
+I should point out that the static type checking for type soundness
  and tag soundness can be the same.
 You can use the same static type checker for each;
  moving to tag soundness just affects the quality of runtime errors
@@ -84,7 +83,7 @@ But this "outside world" problem is not unique to gradually typed languages,
 For example, if the language includes a function `read` that accepts keyboard input
  from a user, the user acts an un-checked source of data.
 Similarly, if the language has a function for de-serializing a value from a file
- or a port, that byte stream is most likely an un-checked source of values.
+ or a port, that byte stream is an un-checked source of values.
 Another example, of course, is calls through a foreign function interface,
  and this includes calls to the runtime system.
 When you invoke a primitive operation, like addition, you're interacting
@@ -92,21 +91,21 @@ When you invoke a primitive operation, like addition, you're interacting
 
 All these examples are instances of the same general problem,
  this "outside world" problem that static typing makes some assumption
- that may not hold at runtime.
+ about an external source of values.
 
 There are essentially two solutions to this problem.
 One is to trust the outside world, trust that it returns well-typed values.
 This makes sense in some special cases.
-The alternative is to somehow check the incoming value at runtime.
+The alternative is to check the incoming value at runtime.
 Instead of assuming the value is type-correct,
  we take some additional reduction steps to check that assumption,
  and either approve the value or halt the program.
 
 These extra steps are the performance cost of soundness.
 The cost is the number of reduction steps that the program takes to
- validate the static typing assumptions.
+ validate static typing assumptions at runtime.
 
-Now I can illustrate my point for earlier about the relative cost of
+Now I can illustrate my point from earlier about the relative cost of
  types versus tags.
 Suppose the program expects a pair of integers, and receives a value from
  an untrusted source.
@@ -131,12 +130,12 @@ Statically typed code in a Reticulated program can receive input from Python
  code, so Reticulated has an "outside world" problem like we've just discussed.
 
 As a concrete example, here is a typed Reticulated function that computes
- the taxi-cab distance from a point to the origin.
-If we call this function with a tuple of integers, then all goes well and
+ the Manhattan distance from a point to the origin.
+If we call this function with a pair of integers, then all goes well and
  it returns an integer.
-If we call this function with something that is not a tuple,
+If we call this function with something that is not a pair,
  then Reticulated raises a tag error before entering the body of the function.
-And if we call the function with a tuple that contains a string,
+And if we call the function with a pair that contains a string,
  then Reticulated raises a tag error on the line where it tries to extract
  an integer from the pair.
 
@@ -150,11 +149,15 @@ We call elements of this set "configurations" of the original program.
 Third, we measure performance.
 Depending on the number of configurations, we might measure
  performance exhaustively, as shown on the slide,
- or take an approximate measure by simple random sampling.
+ or we use simple random sampling to get an approximate measure.
 Fourth, we ask you the reader to choose an cutoff for "good performance"
  and compare the overhead relative to Python.
 If you are willing to accept a 4x slowdown relative to Python, then
  we count the configurations that meet your requirement.
+
+This box at the top is very important.
+We evaluate performance by counting the proportion of configurations that
+ run within some overhead.
 
 Here's the method all on one slide:
  fully typed program,
@@ -174,7 +177,7 @@ The programs in the third column are programs that we added.
 
 To give a sense of size, this table gives `N`, the number of type annotations,
  for each benchmark.
-You can see, they range from 1 to 79.
+You can see, size ranges from 1 to 79.
 Three of these numbers have asterisks, and they correspond to the benchmarks
  that we do not have exhaustive results for --- only sampling data.
 
@@ -197,15 +200,15 @@ Ok.
 We've shown two plots so far, and these are results for two benchmarks.
 To read plots like these, you want to look for the shaded area,
  a larger shaded area is better.
-Ideally the shading starts early on the x-axis, meaning some configurations
+Ideally the shading starts early on the x-axis, far to the left, meaning some configurations
  run with very low overhead.
-And ideally this monotonically-increasing line quickly reaches the top of
+If there is a y-intercept, that demonstrates a speedup relative to Python.
+Also ideally this monotonically-increasing line quickly reaches the top of
  the y-axis.
 Wherever it does, that is the worst-case overhead for the benchmark.
 
 So that's your crash-course on reading the plots you can find in the paper.
 Here they all are, and you can see there's a fair amount of shaded area.
-Performance is "good".
 
 Our main conclusions are the following.
 First, the worst-case overhead out of all configurations was within 10x.
@@ -219,12 +222,19 @@ This is an apples-to-oranges comparison: different programs, different languages
  and different guarantees, but its also an order-of-magnitude improvement.
 That's why we say 10x is good news.
 
+Maybe, an implementation of tag soundness for TypeScript would give programmers
+ some kind of soundness at a reasonable overhead.
+
 Second, some bad news, the best-case overhead in Reticulated was between 1x and 4x.
 This means that for all ways of gradual typing, moving from Python to
  Reticulated made the program run slower.
 Third, "how much slower" appears to be a linear function of the number of
  type annotations.
 In fact the fully-typed configuration was among the slowest in all benchmarks.
+
+This raises an open question: whether it is possible to have a more performant
+ implementation of tag soundness, ideally one where fully-typed programs
+ have very little overhead.
 
 Also in the paper, we compare the sampling method to the exhaustive
  evaluation method.
