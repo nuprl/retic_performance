@@ -7,7 +7,7 @@
 (require
   plot/no-gui
   math/statistics
-  glob
+  file/glob
   racket/string
   racket/match
   racket/format
