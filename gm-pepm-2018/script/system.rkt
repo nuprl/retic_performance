@@ -61,23 +61,25 @@
   (require rackunit racket/runtime-path (only-in racket/string string-split))
   (define-runtime-path sloc-example "test/sloc-example.py")
 
-  (test-case "shell"
-    (check-regexp-match #rx"^Welcome to Racket"
-      (shell "racket" '("--version"))))
+  (define CI? (getenv "CI"))
 
-  (test-case "find-exe"
-    (check-equal?
-      (find-exe "racket")
-      (find-executable-path "racket"))
-    (check-exn exn:fail:user?
-      (lambda () (find-exe "this-is-not-racket-this-is-sparta"))))
+  (unless CI?
+    (test-case "shell"
+        (check-regexp-match #rx"^Welcome to Racket"
+          (shell "racket" '("--version"))))
 
-  (test-case "md5sum"
-    (define (check-md5 ps)
-      (define openssl-md5 (md5sum sloc-example))
-      (define system-md5 (car (string-split (shell "md5sum" (path->string sloc-example)))))
-      (check-equal? openssl-md5 system-md5))
+    (test-case "find-exe"
+      (check-equal?
+        (find-exe "racket")
+        (find-executable-path "racket"))
+      (check-exn exn:fail:user?
+        (lambda () (find-exe "this-is-not-racket-this-is-sparta"))))
 
-    (check-md5 sloc-example)
-  )
+    (test-case "md5sum"
+      (define (check-md5 ps)
+        (define openssl-md5 (md5sum sloc-example))
+        (define system-md5 (car (string-split (shell "md5sum" (path->string sloc-example)))))
+        (check-equal? openssl-md5 system-md5))
+
+      (check-md5 sloc-example)))
 )
