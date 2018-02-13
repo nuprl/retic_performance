@@ -79,7 +79,7 @@ Specifically, these plots are the result of a two-step recipe:
 @figure["fig:sample:validate" @elem{Simple random approximations}
   (parameterize ([*PLOT-HEIGHT* 100]
                  [*SINGLE-COLUMN?* #true])
-    @render-validate-samples-plot*[VALIDATE-BENCHMARKS])
+    (if CI? (elem) @render-validate-samples-plot*[VALIDATE-BENCHMARKS]))
 ]
 
 @section[#:tag "sec:appendix:benchmarks"]{Benchmark Descriptions}

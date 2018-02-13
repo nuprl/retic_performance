@@ -417,30 +417,33 @@
 (module+ test
   (require rackunit rackunit-abbrevs)
 
-  (test-case "->benchmark-info"
-    (define (check-->benchmark-info n)
-      (define bm (->benchmark-info n))
-      (define k (benchmark->karst-data bm))
-      (define small-loc 50)
-      (check-equal? (benchmark-info-name bm) n)
-      (check-true (and (member "main.py" (benchmark-info-module* bm)) #t))
-      (check-equal?
-        (benchmark->num-modules bm)
-        (length (benchmark-info-module* bm)))
-      (let ([kd (benchmark->karst-data bm)]
-            [sd (benchmark->sample-data bm)])
-        (if kd
-          (check-pred file-exists? kd "karst data file does not exist")
-          (check-pred pair? sd (format "missing karst data and sample data for benchmark ~a" n))))
-      (let ([pd (benchmark->python-data bm)])
-        (check-pred list? pd)
-        (check < 1 (length pd))
-        (check-true (andmap real? pd)))
-      (check > (benchmark->sloc bm) small-loc
-        (format "expected benchmark '~a' to contain at least ~a LOC" n small-loc))
-      (void))
-    (check-->benchmark-info (car DLS-2014-BENCHMARK-NAMES))
-    (check-->benchmark-info 'sample_fsm))
+  (define CI? (getenv "CI"))
+
+  (unless CI?
+    (test-case "->benchmark-info"
+      (define (check-->benchmark-info n)
+        (define bm (->benchmark-info n))
+        (define k (benchmark->karst-data bm))
+        (define small-loc 50)
+        (check-equal? (benchmark-info-name bm) n)
+        (check-true (and (member "main.py" (benchmark-info-module* bm)) #t))
+        (check-equal?
+          (benchmark->num-modules bm)
+          (length (benchmark-info-module* bm)))
+        (let ([kd (benchmark->karst-data bm)]
+              [sd (benchmark->sample-data bm)])
+          (if kd
+            (check-pred file-exists? kd "karst data file does not exist")
+            (check-pred pair? sd (format "missing karst data and sample data for benchmark ~a" n))))
+        (let ([pd (benchmark->python-data bm)])
+          (check-pred list? pd)
+          (check < 1 (length pd))
+          (check-true (andmap real? pd)))
+        (check > (benchmark->sloc bm) small-loc
+          (format "expected benchmark '~a' to contain at least ~a LOC" n small-loc))
+        (void))
+      (check-->benchmark-info (car DLS-2014-BENCHMARK-NAMES))
+      (check-->benchmark-info 'sample_fsm)))
 
   (test-case "->benchmark-info:fail"
     (check-exn exn:fail:contract?
@@ -448,9 +451,10 @@
     (check-exn exn:fail:contract?
       (λ () (->benchmark-info '|hello world|))))
 
-  (test-case "benchmark->sample-data"
-    (check-pred list? (benchmark->sample-data (->benchmark-info 'take5)))
-    (check-false (benchmark->sample-data (->benchmark-info 'call_simple))))
+  (unless CI?
+    (test-case "benchmark->sample-data"
+      (check-pred list? (benchmark->sample-data (->benchmark-info 'take5)))
+      (check-false (benchmark->sample-data (->benchmark-info 'call_simple)))))
 
   (test-case "path->simple-name"
     (check-equal?
@@ -465,22 +469,23 @@
     (check-true (simple-name? 'hello))
     (check-false (simple-name? "hello/world")))
 
-  (test-case "max-configuration"
-    (define (check-max-configuration bm-name expected)
-      (define bm (->benchmark-info bm-name))
-      (define src (benchmark-info-src bm))
-      (define mod* (benchmark-info-module* bm))
-      (define c1 (->max-configuration src mod*))
-      (define c2 (benchmark-dir->max-configuration src mod*))
-      (define c3 (python-info->max-configuration (benchmark-dir->python-info src)))
-      (check-equal? c1 c2
-        (format "~a : ->max = ~a, benchmark-dir->max = ~a" src c1 c2))
-      (check-equal? c2 c3)
-      (check-equal? c3 expected))
+  (unless CI?
+    (test-case "max-configuration"
+      (define (check-max-configuration bm-name expected)
+        (define bm (->benchmark-info bm-name))
+        (define src (benchmark-info-src bm))
+        (define mod* (benchmark-info-module* bm))
+        (define c1 (->max-configuration src mod*))
+        (define c2 (benchmark-dir->max-configuration src mod*))
+        (define c3 (python-info->max-configuration (benchmark-dir->python-info src)))
+        (check-equal? c1 c2
+          (format "~a : ->max = ~a, benchmark-dir->max = ~a" src c1 c2))
+        (check-equal? c2 c3)
+        (check-equal? c3 expected))
 
-    (check-max-configuration 'fannkuch '(2))
-    (check-max-configuration 'Espionage '(128 32))
-    (check-max-configuration 'slowSHA '(16 64 32 4)))
+      (check-max-configuration 'fannkuch '(2))
+      (check-max-configuration 'Espionage '(128 32))
+      (check-max-configuration 'slowSHA '(16 64 32 4))))
 
   (test-case "configuration<?"
     (check-apply* configuration<?
@@ -493,75 +498,78 @@
      ['(5 2 4) '(3 3 9)
       ==> #f]))
 
-  (test-case "natural<->configuration"
-    (define (check-natural<->configuration bm-name in/out* err-nat* err-cfg*)
-      (define bm (->benchmark-info bm-name))
-      (for ([io (in-list in/out*)])
-        (define n (car io))
-        (define cfg (cadr io))
-        (define msg1 (format "(natural->configuration ~a ~a)" bm-name n))
-        (define msg2 (format "(configuration->natural ~a ~a)" bm-name cfg))
-        (check-equal? (natural->configuration bm n) cfg msg1)
-        (check-equal? (configuration->natural bm cfg) n msg2)
+  (unless CI?
+    (test-case "natural<->configuration"
+      (define (check-natural<->configuration bm-name in/out* err-nat* err-cfg*)
+        (define bm (->benchmark-info bm-name))
+        (for ([io (in-list in/out*)])
+          (define n (car io))
+          (define cfg (cadr io))
+          (define msg1 (format "(natural->configuration ~a ~a)" bm-name n))
+          (define msg2 (format "(configuration->natural ~a ~a)" bm-name cfg))
+          (check-equal? (natural->configuration bm n) cfg msg1)
+          (check-equal? (configuration->natural bm cfg) n msg2)
+          (void))
+        (for ([e (in-list err-nat*)])
+          (define msg (format "(natural->configuration ~a ~a)" bm-name e))
+          (check-exn exn:fail:contract?
+            (lambda () (natural->configuration bm e))
+            msg))
+        (for ([e (in-list err-cfg*)])
+          (define msg (format "(configuration->natural ~a ~a)" bm-name e))
+          (check-exn exn:fail:contract?
+            (lambda () (configuration->natural bm e))
+            msg)))
+
+      (check-natural<->configuration 'nqueens
+        '((0 (0))
+          (1 (1))
+          (2 (2))
+          (3 (3)))
+        '(4 -1)
+        '((4) (-1)))
+
+      (check-natural<->configuration 'futen
+        '((0 (0 0 0))
+          (6 (0 0 6))
+          (1025 (0 1 1))
+          (2048 (1 0 0))
+          (2050 (1 0 2)))
+        (list (* 16 2 1024))
+        '((0 0 1025) (0 0 1024) ()))
+
+      (check-natural<->configuration 'slowSHA
+        `((0 (0 0 0 0))
+          (4 (0 0 1 0))
+          (128 (0 1 0 0))
+          (8192 (1 0 0 0))
+          (16385 (2 0 0 1))
+          (32768 (4 0 0 0))
+          (,(sub1 (* 16 64 32 4)) (15 63 31 3)))
+        (list (* 16 64 32 4))
+        '((1 1 1 5) (16 64 32 4) (16 11 12 3)))
+    ))
+
+  (unless CI?
+    (test-case "benchmark->num-configurations"
+      (check-apply* benchmark->num-configurations
+       [(->benchmark-info 'futen)
+        ==> (* 16 2 1024)]
+       [(->benchmark-info 'fannkuch)
+        ==> 2])))
+
+  (unless CI?
+    (test-case "benchmark-info->python-info"
+      (define (check-python-info bm)
+        (define py (benchmark-info->python-info bm))
+        (check-pred python-info? py)
+        (check-equal? (benchmark-info-module* bm) (python-info->module* py)
+          (format "~a module names" (benchmark-info-name bm)))
+        (check-equal? (benchmark->max-configuration bm) (python-info->max-configuration py)
+          (format "~a max configuration" (benchmark-info-name bm)))
         (void))
-      (for ([e (in-list err-nat*)])
-        (define msg (format "(natural->configuration ~a ~a)" bm-name e))
-        (check-exn exn:fail:contract?
-          (lambda () (natural->configuration bm e))
-          msg))
-      (for ([e (in-list err-cfg*)])
-        (define msg (format "(configuration->natural ~a ~a)" bm-name e))
-        (check-exn exn:fail:contract?
-          (lambda () (configuration->natural bm e))
-          msg)))
 
-    (check-natural<->configuration 'nqueens
-      '((0 (0))
-        (1 (1))
-        (2 (2))
-        (3 (3)))
-      '(4 -1)
-      '((4) (-1)))
-
-    (check-natural<->configuration 'futen
-      '((0 (0 0 0))
-        (6 (0 0 6))
-        (1025 (0 1 1))
-        (2048 (1 0 0))
-        (2050 (1 0 2)))
-      (list (* 16 2 1024))
-      '((0 0 1025) (0 0 1024) ()))
-
-    (check-natural<->configuration 'slowSHA
-      `((0 (0 0 0 0))
-        (4 (0 0 1 0))
-        (128 (0 1 0 0))
-        (8192 (1 0 0 0))
-        (16385 (2 0 0 1))
-        (32768 (4 0 0 0))
-        (,(sub1 (* 16 64 32 4)) (15 63 31 3)))
-      (list (* 16 64 32 4))
-      '((1 1 1 5) (16 64 32 4) (16 11 12 3)))
-  )
-
-  (test-case "benchmark->num-configurations"
-    (check-apply* benchmark->num-configurations
-     [(->benchmark-info 'futen)
-      ==> (* 16 2 1024)]
-     [(->benchmark-info 'fannkuch)
-      ==> 2]))
-
-  (test-case "benchmark-info->python-info"
-    (define (check-python-info bm)
-      (define py (benchmark-info->python-info bm))
-      (check-pred python-info? py)
-      (check-equal? (benchmark-info-module* bm) (python-info->module* py)
-        (format "~a module names" (benchmark-info-name bm)))
-      (check-equal? (benchmark->max-configuration bm) (python-info->max-configuration py)
-        (format "~a max configuration" (benchmark-info-name bm)))
-      (void))
-
-    (for-each check-python-info (all-benchmarks)))
+      (for-each check-python-info (all-benchmarks))))
 
   (test-case "string<->configuration"
     (define (check-string<->configuration cfg str)

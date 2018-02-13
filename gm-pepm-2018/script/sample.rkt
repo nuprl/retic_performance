@@ -113,6 +113,8 @@
 (module+ test
   (require rackunit rackunit-abbrevs)
 
+  (define CI? (getenv "CI"))
+
   (test-case "parse-int"
     (define dummy-name "yolo")
     (check-equal? (parse-int "4" dummy-name) 4)
@@ -135,26 +137,27 @@
      [2048 10
       ==> 110]))
 
-  (test-case "->sample*"
-    (define (check->sample bm-name)
-      (define bm (->benchmark-info bm-name))
-      (define pi (benchmark->performance-info bm))
-      (define sample-rate 10)
-      (define num-trials 2)
-      (define mc (benchmark->max-configuration bm))
-      (define nc (benchmark->num-configurations bm))
-      (define sample-size (num-configurations->sample-size nc sample-rate))
-      (define s1 (benchmark-info->sampler bm))
-      (define s2 (max-configuration->sampler (benchmark->max-configuration bm)))
-      (check-true
-        (for/and ([i (in-range 200)])
-          (and (configuration<? (string->configuration (s1)) mc)
-               (configuration<? (string->configuration (s2)) mc))))
-      (void))
+  (unless CI?
+    (test-case "->sample*"
+      (define (check->sample bm-name)
+        (define bm (->benchmark-info bm-name))
+        (define pi (benchmark->performance-info bm))
+        (define sample-rate 10)
+        (define num-trials 2)
+        (define mc (benchmark->max-configuration bm))
+        (define nc (benchmark->num-configurations bm))
+        (define sample-size (num-configurations->sample-size nc sample-rate))
+        (define s1 (benchmark-info->sampler bm))
+        (define s2 (max-configuration->sampler (benchmark->max-configuration bm)))
+        (check-true
+          (for/and ([i (in-range 200)])
+            (and (configuration<? (string->configuration (s1)) mc)
+                 (configuration<? (string->configuration (s2)) mc))))
+        (void))
 
-    (check->sample 'Espionage)
-    (check->sample 'futen)
-  )
+      (check->sample 'Espionage)
+      (check->sample 'futen)
+    ))
 
   (test-case "big-random"
     (check-pred big-random 4)

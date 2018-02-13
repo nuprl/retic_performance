@@ -487,235 +487,238 @@
   (define py-Espionage (benchmark-dir->python-info Espionage-dir))
   (define py-futen (benchmark-dir->python-info futen-dir))
 
+  (define CI? (getenv "CI"))
+
   ;; -------------------------------------------------------
+  (unless CI?
 
-  (test-case "python-path?"
-    (check-pred python-path? sloc-example)
-    (check-false (python-path? "foo")))
+    (test-case "python-path?"
+      (check-pred python-path? sloc-example)
+      (check-false (python-path? "foo")))
 
-  (test-case "python-sloc"
-    (check-equal?
-      (python-sloc sloc-example)
-      2))
+    (test-case "python-sloc"
+      (check-equal?
+        (python-sloc sloc-example)
+        2))
 
-  (test-case "python-info->max-configuration"
-    (check-equal? (python-info->max-configuration py-Espionage) '(128 32))
-    (check-equal? (python-info->max-configuration py-futen) '(16 2 1024)))
+    (test-case "python-info->max-configuration"
+      (check-equal? (python-info->max-configuration py-Espionage) '(128 32))
+      (check-equal? (python-info->max-configuration py-futen) '(16 2 1024)))
 
-  (test-case "check-python-file!"
-    (check-pred check-python-file! sloc-example)
-    (check-exn exn:fail:user?
-      (λ () (check-python-file! "not-a-real-file.txt"))))
+    (test-case "check-python-file!"
+      (check-pred check-python-file! sloc-example)
+      (check-exn exn:fail:user?
+        (λ () (check-python-file! "not-a-real-file.txt"))))
 
-  (test-case "valid-python-version?"
-    (check-true (valid-python-version? "Python 3.4"))
-    (check-true (valid-python-version? "Python 3.4.4"))
-    (check-false (valid-python-version? "Python 2.7.1")))
+    (test-case "valid-python-version?"
+      (check-true (valid-python-version? "Python 3.4"))
+      (check-true (valid-python-version? "Python 3.4.4"))
+      (check-false (valid-python-version? "Python 2.7.1")))
 
-  (test-case "selectors"
-    (check-equal?
-      (python-info->module* py-Espionage)
-      '("main.py" "union_find.py"))
-    (check-equal?
-      (python-info->function* py-Espionage)
-      '("main" "output_result" "convert_to_set" "create_nodes" "make_tuple" "make_set" "kruskal"))
-    (check-equal?
-      (python-info->class* py-Espionage)
-      '("UnionFind"))
-    (check-equal?
-      (python-info->method* py-Espionage)
-      '("__init__" "add_node" "find" "union"))
-    (check-equal?
-      (python-info->field* py-Espionage)
-      (list (field-info 'my_dict "Dict(Int,Tuple(Int,Int))")))
-    (check-equal?
-      (length (python-info->domain* py-Espionage))
-      (+ (python-info->num-functions py-Espionage)
-         (python-info->num-methods py-Espionage)))
-    (check-equal?
-      (python-info->num-parameters py-Espionage)
-      (+ 10 9))
-    (check-equal?
-      (python-info->num-returns py-Espionage)
-      (+ 7 4))
-    (check-equal?
-      (python-info->all-types py-Espionage)
-      (list->set '("UnionFind" "Tuple(Int,Int)" "Tuple(Int,Int,Int)" "String" "Void" "Int" "Dict(Int,Tuple(Int,Int))" "List(String)" "List(Tuple(Int,Int))" "List(Tuple(Int,Int,Int))" "List(Int)")))
-    (check-equal?
-      (python-info->num-types py-Espionage)
-      (+ 7 1 4)))
+    (test-case "selectors"
+      (check-equal?
+        (python-info->module* py-Espionage)
+        '("main.py" "union_find.py"))
+      (check-equal?
+        (python-info->function* py-Espionage)
+        '("main" "output_result" "convert_to_set" "create_nodes" "make_tuple" "make_set" "kruskal"))
+      (check-equal?
+        (python-info->class* py-Espionage)
+        '("UnionFind"))
+      (check-equal?
+        (python-info->method* py-Espionage)
+        '("__init__" "add_node" "find" "union"))
+      (check-equal?
+        (python-info->field* py-Espionage)
+        (list (field-info 'my_dict "Dict(Int,Tuple(Int,Int))")))
+      (check-equal?
+        (length (python-info->domain* py-Espionage))
+        (+ (python-info->num-functions py-Espionage)
+           (python-info->num-methods py-Espionage)))
+      (check-equal?
+        (python-info->num-parameters py-Espionage)
+        (+ 10 9))
+      (check-equal?
+        (python-info->num-returns py-Espionage)
+        (+ 7 4))
+      (check-equal?
+        (python-info->all-types py-Espionage)
+        (list->set '("UnionFind" "Tuple(Int,Int)" "Tuple(Int,Int,Int)" "String" "Void" "Int" "Dict(Int,Tuple(Int,Int))" "List(String)" "List(Tuple(Int,Int))" "List(Tuple(Int,Int,Int))" "List(Int)")))
+      (check-equal?
+        (python-info->num-types py-Espionage)
+        (+ 7 1 4)))
 
-  (test-case "python-tests"
-    ;; These tests depend on a working Python3.4 executable,
-    (when (with-handlers ((exn:fail? (λ (e) #f)))
-            (check-python-exe! (*python-exe*)))
-      (define mi-sloc (path-string->module-info sloc-example))
-      (define mi-parse (path-string->module-info parse-example))
-      (define py-sloc (python-info 'test (list mi-sloc)))
-      (define py-parse (python-info 'test (list mi-parse)))
+    (test-case "python-tests"
+      ;; These tests depend on a working Python3.4 executable,
+      (when (with-handlers ((exn:fail? (λ (e) #f)))
+              (check-python-exe! (*python-exe*)))
+        (define mi-sloc (path-string->module-info sloc-example))
+        (define mi-parse (path-string->module-info parse-example))
+        (define py-sloc (python-info 'test (list mi-sloc)))
+        (define py-parse (python-info 'test (list mi-parse)))
 
-      (test-case "max-configuration"
-        (check-equal? (python-info->max-configuration py-sloc) '(2))
-        (check-equal? (python-info->max-configuration py-parse) '(1024)))
+        (test-case "max-configuration"
+          (check-equal? (python-info->max-configuration py-sloc) '(2))
+          (check-equal? (python-info->max-configuration py-parse) '(1024)))
 
-      (test-case "path-string->exploded-module"
-        (check-pred jsexpr? (path-string->exploded-module sloc-example)))
+        (test-case "path-string->exploded-module"
+          (check-pred jsexpr? (path-string->exploded-module sloc-example)))
 
-      (test-case "path-string->module-info:basic"
+        (test-case "path-string->module-info:basic"
 
-        (define (name=? n1 n2)
-          (unless (eq? n1 n2)
-            (raise-user-error 'module-info=? "unequal names, ~a /= ~a" n1 n2)))
+          (define (name=? n1 n2)
+            (unless (eq? n1 n2)
+              (raise-user-error 'module-info=? "unequal names, ~a /= ~a" n1 n2)))
 
-        (define (type=? t1 t2)
-          (if (not t2)
-            (when t1
-              (raise-user-error 'type=? "got type ~a, expected #f" t1))
-            (unless (string=? t1 t2)
-              (raise-user-error 'type=? "got type ~a, expected ~a" t1 t2))))
+          (define (type=? t1 t2)
+            (if (not t2)
+              (when t1
+                (raise-user-error 'type=? "got type ~a, expected #f" t1))
+              (unless (string=? t1 t2)
+                (raise-user-error 'type=? "got type ~a, expected ~a" t1 t2))))
 
-        (define (field-info=? actual expected)
-          (and (name=? (field-info-name actual) (field-info-name expected))
-               (type=? (field-info-type actual) (field-info-type expected))))
+          (define (field-info=? actual expected)
+            (and (name=? (field-info-name actual) (field-info-name expected))
+                 (type=? (field-info-type actual) (field-info-type expected))))
 
-        (define (module-info=? actual expected)
-          (and (name=? (module-info-name actual) (module-info-name expected))
-               (map function-info=? (module-info-function* actual) (module-info-function* expected))
-               (map class-info=? (module-info-class* actual) (module-info-class* expected))))
+          (define (module-info=? actual expected)
+            (and (name=? (module-info-name actual) (module-info-name expected))
+                 (map function-info=? (module-info-function* actual) (module-info-function* expected))
+                 (map class-info=? (module-info-class* actual) (module-info-class* expected))))
 
-        (define (function-info=? actual expected)
-          (and (name=? (function-info-name actual) (function-info-name expected))
-               (map field-info=? (function-info-dom* actual) (function-info-dom* expected))
-               (type=? (function-info-cod actual) (function-info-cod expected))))
+          (define (function-info=? actual expected)
+            (and (name=? (function-info-name actual) (function-info-name expected))
+                 (map field-info=? (function-info-dom* actual) (function-info-dom* expected))
+                 (type=? (function-info-cod actual) (function-info-cod expected))))
 
-        (define (class-info=? actual expected)
-          (and (name=? (class-info-name actual) (class-info-name expected))
-               (if (not (class-info-field* expected))
-                 (when (class-info-field* actual)
-                   (raise-user-error 'class-info=? "got fields, did not expect fields ~a" actual))
-                 (map field-info=? (class-info-field* actual) (class-info-field* expected)))
-               (map function-info=? (class-info-method* actual) (class-info-method* expected))))
+          (define (class-info=? actual expected)
+            (and (name=? (class-info-name actual) (class-info-name expected))
+                 (if (not (class-info-field* expected))
+                   (when (class-info-field* actual)
+                     (raise-user-error 'class-info=? "got fields, did not expect fields ~a" actual))
+                   (map field-info=? (class-info-field* actual) (class-info-field* expected)))
+                 (map function-info=? (class-info-method* actual) (class-info-method* expected))))
 
-        (check module-info=?
-          mi-sloc
-          (module-info 'sloc-example
-            (list
-              (function-info 'f
-                (list (field-info 'x #f))
-                #f))
-            (list)))
+          (check module-info=?
+            mi-sloc
+            (module-info 'sloc-example
+              (list
+                (function-info 'f
+                  (list (field-info 'x #f))
+                  #f))
+              (list)))
 
-        (check module-info=?
-          mi-parse
-          (module-info 'parse-example
-            (list
-              (function-info 'untyped_function
-                (list (field-info 'x #f) (field-info 'y #f))
-                #f)
-              (function-info 'typed_function
-                (list (field-info 'x "int") (field-info 'y "List(Void)"))
-                "Int")
-              (function-info 'gradual_function
-                (list (field-info 'x "int") (field-info 'y #f))
-                #f))
-            (list
-              (class-info 'without_fields
-                #f
-                (list
-                  (function-info 'untyped_method
-                    (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
-                    #f)
-                  (function-info 'typed_method
-                    (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
-                    "Int")
-                  (function-info 'gradual_method
-                    (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
-                    #f)))
-              (class-info 'with_fields
-                (list (field-info 'f1 "List(List(Int))"))
-                (list (function-info '__init__
-                        (list (field-info 'self "with_fields"))
-                        #f)
-                      (function-info 'm
-                        (list (field-info 'self "with_fields")
-                              (field-info 'x "int"))
-                        "int"))))))
-      )
+          (check module-info=?
+            mi-parse
+            (module-info 'parse-example
+              (list
+                (function-info 'untyped_function
+                  (list (field-info 'x #f) (field-info 'y #f))
+                  #f)
+                (function-info 'typed_function
+                  (list (field-info 'x "int") (field-info 'y "List(Void)"))
+                  "Int")
+                (function-info 'gradual_function
+                  (list (field-info 'x "int") (field-info 'y #f))
+                  #f))
+              (list
+                (class-info 'without_fields
+                  #f
+                  (list
+                    (function-info 'untyped_method
+                      (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
+                      #f)
+                    (function-info 'typed_method
+                      (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
+                      "Int")
+                    (function-info 'gradual_method
+                      (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
+                      #f)))
+                (class-info 'with_fields
+                  (list (field-info 'f1 "List(List(Int))"))
+                  (list (function-info '__init__
+                          (list (field-info 'self "with_fields"))
+                          #f)
+                        (function-info 'm
+                          (list (field-info 'self "with_fields")
+                                (field-info 'x "int"))
+                          "int"))))))
+        )
 
-      (test-case "python-info->module*"
-        (check-equal? (python-info->module* py-sloc) '("sloc-example.py"))
-        (check-equal? (python-info->module* py-parse) '("parse-example.py")))
+        (test-case "python-info->module*"
+          (check-equal? (python-info->module* py-sloc) '("sloc-example.py"))
+          (check-equal? (python-info->module* py-parse) '("parse-example.py")))
 
-      (test-case "python-info->num-modules"
-        (check-equal? (python-info->num-modules py-sloc) 1)
-        (check-equal? (python-info->num-modules py-parse) 1))
+        (test-case "python-info->num-modules"
+          (check-equal? (python-info->num-modules py-sloc) 1)
+          (check-equal? (python-info->num-modules py-parse) 1))
 
-      (test-case "python-info->function*"
-        (check-equal? (python-info->function* py-sloc) '("f"))
-        (check-equal? (python-info->function* py-parse)
-                      '("untyped_function" "typed_function" "gradual_function")))
+        (test-case "python-info->function*"
+          (check-equal? (python-info->function* py-sloc) '("f"))
+          (check-equal? (python-info->function* py-parse)
+                        '("untyped_function" "typed_function" "gradual_function")))
 
-      (test-case "python-info->num-functions"
-        (check-equal? (python-info->num-functions py-sloc) 1)
-        (check-equal? (python-info->num-functions py-parse) 3))
+        (test-case "python-info->num-functions"
+          (check-equal? (python-info->num-functions py-sloc) 1)
+          (check-equal? (python-info->num-functions py-parse) 3))
 
-      (test-case "python-info->class*"
-        (check-equal? (python-info->class* py-sloc) '())
-        (check-equal? (python-info->class* py-parse) '("without_fields" "with_fields")))
+        (test-case "python-info->class*"
+          (check-equal? (python-info->class* py-sloc) '())
+          (check-equal? (python-info->class* py-parse) '("without_fields" "with_fields")))
 
-      (test-case "python-info->num-classes"
-        (check-equal? (python-info->num-classes py-sloc) 0)
-        (check-equal? (python-info->num-classes py-parse) 2))
+        (test-case "python-info->num-classes"
+          (check-equal? (python-info->num-classes py-sloc) 0)
+          (check-equal? (python-info->num-classes py-parse) 2))
 
-      (test-case "python-info->method*"
-        (check-equal? (python-info->method* py-sloc) '())
-        (check-equal? (python-info->method* py-parse)
-                      '("untyped_method" "typed_method" "gradual_method" "__init__" "m")))
+        (test-case "python-info->method*"
+          (check-equal? (python-info->method* py-sloc) '())
+          (check-equal? (python-info->method* py-parse)
+                        '("untyped_method" "typed_method" "gradual_method" "__init__" "m")))
 
-      (test-case "python-info->num-methods"
-        (check-equal? (python-info->num-methods py-sloc) 0)
-        (check-equal? (python-info->num-methods py-parse) 5))
+        (test-case "python-info->num-methods"
+          (check-equal? (python-info->num-methods py-sloc) 0)
+          (check-equal? (python-info->num-methods py-parse) 5))
 
-      (test-case "python-info->domain*"
-        (check-equal? (python-info->domain* py-sloc) (list (list (field-info 'x #f))))
-        (check-equal?
-          (python-info->domain* py-parse)
-          (list (list (field-info 'x #f) (field-info 'y #f))
-                (list (field-info 'x "int") (field-info 'y "List(Void)"))
-                (list (field-info 'x "int") (field-info 'y #f))
-                (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
-                (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
-                (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
-                (list (field-info 'self "with_fields"))
-                (list (field-info 'self "with_fields") (field-info 'x "int")))))
+        (test-case "python-info->domain*"
+          (check-equal? (python-info->domain* py-sloc) (list (list (field-info 'x #f))))
+          (check-equal?
+            (python-info->domain* py-parse)
+            (list (list (field-info 'x #f) (field-info 'y #f))
+                  (list (field-info 'x "int") (field-info 'y "List(Void)"))
+                  (list (field-info 'x "int") (field-info 'y #f))
+                  (list (field-info 'self #f) (field-info 'x #f) (field-info 'y #f))
+                  (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y "List(Void)"))
+                  (list (field-info 'self "without_fields") (field-info 'x "int") (field-info 'y #f))
+                  (list (field-info 'self "with_fields"))
+                  (list (field-info 'self "with_fields") (field-info 'x "int")))))
 
-      (test-case "python-info->num-parameters"
-        (check-equal? (python-info->num-parameters py-sloc) 1)
-        (check-equal? (python-info->num-parameters py-parse) 18))
+        (test-case "python-info->num-parameters"
+          (check-equal? (python-info->num-parameters py-sloc) 1)
+          (check-equal? (python-info->num-parameters py-parse) 18))
 
-      (test-case "python-info->return*"
-        (check-equal? (python-info->return* py-sloc) '(#f))
-        (check-equal? (python-info->return* py-parse) '(#f "Int" #f #f "Int" #f #f "int")))
+        (test-case "python-info->return*"
+          (check-equal? (python-info->return* py-sloc) '(#f))
+          (check-equal? (python-info->return* py-parse) '(#f "Int" #f #f "Int" #f #f "int")))
 
-      (test-case "python-info->num-returns"
-        (check-equal? (python-info->num-returns py-sloc) 1)
-        (check-equal? (python-info->num-returns py-parse) 8))
+        (test-case "python-info->num-returns"
+          (check-equal? (python-info->num-returns py-sloc) 1)
+          (check-equal? (python-info->num-returns py-parse) 8))
 
-      (test-case "python-info->field*"
-        (check-equal? (python-info->field* py-sloc) '())
-        (check-equal? (python-info->field* py-parse) (list (field-info 'f1 "List(List(Int))"))))
+        (test-case "python-info->field*"
+          (check-equal? (python-info->field* py-sloc) '())
+          (check-equal? (python-info->field* py-parse) (list (field-info 'f1 "List(List(Int))"))))
 
-      (test-case "python-info->num-fields"
-        (check-equal? (python-info->num-fields py-sloc) 0)
-        (check-equal? (python-info->num-fields py-parse) 1))
+        (test-case "python-info->num-fields"
+          (check-equal? (python-info->num-fields py-sloc) 0)
+          (check-equal? (python-info->num-fields py-parse) 1))
 
-      (test-case "python-info->all-types"
-        (check-equal? (python-info->all-types py-sloc) (list->set '(#f)))
-        (check-equal? (python-info->all-types py-parse) (list->set '(#f "int" "without_fields" "with_fields" "List(Void)" "List(List(Int))" "Int"))))
+        (test-case "python-info->all-types"
+          (check-equal? (python-info->all-types py-sloc) (list->set '(#f)))
+          (check-equal? (python-info->all-types py-parse) (list->set '(#f "int" "without_fields" "with_fields" "List(Void)" "List(List(Int))" "Int"))))
 
-      (test-case "python-info->num-types"
-        (check-equal? (python-info->num-types py-sloc) 1)
-        (check-equal? (python-info->num-types py-parse) 10))
-      ))
-
+        (test-case "python-info->num-types"
+          (check-equal? (python-info->num-types py-sloc) 1)
+          (check-equal? (python-info->num-types py-parse) 10))
+        ))
+  )
 )

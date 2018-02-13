@@ -222,9 +222,11 @@
 (module+ test
   (require rackunit (only-in scribble/core table?))
 
-  (test-case "render-table"
-    (check-pred table? (render-static-information (list (->benchmark-info 'futen))))
-  )
+  (define CI? (getenv "CI"))
+
+  (unless CI?
+    (test-case "render-table"
+      (check-pred table? (render-static-information (list (->benchmark-info 'futen))))))
 )
 
 ;(module+ main

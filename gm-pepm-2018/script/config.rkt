@@ -100,16 +100,16 @@
 (module+ test
   (require rackunit)
 
-  (define home (retic-performance-home-dir))
+  (define CI? (getenv "CI"))
 
-  (test-case "home-dir"
-    (check-pred directory-exists? home))
-
-  (test-case "is-benchmark-directory?"
-    (define futen (build-path (retic-performance-benchmarks-dir home) "futen"))
-    (check-true (is-benchmark-directory? futen))
-    (check-false (is-benchmark-directory? home)))
-
-  (test-case "benchmark-dir->name"
-    (check-equal? (benchmark-dir->name "foo/bar/baz/") 'baz))
+  (unless CI?
+    (define home (retic-performance-home-dir))
+    (test-case "home-dir"
+      (check-pred directory-exists? home))
+    (test-case "is-benchmark-directory?"
+      (define futen (build-path (retic-performance-benchmarks-dir home) "futen"))
+      (check-true (is-benchmark-directory? futen))
+      (check-false (is-benchmark-directory? home)))
+    (test-case "benchmark-dir->name"
+      (check-equal? (benchmark-dir->name "foo/bar/baz/") 'baz)))
 )

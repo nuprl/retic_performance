@@ -5,7 +5,7 @@
 @(define RT (get-ratios-table MAIN-BENCHMARKS))
 
 @figure["fig:static-benchmark" "Static summary of benchmarks"
-  @render-static-information[MAIN-BENCHMARKS]]
+  (if CI? (elem) @render-static-information[MAIN-BENCHMARKS])]
 
 
 @title[#:tag "sec:evaluation"]{Performance Evaluation}
@@ -94,14 +94,14 @@ The overhead is always within an order-of-magnitude.
 })
 
 @figure["fig:ratio" "Performance ratios"
-  @render-ratios-table[RT]
+  (if CI? (elem) @render-ratios-table[RT])
 ]
 
 
 @section[#:tag "sec:overhead"]{Overhead Plots}
 
 @figure*["fig:overhead" "Overhead plots"
-  @render-overhead-plot*[MAIN-BENCHMARKS]
+  (if CI? (elem) @render-overhead-plot*[MAIN-BENCHMARKS])
 ]
 
 @Figure-ref{fig:overhead} summarizes the overhead of gradual typing in the
@@ -209,7 +209,7 @@ Unfortunately, this speedup is due to a soundness bug;@note{Bug report: @url{htt
 @section[#:tag "sec:exact"]{Absolute Running Times}
 
 @figure*["fig:exact" "Running time (in seconds) vs. Number of typed components"
-  @render-exact-runtime-plot*[MAIN-BENCHMARKS]
+  (if CI? (elem) @render-exact-runtime-plot*[MAIN-BENCHMARKS])
 ]
 
 Since changing the type annotations in a Reticulated program changes its

@@ -313,6 +313,8 @@
   ratios-row-retic/python
   ratios-row-typed/retic
   ratios-row-typed/python
+
+  CI?
 )
 
 (require
@@ -747,25 +749,28 @@
 
   ;; ------------------------------------------------------------------
 
-  (test-case "all-benchmarks"
-    (check set=?
-      (map benchmark->name EXHAUSTIVE-BENCHMARKS)
-      '(futen http2 slowSHA call_method call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
-    (check set=?
-      (map benchmark->name (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))
-      '(futen slowSHA chaos pystone Espionage PythonFlow sample_fsm aespython stats)))
+  (unless CI?
+    (test-case "all-benchmarks"
+      (check set=?
+        (map benchmark->name EXHAUSTIVE-BENCHMARKS)
+        '(futen http2 slowSHA call_method call_simple chaos fannkuch float go meteor nbody nqueens pidigits pystone spectralnorm Espionage PythonFlow take5))
+      (check set=?
+        (map benchmark->name (append VALIDATE-BENCHMARKS SAMPLE-BENCHMARKS))
+        '(futen slowSHA chaos pystone Espionage PythonFlow sample_fsm aespython stats))))
 
-  (test-case "partitioning benchmarks"
-    (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 18)
-    (check-equal? NUM-VALIDATE-SAMPLES 6)
-    (check-equal? NUM-NEW-SAMPLES 3))
+  (unless CI?
+    (test-case "partitioning benchmarks"
+      (check-equal? NUM-EXHAUSTIVE-BENCHMARKS 18)
+      (check-equal? NUM-VALIDATE-SAMPLES 6)
+      (check-equal? NUM-NEW-SAMPLES 3)))
 
-  (test-case "->benchmark"
-    (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))
-    (check-exn #rx"the name of a benchmark"
-      (λ () (->benchmark 'zeina)))
-    (check-exn #rx"string?"
-      (λ () (->benchmark 8))))
+  (unless CI?
+    (test-case "->benchmark"
+      (check-equal? (car SAMPLE-BENCHMARKS) (->benchmark (benchmark->name (car SAMPLE-BENCHMARKS))))
+      (check-exn #rx"the name of a benchmark"
+        (λ () (->benchmark 'zeina)))
+      (check-exn #rx"string?"
+        (λ () (->benchmark 8)))))
 
   (test-case "authors"
     (check-exn exn:fail:contract?
@@ -774,8 +779,9 @@
     (check-equal? (authors "a" "b") (list "a" " and " "b"))
     (check-equal? (authors "a" "b" "c") (list "a" ", " "b" ", and " "c")))
 
-  (test-case "percent-slower-than-typed"
-    (check-equal? (percent-slower-than-typed "spectralnorm") 38))
+  (unless CI?
+    (test-case "percent-slower-than-typed"
+      (check-equal? (percent-slower-than-typed "spectralnorm") 38)))
 
   (test-case "remove-prefix"
     (check-equal?

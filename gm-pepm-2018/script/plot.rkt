@@ -683,23 +683,26 @@
   ;; - make ticks? also weird output format
   ;; - add legend? ditto idk what besides comparing argb pixels
 
-  (test-case "deliverable-counter"
-    (define (check-deliverable-counter/cache bm-name)
-      (define pi (benchmark->performance-info (->benchmark-info bm-name)))
-      (define f0 (make-simple-deliverable-counter pi))
-      (define f1 (make-deliverable-counter pi))
-      (define seq (linear-seq 1 (*OVERHEAD-MAX*) (*OVERHEAD-SAMPLES*)))
-      (define-values [v*0 t0]
-        (force/cpu-time (λ () (map f0 seq))))
-      (define-values [v*1 t1]
-        (force/cpu-time (λ () (map f1 seq))))
-      (check-equal? v*0 v*1)
-      (check < t1 t0)
-      (void))
+  (define CI? (getenv "CI"))
 
-    ;; Maybe want to put a time limit on this. For me it's like 20 seconds, I don't mind --ben
-    (check-deliverable-counter/cache 'PythonFlow)
-    (check-deliverable-counter/cache 'call_simple)
-  )
+  (unless CI?
+    (test-case "deliverable-counter"
+      (define (check-deliverable-counter/cache bm-name)
+        (define pi (benchmark->performance-info (->benchmark-info bm-name)))
+        (define f0 (make-simple-deliverable-counter pi))
+        (define f1 (make-deliverable-counter pi))
+        (define seq (linear-seq 1 (*OVERHEAD-MAX*) (*OVERHEAD-SAMPLES*)))
+        (define-values [v*0 t0]
+          (force/cpu-time (λ () (map f0 seq))))
+        (define-values [v*1 t1]
+          (force/cpu-time (λ () (map f1 seq))))
+        (check-equal? v*0 v*1)
+        (check < t1 t0)
+        (void))
+
+      ;; Maybe want to put a time limit on this. For me it's like 20 seconds, I don't mind --ben
+      (check-deliverable-counter/cache 'PythonFlow)
+      (check-deliverable-counter/cache 'call_simple)
+    ))
 
 )
