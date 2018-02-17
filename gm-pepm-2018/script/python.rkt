@@ -484,13 +484,12 @@
   (define-runtime-path Espionage-dir "../../benchmarks/Espionage")
   (define-runtime-path futen-dir "../../benchmarks/futen")
 
-  (define py-Espionage (benchmark-dir->python-info Espionage-dir))
-  (define py-futen (benchmark-dir->python-info futen-dir))
-
   (define CI? (getenv "CI"))
 
   ;; -------------------------------------------------------
   (unless CI?
+    (define py-Espionage (benchmark-dir->python-info Espionage-dir))
+    (define py-futen (benchmark-dir->python-info futen-dir))
 
     (test-case "python-path?"
       (check-pred python-path? sloc-example)

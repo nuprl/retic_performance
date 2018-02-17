@@ -45,7 +45,8 @@ From left to right, these are:
  the performance of the fully-typed configuration relative to the untyped configuration (the @emph[t/u-ratio]),
  and the overall delta between fully-typed and Python (the @emph[t/p-ratio]).
 
-@(let* ([futen-row (ratios-table-row RT 'futen)]
+@(unless CI?
+  (let* ([futen-row (ratios-table-row RT 'futen)]
         [futen-u/p (ratios-row-retic/python futen-row)]
         [futen-t/u (ratios-row-typed/retic futen-row)]) @elem{
   For example, the row for @bm{futen} reports a @|u/p-ratio| of @${@|futen-u/p|}.
@@ -54,7 +55,7 @@ From left to right, these are:
    average time of running the same code using Python.
   Similarly, the @|t/u-ratio| for @bm{futen} states that the fully-typed configuration
    is @${@|futen-t/u|} times slower than the untyped configuration.
-})
+}))
 
 
 @parag{Conclusions}

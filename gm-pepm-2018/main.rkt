@@ -431,8 +431,10 @@
       (raise-argument-error '->benchmark "the name of a benchmark" x))))
 
 (define (render-benchmark-name str)
-  (define bm (if (benchmark-info? str) str (->benchmark str)))
-  (tt (symbol->string (benchmark->name bm))))
+  (if CI?
+    str
+    (let ([bm (if (benchmark-info? str) str (->benchmark str))])
+      (tt (symbol->string (benchmark->name bm))))))
 
 (define (render-benchmark-names . str*)
   (render-benchmark-names* str*))

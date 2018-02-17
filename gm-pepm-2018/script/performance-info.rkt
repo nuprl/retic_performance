@@ -652,6 +652,8 @@
 
   (define-runtime-path karst-example "./test/karst-example_tab.gz")
 
+  (define CI? (getenv "CI"))
+
   (test-case "benchmark->performance-info:example-data"
     (define karst-example-gunzip (gunzip/cd karst-example))
     (define-values [num-configs configs/module* base-retic typed-retic]
@@ -681,9 +683,10 @@
         (void))
       (void)))
 
-  (test-case "benchmark->performance-info:no-data"
-    (check-pred performance-info?
-      (benchmark->performance-info (->benchmark-info 'stats))))
+  (unless CI?
+    (test-case "benchmark->performance-info:no-data"
+      (check-pred performance-info?
+        (benchmark->performance-info (->benchmark-info 'stats)))))
 
   ;; general correctness/sanity for a real program
   (let* ([bm (->benchmark-info 'Espionage)]
@@ -752,18 +755,19 @@
     (check-exn exn:fail:contract?
       (λ () (string->time* "[1, -2]"))))
 
-  (test-case "samples"
-    (define (check-sample* bm-name)
-      (define pi (benchmark->performance-info (->benchmark-info bm-name)))
-      (define n+s* (performance-info->sample* pi))
-      (define num-configs (car n+s*))
-      (define s* (cdr n+s*))
-      (check-true (< 0 (length s*)) "positive number of sample files")
-      (define count* (map count-karst-lines s*))
-      (check-true (apply = num-configs count*))
-      (void))
+  (unless CI?
+    (test-case "samples"
+      (define (check-sample* bm-name)
+        (define pi (benchmark->performance-info (->benchmark-info bm-name)))
+        (define n+s* (performance-info->sample* pi))
+        (define num-configs (car n+s*))
+        (define s* (cdr n+s*))
+        (check-true (< 0 (length s*)) "positive number of sample files")
+        (define count* (map count-karst-lines s*))
+        (check-true (apply = num-configs count*))
+        (void))
 
-    (check-sample* 'Espionage))
+      (check-sample* 'Espionage)))
 
   (test-case "count-types"
     (check-apply* count-types
@@ -814,7 +818,7 @@
      ["hello" 4 #\H
       ==> "hellH"]))
 
-  (let ()
+  (unless CI?
     (define futen (->benchmark-info 'futen))
     (define spectralnorm (->benchmark-info 'spectralnorm))
     (define call_method (->benchmark-info 'call_method))
@@ -828,50 +832,61 @@
        [(list futen spectralnorm fannkuch) ==> 23496]))
 
     (test-case "find-speedy-types"
-      (check-apply* find-speedy-types
-       [(list fannkuch)
-        ==> (make-immutable-hash '((fannkuch . ())))]
-       [(list fannkuch spectralnorm)
-        ==> (make-immutable-hash
-              '((fannkuch . ())
-                (spectralnorm . (("10" . "2") ("23" . "21") ("26" . "10")
-                                 ("26" . "18") ("28" . "12") ("28" . "20")
-                                 ("30" . "14") ("30" . "22") ("24" . "8")
-                                 ("24" . "16") ("16" . "0") ("18" . "2")
-                                 ("20" . "4") ("12" . "4") ("8" . "0")
-                                 ("14" . "6") ("22" . "6")))))])))
+      (check-equal?
+        (find-speedy-types (list fannkuch))
+        (make-immutable-hash '((fannkuch . ()))))
+      (let* ([x (find-speedy-types (list fannkuch spectralnorm))]
+             [lex< (lambda (a b) (or (string<? (car a) (car b))
+                                     (and (string=? (car a) (car b))
+                                          (string<? (cdr a) (cdr b)))))]
+             [lex-sort (lambda (x*) (sort x* lex<))])
+        (check-equal? (hash-count x) 2)
+        (check-equal? (hash-ref x 'fannkuch) '())
+        (check-equal?
+          (lex-sort (hash-ref x 'spectralnorm))
+          (lex-sort 
+            '(("10" . "2") ("23" . "21") ("26" . "10")
+              ("26" . "18") ("28" . "12") ("28" . "20")
+              ("30" . "14") ("30" . "22") ("24" . "8")
+              ("24" . "16") ("16" . "0") ("18" . "2")
+              ("20" . "4") ("12" . "4") ("8" . "0")
+              ("14" . "6") ("22" . "6")))))))
 
-  (test-case "has-karst-data"
-    (check-true (performance-info-has-karst-data? (->performance-info 'call_method)))
-    (check-false (performance-info-has-karst-data? (->performance-info 'Evolution))))
+  (unless CI?
+    (test-case "has-karst-data"
+      (check-true (performance-info-has-karst-data? (->performance-info 'call_method)))
+      (check-false (performance-info-has-karst-data? (->performance-info 'Evolution)))))
 
-  (test-case "ratio-for-samples"
-    (define (check-t/p-ratio bm-name)
-      (define pi (->performance-info bm-name))
-      (void ;; assert that `pi` has ONLY sample data
-        (when (performance-info-has-karst-data? pi)
-          (raise-user-error 'check-t/p-ratio "benchmark '~a' has more than just sample data" bm-name))
-        (performance-info->sample* pi))
-      (check-pred typed/python-ratio pi)
-      (void))
-    (check-t/p-ratio 'Evolution))
+  (unless CI?
+    (test-case "ratio-for-samples"
+      (define (check-t/p-ratio bm-name)
+        (define pi (->performance-info bm-name))
+        (void ;; assert that `pi` has ONLY sample data
+          (when (performance-info-has-karst-data? pi)
+            (raise-user-error 'check-t/p-ratio "benchmark '~a' has more than just sample data" bm-name))
+          (performance-info->sample* pi))
+        (check-pred typed/python-ratio pi)
+        (void))
+      (check-t/p-ratio 'Evolution)))
 
-  (test-case "in-configurations/karst"
-    (define pi (->performance-info 'fannkuch))
-    (define x
-      (for/list ([(a b c) (in-configurations pi)])
-        (list a b c)))
-    (check-equal? (length x) 2)
-    (check-equal? (caar x) '(0))
-    (check-equal? (caadr x) '(1)))
+  (unless CI?
+    (test-case "in-configurations/karst"
+      (define pi (->performance-info 'fannkuch))
+      (define x
+        (for/list ([(a b c) (in-configurations pi)])
+          (list a b c)))
+      (check-equal? (length x) 2)
+      (check-equal? (caar x) '(0))
+      (check-equal? (caadr x) '(1))))
 
-  (test-case "in-configurations/sample-data"
-    (define pi (->performance-info 'sample_fsm))
-    (define x
-      (for/list ([(a b c) (in-configurations pi)])
-        (list a b c)))
-    (check-equal? (length x) 1900)
-    (check-equal? (caar x) '(13 0 2 7 7)))
+  (unless CI?
+    (test-case "in-configurations/sample-data"
+      (define pi (->performance-info 'sample_fsm))
+      (define x
+        (for/list ([(a b c) (in-configurations pi)])
+          (list a b c)))
+      (check-equal? (length x) 1900)
+      (check-equal? (caar x) '(13 0 2 7 7))))
 
   (test-case "parse-typed-racket-filename"
     (check-equal? (parse-typed-racket-filename "nepls-2017/src/tr-data/mbta-v6.4-2016-07-25T06:46:31.rktd")
