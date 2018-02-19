@@ -689,37 +689,38 @@
         (benchmark->performance-info (->benchmark-info 'stats)))))
 
   ;; general correctness/sanity for a real program
-  (let* ([bm (->benchmark-info 'Espionage)]
-         [pf (benchmark->performance-info bm)])
-    (test-case "performance-info:spot-check"
-      (check-true (performance-info? pf))
-      (check <= (performance-info-python-runtime pf) (performance-info-untyped-runtime pf))
-      (let* ([lo (min-overhead pf)]
-             [hi (max-overhead pf)]
-             [avg (mean-overhead pf)]
-             [nc (num-configurations pf)]
-             [d2 ((deliverable 2) pf)]
-             [d3 ((deliverable 3) pf)]
-             [dhi ((deliverable hi) pf)])
-        (check <= lo hi)
-        (check <= lo avg)
-        (check <= avg hi)
-        (check <= d2 nc)
-        (check <= d2 d3)
-        (check-equal? dhi nc)
-        (void)))
+  (unless CI?
+    (let* ([bm (->benchmark-info 'Espionage)]
+           [pf (benchmark->performance-info bm)])
+      (test-case "performance-info:spot-check"
+        (check-true (performance-info? pf))
+        (check <= (performance-info-python-runtime pf) (performance-info-untyped-runtime pf))
+        (let* ([lo (min-overhead pf)]
+               [hi (max-overhead pf)]
+               [avg (mean-overhead pf)]
+               [nc (num-configurations pf)]
+               [d2 ((deliverable 2) pf)]
+               [d3 ((deliverable 3) pf)]
+               [dhi ((deliverable hi) pf)])
+          (check <= lo hi)
+          (check <= lo avg)
+          (check <= avg hi)
+          (check <= d2 nc)
+          (check <= d2 d3)
+          (check-equal? dhi nc)
+          (void)))
 
-    (test-case "quick-stats:spot-check"
-      (define quick-stats-str
-        (let ([sp (open-output-string)])
-          (parameterize ([current-output-port sp])
-            (quick-performance-info 'Espionage))
-          (begin0 (get-output-string sp) (close-output-port sp))))
-      (define m (regexp-match #rx"avg overhead : ([.0-9]+)\n" quick-stats-str))
-      (check-true (pair? m))
-      (check-equal? (string->number (cadr m)) (mean-overhead pf))
-      (void))
-  )
+      (test-case "quick-stats:spot-check"
+        (define quick-stats-str
+          (let ([sp (open-output-string)])
+            (parameterize ([current-output-port sp])
+              (quick-performance-info 'Espionage))
+            (begin0 (get-output-string sp) (close-output-port sp))))
+        (define m (regexp-match #rx"avg overhead : ([.0-9]+)\n" quick-stats-str))
+        (check-true (pair? m))
+        (check-equal? (string->number (cadr m)) (mean-overhead pf))
+        (void))
+    ))
 
   (test-case "typed-configuration?"
     (check-true (typed-configuration? '(0 0 0)))

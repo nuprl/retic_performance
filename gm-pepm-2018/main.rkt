@@ -432,7 +432,7 @@
 
 (define (render-benchmark-name str)
   (if CI?
-    str
+    (format "~a" str)
     (let ([bm (if (benchmark-info? str) str (->benchmark str))])
       (tt (symbol->string (benchmark->name bm))))))
 
@@ -496,7 +496,9 @@
 (define (authors* a*)
   (cond
    [(null? a*)
-    (raise-argument-error 'authors "at least one argument" a*)]
+    (if CI?
+      "" ;; TODO remove this check?
+      (raise-argument-error 'authors "at least one argument" a*))]
    [(null? (cdr a*))
     (car a*)]
    [(null? (cddr a*))
@@ -565,19 +567,21 @@
     descr))
 
 (define exact-runtime-category
-   (let* ([cat-num (box 0)]
-          [get-number (λ ()
-                        (set-box! cat-num (+ (unbox cat-num) 1))
-                        (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
-     (λ (name pre-bm* make-descr)
-       (define bm-name* (map render-benchmark-name pre-bm*))
-       (define perf-type (format "Trend ~a " (get-number)))
-       (elem (bold perf-type)
-             ~ ~
-             (emph "(" name ")") ": "
-             (make-descr (integer->word (length pre-bm*)))
-             "\n"
-             (list "Applies to " (authors* bm-name*) ".")))))
+  (if CI?
+    (λ (name pre-bm* make-descr) "")
+    (let* ([cat-num (box 0)]
+           [get-number (λ ()
+                         (set-box! cat-num (+ (unbox cat-num) 1))
+                         (case (unbox cat-num) [(1) "I"] [(2) "II"] [(3) "III"] [(4) "IV"] [else (error 'get-number)]))])
+      (λ (name pre-bm* make-descr)
+        (define bm-name* (map render-benchmark-name pre-bm*))
+        (define perf-type (format "Trend ~a " (get-number)))
+        (elem (bold perf-type)
+              ~ ~
+              (emph "(" name ")") ": "
+              (make-descr (integer->word (length pre-bm*)))
+              "\n"
+              (list "Applies to " (authors* bm-name*) "."))))))
 
 (define (format-deps dep*)
   (if (null? dep*)

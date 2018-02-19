@@ -195,16 +195,17 @@ This is to be expected, given the @|u/p-ratio|s in @figure-ref{fig:ratio} and th
 })
 
 @(let* ([NOT-tp '(http2 call_method spectralnorm)]
-        [num-tp (- NUM-MAIN-BENCHMARKS (length NOT-tp))]) @elem{
+        [num-tp (- NUM-MAIN-BENCHMARKS (length NOT-tp))]
+        [S-SLOWER (if CI? "" (percent-slower-than-typed "spectralnorm"))]) @elem{
   @Integer->word[num-tp] benchmarks are roughly @deliverable{T}, where @${T} is
    the @|t/p-ratio| listed in @figure-ref{fig:ratio}.
-})
 In these benchmarks, the fully-typed configuration is one of the slowest configurations.
 @;Note that these ratios are typically larger than Typed Racket's typed/untyped ratios@~cite[tfgnvf-popl-2016].
 The notable exception is @bm{spectralnorm}, in which the fully-typed configuration
- runs faster than @${@id[@percent-slower-than-typed{spectralnorm}]\%} of all configurations.
+ runs faster than @${@id[S-SLOWER]\%} of all configurations.
 Unfortunately, this speedup is due to a soundness bug;@note{Bug report: @url{https://github.com/mvitousek/reticulated/issues/36}}
  in short, the implementation of Reticulated does not type-check the contents of tuples.
+})
 
 
 @section[#:tag "sec:exact"]{Absolute Running Times}
