@@ -1,10 +1,5 @@
-plateau
+pepm
 ===
-
-**Deadline: 2017-08-01**
-
-8 page limit
-
 
 #### How to write a section
 
@@ -22,9 +17,9 @@ If you want more, edit `main.rkt` to provide it.
 
 #### How to build the paper
 
-- _For the first time_ : `make all`
-- _After the first time, for a faster build_: `make`
-- _Just the LaTeX_ : `make tex`
+- For the first time : `make all`
+- After the first time, for a faster build: `make`
+- Just the LaTeX : `make tex`
 
 
 #### Dependencies
