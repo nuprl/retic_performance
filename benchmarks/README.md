@@ -35,3 +35,11 @@ See `../scripts/README.md` for help converting a benchmark to valid Python code.
 ### How to run the benchmarks
 
 See `../scripts/README.md`
+
+
+### History
+
+- `aespython`, `stats`, `futen`, `http2`, and `slowSHA` are based on case study programs reported in: [_Design and Evaluation of Gradual Typing for Python_](https://dl.acm.org/citation.cfm?id=2661101). Michael M. Vitousek, Andrew M. Kent, Jeremy G. Siek, and Jim Baker. DLS 2014.
+- `call_method`, `call_method_slots`, `call_simple`, `chaos`, `fannkuch`, `float`, `go`, `meteor`, `nbody`, `nqueens`, `pidigits`, `pystone`, and `spectralnorm` are based on benchmarks from: [_Big Types in Little Runtime: Open-world Soundness and Collaborative Blame for Gradual Type Systems_](https://dl.acm.org/citation.cfm?id=3009849). Michael M. Vitousek, Cameron Swords, and Jeremy G. Siek. POPL 2017.
+- `take5` and `sample_fsm` are inspired by Racket benchmarks: <https://github.com/bennn/gtp-benchmarks>
+  **NOTE**: the performance of these Reticulated benchmarks is not directly comparable to the performance of the Racket benchmarks.
