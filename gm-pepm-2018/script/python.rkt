@@ -252,7 +252,7 @@
   (define-values [_base name _mbd] (split-path ps))
   (define m* (glob (build-path ps "*.py")))
   (if (null? m*)
-    (raise-user-error 'directory->python-info "directory ~a has no Python files")
+    (raise-user-error 'directory->python-info "directory ~a has no Python files" ps)
     (python-info name (map path-string->module-info m*))))
 
 (define (path-string->python-info ps)
