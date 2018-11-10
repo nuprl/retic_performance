@@ -6,7 +6,7 @@ pepm
 Begin every `.scrbl` file with the language:
 
 ```
-#lang gm-plateau-2017
+#lang gm-pepm-2018
 ```
 
 This language imports every library you need to start writing a Scribble

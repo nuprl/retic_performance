@@ -807,12 +807,12 @@
 (module+ test ;; These tests are slow
   (require
     racket/set
-    (only-in gm-plateau-2017/script/benchmark-info
+    (only-in gm-pepm-2018/script/benchmark-info
       benchmark-info->python-info)
-    (only-in gm-plateau-2017/script/python
+    (only-in gm-pepm-2018/script/python
       python-info->all-types
       python-info->num-types)
-    (only-in gm-plateau-2017/script/performance-info
+    (only-in gm-pepm-2018/script/performance-info
       benchmark->performance-info
       untyped/python-ratio
       typed/retic-ratio

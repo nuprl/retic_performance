@@ -19,10 +19,11 @@
   plot/utils
   slideshow/code
   slideshow/text
-  with-cache)
-#;(require ; for the cache
-  gm-plateau-2017/script/benchmark-info
-  gm-plateau-2017/script/performance-info)
+  racket/serialize)
+#;(require ; for building the cache
+  with-cache
+  gm-pepm-2018/script/benchmark-info
+  gm-pepm-2018/script/performance-info)
 
 ;; =============================================================================
 
@@ -155,7 +156,10 @@
   tr-worst-case)
 
 (define performance-data
-  (with-cache (build-path PWD "with-cache" "performance.rktd")
+  (with-input-from-file (build-path PWD "with-cache" "performance.rktd")
+    (lambda ()
+      (deserialize (cdr (read)))))
+  #;(with-cache (build-path PWD "with-cache" "performance.rktd")
     #:fasl? #f
     #:keys #f
     (lambda () (error 'die))
@@ -766,7 +770,7 @@
   (require
     rackunit
     (prefix-in dls:
-      (only-in gm-plateau-2017
+      (only-in gm-pepm-2018
         NUM-EXHAUSTIVE-BENCHMARKS)))
 
   (test-case "constants"
