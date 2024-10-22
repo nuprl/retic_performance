@@ -1,6 +1,6 @@
 # retic_performance
 
-Performance evaluation for [Reticulated Python](https://github.com/mvitousek/reticulated) commit [e478343](https://github.com/mvitousek/reticulated/commit/e478343).
+Performance evaluation for [Reticulated Python](https://github.com/mvitousek/reticulated) commit [`e478343`](https://github.com/mvitousek/reticulated/commit/e478343).
 
 ### Summary
 
@@ -12,3 +12,5 @@ Performance evaluation for [Reticulated Python](https://github.com/mvitousek/ret
 - `script/` data processing scripts
 
 For more info, see the `README.md` files in each folder.
+
+Thank you Senxi Li for discovering that Reticulated made big changes between commit `e478343` and the present. The latest version cannot run these benchmarks as-is because it requires types on all imports. It also optimizes transient code using the strategy from [Vitousek, Siek, Chaudhuri DLS 2019](https://dl.acm.org/doi/10.1145/3359619.3359742).
