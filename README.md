@@ -1,7 +1,6 @@
 # retic_performance
 
-Performance evaluation for [Reticulated Python](https://github.com/mvitousek/reticulated)
-
+Performance evaluation for [Reticulated Python](https://github.com/mvitousek/reticulated) commit [e478343](https://github.com/mvitousek/reticulated/commit/e478343).
 
 ### Summary
 
