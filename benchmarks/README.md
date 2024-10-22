@@ -18,6 +18,8 @@ The files under `both` are this input.
 
 ### How to Test-Run a Benchmark
 
+Install [Reticulated commit `e478343`](https://github.com/mvitousek/reticulated/commit/e478343).
+
 ```
 $ cp -r typed/ test-run/
 $ cp -r both/* test-run/.
